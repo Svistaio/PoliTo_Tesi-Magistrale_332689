@@ -23,19 +23,19 @@ with ZF(zipPath) as z:
     b = z.read("elencom91.xls")  # Extract raw bytes from «elencom91.xls»
 
 
-streamXLS = bio(b)  # Creates a binary stream in RAM from the bytes «b»
-df = pd.read_excel( # Reads the Excel content
+streamXLS = bio(b)  # Create a binary stream in RAM from the bytes «b»
+df = pd.read_excel( # Read the Excel content
     streamXLS,      # from «streamXLS»
-    dtype=str,      # treatig columns as strings
+    dtype=str,      # treating columns as strings
     engine="xlrd",  # using «xlrd»
     sheet_name=0    # for only the first worksheet
 ) # «df» stands for «DataFrame» from «pandas.DataFrame»
-streamCSV = sio()   # Allocates a text buffer in RAM that behaves like a writable text file (UTF-8 encoding)
-df.to_csv(          # Serializes «df» as CSV
+streamCSV = sio()   # Allocate a text buffer in RAM that behaves like a writable text file (UTF-8 encoding)
+df.to_csv(          # Serialize «df» as CSV
     streamCSV,      # into «streamCSV» and
     index=False     # without the DataFrame’s row numbers
 )
-streamCSV.seek(0)   # Resets the text buffer cursor to the start so it can be read from the beginning
+streamCSV.seek(0)   # Reset the text buffer cursor to the start so it can be read from the beginning
 
 
 # Dictionary and number of the major municipalities
@@ -45,7 +45,7 @@ dicMun2Reg = {}
 gI = 0
 
 reader = csv.reader(streamCSV)
-next(reader)  # skip header line containing metadata labels
+next(reader)  # Skip header line containing metadata labels
 for row in reader:
     try: # If the code is not empty
         codeReg = int(row[0])
