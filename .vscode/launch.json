@@ -8,7 +8,8 @@
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "program": "${workspaceFolder}/Codice/main.py", // https://stackoverflow.com/questions/74051616/how-do-i-make-visual-studio-code-always-run-the-main-python-file-when-the-run-bu
+            // "program": "${file}",
             // "console": "integratedTerminal", // Open «Terminal» when debugging
             "console": "internalConsole",       // Open «Debug Console» when debugging 
             "internalConsoleOptions": "openOnSessionStart",            
