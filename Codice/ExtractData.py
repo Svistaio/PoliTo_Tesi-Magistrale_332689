@@ -93,13 +93,14 @@ adjacencyMReg = {
 
 with ZF(zipPath) as z, z.open("Pen_91It.txt") as f:
     for line in tiow(f,encoding="utf-8"):
-        oMun = line[:6]    # Origin municipality
-        dMun = line[11:17] # Destination municipality
+        oMun = line[:6]         # Origin municipality
+        dMun = line[11:17]      # Destination municipality
+        eWgt = int(line[17:-1]) # Edge weight (commuters)
         if oMun != dMun and ' ' not in dMun: # and ' ' not in oMun
             try:
                 oReg = dicMun2Reg[oMun] # Origin region
                 dReg = dicMun2Reg[dMun] # Destination region
-                if oReg == dReg:
+                if oReg == dReg: # and eWgt!=0
                     oI = dicReg2Mun[oReg][oMun][2] # [Local] origin index
                     dI = dicReg2Mun[dReg][dMun][2] # [Local] destination index
                     adjacencyMReg[oReg][oI,dI] = 1
