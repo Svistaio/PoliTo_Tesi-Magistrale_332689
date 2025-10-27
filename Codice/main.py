@@ -4,8 +4,14 @@ import libAnalyseNetwork as libAN
 importlib.reload(libAN)
 import libExtractData as libED
 importlib.reload(libED)
+import libMASKineticTheory as libKT
+importlib.reload(libKT)
 
 import numpy as np
+
+
+
+### Network section ###
 
 # zipPath = "../Dati/matriciPendolarismo1991.zip"
 # libED.ExtractAdjacencyMatrices(zipPath)
@@ -15,7 +21,7 @@ A, W = libED.ReadAdjacencyMatrices(
     "20AdjacencyMatrixSardegna.txt",
     "20WeightedAdjacencyMatrixSardegna.txt"
 )
-
+N = A.shape[0]
 
 # Degrees
 di = np.sum(A,axis=0) # Vectors of degrees
@@ -48,3 +54,15 @@ sk, sNk = np.unique(si,return_counts=True)
 
 # plt.show()
 # mpld3.show()
+
+
+
+### Kinetic section ###
+
+# popSard = 1600000 # Sardinia population in 1991
+
+# dt = 1e-2
+# Nt = 2e4
+
+# libKT.Initialize(popSard)
+# libKT.MonteCarlo()
