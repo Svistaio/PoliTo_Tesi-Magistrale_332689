@@ -11,6 +11,13 @@ import csv
 import numpy as np
 
 
+def Save2Zip(M,path,z):
+    buf = sio()
+    np.savetxt(buf,M,fmt="%d",delimiter=",")
+    data = buf.getvalue()
+    z.writestr(path,data)
+
+
 def ExtractAdjacencyMatrices(zipFile):
     # Conversion of «elencom91.xls» from the old format .xls to a more modern .csv 
     with ZF(zipFile) as z:
@@ -77,11 +84,15 @@ def ExtractAdjacencyMatrices(zipFile):
     ]
     dicReg = {i:r for i,r in enumerate(regList,start=1)}
 
-    adjacencyMIt  = np.zeros((gI,gI))
-    adjacencyMReg = {
-        k:np.zeros((dicReg2Mun[k]['lI'],dicReg2Mun[k]['lI']),dtype=int)
+    # 0: Adjacency matrix
+    # 1: Weighted adjacency matrix
+    matricesIt  = np.zeros((2,gI,gI))
+    matricesReg = {
+        k:np.zeros((2,dicReg2Mun[k]['lI'],dicReg2Mun[k]['lI']),dtype=int)
         for k in dicReg2Mun
     }
+
+    temp = 0
 
     with ZF(zipFile) as z, z.open("Pen_91It.txt") as f:
         for line in tiow(f,encoding="utf-8"):
@@ -90,19 +101,29 @@ def ExtractAdjacencyMatrices(zipFile):
             eWgt = int(line[17:-1]) # Edge weight (commuters)
 
             if oMun != dMun and ' ' not in dMun: # and ' ' not in oMun
+                if eWgt>temp:
+                    temp = eWgt
                 try:
                     oReg = dicMun2Reg[oMun] # Origin region
                     dReg = dicMun2Reg[dMun] # Destination region
 
-                    oI = dicReg2Mun[oReg][oMun][2] # [Local] origin index
-                    dI = dicReg2Mun[dReg][dMun][2] # [Local] destination index
-                    
                     if oReg == dReg: # and eWgt!=0
-                        adjacencyMReg[oReg][oI,dI] = 1
-                        adjacencyMReg[dReg][dI,oI] = 1
+                        oI = dicReg2Mun[oReg][oMun][2] # [Local] origin index
+                        dI = dicReg2Mun[dReg][dMun][2] # [Local] destination index
+                        
+                        matricesReg[oReg][0,oI,dI] = 1
+                        matricesReg[dReg][0,dI,oI] = 1
+                        matricesReg[oReg][1,oI,dI] += eWgt
+                        matricesReg[dReg][1,dI,oI] = matricesReg[oReg][1,oI,dI]
+                        # The sum in «matricesReg[oReg][1,oI,dI] += eWgt» is necessary as there are repeating origin-destination links in the dataset
 
-                    adjacencyMIt[oReg][oI,dI] = 1
-                    adjacencyMIt[dReg][dI,oI] = 1
+                    oI = dicReg2Mun[oReg][oMun][1] # [Global] origin index
+                    dI = dicReg2Mun[dReg][dMun][1] # [Global] destination index
+                        
+                    matricesIt[0,oI,dI] = 1
+                    matricesIt[0,dI,oI] = 1
+                    matricesIt[1,oI,dI] += eWgt
+                    matricesIt[1,dI,oI] = matricesIt[1,oI,dI]
                 except Exception:
                     continue
 
@@ -116,35 +137,31 @@ def ExtractAdjacencyMatrices(zipFile):
         compresslevel=9              # Max compression for «ZIP_DEFLATED»
         # https://docs.python.org/3/library/zipfile.html#zipfile-objects
     ) as z:
-        for i,A in enumerate(adjacencyMReg.values()):
-            buf = sio()
-            np.savetxt(buf,A,fmt="%d",delimiter=",")
-            data = buf.getvalue()
+        for i,M in enumerate(matricesReg.values()):
+            path = (f"{"0" if i<9 else ""}{i+1}"
+                    f"AdjacencyMatrix{regList[i]}.txt")
+            Save2Zip(M[0,:,:],path,z)
 
-            path = ("0" if i<9 else "")+ \
-                str(i+1)+ \
-                "AdjacencyMatrix"+ \
-                regList[i]+ \
-                ".txt"
-            z.writestr(path,data)
+            path = (f"{"0" if i<9 else ""}{i+1}"
+                    f"WeightedAdjacencyMatrix{regList[i]}.txt")
+            Save2Zip(M[1,:,:],path,z)
+
+        Save2Zip(matricesIt[0,:,:],"AdjacencyMatrixIt.txt",z)
+        Save2Zip(matricesIt[1,:,:],"WeightedAdjacencyMatrixIt.txt",z)
+
+
+def SaveMatrixFromZip(z,id):
+    with z.open(id,"r") as f:
+        M = np.loadtxt( # Decodes binary stream as UTF-8 text
+            tiow(f,encoding="utf-8"),
+            delimiter=",",
+            dtype=int
+        )
+    return M
 
 
 def ReadAdjacencyMatrices(zipFile,idA,idW):
-    A = np.array([],dtype=int)
-    W = np.array([],dtype=int)
-
     with ZF(zipFile) as z:
-        with z.open(idA,"r") as f:
-            A = np.loadtxt( # Decodes binary stream as UTF-8 text
-                tiow(f,encoding="utf-8"),
-                delimiter=",",
-                dtype=int
-            )
-        with z.open(idW,"r") as f:
-            W = np.loadtxt( # Decodes binary stream as UTF-8 text
-                tiow(f,encoding="utf-8"),
-                delimiter=",",
-                dtype=int
-            )
-
+        A = SaveMatrixFromZip(z,idA)
+        W = SaveMatrixFromZip(z,idW)
     return A, W
