@@ -7,35 +7,44 @@ importlib.reload(libED)
 
 import numpy as np
 
-# with ZF("../Dati/AdjacencyMatricesIt91.zip") as z:
-#     with z.open("20AdjacencyMatrixSardegna.txt","r") as f:
-#         A = np.loadtxt( # Decodes binary stream as UTF-8 text
-#             tiow(f,encoding="utf-8"),
-#             delimiter=",",
-#             dtype=int
-#         )
-
 # zipPath = "../Dati/matriciPendolarismo1991.zip"
-# libED.ExtractData(zipPath)
+# libED.ExtractAdjacencyMatrices(zipPath)
 
 A, W = libED.ReadAdjacencyMatrices(
-    "../Dati/AdjacencyMatricesIt91.zip"
+    "../Dati/AdjacencyMatricesIt91.zip",
     "20AdjacencyMatrixSardegna.txt",
     "20WeightedAdjacencyMatrixSardegna.txt"
 )
 
-# Vectors of degrees
-d = np.sum(A, axis=0)
-N = len(d) # Number of nodes (normalization factor)
 
+# Degrees
+di = np.sum(A,axis=0) # Vectors of degrees
+dk, Nk = np.unique(di,return_counts=True)
 # Unique degrees and corresponding frequencies
-k, Nk = np.unique(d,return_counts=True)
 # Pk = counts/N
 
-# libAN.DegreeDistributionFig(d,N,k)
-# libAN.ClusteringCoefficientFig(A,d,k,Nk)
-# libAN.AssortativityFig(A,k)
-libAN.BetweennessCentralityFig(A,d)
+# [Nonzero] Weights
+wi = W[W>0]
+wk, wNk = np.unique(wi,return_counts=True)
+# Unique weights and corresponding frequencies
+
+# Strenghts
+si = np.sum(W,axis=0)
+sk, sNk = np.unique(si,return_counts=True)
+# Unique strenghts and corresponding frequencies
+
+# libAN.DegreeDistributionFig(di)
+# libAN.WeightDistributionFig(wi)
+# libAN.StrengthDistributionFig(si)
+
+# libAN.BetweennessCentralityFig(A,di)
+# libAN.StrengthFromDegreeFig(si,di,dk,Nk)
+
+# Ck = libAN.ClusteringCoefficientFig(A,di,dk,Nk)
+# libAN.WeightedClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck)
+
+# knn = libAN.AssortativityFig(A,dk)
+# libAN.WeightedAssortativityFig(W,dk,knn)
 
 # plt.show()
 # mpld3.show()
