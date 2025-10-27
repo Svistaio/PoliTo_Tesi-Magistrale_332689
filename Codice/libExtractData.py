@@ -11,12 +11,8 @@ import csv
 import numpy as np
 
 
-def Save2Zip(M,path,z):
-    buf = sio()
-    np.savetxt(buf,M,fmt="%d",delimiter=",")
-    data = buf.getvalue()
-    z.writestr(path,data)
 
+### Main code ###
 
 def ExtractAdjacencyMatrices(zipFile):
     # Conversion of «elencom91.xls» from the old format .xls to a more modern .csv 
@@ -150,6 +146,23 @@ def ExtractAdjacencyMatrices(zipFile):
         Save2Zip(matricesIt[1,:,:],"WeightedAdjacencyMatrixIt.txt",z)
 
 
+def ReadAdjacencyMatrices(zipFile,idA,idW):
+    with ZF(zipFile) as z:
+        A = SaveMatrixFromZip(z,idA)
+        W = SaveMatrixFromZip(z,idW)
+    return A, W
+
+
+
+### Auxiliary code ###
+
+def Save2Zip(M,path,z):
+    buf = sio()
+    np.savetxt(buf,M,fmt="%d",delimiter=",")
+    data = buf.getvalue()
+    z.writestr(path,data)
+
+
 def SaveMatrixFromZip(z,id):
     with z.open(id,"r") as f:
         M = np.loadtxt( # Decodes binary stream as UTF-8 text
@@ -158,10 +171,3 @@ def SaveMatrixFromZip(z,id):
             dtype=int
         )
     return M
-
-
-def ReadAdjacencyMatrices(zipFile,idA,idW):
-    with ZF(zipFile) as z:
-        A = SaveMatrixFromZip(z,idA)
-        W = SaveMatrixFromZip(z,idW)
-    return A, W
