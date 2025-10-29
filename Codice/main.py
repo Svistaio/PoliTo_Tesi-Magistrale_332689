@@ -21,7 +21,7 @@ A, W = libED.ReadAdjacencyMatrices(
     "20AdjacencyMatrixSardegna.txt",
     "20WeightedAdjacencyMatrixSardegna.txt"
 )
-N = A.shape[0]
+Nn = A.shape[0]
 
 # Degrees
 di = np.sum(A,axis=0) # Vectors of degrees
@@ -59,10 +59,10 @@ sk, sNk = np.unique(si,return_counts=True)
 
 ### Kinetic section ###
 
-# popSard = 1600000 # Sardinia population in 1991
+popSard = 1600000 # Sardinia population in 1991
 
-# dt = 1e-2
-# Nt = 2e4
+dt = 1e-2; Nt = int(2e4)
+l  = 0.2; a = 1
+sigma = 5e-2
 
-# libKT.Initialize(popSard)
-# libKT.MonteCarlo()
+stateCities = libKT.MonteCarlo(popSard,Nn,A,Nt,dt,l,a,sigma)
