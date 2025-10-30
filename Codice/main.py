@@ -21,7 +21,7 @@ A, W = libED.ReadAdjacencyMatrices(
     "20AdjacencyMatrixSardegna.txt",
     "20WeightedAdjacencyMatrixSardegna.txt"
 )
-Nn = A.shape[0]
+Nn = A.shape[0] # Number of nodes
 
 # Degrees
 di = np.sum(A,axis=0) # Vectors of degrees
@@ -39,7 +39,7 @@ si = np.sum(W,axis=0)
 sk, sNk = np.unique(si,return_counts=True)
 # Unique strenghts and corresponding frequencies
 
-# libAN.DegreeDistributionFig(di)
+# libAN.DegreeDistributionFig(di,Nn)
 # libAN.WeightDistributionFig(wi)
 # libAN.StrengthDistributionFig(si)
 
@@ -66,3 +66,4 @@ l  = 0.2; a = 1
 sigma = 5e-2
 
 stateCities = libKT.MonteCarlo(popSard,Nn,A,Nt,dt,l,a,sigma)
+libKT.CityDistributionFig(stateCities.verticesState,Nn)

@@ -9,11 +9,7 @@ import networkx as nx
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
-
-plt.rcParams["mathtext.fontset"] = "stix"
-plt.rcParams["font.family"] = "serif"
-plt.rcParams["font.serif"] = ["Times New Roman"]
-plt.rcParams["font.size"] = 13
+SetTextStyle()
 
 # import tikzplotlib as tikzpl # It's necessary «matplotlib<3.8»
 # tikzpl.save(path)
@@ -27,16 +23,14 @@ import subprocess
 
 ### Main code ###
 
-def DegreeDistributionFig(di):
+def DegreeDistributionFig(di,Nn):
 
     fig = plt.figure()
 
-    N = len(di) # Number of nodes
-
-    kAvr = np.sum(di)/N
+    kAvr = np.sum(di)/Nn
     fig.text(
         0.8,0.25,
-        r"$N$="+f"{N}"+"\n"+\
+        r"$N$="+f"{Nn}"+"\n"+\
         r"$E$="+f"{int(np.sum(di)/2)}"+"\n"+\
         r"$k_{min}$="+f"{np.min(di)}"+"\n"+\
         r"$k_{max}$="+f"{np.max(di)}"+"\n"+\
@@ -130,7 +124,7 @@ def DegreeDistributionFig(di):
 
     # Style
     CentrePlot()
-    SetFigStyle(r"$k$",r"$P(k)$",[0,300],[0,0.03])
+    SetPlotStyle(r"$k$",r"$P(k)$",[0,300],[0,0.03])
     SaveFig(fig,"DegreeDistributionSardegna")
 
 
@@ -196,7 +190,7 @@ def ClusteringCoefficientFig(A,di,dk,Nk):
 
     # Style
     CentrePlot()
-    SetFigStyle(r"$k$",r"$C(k)$",[0,300],[0,0.8])
+    SetPlotStyle(r"$k$",r"$C(k)$",[0,300],[0,0.8])
     SaveFig(fig,"ClusteringCoefficientSardegna")
 
     return Ck
@@ -232,7 +226,7 @@ def AssortativityFig(A,dk):
 
     # Style
     CentrePlot()
-    SetFigStyle(r"$k$",r"$k_{nn}(k)$",[0,300],[40,95])
+    SetPlotStyle(r"$k$",r"$k_{nn}(k)$",[0,300],[40,95])
     SaveFig(fig,"AssortativitySardegna")
 
     return knn
@@ -267,7 +261,7 @@ def BetweennessCentralityFig(A,di):
 
     # Style
     CentrePlot()
-    SetFigStyle(
+    SetPlotStyle(
         r"$k$",r"$g(i)$",
         # [0.5e1,0.5e3],[1,0.5e5],
         xScale="log",yScale="log"
@@ -340,7 +334,7 @@ def WeightDistributionFig(wi):
 
     # Style
     CentrePlot()
-    SetFigStyle(
+    SetPlotStyle(
         r"$w$",r"$P(w)$",
         xScale="log",yScale="log"
     )
@@ -413,7 +407,7 @@ def StrengthDistributionFig(si):
 
     # Style
     CentrePlot()
-    SetFigStyle(
+    SetPlotStyle(
         r"$s$",r"$P(s)$",
         xScale="log",yScale="log"
     )
@@ -476,7 +470,7 @@ def StrengthFromDegreeFig(si,di,dk,Nk):
 
     # Style
     CentrePlot()
-    SetFigStyle(
+    SetPlotStyle(
         r"$k$",r"$s(k)$",
         xScale="log",yScale="log"
     )
@@ -518,7 +512,7 @@ def WeightedClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck):
     )
 
     # Style
-    SetFigStyle(
+    SetPlotStyle(
         r"$k$",r"$C^w(k)$",
         xScale="log",ax=ax[0]
     )
@@ -535,7 +529,7 @@ def WeightedClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck):
     )
 
     # Style
-    SetFigStyle(
+    SetPlotStyle(
         r"$k$",r"$C^w_{\text{rel}}(k)$",
         xScale="log",yScale="log",
         ax=ax[1]
@@ -565,7 +559,7 @@ def WeightedAssortativityFig(W,dk,knn):
     )
 
     # Style
-    SetFigStyle(
+    SetPlotStyle(
         r"$k$",r"$k_{nn}^w(k)$",
         xScale="log",yScale="log",
         ax=ax[0]
@@ -583,7 +577,7 @@ def WeightedAssortativityFig(W,dk,knn):
     )
 
     # Style
-    SetFigStyle(
+    SetPlotStyle(
         r"$k$",r"$k_{nn,rel}^w(k)$",
         xScale="log",yScale="log",
         ax=ax[1]
@@ -617,7 +611,14 @@ def CentrePlot():
     manager.window.geometry(f"+{x}+{y}")
 
 
-def SetFigStyle(
+def SetTextStyle():
+    plt.rcParams["mathtext.fontset"] = "stix"
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams["font.serif"] = ["Times New Roman"]
+    plt.rcParams["font.size"] = 13
+
+
+def SetPlotStyle(
         xLabel=None,yLabel=None,
         xDom=None,yDom=None,
         xScale="linear",yScale="linear",

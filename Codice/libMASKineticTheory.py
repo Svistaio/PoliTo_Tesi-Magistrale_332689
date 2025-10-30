@@ -1,5 +1,14 @@
 import numpy as np
+from scipy.stats import lognorm
+
+import importlib
 from tqdm import tqdm
+
+import libAnalyseNetwork as libAN
+importlib.reload(libAN)
+
+import matplotlib.pyplot as plt
+libAN.SetTextStyle()
 
 
 ### Main code ###
@@ -11,6 +20,74 @@ def MonteCarlo(totP,Nn,A,Nt,dt,l,a,sigma):
         stateCities.updateState(dt,nt)
 
     return stateCities 
+
+
+def CityDistributionFig(cs,Nn):
+    fig = plt.figure()
+
+    csAvr = np.mean(cs)
+    fig.text(
+        0.8,0.25,
+        r"$N$="+f"{Nn}"+"\n"+\
+        r"$s_{min}$="+f"{np.min(cs)}"+"\n"+\
+        r"$s_{max}$="+f"{np.max(cs)}"+"\n"+\
+        r"$\langle s\rangle $="+f"{csAvr}",
+        ha="center",
+        # fontsize=10,
+        color="black"
+    )
+
+
+    # Histogram plot
+    hgPlot = plt.hist(cs,
+        # bins=int(np.mean(d)),
+        bins=25,
+        # bins=60,
+        density=True,
+        color="gray",
+        edgecolor="none", # "black"
+        label="Histogram"
+    )
+
+    # hgPlot[0] = heights,
+    # hgPlot[1] = bin edges,
+    # hgPlot[2] = patches (Rectangle objects)
+
+    # mplcursors.cursor(hgPlot[2],hover=False).connect(
+    #     "add",lambda sel: sel.annotation.set_text(
+    #         "$P^{bin}(k)$="+f"{hgPlot[0][sel.index]:.3f}"
+    #     )
+    # )
+
+    # SciPy fitting (ML)
+    x = np.linspace(0,np.max(cs),500)
+
+    shape, loc, scale = lognorm.fit(cs,floc=0)
+    plt.plot(
+        [csAvr,csAvr],[0,lognorm.pdf(csAvr,shape,loc=loc,scale=scale)],
+        label=r"Mean value $\langle k\rangle$",
+        color="black",
+        linewidth=1,
+        linestyle="--"
+    )
+
+    fPlot = plt.plot(
+        x,lognorm.pdf(x,shape,loc=loc,scale=scale),
+        label="SciPy lognormal fit (ML)", # Maximum likelyhood
+        color="blue",
+        linewidth=1
+    ) # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
+
+    # mplcursors.cursor(fPlot,hover=False).connect(
+    #     "add",lambda sel: sel.annotation.set_text(
+    #         f"k={sel.target[0]:.3f}, LN(k)={sel.target[1]:.3f}"
+    #     )
+    # )
+
+    # Style
+    libAN.CentrePlot()
+    libAN.SetPlotStyle(r"$s$",r"$P(s)$")
+    libAN.SaveFig(fig,"CitySizeDistributionSardegna")
 
 
 ### Auxiliary code ###
