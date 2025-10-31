@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import lognorm
+from scipy.stats import lognorm, linregress, pareto
 
 import importlib
 from tqdm import tqdm
@@ -23,35 +23,23 @@ def MonteCarlo(totP,Nn,A,Nt,dt,l,a,sigma):
 
 
 def CityDistributionFig(cs,Nn):
-    fig = plt.figure()
+    fig, ax = plt.subplots(1,2,figsize=(15,7))
 
-    csAvr = np.mean(cs)
-    fig.text(
-        0.8,0.25,
-        r"$N$="+f"{Nn}"+"\n"+\
-        r"$s_{min}$="+f"{np.min(cs)}"+"\n"+\
-        r"$s_{max}$="+f"{np.max(cs)}"+"\n"+\
-        r"$\langle s\rangle $="+f"{csAvr}",
-        ha="center",
-        # fontsize=10,
-        color="black"
-    )
+    csAvr = np.mean(cs); csSum = np.sum(cs)
+    csMin = np.min(cs); csMax = np.max(cs)
 
+
+    ### Lognormal fit ###
 
     # Histogram plot
-    hgPlot = plt.hist(cs,
-        # bins=int(np.mean(d)),
-        bins=25,
-        # bins=60,
+    hgPlot = ax[0].hist(cs,
+        # bins='auto',
+        bins=30,
         density=True,
         color="gray",
         edgecolor="none", # "black"
         label="Histogram"
     )
-
-    # hgPlot[0] = heights,
-    # hgPlot[1] = bin edges,
-    # hgPlot[2] = patches (Rectangle objects)
 
     # mplcursors.cursor(hgPlot[2],hover=False).connect(
     #     "add",lambda sel: sel.annotation.set_text(
@@ -59,11 +47,8 @@ def CityDistributionFig(cs,Nn):
     #     )
     # )
 
-    # SciPy fitting (ML)
-    x = np.linspace(0,np.max(cs),500)
-
     shape, loc, scale = lognorm.fit(cs,floc=0)
-    plt.plot(
+    ax[0].plot(
         [csAvr,csAvr],[0,lognorm.pdf(csAvr,shape,loc=loc,scale=scale)],
         label=r"Mean value $\langle k\rangle$",
         color="black",
@@ -71,7 +56,8 @@ def CityDistributionFig(cs,Nn):
         linestyle="--"
     )
 
-    fPlot = plt.plot(
+    x = np.linspace(0,np.max(cs),500)
+    fPlot = ax[0].plot(
         x,lognorm.pdf(x,shape,loc=loc,scale=scale),
         label="SciPy lognormal fit (ML)", # Maximum likelyhood
         color="blue",
@@ -85,9 +71,110 @@ def CityDistributionFig(cs,Nn):
     # )
 
     # Style
+    libAN.SetPlotStyle(
+        r"$s$",r"$P(s)$",ax=ax[0],
+        yNotation="sci" # ,xNotation="sci"
+    )
+
+
+    ### Power law fit ###
+
+    # Histogram plot
+    xmin = np.percentile(cs,75)
+    xtail = cs[cs >= xmin]
+    b, loc, scale = pareto.fit(xtail,floc=0,fscale=xmin)  # b≈alpha
+
+    # Empirical CCDF on the tail
+    xs = np.sort(xtail) # Ascending values
+    n = xs.size
+    ccdfEmp = 1.0 - np.arange(1,n+1,dtype=float)/n # P(X≥x)
+
+    # Model CCDF from the fitted Pareto
+    ccdfFit = pareto.sf(xs,b,loc=loc,scale=scale) # Survival function
+
+    ax[1].plot(
+        xs,ccdfEmp,
+        marker="o",
+        linewidth=1,
+        # linestyle="--",
+        linestyle="none",
+        label="Empirical CCDF"
+    )
+    ax[1].plot(
+        xs,ccdfFit,
+        color='blue',
+        label=fr"Pareto fit,$\alpha={b:.2f}$"
+    )
+
+    libAN.SetPlotStyle(
+        r"$s$",ax=ax[1],
+        xScale="log",yScale="log"
+    )
+    
+
+    # hgPlot = ax[1].hist(cs,
+    #     bins=np.logspace(
+    #         np.log10(np.min(cs)),
+    #         np.log10(np.max(cs)),
+    #         40
+    #     ),
+    #     density=True,
+    #     color="gray",
+    #     edgecolor="none", # "black"
+    #     label="Histogram"
+    # )
+
+    # binx = (hgPlot[1][1:]+hgPlot[1][:-1])/2
+    # biny = hgPlot[0]
+
+    # # Select the last quarter of city sizes
+    # f = 1/4; v = binx>=csMin*(1-f)+csMax*f
+
+    # logBinxV = np.log10(binx[v]); logBinyV = np.log10(biny[v])
+    # slope, intercept, _, _, _ = linregress(logBinxV,logBinyV)
+    # regression = 10**(intercept+slope*logBinxV)
+
+    # fPlot = ax[1].plot(
+    #     binx[v],regression,
+    #     label="Regression",
+    #     color="blue",
+    #     linewidth=1
+    # )
+
+
+    fig.text(
+        0.5,0.95,
+        fr"$N$="f"{Nn}\\t"
+        fr"$s_{{min}}$={csMin:.2f}\\t"
+        fr"$s_{{max}}$={csMax:.2f}\\t"
+        fr"$\langle s\rangle $={csAvr:.2f}\\t"
+        fr"$s_{{Sum}}=${csSum:.2f}\\t"
+        fr"$\alpha=${b:.2f}",
+        ha="center",
+        # fontsize=10,
+        color="black"
+    )
+
     libAN.CentrePlot()
-    libAN.SetPlotStyle(r"$s$",r"$P(s)$")
     libAN.SaveFig(fig,"CitySizeDistributionSardegna")
+
+
+def CityAverageFig(ca,Nt,dt):
+    fig = plt.figure()
+
+    timeInterval = np.arange(Nt+1)*dt
+
+    plt.plot(
+        timeInterval,ca,
+        # label=r"etichetta",
+        color="black",
+        linewidth=1,
+    )
+
+    libAN.SetPlotStyle(r"$t$",r"$\langle s\rangle$")
+    libAN.CentrePlot()
+    libAN.SaveFig(fig,"AverageCitySizeSardegna")
+
 
 
 ### Auxiliary code ###
@@ -123,7 +210,7 @@ class networkState:
             # It's assumed node p1(i) is the interacting node while node p2(i) is the receiving one
 
             E = self.E(si,sr); mu = self.mu(E)
-            newState[p1[i]] = si*(1-theta)+theta*si*(1-E+mu)
+            newState[p1[i]] = si*(1-theta)+theta*si*(1-E) # +mu
             newState[p2[i]] = sr*(1-theta)+theta*(sr+si*E)
 
         self.verticesState = newState
