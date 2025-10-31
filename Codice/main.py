@@ -67,3 +67,4 @@ sigma = 5e-2
 
 stateCities = libKT.MonteCarlo(popSard,Nn,A,Nt,dt,l,a,sigma)
 libKT.CityDistributionFig(stateCities.verticesState,Nn)
+libKT.CityAverageFig(stateCities.averageState,Nt,dt)

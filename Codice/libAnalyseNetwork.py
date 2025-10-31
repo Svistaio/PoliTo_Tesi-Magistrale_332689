@@ -9,7 +9,6 @@ import networkx as nx
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
-SetTextStyle()
 
 # import tikzplotlib as tikzpl # It's necessary «matplotlib<3.8»
 # tikzpl.save(path)
@@ -347,7 +346,11 @@ def StrengthDistributionFig(si):
     # Histogram plot
     hgPlot = plt.hist(
         si,
-        bins=np.logspace(np.log10(min(si)),np.log10(max(si)),20),
+        bins=np.logspace(
+            np.log10(min(si)),
+            np.log10(max(si)),
+            20
+        ),
         density=True,
         color="gray",
         edgecolor="none", # "black"
@@ -438,8 +441,7 @@ def StrengthFromDegreeFig(si,di,dk,Nk):
     )
 
     # Fit in log–log space
-    logdk = np.log10(dk)
-    logsk = np.log10(sk)
+    logdk = np.log10(dk); logsk = np.log10(sk)
     slope, intercept, _, _, _ = linregress(logdk,logsk)
     regression = 10**(intercept+slope*logdk)
 
@@ -616,12 +618,14 @@ def SetTextStyle():
     plt.rcParams["font.family"] = "serif"
     plt.rcParams["font.serif"] = ["Times New Roman"]
     plt.rcParams["font.size"] = 13
+SetTextStyle()
 
 
 def SetPlotStyle(
         xLabel=None,yLabel=None,
         xDom=None,yDom=None,
         xScale="linear",yScale="linear",
+        xNotation="plain",yNotation="plain",
         ax=None
     ):
     if ax is None: ax = plt.gca()
@@ -634,6 +638,11 @@ def SetPlotStyle(
 
     ax.set_xscale(xScale)
     ax.set_yscale(yScale)
+
+    if xScale == "linear":
+        plt.ticklabel_format(style=xNotation,axis="x",scilimits=(0,0))
+    if yScale == "linear":
+        plt.ticklabel_format(style=yNotation,axis="y",scilimits=(0,0))
 
     ax.grid(True,linestyle=":",linewidth=1)
     ax.set_axisbelow(True)
