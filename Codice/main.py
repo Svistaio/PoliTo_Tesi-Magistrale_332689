@@ -62,9 +62,9 @@ sk, sNk = np.unique(si,return_counts=True)
 popSard = 1600000 # Sardinia population in 1991
 
 dt = 1e-2; Nt = int(2e4)
-l  = 0.2; a = 1
+l  = .75; a = 1
 sigma = 5e-2
 
 stateCities = libKT.MonteCarlo(popSard,Nn,A,Nt,dt,l,a,sigma)
-libKT.CityDistributionFig(stateCities.verticesState,Nn)
-libKT.CityAverageFig(stateCities.averageState,Nt,dt)
+libKT.CityDistributionFig(stateCities.vtxState,Nn)
+libKT.CityAverageFig(stateCities.avgState,Nt,dt)
