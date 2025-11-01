@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import lognorm, linregress, pareto
+from scipy.stats import lognorm, pareto
 
 import importlib
 from tqdm import tqdm
@@ -25,134 +25,108 @@ def MonteCarlo(totP,Nn,A,Nt,dt,l,a,sigma):
 def CityDistributionFig(cs,Nn):
     fig, ax = plt.subplots(1,2,figsize=(15,7))
 
-    csAvr = np.mean(cs); csSum = np.sum(cs)
-    csMin = np.min(cs); csMax = np.max(cs)
+    labels = ["Ext.","Apx."]
+    colours = ["blue","red"]
+
+    csAvr = np.array((2,1)); csSum = np.array((2,1))
+    csMin = np.array((2,1)); csMax = np.array((2,1))
+
+    for i,k in enumerate(cs):
+        csAvr[i] = np.mean(cs[k]); csSum[i] = np.sum(cs[k])
+        csMin[i] = np.min(cs[k]); csMax[i] = np.max(cs[k])
 
 
-    ### Lognormal fit ###
+        ### Lognormal fit ###
 
-    # Histogram plot
-    hgPlot = ax[0].hist(cs,
-        # bins='auto',
-        bins=30,
-        density=True,
-        color="gray",
-        edgecolor="none", # "black"
-        label="Histogram"
-    )
+        # Histogram plot
+        hgPlot = ax[0].hist(
+            cs[k],
+            # bins='auto',
+            bins=30,
+            density=True,
+            color=colours[i],
+            edgecolor="none", # "black"
+            label=f"{labels[i]} histogram",
+            alpha=0.5
+        )
 
-    # mplcursors.cursor(hgPlot[2],hover=False).connect(
-    #     "add",lambda sel: sel.annotation.set_text(
-    #         "$P^{bin}(k)$="+f"{hgPlot[0][sel.index]:.3f}"
-    #     )
-    # )
+        shape, loc, scale = lognorm.fit(cs[k],floc=0)
+        ax[0].plot(
+            [csAvr[i],csAvr[i]],
+            [0,lognorm.pdf(csAvr[i],shape,loc=loc,scale=scale)],
+            label=fr"{labels[i]} mean value $\langle k\rangle$",
+            color=colours[i],
+            linewidth=1,
+            linestyle="--"
+        )
 
-    shape, loc, scale = lognorm.fit(cs,floc=0)
-    ax[0].plot(
-        [csAvr,csAvr],[0,lognorm.pdf(csAvr,shape,loc=loc,scale=scale)],
-        label=r"Mean value $\langle k\rangle$",
-        color="black",
-        linewidth=1,
-        linestyle="--"
-    )
-
-    x = np.linspace(0,np.max(cs),500)
-    fPlot = ax[0].plot(
-        x,lognorm.pdf(x,shape,loc=loc,scale=scale),
-        label="SciPy lognormal fit (ML)", # Maximum likelyhood
-        color="blue",
-        linewidth=1
-    ) # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
-
-    # mplcursors.cursor(fPlot,hover=False).connect(
-    #     "add",lambda sel: sel.annotation.set_text(
-    #         f"k={sel.target[0]:.3f}, LN(k)={sel.target[1]:.3f}"
-    #     )
-    # )
-
-    # Style
-    libAN.SetPlotStyle(
-        r"$s$",r"$P(s)$",ax=ax[0],
-        yNotation="sci" # ,xNotation="sci"
-    )
+        s = np.linspace(0,np.max(cs[k]),500)
+        fPlot = ax[0].plot(
+            s,lognorm.pdf(s,shape,loc=loc,scale=scale),
+            label=f"{labels[i]} lognormal fit (ML)", # Maximum likelyhood
+            color=colours[i],
+            linewidth=1
+        ) # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
 
 
-    ### Power law fit ###
+        ### Power law fit ###
 
-    # Histogram plot
-    xmin = np.percentile(cs,75)
-    xtail = cs[cs >= xmin]
-    b, loc, scale = pareto.fit(xtail,floc=0,fscale=xmin)  # b≈alpha
+        csQuarter = np.percentile(cs[k],75)
+        csTail = cs[k][cs[k] >= csQuarter]
+        b, loc, scale = pareto.fit(csTail,floc=0,fscale=csQuarter) # b≈alpha
 
-    # Empirical CCDF on the tail
-    xs = np.sort(xtail) # Ascending values
-    n = xs.size
-    ccdfEmp = 1.0 - np.arange(1,n+1,dtype=float)/n # P(X≥x)
+        # # Select the last quarter of city sizes
+        # f = 1/4; v = binx>=csMin*(1-f)+csMax*f
+        # binx = (hgPlot[1][1:]+hgPlot[1][:-1])/2
+        # biny = hgPlot[0]
 
-    # Model CCDF from the fitted Pareto
-    ccdfFit = pareto.sf(xs,b,loc=loc,scale=scale) # Survival function
+        # Empirical CCDF on the tail
+        csSort = np.sort(csTail) # Ascending values
+        n = csSort.size
+        ccdfEmp = 1 - np.arange(1,n+1,dtype=float)/n # P(X≥x)
 
-    ax[1].plot(
-        xs,ccdfEmp,
-        marker="o",
-        linewidth=1,
-        # linestyle="--",
-        linestyle="none",
-        label="Empirical CCDF"
-    )
-    ax[1].plot(
-        xs,ccdfFit,
-        color='blue',
-        label=fr"Pareto fit,$\alpha={b:.2f}$"
-    )
+        # Model CCDF from the fitted Pareto
+        ccdfFit = pareto.sf(csSort,b,loc=loc,scale=scale) # Survival function
+
+        ax[1].plot(
+            csSort,ccdfEmp,
+            marker="o",
+            color=colours[i],
+            linewidth=1,
+            # linestyle="--",
+            linestyle="none",
+            label=f"{labels[i]} empirical CCDF",
+            alpha=0.5
+        )
+        ax[1].plot(
+            csSort,ccdfFit,
+            color=colours[i],
+            label=fr"{labels[i]} pareto fit$"
+        )
+
+        fig.text(
+            .5,.925+i*.05,
+            fr"{labels[i]}: $\quad s_{{min}}={csMin[i]:.2f}\qquad$"
+            fr"$s_{{max}}={csMax[i]:.2f}\qquad$"
+            fr"$\langle s\rangle ={csAvr[i]:.2f}\qquad$"
+            fr"$s_{{\Sigma}}={csSum[i]:.2f}\qquad$"
+            fr"$\alpha={b:.2f}$",
+            ha="center",
+            # fontsize=10,
+            color="black"
+        )
+
+    fig.text(.1,.95,fr"$N={Nn}\qquad$")
 
     libAN.SetPlotStyle(
         r"$s$",ax=ax[1],
         xScale="log",yScale="log"
     )
-    
 
-    # hgPlot = ax[1].hist(cs,
-    #     bins=np.logspace(
-    #         np.log10(np.min(cs)),
-    #         np.log10(np.max(cs)),
-    #         40
-    #     ),
-    #     density=True,
-    #     color="gray",
-    #     edgecolor="none", # "black"
-    #     label="Histogram"
-    # )
-
-    # binx = (hgPlot[1][1:]+hgPlot[1][:-1])/2
-    # biny = hgPlot[0]
-
-    # # Select the last quarter of city sizes
-    # f = 1/4; v = binx>=csMin*(1-f)+csMax*f
-
-    # logBinxV = np.log10(binx[v]); logBinyV = np.log10(biny[v])
-    # slope, intercept, _, _, _ = linregress(logBinxV,logBinyV)
-    # regression = 10**(intercept+slope*logBinxV)
-
-    # fPlot = ax[1].plot(
-    #     binx[v],regression,
-    #     label="Regression",
-    #     color="blue",
-    #     linewidth=1
-    # )
-
-
-    fig.text(
-        0.5,0.95,
-        fr"$N$="f"{Nn}\\t"
-        fr"$s_{{min}}$={csMin:.2f}\\t"
-        fr"$s_{{max}}$={csMax:.2f}\\t"
-        fr"$\langle s\rangle $={csAvr:.2f}\\t"
-        fr"$s_{{Sum}}=${csSum:.2f}\\t"
-        fr"$\alpha=${b:.2f}",
-        ha="center",
-        # fontsize=10,
-        color="black"
+    # Style
+    libAN.SetPlotStyle(
+        r"$s$",r"$P(s)$",ax=ax[0],
+        yNotation="sci" # ,xNotation="sci"
     )
 
     libAN.CentrePlot()
@@ -162,14 +136,17 @@ def CityDistributionFig(cs,Nn):
 def CityAverageFig(ca,Nt,dt):
     fig = plt.figure()
 
+    labels = ["Ext.","Apx."]
+    colours = ["blue","red"]
     timeInterval = np.arange(Nt+1)*dt
 
-    plt.plot(
-        timeInterval,ca,
-        # label=r"etichetta",
-        color="black",
-        linewidth=1,
-    )
+    for i,k in enumerate(ca):
+        plt.plot(
+            timeInterval,ca[k],
+            label=rf"{labels[i]} city size average $\langle s\rangle$",
+            color=colours[i],
+            linewidth=1,
+        )
 
     libAN.SetPlotStyle(r"$t$",r"$\langle s\rangle$")
     libAN.CentrePlot()
@@ -182,12 +159,30 @@ def CityAverageFig(ca,Nt,dt):
 class networkState:
     def __init__(self,totP,Nn,A,Nt,l,a,sigma):
         # Uniform initial state for all vertices
-        self.verticesState   = np.ones((Nn,1),dtype=float)*(totP/Nn)
-        self.averageState    = np.zeros((Nt+1,1),dtype=float)
-        self.averageState[0] = totP/Nn
+        keys = ["ext","apx"]
 
-        self.Nn              = Nn # Number of nodes
-        self.A               = A  # Adjacency matrix
+        self.vtxState   = {
+            keys[0]:np.ones((Nn,1),dtype=float)*(totP/Nn),
+            keys[1]:np.ones((Nn,1),dtype=float)*(totP/Nn),
+        }
+        self.avgState    = {
+            keys[0]:np.zeros((Nt+1,1),dtype=float),
+            keys[1]:np.zeros((Nt+1,1),dtype=float)
+        }
+        for k in self.avgState:
+            self.avgState[k][0] = totP/Nn 
+
+        # Exact Adjacency matrix
+        self.A  = A
+        
+        # Approximated adjacency matrix
+        Mn = np.sum(A)
+        wO = np.sum(A,axis=1,keepdims=True)
+        wI = np.sum(A,axis=0,keepdims=True)
+        self.R  = wO@wI/Mn
+        # In my case wO=wI but it's better to define them in the most general way
+
+        self.M = {keys[0]:self.A, keys[1]:self.R}
 
         def E(si,sr): return NonLinearEmigration(si,sr,l,a)
         self.E = E
@@ -195,26 +190,32 @@ class networkState:
         def mu(E): return StochasticFluctuations(sigma,E)
         self.mu = mu
 
+        self.Nn = Nn # Number of nodes
+
     def updateState(self,dt,nt):
-        oldState = self.verticesState
-        newState = np.copy(self.verticesState)
+        oldState = self.vtxState
+        newState = {k: v.copy() for k, v in self.vtxState.items()}
+ 
         P = np.random.permutation(self.Nn)
 
         halfN = int(np.floor(self.Nn/2))
         p1 = P[:halfN]; p2 = P[halfN+1:]
 
         for i in range(halfN):
-            p = float(np.clip(self.A[p1[i],p2[i]]*dt,0,1))
-            theta = np.random.binomial(1,p)
-            si = oldState[p1[i]]; sr = oldState[p2[i]]
-            # It's assumed node p1(i) is the interacting node while node p2(i) is the receiving one
+            for k in self.M:
+                # It's assumed node p1(i) is the interacting node while node p2(i) is the receiving one
 
-            E = self.E(si,sr); mu = self.mu(E)
-            newState[p1[i]] = si*(1-theta)+theta*si*(1-E) # +mu
-            newState[p2[i]] = sr*(1-theta)+theta*(sr+si*E)
+                p = float(np.clip(self.M[k][p1[i],p2[i]]*dt,0,1))
+                theta = np.random.binomial(1,p)
+                si = oldState[k][p1[i]]; sr = oldState[k][p2[i]]
 
-        self.verticesState = newState
-        self.averageState[nt+1] = np.mean(newState)
+                E = self.E(si,sr); mu = self.mu(E)
+                newState[k][p1[i]] = si*(1-theta)+theta*si*(1-E+mu) 
+                newState[k][p2[i]] = sr*(1-theta)+theta*(sr+si*E)
+
+        self.vtxState = newState
+        self.avgState["ext"][nt+1] = np.mean(newState["ext"])
+        self.avgState["apx"][nt+1] = np.mean(newState["apx"])
 
 
 def NonLinearEmigration(
@@ -234,7 +235,7 @@ def NonLinearEmigration(
 def StochasticFluctuations(sigma,E):
     while True:
         mu = np.random.normal(0,sigma,size=1)
-        if mu>E-1 and mu<E:
+        if mu>E-1: #and mu<E:
             break
     # The conditions «mu>E-1» and «mu<E» are necessary to have the total emigration rage 1-E+μ between 0 and 1
     return mu

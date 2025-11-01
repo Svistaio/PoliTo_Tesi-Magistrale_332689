@@ -29,11 +29,11 @@ def DegreeDistributionFig(di,Nn):
     kAvr = np.sum(di)/Nn
     fig.text(
         0.8,0.25,
-        r"$N$="+f"{Nn}"+"\n"+\
-        r"$E$="+f"{int(np.sum(di)/2)}"+"\n"+\
-        r"$k_{min}$="+f"{np.min(di)}"+"\n"+\
-        r"$k_{max}$="+f"{np.max(di)}"+"\n"+\
-        r"$\langle k\rangle $="+f"{kAvr}",
+        fr"$N$={Nn}"f"\n"
+        fr"$E$={int(np.sum(di)/2)}"f"\n"
+        fr"$k_{{min}}$={np.min(di)}"f"\n"
+        fr"$k_{{max}}$={np.max(di)}"f"\n"
+        r"$\langle k\rangle $="f"{kAvr}",
         ha="center",
         # fontsize=10,
         color="black"
@@ -57,7 +57,7 @@ def DegreeDistributionFig(di,Nn):
 
     mplcursors.cursor(hgPlot[2],hover=False).connect(
         "add",lambda sel: sel.annotation.set_text(
-            "$P^{bin}(k)$="+f"{hgPlot[0][sel.index]:.3f}"
+            r"$P^{bin}(k)$="f"{hgPlot[0][sel.index]:.3f}"
         )
     )
 
@@ -117,7 +117,7 @@ def DegreeDistributionFig(di,Nn):
 
     mplcursors.cursor(fPlot,hover=False).connect(
         "add",lambda sel: sel.annotation.set_text(
-            f"k={sel.target[0]:.3f}, LN(k)={sel.target[1]:.3f}"
+            f"k={sel.target[0]:.3f},LN(k)={sel.target[1]:.3f}"
         )
     )
 
@@ -170,10 +170,10 @@ def ClusteringCoefficientFig(A,di,dk,Nk):
     CAvr = nx.average_clustering(G)
     fig.text(
         0.75,0.75,
-        r"$C_{min}$="f"{np.min(list(Cd.values())):.3f}\n"
-        r"$C_{max}$="f"{np.max(list(Cd.values())):.3f}\n"
-        r"$\langle C\rangle $="f"{CAvr:.3f}",
-        ha="center",
+        fr"$C_{{min}}$={np.min(list(Cd.values())):.3f}"f"\n"
+        fr"$C_{{max}}$={np.max(list(Cd.values())):.3f}"f"\n"
+        fr"$\langle C\rangle $={CAvr:.3f}",
+        ha='center',
         # fontsize=10,
         color="black"
     )
@@ -182,8 +182,8 @@ def ClusteringCoefficientFig(A,di,dk,Nk):
 
     mplcursors.cursor(sc,hover=True).connect(
         "add",lambda sel: sel.annotation.set_text(
-            f"cx={dk[sel.index]:.3f}, \
-            cy={Ck[sel.index]:.3f}"
+            f"cx={dk[sel.index]:.3f},"
+            f"cy={Ck[sel.index]:.3f}"
         )
     )
 
@@ -287,7 +287,7 @@ def WeightDistributionFig(wi):
 
     mplcursors.cursor(hgPlot[2],hover=False).connect(
         "add",lambda sel: sel.annotation.set_text(
-            "$w^{bin}(k)$="+f"{hgPlot[0][sel.index]:.3f}"
+            "$w^{bin}(k)$="f"{hgPlot[0][sel.index]:.3f}"
         )
     )
 
@@ -398,10 +398,10 @@ def StrengthDistributionFig(si):
     kAvr = np.mean(si)
     fig.text(
         0.75,0.5,
-        r"$s_{min}$="f"{np.min(si)}\n"
-        r"$s_{max}$="f"{np.max(si)}\n"
-        r"$\langle s\rangle $="f"{kAvr:.3f}\n"
-        r"$\alpha$="f"{slope:.3f}",
+        fr"$s_{{min}}$={np.min(si)}"f"\n"
+        fr"$s_{{max}}$={np.max(si)}"f"\n"
+        fr"$\langle s\rangle $={kAvr:.3f}"f"\n"
+        fr"$\alpha$={slope:.3f}",
         ha="center",
         # fontsize=10,
         color="black"
@@ -640,9 +640,9 @@ def SetPlotStyle(
     ax.set_yscale(yScale)
 
     if xScale == "linear":
-        plt.ticklabel_format(style=xNotation,axis="x",scilimits=(0,0))
+        ax.ticklabel_format(style=xNotation,axis="x",scilimits=(0,0))
     if yScale == "linear":
-        plt.ticklabel_format(style=yNotation,axis="y",scilimits=(0,0))
+        ax.ticklabel_format(style=yNotation,axis="y",scilimits=(0,0))
 
     ax.grid(True,linestyle=":",linewidth=1)
     ax.set_axisbelow(True)
