@@ -225,7 +225,7 @@ def NonLinearEmigration(
         a   # Emigration intensity
     ):
     if si != 0:
-        rs = sr/si           # Relative population
+        rs = sr/si               # Relative population ratio
         ef = l*(rs**a)/(1+rs**a) # Actual emigration rate
     else:
         ef = 0
