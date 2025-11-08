@@ -12,7 +12,7 @@ import numpy as np
 
 
 
-### Main code ###
+### Main functions ###
 
 def ExtractAdjacencyMatrices(zipFile):
     # Conversion of «elencom91.xls» from the old format .xls to a more modern .csv 
@@ -154,7 +154,7 @@ def ReadAdjacencyMatrices(zipFile,idA,idW):
 
 
 
-### Auxiliary code ###
+### Auxiliary functions ###
 
 def Save2Zip(M,path,z):
     buf = sio()

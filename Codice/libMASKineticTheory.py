@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 libAN.SetTextStyle()
 
 
-### Main code ###
+### Main functions ###
 
 def MonteCarlo(totP,Nn,A,Nt,dt,l,a,sigma):
     stateCities = networkState(totP,Nn,A,Nt,l,a,sigma)
@@ -154,7 +154,7 @@ def CityAverageFig(ca,Nt,dt):
 
 
 
-### Auxiliary code ###
+### Auxiliary functions ###
 
 class networkState:
     def __init__(self,totP,Nn,A,Nt,l,a,sigma):
