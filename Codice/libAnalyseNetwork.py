@@ -20,7 +20,7 @@ import subprocess
 
 
 
-### Main code ###
+### Main functions ###
 
 def DegreeDistributionFig(di,Nn):
 
@@ -591,7 +591,7 @@ def WeightedAssortativityFig(W,dk,knn):
 
 
 
-### Auxiliary code ###
+### Auxiliary functions ###
 
 def CentrePlot():
     fig = plt.gcf()
