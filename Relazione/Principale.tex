@@ -1,0 +1,102 @@
+% !TEX program = pdflatex % Usa il compilatore «PDFLaTeX»
+
+\documentclass[
+    a4paper,
+    twoside,
+    openright,
+    titlepage,
+    headinclude,
+    footinclude,
+    BCOR5mm,
+    numbers=noenddot,
+    cleardoublepage=empty,
+    tablecaptionabove
+]{scrreprt}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} % if pdfLaTeX
+\usepackage[italian]{babel}
+\usepackage{microtype}
+\usepackage{subfig}
+
+\usepackage[
+    eulerchapternumbers,
+    subfig,
+    beramono,
+    eulermath,
+    pdfspacing
+]{classicthesis}
+\usepackage{arsclassica}
+
+% Pacchetti per vari comandi matematici
+\usepackage{amsmath,
+            amsfonts,
+            amsthm,
+            amssymb}
+
+\newcommand\derS[3][d]{\frac{\mathrm{#1}#2}{\mathrm{#1}#3}} % Derivata sostanziale
+% \usepackage[hidelinks]{hyperref}
+
+\begin{document}
+    Si consideri la distribuzione totale
+    %
+    \begin{equation}
+        % \label{eqDistribuzioneTotale}
+        f(x,v,t)=\frac1N\sum_{i\in\mathcal I}f_i(v,t)\otimes\delta(x-i),
+    \end{equation}
+    %
+    se le particelle sono \textit{indistinguibili} (1° ipotesi) allora vale
+    %
+    \begin{equation}
+        f_i(v,t)=f_j(v,t)=f(v,t)\quad\forall i,j\in\mathcal I,
+    \end{equation}
+    %
+    da cui la distribuzione marginale
+    %
+    \begin{equation}
+        \begin{aligned}
+            \int_{\mathcal I}f(x,v,t)dx&=\frac1N\sum_{i\in\mathcal I}\int_{\mathcal I}f_i(v,t)\otimes\delta(x-i)dx\\
+            &=\frac1Nf(v,t)\otimes\sum_{i\in\mathcal I}\int_{\mathcal I}\delta(x-i)dx\\
+            &=\frac1Nf(v,t)\otimes\sum_{i\in\mathcal I}1\\
+            &=\frac1Nf(v,t)N=f(v,t),
+        \end{aligned}
+    \end{equation}
+    %
+    e ciò è anche coerente col fatto che in un gas il numero di particelle è molto elevato.
+
+    Considerando una \textit{matrice d'adiacenza unitaria} (2° ipotesi) si può scrivere la (2.10) come
+    %
+    \begin{equation}
+        \begin{aligned}
+            \derS{}t\int_{\mathcal O}\varphi(v)f(v,t)dv&=
+            \frac1{2N}\sum_{j\in\mathcal I}\int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*\\
+            &+\frac1{2N}\sum_{j\in\mathcal I}\int_{\mathcal O^{2}}\langle\varphi(v_*^{'})-\varphi(v_*)\rangle f(v,t)f(v_*,t)dvdv_*\\
+            &=\frac1{2N}N\int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*\\
+            &+\frac1{2N}N\int_{\mathcal O^{2}}\langle\varphi(v_*^{'})-\varphi(v_*)\rangle f(v,t)f(v_*,t)dvdv_*\\
+            &=\frac12\int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*\\
+            &+\frac12\int_{\mathcal O^{2}}\langle\varphi(v_*^{'})-\varphi(v_*)\rangle f(v,t)f(v_*,t)dvdv_*,
+        \end{aligned}
+    \end{equation}
+    
+    che unita all'ipotesi d'interazioni simmetriche, ossia tali che 
+    %
+    \begin{equation}
+        v^{'}=\Psi(v,v_*)=\Psi_*(v_*,v)\quad\text{ove }v_*=\Psi_*(v,v_*),
+    \end{equation}
+    %
+    porta all'equivalenza (mediante il cambio di variabili \(v_*=v\) e \(v=v_*\))
+    %
+    \begin{equation}
+        \int_{\mathcal O^{2}}\langle\varphi(v_*^{'})-\varphi(v_*)\rangle f(v,t)f(v_*,t)dvdv_*,
+        =\int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*,
+    \end{equation}
+    %
+    e quindi a
+    %
+    \begin{equation}
+        \derS{}t\int_{\mathcal O}\varphi(v)f(v,t)dv=
+        \int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*,
+    \end{equation}
+    %
+    che equivale alla formula classica di Boltzmann.
+\end{document}

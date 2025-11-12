@@ -2,3 +2,6 @@
 /Figure
 /Riferimenti
 /Dati/Limiti1991.zip
+/Relazione/*
+!/Relazione/*.tex
+!/Relazione/*.pdf
