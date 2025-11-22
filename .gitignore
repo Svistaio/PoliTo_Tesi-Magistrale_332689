@@ -1,7 +1,10 @@
 /Codice/__pycache__
+
+/Relazione/Testa/*
+!/Relazione/Testa/*.tex
+!/Relazione/Testa/*.pdf
+/Relazione/Modello_Tesi_PoliTO.zip
+
 /Figure
 /Riferimenti
 /Dati/Limiti1991.zip
-/Relazione/*
-!/Relazione/*.tex
-!/Relazione/*.pdf
