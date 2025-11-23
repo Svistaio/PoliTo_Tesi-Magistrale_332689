@@ -1,5 +1,5 @@
 
-%!LW recipe=2xpdfLaTeX
+% !LW recipe=pdfLaTeX ➞ biber ➞ pdfLaTeX
 % !TEX root = Principale.tex
 % LTeX: language=it
 
@@ -35,85 +35,160 @@
     %%%
     %%%
 
-    \chapter{Introduzione}
+    % \part{Introduzione}
+    \chapter{Introduzone}
 
     %%%
     %%%
     %%%
 
+    % \part{Teoria}
     \chapter{\texorpdfstring
         {Teorie cinetiche dei\newline sistemi multiagente}
-        {Teorie cinetiche deisistemi multiagente}%
+        {Teorie cinetiche dei sistemi multiagente}%
     }\label{secTCSM}
 
-        \section{Nesso discreto-continuo}\label{secNessoDC}
-
-            Si consideri la distribuzione totale
+        \section{Descrizione cinetica}\label{secDescrizioneCinetica} %  d'interazioni mediante da un grafo
+            La distribuzione totale presenta la seguente forma
             %
             \begin{equation}
-                % \label{eqDistribuzioneTotale}
+                \label{eqDistribuzioneTotale}
                 f(x,v,t)=\frac1N\sum_{i\in\mathcal I}f_i(v,t)\otimes\delta(x-i),
             \end{equation}
             %
-            se le particelle sono \textit{indistinguibili} (1° ipotesi) allora vale
-            %
-            \begin{equation}
-                f_i(v,t)=f_j(v,t)=f(v,t)\quad\forall i,j\in\mathcal I,
-            \end{equation}
-            %
-            da cui la distribuzione marginale
-            %
-            \begin{equation}
-                \begin{aligned}
-                    \int_{\mathcal I}f(x,v,t)dx&=\frac1N\sum_{i\in\mathcal I}\int_{\mathcal I}f_i(v,t)\otimes\delta(x-i)dx\\
-                    &=\frac1Nf(v,t)\otimes\sum_{i\in\mathcal I}\int_{\mathcal I}\delta(x-i)dx\\
-                    &=\frac1Nf(v,t)\otimes\sum_{i\in\mathcal I}1\\
-                    &=\frac1Nf(v,t)N=f(v,t),
-                \end{aligned}
-            \end{equation}
-            %
-            e ciò è anche coerente col fatto che in un gas il numero di particelle è molto elevato.
-
-            Considerando una \textit{matrice d'adiacenza unitaria} (2° ipotesi) si può scrivere la (2.10) come
-            %
-            \begin{equation}
-                \begin{aligned}
-                    \derS{}t\int_{\mathcal O}\varphi(v)f(v,t)dv&=
-                    \frac1{2N}\sum_{j\in\mathcal I}\int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*\\
-                    &+\frac1{2N}\sum_{j\in\mathcal I}\int_{\mathcal O^{2}}\langle\varphi(v_*^{'})-\varphi(v_*)\rangle f(v,t)f(v_*,t)dvdv_*\\
-                    &=\frac1{2N}N\int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*\\
-                    &+\frac1{2N}N\int_{\mathcal O^{2}}\langle\varphi(v_*^{'})-\varphi(v_*)\rangle f(v,t)f(v_*,t)dvdv_*\\
-                    &=\frac12\int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*\\
-                    &+\frac12\int_{\mathcal O^{2}}\langle\varphi(v_*^{'})-\varphi(v_*)\rangle f(v,t)f(v_*,t)dvdv_*,
-                \end{aligned}
-            \end{equation}
+            ove \(N\equiv\vert\mathcal I\vert\) è il numero totale d'agenti/vertici del grafo mentre \(\delta(\cdot)\) denota la delta di Dirac centrata all'origine; d'altra parte \[f_i=f_i(s,t):\mathcal P\times[0,+\infty)\rightarrow\mathbb R_+\] è la densità di probabilità della taglia \(S_t\) dell'agente \(X=i\).
             
-            che unita all'ipotesi d'\textit{interazioni simmetriche} (3° ipotesi), ossia tali che 
+            Logicamente si richiede
+            %
+            \begin{equation*}
+                % \label{eqUnitaryIntegrationfi}
+                \int_{\mathcal P}f_i(s,t)\de s=1,
+                \qquad\forall t\geq0,\;\forall i\in\mathcal I,
+            \end{equation*}
+            %
+            che implica coerentemente
+            %
+            \begin{equation*}
+                % \label{eqUnitaryIntegrationf}
+                \int_{\mathcal I}\int_{\mathcal P}f(x,s,t)\de s\de x=1
+            \end{equation*}
+            %
+            a ogn'istante.
+
+            [...]
+
             %
             \begin{equation}
-                v^{'}=\Psi(v,v_*)=\Psi_*(v_*,v)\quad\text{ove }v_*=\Psi_*(v,v_*),
+                \label{eqBoltzmannMediataDalGrafo}
+                \begin{aligned}
+                    \derS{}t\int_{\mathcal P}\varphi f_i\de s&=
+                    \frac1{2N}\sum_{j\in\mathcal I}B(i,j)
+                    \int_{\mathcal P^2}%\int_{\mathcal P}
+                    \langle\varphi'-\varphi\rangle
+                    f_if_j\de s\de s_*\\&
+                    +\frac1{2N}\sum_{j\in\mathcal I}B(j,i)
+                    \int_{\mathcal P^2}%\int_{\mathcal P}
+                    \langle\varphi'_*-\varphi_*\rangle
+                    f_jf_i\de s\de s_*,%\\&
+                    \quad\forall i\in\mathcal I
+                \end{aligned}
             \end{equation}
             %
-            porta all'equivalenza (mediante il cambio di variabili \(v_*=v\) e \(v=v_*\))
-            %
-            \begin{equation}
-                \int_{\mathcal O^{2}}\langle\varphi(v_*^{'})-\varphi(v_*)\rangle f(v,t)f(v_*,t)dvdv_*
-                =\int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*,
-            \end{equation}
-            %
-            e quindi a
-            %
-            \begin{equation}
-                \derS{}t\int_{\mathcal O}\varphi(v)f(v,t)dv=
-                \int_{\mathcal O^{2}}\langle\varphi(v^{'})-\varphi(v)\rangle f(v,t)f(v_*,t)dvdv_*,
-            \end{equation}
-            %
-            che equivale alla formula classica di Boltzmann.
+            ove gli argomenti di tutte le funzioni sono stati sottintesi, vale a dire
+            \[
+                \newcommand\spazOr{\;\;\;}
+                f_i\equiv f_i(s,t)\spazOr\forall i\in\mathcal I,
+                \spazOr\varphi\equiv\varphi(s),
+                \spazOr\varphi_*\equiv\varphi(s_*)
+                \spazOr\text{e}\spazOr
+                \varphi'\equiv\varphi(s').
+            \]
+
+        \section{Nesso discreto-continuo}\label{secNessoDC}
+
+            È d'interesse esplorare il legame presente tra la %\eqref{}
+
+            \subsection{Ipotesi semplificative}
+
+            \subsection{\texorpdfstring{\(2^\circ\)}{2°} ipotesi}
+
+            \subsection{\texorpdfstring{\(3^\circ\)}{3°} ipotesi}
+
+            \subsection{\texorpdfstring{\(1^\circ+2^\circ+3^\circ\)}{1°+2°+3°} ipotesi}
+
+                Si consideri la distribuzione totale \eqref{eqDistribuzioneTotale}, se le particelle sono \textit{indistinguibili} (1° ipotesi) allora vale
+                %
+                \begin{equation}
+                    f_i(s,t)=f_j(s,t)=f(s,t)\quad\forall i,j\in\mathcal I,
+                \end{equation}
+                %
+                da cui la distribuzione marginale
+                %
+                \begin{equation}
+                    \begin{aligned}
+                        \int_{\mathcal I}f(x,s,t)dx&=\frac1N\sum_{i\in\mathcal I}\int_{\mathcal I}f_i(s,t)\otimes\delta(x-i)dx\\
+                        &=\frac1Nf(s,t)\otimes\sum_{i\in\mathcal I}\int_{\mathcal I}\delta(x-i)dx\\
+                        &=\frac1Nf(s,t)\otimes\sum_{i\in\mathcal I}1\\
+                        &=\frac1Nf(s,t)N=f(s,t),
+                    \end{aligned}
+                \end{equation}
+                %
+                e ciò è anche coerente col fatto che in un gas il numero di particelle è molto elevato.
+
+                Considerando una \textit{matrice d'adiacenza unitaria} (2° ipotesi) si può scrivere la (2.10) come
+                %
+                \begin{equation}
+                    \begin{aligned}
+                        \derS{}t\int_{\mathcal O}\varphi(s)f(s,t)ds&=
+                        \frac1{2N}\sum_{j\in\mathcal I}\int_{\mathcal O^{2}}\langle\varphi(s)-\varphi(s)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
+                        &+\frac1{2N}\sum_{j\in\mathcal I}\int_{\mathcal O^{2}}\langle\varphi(s_*')-\varphi(s_*)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
+                        &=\frac1{2N}N\int_{\mathcal O^{2}}\langle\varphi(s')-\varphi(s)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
+                        &+\frac1{2N}N\int_{\mathcal O^{2}}\langle\varphi(s_*')-\varphi(s_*)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
+                        &=\frac12\int_{\mathcal O^{2}}\langle\varphi(s')-\varphi(s)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
+                        &+\frac12\int_{\mathcal O^{2}}\langle\varphi(s_*')-\varphi(s_*)\rangle f(s,t)f(s_*,t)\de s\de s_*,
+                    \end{aligned}
+                \end{equation}
+                
+                che unita all'ipotesi d'\textit{interazioni simmetriche} (3° ipotesi), ossia tali che 
+                %
+                \begin{equation}
+                    s'=\Psi(s,s_*)=\Psi_*(s_*,s)\quad\text{ove }s_*=\Psi_*(s,s_*),
+                \end{equation}
+                %
+                porta all'equivalenza (mediante il cambio di variabili \(s_*=s\) e \(s=s_*\))
+                %
+                \begin{equation}
+                    \int_{\mathcal O^{2}}\langle\varphi_*'-\varphi_*\rangle ff_*dsds_*
+                    =\int_{\mathcal O^{2}}\langle\varphi'-\varphi\rangle ff_*dsds_*,
+                \end{equation}
+                %
+                e quindi a
+                %
+                \begin{equation}
+                    \derS{}t\int_{\mathcal O}\varphi(s)f(s,t)ds=
+                    \int_{\mathcal O^{2}}\langle\varphi(s')-\varphi(s)\rangle f(s,t)f(s_*,t)dsds_*,
+                \end{equation}
+                %
+                che equivale alla formula classica di Boltzmann.
 
     %%%
     %%%
     %%%
 
+    % \part{Risultati}
     \chapter{Simulazioni}\label{secSimulazioni}
+
+    %%%
+    %%%
+    %%%
+
+    % \part{Conclusioni}
+    \chapter{Conclusioni}\label{secConclusioni}
+
+    %%%
+    %%%
+    %%%
+
+    \printbibliography
 
 \end{document}

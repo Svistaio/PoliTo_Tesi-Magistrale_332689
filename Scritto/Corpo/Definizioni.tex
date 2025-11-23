@@ -1,68 +1,84 @@
 
 % !TEX root = ../Testa/Principale.tex
 
-\newcommand\dimTesto[1]{%
-    \pgfmathparse{#1*1.2}%
-    \fontsize{#1 pt}{\pgfmathresult pt}\selectfont%
-}
+%\begingroup Tipografia
+    \newcommand\dimTesto[1]{%
+        \pgfmathparse{#1*1.2}%
+        \fontsize{#1 pt}{\pgfmathresult pt}\selectfont%
+    }
+%\endgroup
 
-\newcommand\lineaPuntallata[1][4cm]{\makebox[#1]{\dotfill}}
-\newcommand\Frontespizio{
-    \begin{titlepage}
-        \newgeometry{
-            left=1cm,
-            right=1cm,
-            top=3cm,
-            bottom=3.5cm
-        }
-        \centering
-        %
-        {\Huge\scshape Politecnico di Torino}\\[1cm]
-        {\Large Corso di Laurea\\in Ingegneria Matematica}
-        %
-        \vfill
-        %
-        {\Large Tesi di Laurea Magistrale}\\[0.5cm]
-        \parbox{.9\textwidth}{
-            \centering\huge\bfseries%
-            Modellizzazione della distribuzione della popolazione tra città su reti spaziali mediante la teoria cinetica dei sistemi multiagente
-        }\\[1.5cm]
-        \includegraphics[width=0.25\textwidth]{../../Figure/logo_PoliTO_2021.jpg}
-        %
-        \vfill
-        %
-        \begin{minipage}[t]{0.85\textwidth}
-            \begin{flushleft}\large
-                \textbf{Relatori} \hfill \textbf{Candidato}\\
-                prof. Andrea Tosin \hfill Valerio Taralli\\
-                prof. Nome Cognome\\[0.5cm]
-                \textit{firma dei relatori} \hfill \textit{firma del candidato}\\[0.35cm]
-                \lineaPuntallata\ \hfill \\
-                \lineaPuntallata\ \hfill \lineaPuntallata
-            \end{flushleft}
-        \end{minipage}
-        %
-        \vfill
-        %
-        {\large Anno Accademico 2025-2026\par}
-        %
-        \restoregeometry
-    \end{titlepage}
-}
+%\begingroup Frontespizio
+    \newcommand\lineaPuntallata[1][4cm]{\makebox[#1]{\dotfill}}
+    \newcommand\Frontespizio{
+        \begin{titlepage}
+            \newgeometry{
+                left=1cm,
+                right=1cm,
+                top=3cm,
+                bottom=3.5cm
+            }
+            \centering
+            %
+            {\Huge\scshape Politecnico di Torino}\\[1cm]
+            {\Large Corso di Laurea\\in Ingegneria Matematica}
+            %
+            \vfill
+            %
+            {\Large Tesi di Laurea Magistrale}\\[0.5cm]
+            \parbox{.9\textwidth}{
+                \centering\huge\bfseries%
+                Modellizzazione della distribuzione della popolazione tra città su reti spaziali mediante la teoria cinetica dei sistemi multiagente
+            }\\[1.5cm]
+            \includegraphics[width=0.25\textwidth]{../../Figure/logo_PoliTO_2021.jpg}
+            %
+            \vfill
+            %
+            \begin{minipage}[t]{0.85\textwidth}
+                \begin{flushleft}\large
+                    \textbf{Relatori} \hfill \textbf{Candidato}\\
+                    prof. Andrea Tosin \hfill Valerio Taralli\\
+                    prof. Nome Cognome\\[0.5cm]
+                    \textit{firma dei relatori} \hfill \textit{firma del candidato}\\[0.35cm]
+                    \lineaPuntallata\ \hfill \\
+                    \lineaPuntallata\ \hfill \lineaPuntallata
+                \end{flushleft}
+            \end{minipage}
+            %
+            \vfill
+            %
+            {\large Anno Accademico 2025-2026\par}
+            %
+            \restoregeometry
+        \end{titlepage}
+    }
+%\endgroup
 
-\newcommand\Dedica{
-    \thispagestyle{empty}
-    \phantomsection
-    \pdfbookmark[1]{Dedica}{Dedica}
+%\begingroup Dedica
+    \newcommand\Dedica{
+        \thispagestyle{empty}
+        \phantomsection
+        \pdfbookmark[1]{Dedica}{Dedica}
+    
+        \vspace*{3cm}
+    
+        \begin{center}
+            \Large
+            Ai miei genitori, \\
+            \emph{Elisabetta} e \emph{Marco}
+        \end{center}
+    }
+%\endgroup
 
-    \vspace*{3cm}
+%\begingroup Matematica
+    \newcommand\de[1][]{\mathrm{d}#1}
 
-    \begin{center}
-        \Large
-        Ai miei genitori, \\
-        \emph{Elisabetta} e \emph{Marco}.
-    \end{center}
-}
+    \newcommand\derS[3][d]{\frac{\mathrm{#1}#2}{\mathrm{#1}#3}}
 
-\newcommand\derS[3][d]{\frac{\mathrm{#1}#2}{\mathrm{#1}#3}} % Derivata sostanziale
-% \usepackage[hidelinks]{hyperref}
+    \newcommand\SpazMate[3]{ % Spaz[iatura] Mate[matica]
+        \thinmuskip = #1mu\relax
+        \medmuskip = #2mu\relax
+        \thickmuskip = #3mu\relax
+    }
+    \SpazMate123
+%\endgroup
