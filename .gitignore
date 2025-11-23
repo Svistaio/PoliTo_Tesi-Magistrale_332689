@@ -1,9 +1,10 @@
 /Codice/__pycache__
 
-/Relazione/Testa/*
-!/Relazione/Testa/*.tex
-!/Relazione/Testa/*.pdf
-/Relazione/Modello_Tesi_PoliTO.zip
+/Scritto/Testa/*
+!/Scritto/Testa/*.tex
+!/Scritto/Testa/*.pdf
+
+/Scritto/Riferimenti
 
 /Figure
 /Riferimenti
