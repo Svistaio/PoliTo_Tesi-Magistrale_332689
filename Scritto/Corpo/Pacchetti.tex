@@ -1,13 +1,24 @@
 
 % !TEX root = ../Testa/Principale.tex
 
-\usepackage[pass]{geometry}
+\usepackage[
+    pass,
+    showframe
+]{geometry}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{microtype}
 
 \usepackage[italian]{babel}
+
+\usepackage[
+    backend=biber,
+    style=numeric-comp
+]{biblatex}
+\usepackage{csquotes}
+\addbibresource{../Corpo/Bibliografia.bib}
+\nocite{*}
 
 \usepackage[
     drafting=true,
@@ -32,7 +43,24 @@
 
 \usepackage{enumitem}
 
-\usepackage{hyperref}
+% \usepackage{hyperref} % Già caricato da «classicthesis» colle impostazioni
+\hypersetup{
+    colorlinks=true,
+    linktocpage=true,
+    breaklinks=true,
+    urlcolor=CTurl,
+    linkcolor=CTlink,
+    citecolor=CTcitation
+} % Si v. la linea 732 di «classicthesis.sty»
+% \hypersetup{
+%     colorlinks=false,
+%     linkbordercolor=CTlink,
+%     citebordercolor=CTcitation,
+%     urlbordercolor=CTurl
+%     linktocpage=true,
+%     breaklinks=true,
+%     pdfborder={1 1 1},
+% }
 \usepackage{cleveref}
 
 \usepackage[left]{lineno}
