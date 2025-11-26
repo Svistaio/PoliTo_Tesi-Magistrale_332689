@@ -53,7 +53,7 @@
             %
             \begin{equation}
                 \label{eqDistribuzioneTotale}
-                f(x,v,t)=\frac1N\sum_{i\in\mathcal I}f_i(v,t)\otimes\delta(x-i),
+                f(x,s,t)=\frac1N\sum_{i\in\mathcal I}f_i(s,t)\otimes\delta(x-i),
             \end{equation}
             %
             ove \(N\equiv\vert\mathcal I\vert\) è il numero totale d'agenti/vertici del grafo mentre \(\delta(\cdot)\) denota la delta di Dirac centrata all'origine; d'altra parte \[f_i=f_i(s,t):\mathcal P\times[0,+\infty)\rightarrow\mathbb R_+\] è la densità di probabilità della taglia \(S_t\) dell'agente \(X=i\).
@@ -79,18 +79,18 @@
 
             %
             \begin{equation}
-                \label{eqBoltzmannMediataDalGrafo}
+                \label{eqBoltzmannConGrafo}
                 \begin{aligned}
                     \derS{}t\int_{\mathcal P}\varphi f_i\de s&=
-                    \frac1{2N}\sum_{j\in\mathcal I}B(i,j)
+                    \frac1{2N}\sum_{j\in\mathcal I}A(i,j)
                     \int_{\mathcal P^2}%\int_{\mathcal P}
                     \langle\varphi'-\varphi\rangle
-                    f_if_j\de s\de s_*\\&
-                    +\frac1{2N}\sum_{j\in\mathcal I}B(j,i)
+                    f_if^*_j\de s\de s_*\\&
+                    +\frac1{2N}\sum_{j\in\mathcal I}A(j,i)
                     \int_{\mathcal P^2}%\int_{\mathcal P}
                     \langle\varphi'_*-\varphi_*\rangle
-                    f_jf_i\de s\de s_*,%\\&
-                    \quad\forall i\in\mathcal I
+                    f_jf^*_i\de s\de s_*,%\\&
+                    \quad\forall i\in\mathcal I,
                 \end{aligned}
             \end{equation}
             %
@@ -106,70 +106,257 @@
 
         \section{Nesso discreto-continuo}\label{secNessoDC}
 
-            È d'interesse esplorare il legame presente tra la %\eqref{}
+            È d'interesse esplorare il legame presente tra la \eqref{eqBoltzmannConGrafo} coll'equazione classica di Boltzmann \daRivedere{}.
+
 
             \subsection{Ipotesi semplificative}
 
-            \subsection{\texorpdfstring{\(2^\circ\)}{2°} ipotesi}
+                A questo scopo si possono fare tre principali ipotesi semplificative da applicare alla \eqref{eqBoltzmannConGrafo}:
 
-            \subsection{\texorpdfstring{\(3^\circ\)}{3°} ipotesi}
+                \begin{enumerate}[
+                    label=\arabic*\(^\circ\) IS,
+                    topsep=7.5pt,
+                    parsep=5pt,
+                    itemsep=0pt,
+                    leftmargin=1cm,
+                    rightmargin=0pt,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                ]
+                    \item\label{ipMatriceUnitaria} Si presuppone che il grafo sia completamente connesso e quindi che la matrice d'adiacenza sia unitaria \(A\equiv I\).
+                    %
+                    \item\label{ipAgentiIndistinguibili} Si assume che gli agenti siano indistinguibili:
+                    %
+                    \begin{equation}
+                        f_i(s,t)=f_j(s,t)=f(s,t)
+                        \quad\forall i,j\in\mathcal I,
+                    \end{equation}
+                    %
+                    \item\label{ipInterazioniSimmetriche} S'ipotizza che le interazioni siano simmetriche:% \(\psi(s,s_*)=\psi_*(s_*,s).\)
+                    %
+                    \begin{equation}
+                        s'=\Psi(s,s_*)=\Psi_*(s_*,s),
+                        \;\;\text{ove }s_*=\Psi_*(s,s_*).
+                    \end{equation}
+                \end{enumerate}
 
-            \subsection{\texorpdfstring{\(1^\circ+2^\circ+3^\circ\)}{1°+2°+3°} ipotesi}
 
-                Si consideri la distribuzione totale \eqref{eqDistribuzioneTotale}, se le particelle sono \textit{indistinguibili} (1° ipotesi) allora vale
+            \newcommand\titoloSez{
+                Analisi della %
+                \texorpdfstring{%
+                % \tref{ipMatriceUnitaria}{\(1^\circ\)}
+                \ref{ipMatriceUnitaria}}{1° IS}%
+            }
+            \subsection{\titoloSez}
+
+                Con tal'ipotesi la \eqref{eqBoltzmannConGrafo} diventa
+                %
+                \begin{equation*}
+	                % \begin{aligned}
+                    %     \derS{}t\int_{\mathcal P}\varphi f_i\de s=
+                    %     \frac1{2N}\left[\vphantom{\int_{\mathcal P^2}}\right.&
+                    %     \smash{\sum_{j\in\mathcal I}}\int_{\mathcal P^2}
+                    %     \langle\varphi'-\varphi\rangle f_if^*_j\de s\de s_*\\
+                    %     +&\smash{\sum_{j\in\mathcal I}}\int_{\mathcal P^2}
+                    %     \langle\varphi'_*-\varphi_*\rangle f_jf^*_i\de s\de s_*
+                    %     \left.\vphantom{\int_{\mathcal P^2}}\right],
+                    % \end{aligned}
+                    %
+                    \derS{}t\int_{\mathcal P}\varphi f_i\de s=
+                    \frac1{2N}\left[\vphantom{\int_{\mathcal P^2}}\right.
+                    \smash{\sum_{j\in\mathcal I}}\int_{\mathcal P^2}
+                    \langle\varphi'-\varphi\rangle f_if^*_j\de s\de s_*
+                    +\smash{\sum_{j\in\mathcal I}}\int_{\mathcal P^2}
+                    \langle\varphi'_*-\varphi_*\rangle f_jf^*_i\de s\de s_*
+                    \left.\vphantom{\int_{\mathcal P^2}}\right],
+                \end{equation*}
+                %
+                e valutando la distribuzione marginale della \eqref{eqDistribuzioneTotale} rispetto agl'indici
                 %
                 \begin{equation}
-                    f_i(s,t)=f_j(s,t)=f(s,t)\quad\forall i,j\in\mathcal I,
+                    \label{eqDistribuzioneMarginaleIndici}
+                    F(s,t)\equiv\int_{\mathcal I}f(x,s,t)\de x=
+                    \frac1N\sum_{i\in\mathcal I}f_i(s,t)
+                    \otimes\int_{\mathcal I}\delta(x-i)\de x=
+                    \frac1N\sum_{i\in\mathcal I}f_i(s,t),
                 \end{equation}
                 %
-                da cui la distribuzione marginale
+                che corrisponde a una media tra le distribuzione dei singoli agenti, si ricava
+                %
+                \begin{equation*}
+                    % \label{}
+	                % \begin{aligned}
+                    %     \derS{}t\int_{\mathcal P}\varphi f_i\de s=
+                    %     \frac1{2N}\left[\vphantom{\int_{\mathcal P^2}}\right.&
+                    %     \int_{\mathcal P^2}
+                    %     \langle\varphi'-\varphi\rangle f_iF^*\de s\de s_*\\
+                    %     +&\int_{\mathcal P^2}
+                    %     \langle\varphi'_*-\varphi_*\rangle F_jf^*_i\de s\de s_*
+                    %     \left.\vphantom{\int_{\mathcal P^2}}\right],
+                    % \end{aligned}
+                    %
+                    \derS{}t\int_{\mathcal P}\varphi f_i\de s=
+                    \frac12\left[\vphantom{\int_{\mathcal P^2}}\right.
+                    \int_{\mathcal P^2}
+                    \langle\varphi'-\varphi\rangle f_iF^*\de s\de s_*
+                    +\int_{\mathcal P^2}
+                    \langle\varphi'_*-\varphi_*\rangle Ff^*_i\de s\de s_*
+                    \left.\vphantom{\int_{\mathcal P^2}}\right];
+                \end{equation*}
+                %
+                mediando ora rispetto a tutti gli agenti, si ha
                 %
                 \begin{equation}
+                    \label{eqBoltzmannConGrafoUnitario}
+                    % \begin{aligned}
+                    %     \derS{}t\int_{\mathcal P}\varphi F\de s&=
+                    %     \frac1{2N}\left[\vphantom{\int_{\mathcal P^2}}\right.
+                    %     \int_{\mathcal P^2}
+                    %     \langle\varphi'-\varphi\rangle FF^*\de s\de s_*
+                    %     +\int_{\mathcal P^2}
+                    %     \langle\varphi'_*-\varphi_*\rangle FF^*\de s\de s_*
+                    %     \left.\vphantom{\int_{\mathcal P^2}}\right]\\&=
+                    %     \frac1{2N}\int_{\mathcal P^2}
+                    %     \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle FF^*\de s\de s_*
+                    % \end{aligned}
+                    \derS{}t\int_{\mathcal P}\varphi F\de s=
+                    \frac12\int_{\mathcal P^2}
+                    \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                    FF^*\de s\de s_*,
+                \end{equation}
+                %
+                la quale è formalmente analoga a quella classica di Boltzmann \daRivedere{}. Ciò significa che con tal'ipotesi semplificativa, nonostante gli agenti siano distinti, questi si possono vedere come indistinguibili purché si consideri la distribuzione media \eqref{eqDistribuzioneMarginaleIndici}.
+
+                Tale risultato è anche confermato a livello pratico nell'algoritmo \ref{algMonteCarlo} ove una matrice d'adiacenza unitaria porta ad avere un algoritmo del tutto analogo a quello classico; pertanto l'unica distribuzione che può calcolare \ref{algMonteCarlo} è proprio quella media \(F\).
+    
+                \newcommand\ave[1]{\left\langle#1\right\rangle}
+                \newcommand\bM{\mathbf M}
+                \newcommand\cO{\mathcal O}
+                \begin{algorithm}[!t]
+                    \caption{Algoritmo di Monte Carlo per equazioni di tipo su un grafo}
+                    \label{algMonteCarlo}
+                    \begin{algorithmic}[1]
+                        \Require adjacency matrix \(\bM\); initial state \(V_0\in\cO^N\); time step \(\Delta{t}>0\); final time \(T>0\)
+                        \State \(\tilde{V}\gets V_0\)
+                        \State \(t\gets 1\)
+                        \For{\(t<T\)}
+                        \State \(\ave{\varphi}(t)\gets\frac{1}{N}\sum_{i=1}^N\varphi(\tilde{V}(i))\)
+                        \State \(V\gets\tilde{V}\)
+                        \State \(P\gets \text{random permutation of } \left\{1,\,\dots,\,N\right\}\)
+                        \State \(p_1\gets (P(1),\,\dots,\,P(N/2))\)
+                        \State \(p_2\gets (P(N/2 + 1),\,\dots,\,P(N))\)
+                        \State \(i\gets 1\)
+                        \For{\(i<N/2\)}
+                        \State \(\Theta\sim\operatorname{Bernoulli}\!\left(B(p_1(i),p_2(i))\Delta{t}\right)\)
+                        \State \(\tilde{V}(p_1(i))\gets V(p_1(i))(1-\Theta)+\Psi(V(p_1(i)),V(p_2(i)))\Theta\)
+                        \State \(\tilde{V}(p_2(i))\gets V(p_2(i))(1-\Theta)+\Psi_\ast(V(p_2(i)),V(p_1(i)))\Theta\)
+                        \State \(i\gets i+1\)
+                        \EndFor
+                        \State \(t\gets t+\Delta t\)
+                        \EndFor
+                    \end{algorithmic}
+                \end{algorithm}
+
+
+            \renewcommand\titoloSez{
+                Analisi della %
+                \texorpdfstring{%
+                % \tref{ipAgentiIndistinguibili}{\(2^\circ\)}
+                \ref{ipAgentiIndistinguibili}}{2° IS}%
+            }
+            \subsection{\titoloSez}
+
+                La previa discussione suggerisce di studiare anche il caso in cui gli agenti siano effettivamente indistinguibili; tuttavia, prima di affrontarlo assieme alla prima ipotesi risulta interessante analizzare tale ipotesi isolatamente. Pertanto la \eqref{eqBoltzmannConGrafo} diventa
+                %
+                \begin{equation*}
                     \begin{aligned}
-                        \int_{\mathcal I}f(x,s,t)dx&=\frac1N\sum_{i\in\mathcal I}\int_{\mathcal I}f_i(s,t)\otimes\delta(x-i)dx\\
-                        &=\frac1Nf(s,t)\otimes\sum_{i\in\mathcal I}\int_{\mathcal I}\delta(x-i)dx\\
-                        &=\frac1Nf(s,t)\otimes\sum_{i\in\mathcal I}1\\
-                        &=\frac1Nf(s,t)N=f(s,t),
+                        \derS{}t\int_{\mathcal P}\varphi f\de s&=
+                        \frac1{2N}\sum_{j\in\mathcal I}A(i,j)
+                        \int_{\mathcal P^2}
+                        \langle\varphi'-\varphi\rangle
+                        ff^*\de s\de s_*\\&
+                        +\frac1{2N}\sum_{j\in\mathcal I}A(j,i)
+                        \int_{\mathcal P^2}
+                        \langle\varphi'_*-\varphi_*\rangle
+                        ff^*\de s\de s_*,
                     \end{aligned}
+                \end{equation*}
+                %
+                che sommata su tutti gl'indici porta a
+                %
+                \begin{equation*}
+                    \derS{}t\int_{\mathcal P}\varphi f\de s=
+                    \frac1{2N^2}\sum_{i,j\in\mathcal I}A(i,j)
+                    \int_{\mathcal P^2}
+                    \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                    ff^*\de s\de s_*,
+                \end{equation*}
+                %
+                e definendo \(L\equiv\sum_{i,j\in\mathcal I}A(i,j)\) si arriva a
+                %
+                \begin{equation}
+                    \label{eqBoltzmannConAgentiIndistinguibili}
+                    \derS{}t\int_{\mathcal P}\varphi f\de s=
+                    \frac L{N^2}\left[\frac12
+                    \smash{\sum_{i,j\in\mathcal I}}A(i,j)
+                    \int_{\mathcal P^2}
+                    \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                    ff^*\de s\de s_*\right].
                 \end{equation}
                 %
-                e ciò è anche coerente col fatto che in un gas il numero di particelle è molto elevato.
+                In questo contesto il rapporto \(L/N^2\in[0,1]\) rappresenta topologicamente simile è la rete a una completamente connessa\footnotemark{}; d'altra parte l'equazione è analoga a quella classica di Boltzmann \daRivedere{}.
+               
+                Dunque l'indistinguibilità degli agenti ha una notevole conseguenza sulla \eqref{eqBoltzmannConGrafo}, riassumendo l'effetto complessivo del grafo al solo coefficiente \(L/N^2\) che quindi ne rappresenta gli ultimi bagliori prima di una sua totale scomparsa per la \ref{ipMatriceUnitaria}.
 
-                Considerando una \textit{matrice d'adiacenza unitaria} (2° ipotesi) si può scrivere la (2.10) come
+                \footnotetext{Difatti \(L\) è interpretabile come il numero di lati presenti in un grafo diretto e che ha come limite superiore prorio \(N^2\), ossia il numero totale di coppie [e quindi lati] dati \(N\) nodi.}
+
+
+            \renewcommand\titoloSez{
+                Analisi della %
+                \texorpdfstring{%
+                \tref{ipMatriceUnitaria}{\(1^\circ\)}, %
+                \tref{ipAgentiIndistinguibili}{\(2^\circ\)} e %
+                % \tref{ipInterazioniSimmetriche}{\(3^\circ\)}%
+                \ref{ipInterazioniSimmetriche}}{1°, 2° e 3° IS}%
+            }
+            \subsection{\titoloSez}
+
+                Visto che vale \ref{ipMatriceUnitaria} si può partire dalla \eqref{eqBoltzmannConGrafoUnitario} nella quale la distribuzione media \eqref{eqDistribuzioneMarginaleIndici} diventa per \ref{ipAgentiIndistinguibili}                %
+                \begin{equation*}
+                        F(s,t)=\frac1N\sum_{i\in\mathcal I}f_i(s,t)
+                        \overset{\tref{ipAgentiIndistinguibili}{2^\circ}}=
+                        \frac1N\sum_{i\in\mathcal I}f(s,t)=f(s,t),
+                \end{equation*}
                 %
-                \begin{equation}
-                    \begin{aligned}
-                        \derS{}t\int_{\mathcal O}\varphi(s)f(s,t)ds&=
-                        \frac1{2N}\sum_{j\in\mathcal I}\int_{\mathcal O^{2}}\langle\varphi(s)-\varphi(s)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
-                        &+\frac1{2N}\sum_{j\in\mathcal I}\int_{\mathcal O^{2}}\langle\varphi(s_*')-\varphi(s_*)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
-                        &=\frac1{2N}N\int_{\mathcal O^{2}}\langle\varphi(s')-\varphi(s)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
-                        &+\frac1{2N}N\int_{\mathcal O^{2}}\langle\varphi(s_*')-\varphi(s_*)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
-                        &=\frac12\int_{\mathcal O^{2}}\langle\varphi(s')-\varphi(s)\rangle f(s,t)f(s_*,t)\de s\de s_*\\
-                        &+\frac12\int_{\mathcal O^{2}}\langle\varphi(s_*')-\varphi(s_*)\rangle f(s,t)f(s_*,t)\de s\de s_*,
-                    \end{aligned}
-                \end{equation}
-                
-                che unita all'ipotesi d'\textit{interazioni simmetriche} (3° ipotesi), ossia tali che 
+                ossia la \(F\) coincide con quella di tutti gli agenti\footnotemark, essendo questi, appunto, indistinguibili.
+                \footnotetext{Si noti anche che la perdita della dipendenza della distribuzione media dal numero di nodi \(N\) è coerente colla situazione in cui \(N\to\infty\), condizione fondamentale analoga a casi classici come lo studio del gas nel quale \(N\gg1\) ben approssima il limite.}
+
+                In tal modo la \eqref{eqBoltzmannConGrafoUnitario} diventa
                 %
-                \begin{equation}
-                    s'=\Psi(s,s_*)=\Psi_*(s_*,s)\quad\text{ove }s_*=\Psi_*(s,s_*),
-                \end{equation}
+                \begin{equation*}
+                    \derS{}t\int_{\mathcal P}\varphi f\de s=
+                    \frac12\int_{\mathcal P^2}
+                    \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                    ff^*\de s\de s_*,
+                \end{equation*}
                 %
-                porta all'equivalenza (mediante il cambio di variabili \(s_*=s\) e \(s=s_*\))
+                che unita all \ref{ipInterazioniSimmetriche} porta all'equivalenza (mediante il cambio di variabili \(s_*=s\) e \(s=s_*\))
                 %
-                \begin{equation}
-                    \int_{\mathcal O^{2}}\langle\varphi_*'-\varphi_*\rangle ff_*dsds_*
-                    =\int_{\mathcal O^{2}}\langle\varphi'-\varphi\rangle ff_*dsds_*,
-                \end{equation}
+                \begin{equation*}
+                    \int_{\mathcal P^2}
+                    \langle\varphi_*'-\varphi_*\rangle ff_*dsds_*
+                    =\int_{\mathcal P^2}
+                    \langle\varphi'-\varphi\rangle ff^*dsds_*,
+                \end{equation*}
                 %
                 e quindi a
                 %
-                \begin{equation}
-                    \derS{}t\int_{\mathcal O}\varphi(s)f(s,t)ds=
-                    \int_{\mathcal O^{2}}\langle\varphi(s')-\varphi(s)\rangle f(s,t)f(s_*,t)dsds_*,
-                \end{equation}
+                \begin{equation*}
+                    \derS{}t\int_{\mathcal P}\varphi fds=
+                    \int_{\mathcal P^2}
+                    \langle\varphi'-\varphi\rangle ff^*dsds_*,
+                \end{equation*}
                 %
-                che equivale alla formula classica di Boltzmann.
+                che equivale alla formula classica di Boltzmann con interazioni simmetriche \daRivedere{} usata classicamente per modellizzare la distribuzione dell'energia cinetica tra una popolazione di particelle di un gas.
 
     %%%
     %%%
