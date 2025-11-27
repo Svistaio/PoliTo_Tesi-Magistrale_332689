@@ -47,62 +47,113 @@
         {Teorie cinetiche dei\newline sistemi multiagente}
         {Teorie cinetiche dei sistemi multiagente}%
     }\label{secTCSM}
+        \section{Descrizione cinetica classica}
 
-        \section{Descrizione cinetica}\label{secDescrizioneCinetica} %  d'interazioni mediante da un grafo
-            La distribuzione totale presenta la seguente forma
-            %
-            \begin{equation}
-                \label{eqDistribuzioneTotale}
-                f(x,s,t)=\frac1N\sum_{i\in\mathcal I}f_i(s,t)\otimes\delta(x-i),
-            \end{equation}
-            %
-            ove \(N\equiv\vert\mathcal I\vert\) è il numero totale d'agenti/vertici del grafo mentre \(\delta(\cdot)\) denota la delta di Dirac centrata all'origine; d'altra parte \[f_i=f_i(s,t):\mathcal P\times[0,+\infty)\rightarrow\mathbb R_+\] è la densità di probabilità della taglia \(S_t\) dell'agente \(X=i\).
+        \section{Descrizione cinetica retale}\label{secDescrizioneCinetica} %  d'interazioni mediante da un grafo
             
-            Logicamente si richiede
-            %
-            \begin{equation*}
-                % \label{eqUnitaryIntegrationfi}
-                \int_{\mathcal P}f_i(s,t)\de s=1,
-                \qquad\forall t\geq0,\;\forall i\in\mathcal I,
-            \end{equation*}
-            %
-            che implica coerentemente
-            %
-            \begin{equation*}
-                % \label{eqUnitaryIntegrationf}
-                \int_{\mathcal I}\int_{\mathcal P}f(x,s,t)\de s\de x=1
-            \end{equation*}
-            %
-            a ogn'istante.
+            \subsection{Impostazione}
 
-            [...]
+                La popolazione degli agenti evolve a causa delle interazioni con altri agenti connessi. Seguendo la teoria cinetica collisionale, l'ipotesi fondamentale ipotizzata è che solo le interazioni binarie siano rilevanti: le interazioni fra tre o piú agenti possono essere trascurate.
 
-            %
-            \begin{equation}
-                \label{eqBoltzmannConGrafo}
-                \begin{aligned}
-                    \derS{}t\int_{\mathcal P}\varphi f_i\de s&=
-                    \frac1{2N}\sum_{j\in\mathcal I}A(i,j)
-                    \int_{\mathcal P^2}%\int_{\mathcal P}
-                    \langle\varphi'-\varphi\rangle
-                    f_if^*_j\de s\de s_*\\&
-                    +\frac1{2N}\sum_{j\in\mathcal I}A(j,i)
-                    \int_{\mathcal P^2}%\int_{\mathcal P}
-                    \langle\varphi'_*-\varphi_*\rangle
-                    f_jf^*_i\de s\de s_*,%\\&
-                    \quad\forall i\in\mathcal I,
-                \end{aligned}
-            \end{equation}
-            %
-            ove gli argomenti di tutte le funzioni sono stati sottintesi, vale a dire
-            \[
-                \newcommand\spazOr{\;\;\;}
-                f_i\equiv f_i(s,t)\spazOr\forall i\in\mathcal I,
-                \spazOr\varphi\equiv\varphi(s),
-                \spazOr\varphi_*\equiv\varphi(s_*)
-                \spazOr\text{e}\spazOr
-                \varphi'\equiv\varphi(s').
-            \]
+                Dopodiché, sia \(X\in\mathcal I\) la posizione di un agente sul grafo \(\mathcal G=(\mathcal I,\mathcal E)\), ove \(\mathcal I\) è l'insieme dei vertici mentre \(\mathcal E\) dei lati di \(\mathcal G\). Si assume che il grafico sia statico, ovvero che le connessioni tra agenti non varia nel tempo.
+
+                Si consideri, allora, un generico agente rappresentativo, il cui stato microscopico è descritto dal processo stocastico \((X,S_t)_{t\geq0}\); la funzione \(S_t:\Omega\to\mathcal P\) è una variabile aleatoria da uno spazio astratto \(\Omega\) allo spazio delle popolazioni \(\mathcal P\) e indica la popolazione dell'agente al tempo \(t\geq0\). Tale variabile aleatoria evolve nel tempo per le interazioni binarie con altri agenti mediate dalle connessioni descritte da \(\mathcal E\), definendo cosí un processo stocastico \(\{S_t,t\in[0,+\infty)\}\).
+
+                Nel complesso di descrive statisticamente lo stato microscopico \(X,S_t\) dell'agente mediante una probabilità di misura \(f=f(x,s,t)\), discreta in \(x\in\mathcal I\) e continua in \(s\in\mathcal P\). Pertanto si può dare alla \(f\) la seguente forma
+                %
+                \begin{equation}
+                    \label{eqDistribuzioneTotale}
+                    f(x,s,t)=\frac1N\sum_{i\in\mathcal I}f_i(s,t)\otimes\delta(x-i),
+                \end{equation}
+                %
+                ove \(N\equiv\vert\mathcal I\vert\) è il numero totale d'agenti/vertici del grafo mentre \(\delta(\cdot)\) denota la delta di Dirac centrata all'origine; d'altra parte \[f_i=f_i(s,t):\mathcal P\times[0,+\infty)\rightarrow\mathbb R_+\] è la densità di probabilità della taglia \(S_t\) dell'agente \(X=i\).
+                
+                Logicamente si richiede
+                %
+                \begin{equation*}
+                    % \label{eqUnitaryIntegrationfi}
+                    \int_{\mathcal P}f_i(s,t)\de s=1,
+                    \qquad\forall t\geq0,\;\forall i\in\mathcal I,
+                \end{equation*}
+                %
+                che implica coerentemente
+                %
+                \begin{equation*}
+                    % \label{eqUnitaryIntegrationf}
+                    \int_{\mathcal I}\int_{\mathcal P}
+                    f(x,s,t)\de s\de x=1
+                    \qquad\forall t\geq0
+                \end{equation*}
+
+            \subsection{Algoritmi d'interazione}
+
+                Un algoritmo d'interazione è una regola che descrive come gli agenti interagiscono a coppie e modificano di conseguenza il loro stato nel tempo; nel dettaglio, in un dato passo temporale \(\Delta t>0\) si assume che un agente \((X,S_t)\in\mathcal I\times\mathcal P\) cambi la sua popolazione a \(S_{t+\Delta t}\in\mathcal P\) a seguito di un interazione con un altro agente \((X^*,S^*_t)\in\mathcal I\times\mathcal P\) secondo il successivo schema
+                %
+                \begin{equation}
+                    \label{eqSchemaInterazione}
+                    S_{t+\Delta t}=(1-\Theta)S_t+\Theta S'_t,
+                \end{equation}
+                %
+                ove \(\Theta\in{0,1}\) è una variabile aleatoria che tiene in considerazione qualora l'interazione tra i due agenti effettivamente si manifesti \((\Theta=1)\) o no \((\Theta=0)\); d'altro canto \(S'_t\in\mathcal P\) è la nuova popolazione ottenuta dall'agente \((X,V_t)\) in seguito a un'interazione avvenuta.
+
+                Con maggiore dettaglio si pone
+                %
+                \begin{equation}
+                    \label{eqVariabileAleatoriaInterazione}
+                    \Theta\sim\Bernoulli(A(X,X^*),\Delta t),
+                \end{equation}
+                %
+                il che significa che la probabilità che un'interazione avvenga è proporzionale al passo temporale d'interazione \(\Delta t\) mediante un nucleo d'interazione \(A(X,X^*)=1\), che contiene le informazioni sui lati del grafo, e quindi alle connessioni tra gli agenti, ponendo
+                %
+                \begin{equation*}
+                    %\label{}
+                    A(X,X^*)=
+                    \left\{\begin{aligned}
+                        1&\quad\text{se }(X,X^*)\in\mathcal E,\\
+                        0&\quad\text{se }(X,X^*)\notin\mathcal E,
+                    \end{aligned}\right.
+                \end{equation*}
+                %
+                dove la coppia ordinata \((X,X^*)\) denota il lato dal vertice \(X\) al vertice \(X^*\); per coerenza è necessario imporre \(\Delta t\leq1\) che impone un limite superiore al massimo passo temporale ammissibile, seppure tale condizione sia molto facile da verificare nella pratica.
+
+                La popolazione postinterazione è una variabile aleatoria \(S'_t:\Omega\to\mathcal P\) dipendente in generale dagli stati preinterazione \(V_t\), \(V^*_t\) degli agenti integranti:
+                %
+                \begin{equation}
+                    \label{eqPopolazionePostInterazione}
+                    V'_t(\omega)=\Psi(S_t(\omega),S^*_t(\omega),\omega),
+                    \quad\omega\in\Omega,
+                \end{equation}
+                %
+                in cui \(\Psi:\mathcal P^2\times\Omega\to\mathcal P\) è funzione nota potenzialmente stocastica. 
+                
+                [...]
+
+                %
+                \begin{equation}
+                    \label{eqBoltzmannConGrafo}
+                    \begin{aligned}
+                        \derS{}t\int_{\mathcal P}\varphi f_i\de s&=
+                        \frac1{2N}\sum_{j\in\mathcal I}A(i,j)
+                        \int_{\mathcal P^2}%\int_{\mathcal P}
+                        \langle\varphi'-\varphi\rangle
+                        f_if^*_j\de s\de s_*\\&
+                        +\frac1{2N}\sum_{j\in\mathcal I}A(j,i)
+                        \int_{\mathcal P^2}%\int_{\mathcal P}
+                        \langle\varphi'_*-\varphi_*\rangle
+                        f_jf^*_i\de s\de s_*,%\\&
+                        \quad\forall i\in\mathcal I,
+                    \end{aligned}
+                \end{equation}
+                %
+                ove gli argomenti di tutte le funzioni sono stati sottintesi, vale a dire
+                \[
+                    \newcommand\spazOr{\;\;\;}
+                    f_i\equiv f_i(s,t)\spazOr\forall i\in\mathcal I,
+                    \spazOr\varphi\equiv\varphi(s),
+                    \spazOr\varphi_*\equiv\varphi(s_*)
+                    \spazOr\text{e}\spazOr
+                    \varphi'\equiv\varphi(s').
+                \]
 
         \section{Nesso discreto-continuo}\label{secNessoDC}
 
