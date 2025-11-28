@@ -43,10 +43,11 @@
     %%%
 
     % \part{Teoria}
-    \chapter{\texorpdfstring
+    \chapter[Teorie cinetiche dei sistemi multiagente]{\texorpdfstring
         {Teorie cinetiche dei\newline sistemi multiagente}
         {Teorie cinetiche dei sistemi multiagente}%
     }\label{secTCSM}
+
         \section{Descrizione cinetica classica}
 
         \section{Descrizione cinetica retale}\label{secDescrizioneCinetica} %  d'interazioni mediante da un grafo
@@ -69,8 +70,8 @@
                 ove \(N\equiv\vert\mathcal I\vert\) è il numero totale d'agenti/vertici del grafo mentre \(\delta(\cdot)\) denota la delta di Dirac centrata all'origine; d'altra parte \[f_i=f_i(s,t):\mathcal P\times[0,+\infty)\rightarrow\mathbb R_+\] è la densità di probabilità della taglia \(S_t\) dell'agente \(X=i\).
                 
                 Logicamente si richiede
-                %
                 \begin{equation*}
+                    %
                     % \label{eqUnitaryIntegrationfi}
                     \int_{\mathcal P}f_i(s,t)\de s=1,
                     \qquad\forall t\geq0,\;\forall i\in\mathcal I,
@@ -90,7 +91,7 @@
                 Un algoritmo d'interazione è una regola che descrive come gli agenti interagiscono a coppie e modificano di conseguenza il loro stato nel tempo; nel dettaglio, in un dato passo temporale \(\Delta t>0\) si assume che un agente \((X,S_t)\in\mathcal I\times\mathcal P\) cambi la sua popolazione a \(S_{t+\Delta t}\in\mathcal P\) a seguito di un interazione con un altro agente \((X^*,S^*_t)\in\mathcal I\times\mathcal P\) secondo il successivo schema
                 %
                 \begin{equation}
-                    \label{eqSchemaInterazione}
+                    \label{eqSchemaInterazioneAgenteInteragente}
                     S_{t+\Delta t}=(1-\Theta)S_t+\Theta S'_t,
                 \end{equation}
                 %
@@ -154,6 +155,46 @@
                     \spazOr\text{e}\spazOr
                     \varphi'\equiv\varphi(s').
                 \]
+
+            \subsection{Interazioni azione-reazione}
+                
+                Nel contesto delle città è chiaro che qualora una città-nodo interagisca con un'altra entrambe debbano variare il loro stato.
+                
+                Sia \(S\)
+                la città interagente e \(S^*\) quella subente, allora in un grafo diretto si può distinguere il senso d'interazione: quella \textit{in avanti} avviene sse \((S,S^*)\in\mathcal E\) mentre quella in indietro sse \((S^*,S)\in\mathcal E\); tuttavia questa distinzione è inutile in questo caso di grafo diretto con matrice d'adiacenza simmetrica.  Pertanto l'agente \((X^*,S^*_t)\) aggiorna la sua popolazione attraverso una regola analoga a quella dell'agente \((X,S_t)\):
+                %
+                \begin{equation}
+                    \label{eqSchemaInterazioneAgenteSubente}
+                    S^*_{t+\Delta t}=(1-\Theta)S^*_t+\Theta S^{*\prime}_t,
+                \end{equation}
+                %
+                ove si osserva che la \(\Theta\) è la stessa della \eqref{eqSchemaInterazioneAgenteInteragente} la cui legge dipende da \(A(X,X^*)\) ma non da \(A(X^*,X)\); tale dettaglio è da tenere in considerazione nel caso in cui la matrice di adiacenza non sia simmetrica, ma in questo caso di simmetria non è rilevante. L'opinione postinterazione
+                %
+                \begin{equation*}
+                    %\label{}
+                    S'_t(\omega)=\Psi_*(S^*_(\omega),S_t(\omega),\omega),
+                    \quad\omega\in\Omega,
+                \end{equation*}
+                %
+                è definita mediante una funzione \(\Psi_*:\mathcal P^2\times\Omega\to\mathcal P\) potenzialmente diversa da \(\Psi\).
+
+                Questo tipo d'interazione, prendendo come riferimento \cite[§ 2.2.1]{Nurisso_Raviola_Tosin_2024} sarà identificato come azione-reazione, e riassunto dall'algoritmo
+                %
+                \begin{equation}
+                    \label{eqAlgoritmoInterazioniAzioneReazione}
+                    [AR]=\left\{
+                    \begin{aligned}
+                        S_{t+\Delta t}&=(1-\Theta)S_t+\Theta S'_t,\\
+                        S^*_{t+\Delta t}&=(1-\Theta)S^*_t+\Theta S^{*\prime}_t.
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                %
+                Si conclude questa sezione osservando che gli agenti \((X,S_t)\), \((X^*,S^*_t)\) sono campionati casualmente e uniformemente a ogni passo temporale.
+
+
+        \section{Derivazione dell'equazioni cinetiche}
+
 
         \section{Nesso discreto-continuo}\label{secNessoDC}
 
