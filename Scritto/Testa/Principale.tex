@@ -127,6 +127,102 @@
                 %
                 in cui \(\Psi:\mathcal P^2\times\Omega\to\mathcal P\) è funzione nota potenzialmente stocastica. 
                 
+            \subsection{Interazioni azione-reazione}
+                
+                Nel contesto delle città è chiaro che qualora una città-nodo interagisca con un'altra entrambe debbano variare il loro stato.
+                
+                Sia \(S\)
+                la città interagente e \(S^*\) quella subente, allora in un grafo diretto si può distinguere il senso d'interazione: quella \textit{in avanti} avviene sse \((S,S^*)\in\mathcal E\) mentre quella in indietro sse \((S^*,S)\in\mathcal E\); tuttavia questa distinzione è inutile in questo caso di grafo diretto con matrice d'adiacenza simmetrica.  Pertanto l'agente \((X^*,S^*_t)\) aggiorna la sua popolazione attraverso una regola analoga a quella dell'agente \((X,S_t)\):
+                %
+                \begin{equation}
+                    \label{eqSchemaInterazioneAgenteSubente}
+                    S^*_{t+\Delta t}=(1-\Theta)S^*_t+\Theta S^{*\prime}_t,
+                \end{equation}
+                %
+                ove si osserva che la \(\Theta\) è la stessa della \eqref{eqSchemaInterazioneAgenteInteragente} la cui legge dipende da \(A(X,X^*)\) ma non da \(A(X^*,X)\); tale dettaglio è da tenere in considerazione nel caso in cui la matrice di adiacenza non sia simmetrica, ma in questo caso di simmetria non è rilevante. L'opinione postinterazione
+                %
+                \begin{equation*}
+                    %\label{}
+                    S'_t(\omega)=\Psi_*(S^*_t(\omega),S_t(\omega),\omega),
+                    \quad\omega\in\Omega,
+                \end{equation*}
+                %
+                è definita mediante una funzione \(\Psi_*:\mathcal P^2\times\Omega\to\mathcal P\) potenzialmente diversa da \(\Psi\).
+
+                Questo tipo d'interazione, prendendo come riferimento \cite[§ 2.2.1]{Nurisso2024} sarà identificato come azione-reazione, e riassunto dall'algoritmo
+                %
+                \begin{equation*}
+                    \label{eqAlgoritmoInterazioniAzioneReazione}
+                    \refstepcounter{equation}
+                    [AR]\left\{
+                    \begin{aligned}
+                        S_{t+\Delta t}&=(1-\Theta)S_t+\Theta S'_t,\\
+                        S^*_{t+\Delta t}&=(1-\Theta)S^*_t+\Theta S^{*\prime}_t.
+                    \end{aligned}
+                    \right.
+                    \notag
+                \end{equation*}
+                \newcommand\refAlgIntAR{\tref{eqAlgoritmoInterazioniAzioneReazione}{[AR]}}
+                %
+                Si conclude questa sezione osservando che gli agenti \((X,S_t)\), \((X^*,S^*_t)\) sono campionati casualmente e uniformemente a ogni passo temporale.
+
+
+        \section{Derivazione dell'equazioni cinetiche}
+
+            \subsection{Derivazione esatta}
+
+                Una descrizione cinetica dell'algoritmo \refAlgIntAR{} coincide con dell'equazioni d'evoluzione per le distribuzioni di probabiltà \(f_i\) delle opinioni degli agenti; per derivarle si procede mediante un metodo classico nella teoria dei sistemi multiagente \cite{Nurisso2024,IMS2103}.
+
+                Sia \(\Phi\equiv\Phi(x,s):\mathcal I\times\mathcal P\to\mathbb R\) un osservabile arbitrario (funzione \textit{test}), cioè una quantità che si può calcolata sapendo lo stato microscopico di un generico agente rappresentativo del sistema. Allora dalla prima equazione in \refAlgIntAR{} valutando il valore atteso dell'osservabile postinterazione, si ha
+                %
+                \begin{equation*}
+                    %\label{}
+                    \begin{aligned}
+                        \mathbb E[\Phi(X,V_{t+\Delta t})]=
+                        \mathbb E\left[\mathbb E\right.[
+                            &\Phi\left(X,(1-\Theta)V_t
+                            +\Theta\Psi(V_t,V_t^*,\omega)
+                            A(X,X_*)\Delta t\right)|X,X_*
+                        ]\left.\vphantom{\mathbb E}\right]\\
+                        =\mathbb E\left[
+                            \mathbb E\right.[
+                            &\Phi(X,V_t)(1-A(X,X_*)\Delta t)
+                            \\+&\Phi\left(
+                                X,\Psi(V_t,V_t^*,\omega)
+                            \right)A(X,X_*)\Delta t
+                        ]\left.\vphantom{\mathbb E}\right],
+                    \end{aligned}
+                \end{equation*}
+                %
+                da cui, riordinando i termini e dividendo ambo i membri per \(\Delta t\), si deduce
+                %
+                \begin{equation*}
+                    %\label{}
+                    \frac{
+                        \mathbb E[\Phi(X,V_{t+\Delta t})
+                        -\mathbb E[\Phi(X,V_t)]]
+                    }{\Delta t}=
+                    \mathbb E\left[
+                        A(X,X_*)\left(
+                            \Phi(X,\Psi(V_t,V_t^*,\omega))-\Phi(X,V_t)
+                        \right)
+                    \right],
+                \end{equation*}
+                %
+                laddove, prendendo il limite \(\Delta t\to0^+\), si ricava formalmente
+                %
+                \begin{equation}
+                    \label{eqDinamicaValoreAtteso}
+                    \derS{\mathbb E[\Phi(X,V_t)]}t=
+                    \mathbb E\left[
+                        A(X,X^*)\left(
+                            \Phi(X,\Psi(V_t,V_t^*,\omega))-\Phi(X,V_t)
+                        \right)
+                    \right].
+                \end{equation}
+                %
+                % testo successivo
+
                 [...]
 
                 %
@@ -156,44 +252,10 @@
                     \varphi'\equiv\varphi(s').
                 \]
 
-            \subsection{Interazioni azione-reazione}
-                
-                Nel contesto delle città è chiaro che qualora una città-nodo interagisca con un'altra entrambe debbano variare il loro stato.
-                
-                Sia \(S\)
-                la città interagente e \(S^*\) quella subente, allora in un grafo diretto si può distinguere il senso d'interazione: quella \textit{in avanti} avviene sse \((S,S^*)\in\mathcal E\) mentre quella in indietro sse \((S^*,S)\in\mathcal E\); tuttavia questa distinzione è inutile in questo caso di grafo diretto con matrice d'adiacenza simmetrica.  Pertanto l'agente \((X^*,S^*_t)\) aggiorna la sua popolazione attraverso una regola analoga a quella dell'agente \((X,S_t)\):
-                %
-                \begin{equation}
-                    \label{eqSchemaInterazioneAgenteSubente}
-                    S^*_{t+\Delta t}=(1-\Theta)S^*_t+\Theta S^{*\prime}_t,
-                \end{equation}
-                %
-                ove si osserva che la \(\Theta\) è la stessa della \eqref{eqSchemaInterazioneAgenteInteragente} la cui legge dipende da \(A(X,X^*)\) ma non da \(A(X^*,X)\); tale dettaglio è da tenere in considerazione nel caso in cui la matrice di adiacenza non sia simmetrica, ma in questo caso di simmetria non è rilevante. L'opinione postinterazione
-                %
-                \begin{equation*}
-                    %\label{}
-                    S'_t(\omega)=\Psi_*(S^*_(\omega),S_t(\omega),\omega),
-                    \quad\omega\in\Omega,
-                \end{equation*}
-                %
-                è definita mediante una funzione \(\Psi_*:\mathcal P^2\times\Omega\to\mathcal P\) potenzialmente diversa da \(\Psi\).
 
-                Questo tipo d'interazione, prendendo come riferimento \cite[§ 2.2.1]{Nurisso_Raviola_Tosin_2024} sarà identificato come azione-reazione, e riassunto dall'algoritmo
-                %
-                \begin{equation}
-                    \label{eqAlgoritmoInterazioniAzioneReazione}
-                    [AR]=\left\{
-                    \begin{aligned}
-                        S_{t+\Delta t}&=(1-\Theta)S_t+\Theta S'_t,\\
-                        S^*_{t+\Delta t}&=(1-\Theta)S^*_t+\Theta S^{*\prime}_t.
-                    \end{aligned}
-                    \right.
-                \end{equation}
-                %
-                Si conclude questa sezione osservando che gli agenti \((X,S_t)\), \((X^*,S^*_t)\) sono campionati casualmente e uniformemente a ogni passo temporale.
+            \subsection{Interazioni tra città}
 
-
-        \section{Derivazione dell'equazioni cinetiche}
+            \subsection{Derivazione approssimata}
 
 
         \section{Nesso discreto-continuo}\label{secNessoDC}
