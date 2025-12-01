@@ -147,9 +147,7 @@
                     \quad\omega\in\Omega,
                 \end{equation*}
                 %
-                è definita mediante una funzione \(\Psi_*:\mathcal P^2\times\Omega\to\mathcal P\) potenzialmente diversa da \(\Psi\).
-
-                Questo tipo d'interazione, prendendo come riferimento \cite[§ 2.2.1]{Nurisso2024} sarà identificato come azione-reazione, e riassunto dall'algoritmo
+                è definita mediante una funzione \(\Psi_*:\mathcal P^2\times\Omega\to\mathcal P\) potenzialmente diversa da \(\Psi\). Questo tipo d'interazione, prendendo come riferimento \cite[§ 2.2.1]{Nurisso2024} sarà identificato come azione-reazione, e riassunto dall'algoritmo
                 %
                 \begin{equation*}
                     \label{eqAlgoritmoInterazioniAzioneReazione}
@@ -173,22 +171,22 @@
 
                 Una descrizione cinetica dell'algoritmo \refAlgIntAR{} coincide con dell'equazioni d'evoluzione per le distribuzioni di probabiltà \(f_i\) delle opinioni degli agenti; per derivarle si procede mediante un metodo classico nella teoria dei sistemi multiagente \cite{Nurisso2024,IMS2103}.
 
-                Sia \(\Phi\equiv\Phi(x,s):\mathcal I\times\mathcal P\to\mathbb R\) un osservabile arbitrario (funzione \textit{test}), cioè una quantità che si può calcolata sapendo lo stato microscopico di un generico agente rappresentativo del sistema. Allora dalla prima equazione in \refAlgIntAR{} valutando il valore atteso dell'osservabile postinterazione, si ha
+                Sia \(\Phi\equiv\Phi(x,s):\mathcal I\times\mathcal P\to\mathbb R\) un osservabile arbitrario (funzione \textit{test}), cioè una quantità che si può calcolare sapendo lo stato microscopico di un generico agente rappresentativo del sistema. Allora dalla prima equazione in \refAlgIntAR{}, valutando il valore atteso dell'osservabile postinterazione rispetto agl'indici e alla popolazione a tempo fissato, si ha \daRivedere
                 %
                 \begin{equation*}
                     %\label{}
                     \begin{aligned}
-                        \mathbb E[\Phi(X,V_{t+\Delta t})]=
+                        \mathbb E[\Phi(X,S_{t+\Delta t})]=
                         \mathbb E\left[\mathbb E\right.[
-                            &\Phi\left(X,(1-\Theta)V_t
-                            +\Theta\Psi(V_t,V_t^*,\omega)
+                            &\Phi\left(X,(1-\Theta)S_t
+                            +\Theta\Psi(S_t,S_t^*,\omega)
                             A(X,X_*)\Delta t\right)|X,X_*
                         ]\left.\vphantom{\mathbb E}\right]\\
                         =\mathbb E\left[
                             \mathbb E\right.[
-                            &\Phi(X,V_t)(1-A(X,X_*)\Delta t)
-                            \\+&\Phi\left(
-                                X,\Psi(V_t,V_t^*,\omega)
+                            &\Phi(X,S_t)(1-A(X,X_*)\Delta t)
+                            \\&+\Phi\left(
+                                X,\Psi(S_t,S_t^*,\omega)
                             \right)A(X,X_*)\Delta t
                         ]\left.\vphantom{\mathbb E}\right],
                     \end{aligned}
@@ -199,12 +197,12 @@
                 \begin{equation*}
                     %\label{}
                     \frac{
-                        \mathbb E[\Phi(X,V_{t+\Delta t})
-                        -\mathbb E[\Phi(X,V_t)]]
+                        \mathbb E[\Phi(X,S_{t+\Delta t})
+                        -\mathbb E[\Phi(X,S_t)]]
                     }{\Delta t}=
                     \mathbb E\left[
                         A(X,X_*)\left(
-                            \Phi(X,\Psi(V_t,V_t^*,\omega))-\Phi(X,V_t)
+                            \Phi(X,\Psi(S_t,S_t^*,\omega))-\Phi(X,S_t)
                         \right)
                     \right],
                 \end{equation*}
@@ -212,24 +210,93 @@
                 laddove, prendendo il limite \(\Delta t\to0^+\), si ricava formalmente
                 %
                 \begin{equation}
-                    \label{eqDinamicaValoreAtteso}
-                    \derS{\mathbb E[\Phi(X,V_t)]}t=
+                    \label{eqDinamicaValoreAtteso1}
+                    \derS{\mathbb E[\Phi(X,S_t)]}t=
                     \mathbb E\left[
                         A(X,X^*)\left(
-                            \Phi(X,\Psi(V_t,V_t^*,\omega))-\Phi(X,V_t)
+                            \Phi(X,\Psi(S_t,S_t^*,\omega))-\Phi(X,S_t)
                         \right)
                     \right].
                 \end{equation}
                 %
-                % testo successivo
+                Si può ricavare una simile equazione ripetendo i precedenti passaggi ma colla seconda equazione di \refAlgIntAR{}, da cui
+                %
+                \begin{equation}
+                    \label{eqDinamicaValoreAtteso2}
+                    \derS{\mathbb E[\Phi(X^*,S^*_t)]}t=
+                    \mathbb E\left[
+                        A(X,X^*)\left(
+                            \Phi(X^*,\Psi_*(S^*_t,S_t,\omega))-\Phi(X^*,S^*_t)
+                        \right)
+                    \right].
+                \end{equation}
+                %
+                Osservando che le coppie \((X,S_t)\) e \((X^*,S_t^*)\) fanno riferimento a un agente rappresentativo generico del sistema, vale \[\mathbb E[\Phi(X,S_t)]=\mathbb E[\Phi(X^*,S^*_t)]\] cosicché, sommando \cref{eqDinamicaValoreAtteso1,eqDinamicaValoreAtteso2}, si ha
+                %
+                \begin{equation*}
+                    %\label{}
+                    \begin{aligned}
+                        \derS{\mathbb E[\Phi(X,S_t)]}t=
+                        \frac12\mathbb E\bigl[
+                            A(X,X^*)\bigl(
+                                &\Phi(X,\Psi(S_t,S^*_t,\omega))
+                                +\Phi(X^*,\Psi_*(S^*_t,S_t,\omega))
+                                \\&
+                                -\Phi(X,S_t)-\Phi(X^*,S^*_t)
+                            \bigr)
+                        \bigr],
+                    \end{aligned}
+                \end{equation*}
+                %
+                ed espandendo la definizione della media si arriva a
+                %
+                \begin{equation}
+                    \label{eqDinamicaValoreAttesoEspanso}
+                    % \derS{}t\int_{\mathcal I}\int_{\mathcal O}
+                    % \Phi(x,s)f(x,s,t)\de v \de x=
+                    % \int_{\mathcal I^2}\int_{\mathcal O^2}A(x,x_*)
+                    % \frac{\langle \Phi(x,s')+\Phi(x_*,s'_*)
+                    % -\Phi(x,s)-\Phi(x_*,s_*)\rangle}2
+                    % f(x,s,t)f(x_*,s_*,t)\de s\de s_*\de x\de x_*
+                    \derS{}t\int_{\mathcal I}\int_{\mathcal P}
+                    \Phi f\de v \de x=
+                    \int_{\mathcal I^2}\int_{\mathcal P^2}A(x,x_*)
+                    \frac{\langle \Phi'+\Phi_*'-\Phi-\Phi_*\rangle}2
+                    ff_*\de s\de s_*\de x\de x_*,
+                \end{equation}
+                %
+                ove [per brevità] si sono omessi gli argomenti dell'osservabile e della distribuzione \eqref{eqDistribuzioneTotale}:
+                %
+                \begin{equation*}
+                    %\label{}
+                    \newcommand\spazOr{\;\;\;}
+                    f\equiv f(x,s,t),
+                    \spazOr\Phi\equiv\Phi(x,s),
+                    \spazOr\Phi_*\equiv\Phi(x_*,s_*)
+                    \spazOr\Phi'\equiv\Phi(x,s')
+                    \spazOr\text{e}\spazOr
+                    \Phi_*'\equiv\Phi(x_*,s_*'),
+                \end{equation*}
+                %
+                si è inoltre imposto
+                %
+                \begin{equation}
+                    \label{eqStatiPostInterazioni}
+                    s'=\Psi(s,s_*,\omega)\quad s'_*=\Psi_*(s_*,s,\omega),
+                \end{equation}
+                %
+                mentre \(\langle\cdot\rangle\) indica il valore atteso rispetto alla potenziale stocasticità delle funzioni \(\Psi\) e \(\Psi_*\).
 
-                [...]
+                Si noti che la \eqref{eqDinamicaValoreAttesoEspanso} è valida per ogni funzione \textit{test} \(\Phi\) per cui è un'equazione debole per la distribuzione \(f\). (commento su Fokker-Planck \daRivedere)
 
+                Si osservi anche che la \eqref{eqDinamicaValoreAttesoEspanso} è scritta sotto l'ipotesi della propagazione del caos: ogni due potenziali agenti interagenti sono tra di loro campionati indipendentemente. Questa assunzione è classicamente usata, per es. nella teorica cinetica di Boltzmann, per ottenere un'equazione chiusa per la distribuzione \(f\) di una particella, siccome permette di fattorizzare la distribuzione di probabilità congiunta \(g(x,x_*,s,s_*,t)\) degli agenti interagenti nel prodotto \(f(x,s,t)f(x_*,s_*,t)\).
+
+                Dalla \eqref{eqDinamicaValoreAttesoEspanso} con una scelta adeguata della funzione \textit{test} \(\Psi\), è possibile recuperare un sistema di equazioni debole per le \(f_i\). Sia \(\Psi(x,s)=\phi_i(x)\varphi(s)\), dove \(\phi_i:\mathcal I\to\mathbb R\) è tale che \(\phi_i(i)=1\) mentre \(\phi_i(x)=0\) per ogni \(x\in\mathcal I\setminus\{i\}\) e \(\varphi:\mathcal O\to\mathbb R\) è arbitrario. Allora usando la \eqref{eqDistribuzioneTotale} dentro la \eqref{eqDinamicaValoreAttesoEspanso} si ricava
                 %
                 \begin{equation}
                     \label{eqBoltzmannConGrafo}
                     \begin{aligned}
-                        \derS{}t\int_{\mathcal P}\varphi f_i\de s&=
+                        \derS{}t\int_{\mathcal P}\varphi f_i\de s=&
                         \frac1{2N}\sum_{j\in\mathcal I}A(i,j)
                         \int_{\mathcal P^2}%\int_{\mathcal P}
                         \langle\varphi'-\varphi\rangle
@@ -251,9 +318,122 @@
                     \spazOr\text{e}\spazOr
                     \varphi'\equiv\varphi(s').
                 \]
-
+                Tal'equazione si può anche derivare, sempre sotto l'ipotesi della propagazione del caos, dalla gerarchia tipo BBGKY (v. se aggiungere il riferimento \daRivedere). In aggiunta si può convertire in forma matriciale introducendo la distribuzione vettoriale \(\mathbf f\equiv\bigl(f_i(s,t)\bigr)_{i\in\mathcal I}\) e la matrice \(\mathbf M\equiv\bigl( A(i,j)\bigr)_{i,j\in\mathcal I}\in\mathbb R^{N\times N}\): 
+                %
+                \begin{equation}
+                    \label{eqBoltzmannConGrafoVettoriale}
+                    \begin{aligned}
+                        \derS{}t\int_{\mathcal P}\varphi\mathbf f\de s=&
+                        \frac1{2N}\int_{\mathcal P^2}
+                        \langle\varphi'-\varphi\rangle
+                        \mathbf f\odot\mathbf M\mathbf f_*\de s\de s_*\\&
+                        +\frac1{2N}\int_{\mathcal P^2}
+                        \langle\varphi'_*-\varphi_*\rangle
+                        \mathbf M^\top\mathbf f\odot\mathbf f_*\de s\de s_*,
+                    \end{aligned}
+                \end{equation}
+                %
+                ove \(\odot\) indica il prodotto di Hadamard e \(\mathbf M^\top\) al trasposta di \(\mathbf M\). Si noti che \(\mathbf M\) altro non è che la matrice d'adiacenza di \(\mathcal G\).
+                
 
             \subsection{Interazioni tra città}
+            
+                Si può ora approfondire il tipo d'interazioni ipotizzate tra città su grafi.
+
+                Innanzitutto, è chiaro che l'interazione d'interesse sia di tipo «azione-reazione» descritta da \refAlgIntAR{}: infatti, se una città interagisce con un'altra, scambiando popolazione, entrambi variano il proprio stato ma non è detto che la seconda interagisca a sua volta colla prima.
+
+                Tuttavia, se una città può interagire con un'altra, allora è sempre possibile l'opposto; dunque il grafo in questione è diretto ma con struttura indiretta, ovvero la sua matrice d'adiacenza è simmetrica; a livello matematico, ciò implica che la matrice d'adiacenza \(\mathbf M\) è simmetrica.
+
+                Gli stati postinterazione \eqref{eqStatiPostInterazioni} prendono come riferimento leggi d'interazioni lineari
+                %
+                \begin{equation}
+                    \label{eqStatiPostInterazioniLineari}
+                    \left\{\begin{alignedat}{2}
+                        S_t'&=pS_t&&+qS_t^*,\\
+                        S_t^{*\prime}&=p_*S_t&&+q_*S_t^*,
+                    \end{alignedat}\right.
+                \end{equation}
+                %
+                le quali, specializzate, presentano invece la seguente forma:
+                %
+                \begin{equation}
+                    \label{eqSchemaInterazioneCittà}
+                    \left\{\begin{aligned}
+                        s'&=s\bigl(1-E(s,s_*)+\mu\bigr)\\
+                        s_*'&=s_*+sI(s,s_*)
+                    \end{aligned}\right.
+                \end{equation}
+                %
+                ove \(s\) e \(s_*\) sono le città interagente e subente rispettivamente, \(E(s,s_*)\) e \(I(s,s_*)\) sono rispettivamente i tassi di emigrazione e immigrazione, mentre \(\mu\) rappresenta fluttuazioni stocastiche del tipo
+                %
+                \begin{equation}
+                    \label{eqTipoFluttuazioni}
+                    \langle\mu\rangle=0
+                    \quad\text{e}\quad
+                    \langle\mu^2\rangle=\sigma,
+                \end{equation}
+                %
+                con \(\sigma\) uguale al valore della varianza; rispetto alle leggi d'interazioni lineari \eqref{eqStatiPostInterazioniLineari} le \eqref{eqSchemaInterazioneCittà} soddisfano
+                %
+                \begin{equation}
+                    \label{eqLegameLineareInterazioneCittà}
+                    % \begin{aligned}
+                    %     p(s,s_*)&\equiv s[1-E(s,s_*)+\mu]\\
+                    %     p_*(s,s_*)&\equiv s_*
+                    % \end{aligned}
+                    % \begin{aligned}
+                    %     \quad&\text{e}\quad\\
+                    %     \quad&\text{e}\quad
+                    % \end{aligned}
+                    % \begin{aligned}
+                    %     q(s,s_*)&\equiv 0,\\
+                    %     q_*(s,s_*)&\equiv sI(s,s_*),
+                    % \end{aligned}
+                    \begin{alignedat}{3}
+                        p(s,s_*)&\equiv s[1-E(s,s_*)+\mu]
+                        \quad&&\text{e}\quad
+                        p_*(s,s_*)&&\equiv s_*\\
+                        q(s,s_*)&\equiv 0,
+                        \quad&&\text{e}\quad
+                        q_*(s,s_*)&&\equiv sI(s,s_*),
+                    \end{alignedat}
+                \end{equation}
+                %
+                rispettivamente per la prima e seconda legge. Ovviamente questo scambio deve conservare [in media] la popolazione totale da cui 
+                %
+                \begin{equation}
+                    \label{eqLeggeImmigrazione}
+                    \begin{aligned}
+                        s+s_*&=\langle s+s_*\rangle=
+                        \langle s'+s_*'\rangle\\&=
+                        s-sE(s,s_*)+s_*+sI(s,s_*)
+                    \end{aligned}
+                    \;\;\implies\;\;
+                    E(s,s_*)=I(s,s_*),
+                \end{equation}
+                %
+                ciò ha senso perché l'emigrazione e l'immigrazione sono fenomeni relativi (invertendo \(s\) ed \(s_*\) sarebbe l'opposto). La scelta di \(E(s,s_*)\) dipende da come si vuole modellizzare il fenomeno dell'immigrazione, e in questo manuscritto si è modificata la \cite[(2.2), § 2, p. 223]{Gualandi2019} mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019}: 
+                %
+                \begin{equation}
+                    \label{eqLeggeEmigrazione}
+                    E(s,s_*)\equiv\lambda\frac{(s_*/s)^\alpha}{1+(s_*/s)^\alpha},
+                \end{equation}
+                %
+                che in essenza è una funzione di Hill di ordine \(\alpha\), in cui la logica è che v'è un tasso di emigrazione maggiore verso città con popolazione relativa maggiore, dato dal rapporto \(s_*/s\), con un massimo \(\lambda\in(0,1)\); in poche parole la \eqref{eqLeggeEmigrazione} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
+
+                In questo caso si hanno quindi interazioni non simmetriche, poiché dalla \eqref{eqLegameLineareInterazioneCittà} \(p\neq q\) e \(q\neq p\), e non lineari, a causa della \eqref{eqLeggeEmigrazione}.
+                
+                % Mediante la conservazione di popolazione ho rifatto molto velocemente i conti della formula prima del Teorema 5.1 a p. 16 di [1], confermando che d⟨s⟩/dt=0, come ci si aspetta da questo tipo d'interazione.
+
+                Non manca che caratterizzare il tipo di perturbazione \(\mu\) per avere uno stato postinterazione fisicamente sensato; difatti, è chiaro che rigorosamente \(\mathcal P\equiv\mathbb N\) ma è piú agevole supporre \(\mathcal P\equiv\mathbb R^+\) per poi approssimare per eccesso o difetto il numero reale effettivo; pertanto, dalla \eqref{eqSchemaInterazioneCittà}, si ha
+                %
+                \begin{equation}
+                    \label{eqPositivitàFluttuazioni}
+                    s'>0\;\;\implies\;\;\mu>E(s,s_*)-1
+                \end{equation}
+                %
+                mentre \(s_*'\) è per definizione sempre positivo.
+
 
             \subsection{Derivazione approssimata}
 
