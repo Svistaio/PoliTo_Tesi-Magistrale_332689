@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File",
+            "name": "debug-main",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/Codice/main.py", // https://stackoverflow.com/questions/74051616/how-do-i-make-visual-studio-code-always-run-the-main-python-file-when-the-run-bu

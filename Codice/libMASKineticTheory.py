@@ -187,8 +187,8 @@ class networkState:
         def E(si,sr): return NonLinearEmigration(si,sr,l,a)
         self.E = E
 
-        def mu(E): return StochasticFluctuations(sigma,E)
-        self.mu = mu
+        def ga(E): return StochasticFluctuations(sigma,E)
+        self.ga = ga
 
         self.Nn = Nn # Number of nodes
 
@@ -209,8 +209,8 @@ class networkState:
                 theta = np.random.binomial(1,p)
                 si = oldState[k][p1[i]]; sr = oldState[k][p2[i]]
 
-                E = self.E(si,sr); mu = self.mu(E)
-                newState[k][p1[i]] = si*(1-theta)+theta*si*(1-E+mu) 
+                E = self.E(si,sr); ga = self.ga(E)
+                newState[k][p1[i]] = si*(1-theta)+theta*si*(1-E+ga) 
                 newState[k][p2[i]] = sr*(1-theta)+theta*(sr+si*E)
 
         self.vtxState = newState
@@ -233,9 +233,27 @@ def NonLinearEmigration(
 
 
 def StochasticFluctuations(sigma,E):
-    while True:
-        mu = np.random.normal(0,sigma,size=1)
-        if mu>E-1: #and mu<E:
-            break
-    # The conditions «mu>E-1» and «mu<E» are necessary to have the total emigration rage 1-E+μ between 0 and 1
-    return mu
+    alpha = ((1-E)**2)/(sigma**2)
+    theta = (sigma**2)/(1-E)
+
+    if alpha<=1:
+        raise ValueError(
+            "α must be >1 to have a non-degenerate gamma distribution,"
+            " and thus always admissible fluctuations"
+        )
+
+    ga = np.random.gamma(alpha,theta)
+    return ga+E-1
+
+
+### Discarded code ###
+
+#region Old implementation for fluctuations with a [forcefully] resampled Gaussian until the value picked ensures the post-interaction population positivity
+    # def StochasticFluctuations(sigma,E):
+    #     while True:
+    #         mu = np.random.normal(0,sigma,size=1)
+    #         if mu>E-1: #and mu<E:
+    #             break
+    #     # The conditions «mu>E-1» and «mu<E» are necessary to have the total emigration rage 1-E+μ between 0 and 1
+    #     return mu
+#endregion

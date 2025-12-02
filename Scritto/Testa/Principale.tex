@@ -101,7 +101,7 @@
                 %
                 \begin{equation}
                     \label{eqVariabileAleatoriaInterazione}
-                    \Theta\sim\Bernoulli(A(X,X^*),\Delta t),
+                    \Theta\sim\DstrBernoulli(A(X,X^*),\Delta t),
                 \end{equation}
                 %
                 il che significa che la probabilità che un'interazione avvenga è proporzionale al passo temporale d'interazione \(\Delta t\) mediante un nucleo d'interazione \(A(X,X^*)=1\), che contiene le informazioni sui lati del grafo, e quindi alle connessioni tra gli agenti, ponendo
@@ -359,26 +359,17 @@
                 \begin{equation}
                     \label{eqSchemaInterazioneCittà}
                     \left\{\begin{aligned}
-                        s'&=s\bigl(1-E(s,s_*)+\mu\bigr)\\
+                        s'&=s\bigl(1-E(s,s_*)+\gamma\bigr)\\
                         s_*'&=s_*+sI(s,s_*)
                     \end{aligned}\right.
                 \end{equation}
                 %
-                ove \(s\) e \(s_*\) sono le città interagente e subente rispettivamente, \(E(s,s_*)\) e \(I(s,s_*)\) sono rispettivamente i tassi di emigrazione e immigrazione, mentre \(\mu\) rappresenta fluttuazioni stocastiche del tipo
-                %
-                \begin{equation}
-                    \label{eqTipoFluttuazioni}
-                    \langle\mu\rangle=0
-                    \quad\text{e}\quad
-                    \langle\mu^2\rangle=\sigma,
-                \end{equation}
-                %
-                con \(\sigma\) uguale al valore della varianza; rispetto alle leggi d'interazioni lineari \eqref{eqStatiPostInterazioniLineari} le \eqref{eqSchemaInterazioneCittà} soddisfano
+                ove \(s\) e \(s_*\) sono le città interagente e subente rispettivamente, \(E(s,s_*)\) e \(I(s,s_*)\) sono rispettivamente i tassi di emigrazione e immigrazione, mentre \(\gamma\) rappresenta fluttuazioni stocastiche da definire; rispetto alle leggi d'interazioni lineari \eqref{eqStatiPostInterazioniLineari} le \eqref{eqSchemaInterazioneCittà} soddisfano
                 %
                 \begin{equation}
                     \label{eqLegameLineareInterazioneCittà}
                     % \begin{aligned}
-                    %     p(s,s_*)&\equiv s[1-E(s,s_*)+\mu]\\
+                    %     p(s,s_*)&\equiv s[1-E(s,s_*)+\gamma]\\
                     %     p_*(s,s_*)&\equiv s_*
                     % \end{aligned}
                     % \begin{aligned}
@@ -390,7 +381,7 @@
                     %     q_*(s,s_*)&\equiv sI(s,s_*),
                     % \end{aligned}
                     \begin{alignedat}{3}
-                        p(s,s_*)&\equiv s[1-E(s,s_*)+\mu]
+                        p(s,s_*)&\equiv s[1-E(s,s_*)+\gamma]
                         \quad&&\text{e}\quad
                         p_*(s,s_*)&&\equiv s_*\\
                         q(s,s_*)&\equiv 0,
@@ -419,20 +410,110 @@
                     E(s,s_*)\equiv\lambda\frac{(s_*/s)^\alpha}{1+(s_*/s)^\alpha},
                 \end{equation}
                 %
-                che in essenza è una funzione di Hill di ordine \(\alpha\), in cui la logica è che v'è un tasso di emigrazione maggiore verso città con popolazione relativa maggiore, dato dal rapporto \(s_*/s\), con un massimo \(\lambda\in(0,1)\); in poche parole la \eqref{eqLeggeEmigrazione} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
+                che in essenza è una funzione di Hill di ordine \(\alpha\), in cui v'è un tasso di emigrazione maggiore verso città con popolazione relativa, data dal rapporto \(s_*/s\), maggiore; gli unici due parametri presenti, invece, presentano il seguente significato:
+
+                \begin{itemize}[label=\(\diamond\)]
+                    \item \(\lambda\in(0,1)\) rappresenta l'attrattività dei poli, ossia la frazione che le città piú popolose riescono al massimo ad attrarre in un'interazione;
+                    \item \(\alpha\in\mathbb R^+\) indica la rapidità d'emigrazione e influenza quanto rapidamente il rapporto \(s_*/s\) raggiunge la massima attrattività \(\lambda\).
+                \end{itemize}
+
+                In poche parole la \eqref{eqLeggeEmigrazione} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
 
                 In questo caso si hanno quindi interazioni non simmetriche, poiché dalla \eqref{eqLegameLineareInterazioneCittà} \(p\neq q\) e \(q\neq p\), e non lineari, a causa della \eqref{eqLeggeEmigrazione}.
                 
                 % Mediante la conservazione di popolazione ho rifatto molto velocemente i conti della formula prima del Teorema 5.1 a p. 16 di [1], confermando che d⟨s⟩/dt=0, come ci si aspetta da questo tipo d'interazione.
 
-                Non manca che caratterizzare il tipo di perturbazione \(\mu\) per avere uno stato postinterazione fisicamente sensato; difatti, è chiaro che rigorosamente \(\mathcal P\equiv\mathbb N\) ma è piú agevole supporre \(\mathcal P\equiv\mathbb R^+\) per poi approssimare per eccesso o difetto il numero reale effettivo; pertanto, dalla \eqref{eqSchemaInterazioneCittà}, si ha
+                Non manca che caratterizzare il tipo di perturbazione \(\gamma\) per avere uno stato postinterazione fisicamente sensato; difatti, è chiaro che rigorosamente \(\mathcal P\equiv\mathbb N\) ma è piú agevole supporre \(\mathcal P\equiv\mathbb R^+\) per poi approssimare per eccesso o difetto il numero intero effettivo; pertanto, dalla \eqref{eqSchemaInterazioneCittà}, si ha
                 %
                 \begin{equation}
-                    \label{eqPositivitàFluttuazioni}
-                    s'>0\;\;\implies\;\;\mu>E(s,s_*)-1
+                    \label{eqVincoloPositivitàFluttuazioni}
+                    s'>0\;\;\implies\;\;\gamma>E(s,s_*)-1
                 \end{equation}
                 %
-                mentre \(s_*'\) è per definizione sempre positivo.
+                mentre \(s_*'\) è per definizione sempre positivo. La scelta di \(>\) anziché \(\geq\) nella \eqref{eqVincoloPositivitàFluttuazioni} è ben fondata: di fatto si sta supponendo che le fluttuazioni non possono annullare la popolazione di una città; difatti qualora \(\gamma=E(s,s_*)-1\) si avrebbe \(s'=0\) dalla \eqref{eqSchemaInterazioneCittà}, situazione che si vuole evitare\footnotemark{} dato che nella \eqref{eqLeggeEmigrazione} compare il rapporto tra popolazioni delle città interagenti.
+
+                \footnotetext{Ciò non significa che il modello non possa modellare lo spopolamento di una città, poiché la sua taglia può arbitrariamente avvicinarsi a zero [ma mai esserne uguale], raggiungendolo solo \textit{a posteriori} dopo l'approssimazione dai numeri reali a quelli interi.}
+
+                Perdipiú, le fluttuazioni rappresentano a grandi linee quei fenomeni complessivi di nascita e di morte che vengono considerati ma non direttamente modellati; pertanto \(\gamma\) deve soddisfare le seguenti due caratteristiche:
+
+                \begin{enumerate}[label=F\arabic*]
+                    \item\label{ipFluttuazioniPositivitàNegatività} possono assumere sia valori positivi che negativi, ma non minori del vincolo imposto da \eqref{eqVincoloPositivitàFluttuazioni};
+                    \item\label{ipFluttuazioniMediaNulla} la media è scelta arbitrariamente posta allo zero, ossia \(\langle\gamma\rangle=0\);
+                    \item\label{ipFluttuazioniProbabilitàDecrescente} seppure non vi siano limiti superiori per l'entità della fluttuazione, è chiaro che piú grande questa è meno è probabile.
+                \end{enumerate}
+                
+                Con queste si possono allora analizzare alcune distribuzioni continue:
+
+                \begin{itemize}[label=\(\diamond\)]
+                    \item la distribuzione normale non soddisfa la \ref{ipFluttuazioniPositivitàNegatività} poiché può assumere valori reali arbitrari con probabilità non nulla;
+                    \item la distribuzione uniforme è adeguata solo per intervalli finiti e diventa degenere quando un suo estremo diverge, per cui non soddisfa né \ref{ipFluttuazioniMediaNulla} né \ref{ipFluttuazioniProbabilitàDecrescente}, mentre \ref{ipFluttuazioniPositivitàNegatività} si;
+                    \item la distribuzione esponenziale è quella piú promettente perché riflette sia \ref{ipFluttuazioniMediaNulla} (dopo un'opportuna traslazione dei valori campionati) che \ref{ipFluttuazioniProbabilitàDecrescente}, ma sfortunatamente non \ref{ipFluttuazioniPositivitàNegatività} perché il valore estremo \(\gamma=E(s,s_*)-1\) ha probabilità non nulla [anzi massima] d'essere campionato;
+                    \item l'unica distribuzione che soddisfa tutt'e tre le caratteristiche ricercate è proprio la distribuzione gamma.
+                \end{itemize}
+
+                Si consideri allora una distribuzione gamma avente la seguente funzione di densità di probabilità:
+                %
+                \begin{equation}
+                    \label{eqDistribuzioneGamma}
+                    f(x)=\frac1{\theta\Gamma(\alpha)}x^{\alpha-1}
+                    \exp\left(-\frac x\theta\right),
+                \end{equation}
+                %
+                ove \(\alpha\) e \(\theta\) sono i parametri rispettivamente di forma e di scala, mentre \(\Gamma(\alpha):\mathbb R^+\to\mathbb R^+\) è la funzione gamma:
+                %
+                \begin{equation}
+                    \label{eqFunzioneGamma}
+                    \Gamma(\alpha)\equiv\int_0^{+\infty}y^{\alpha+1}e^{-y}\de y.
+                \end{equation}
+                %
+                Si scelga \(\hat\gamma\sim\DstrGamma(\alpha,\theta)\), che soddisfa per definizione la \ref{ipFluttuazioniProbabilitàDecrescente}, e s'imponga
+                %
+                \begin{equation}
+                    \label{eqMediaVarianzaFluttuazioni}
+                    \langle\hat\gamma\rangle=1-E(s,s_*)=\alpha\theta
+                    \quad\text{e}\quad
+                    \langle\hat\gamma^2\rangle=\sigma^2=\alpha\theta^2,
+                \end{equation}
+                %
+                con \(\sigma\in\mathbb R^+\) equivalente alla deviazione \textit{standard} mentre \(\sigma^2\) alla varianza, da cui
+                %
+                \begin{equation}
+                    \label{eqParametriDstrGamma}
+                    \alpha=\frac{(1-E(s,s_*))^2}{\sigma^2}
+                    \quad\text{e}\quad
+                    \theta=\frac{\sigma^2}{1-E(s,s_*)}.
+                \end{equation}
+                %
+                Con tale scelta dei parametri è possibile soddisfare la \ref{ipFluttuazioniMediaNulla} semplicemente traslando i valori campionanti della \(\hat\gamma\) di \(-\langle\hat\gamma\rangle\), ossia si considera la distribuzione \(\gamma\sim\hat\gamma-\langle\hat\gamma\rangle\):
+                %
+                \begin{equation*}
+                    %\label{}
+                    \langle\gamma\rangle=
+                    \langle\hat\gamma-\langle\hat\gamma\rangle\rangle=
+                    \langle\hat\gamma\rangle-\langle\hat\gamma\rangle=0.
+                \end{equation*}
+                %
+                D'altra parte la \ref{ipFluttuazioniPositivitàNegatività} necessità di salvaguardarsi dai casi degeneri della distribuzione gamma: essa infatti se \(\alpha=1\) diventa un'esponenziale di parametro \(\theta\), mentre se \(\alpha<1\) diverge all'origine; per avere quindi una probabilità nulla di campionare l'origine [e quindi -\(\langle\hat\gamma\rangle\) dopo la traslazione] è necessario porre
+                %
+                \begin{equation*}
+                    %\label{}
+                    \alpha>1
+                    \;\;\implies\;\;
+                    \frac{(1-E(s,s_*))^2}{\sigma^2}>1,
+                \end{equation*}
+                %
+                ma nel caso peggiore \(1-E(s,s_*)=1-\lambda\) da cui
+                %
+                \begin{equation}
+                    \label{eqVincoloTraParametri}
+                    \frac{(1-\lambda)^2}{\sigma^2}>1
+                    \;\;\implies\;\;
+                    \sigma^2<(1-\lambda)^2
+                    \;\;\implies\;\;
+                    \sigma<\vert1-\lambda\vert=1-\lambda,
+                \end{equation}
+                %
+                siccome \(E(s,s_*)\in(0,\lambda)\;\;\forall s,s_*\in\mathcal P\) e \(\lambda\in(0,1)\). La \eqref{eqVincoloTraParametri} implica quindi che non è possibile avere una varianza arbitraria per poter soddisfare la \ref{ipFluttuazioniPositivitàNegatività}, ma che questa è limitata superiormente dall'attrattività dei poli: piú è grande \(\lambda\) piú piccola è la varianza, e viceversa.
 
 
             \subsection{Derivazione approssimata}
