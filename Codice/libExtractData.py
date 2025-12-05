@@ -11,7 +11,6 @@ import csv
 import numpy as np
 
 
-
 ### Main functions ###
 
 def ExtractAdjacencyMatrices(zipFile):
@@ -35,9 +34,9 @@ def ExtractAdjacencyMatrices(zipFile):
 
 
     # Dictionary and number of the major municipalities
-    dicReg2Mun = {i: {'lI':0} for i in range(1,21)}
+    dicReg2Mun = {i:{'lI':0} for i in range(1,21)} # Local index
     dicMun2Reg = {}
-    gI = 0
+    gI = 0 # Global index
 
     reader = csv.reader(streamCSV)
     next(reader)  # Skip header line containing metadata labels
@@ -47,8 +46,8 @@ def ExtractAdjacencyMatrices(zipFile):
 
             codeMun = row[3]
             nameMun = row[4]
-            value = [nameMun,gI,dicReg2Mun[codeReg]['lI']]
-            dicReg2Mun[codeReg][codeMun] = value
+            list = [nameMun,gI,dicReg2Mun[codeReg]['lI']]
+            dicReg2Mun[codeReg][codeMun] = list
             dicMun2Reg[codeMun] = codeReg
 
             dicReg2Mun[codeReg]['lI'] += 1
@@ -78,48 +77,48 @@ def ExtractAdjacencyMatrices(zipFile):
         'Sicilia',
         'Sardegna'
     ]
-    dicReg = {i:r for i,r in enumerate(regList,start=1)}
-
-    # 0: Adjacency matrix
-    # 1: Weighted adjacency matrix
-    matricesIt  = np.zeros((2,gI,gI))
+    dicCode2Reg = {i:r for i,r in enumerate(regList,start=1)}
+    
+    matricesIt  = {
+        'A':np.zeros((gI,gI),dtype=int), # 'A' == Adjacency matrix
+        'W':np.zeros((gI,gI),dtype=int)  # 'W' == Weighted adjacency matrix
+    }
     matricesReg = {
-        k:np.zeros((2,dicReg2Mun[k]['lI'],dicReg2Mun[k]['lI']),dtype=int)
+        k:{
+            'A':np.zeros((dicReg2Mun[k]['lI'],dicReg2Mun[k]['lI']),dtype=int),
+            'W':np.zeros((dicReg2Mun[k]['lI'],dicReg2Mun[k]['lI']),dtype=int)
+        }
         for k in dicReg2Mun
     }
-
-    temp = 0
 
     with ZF(zipFile) as z, z.open("Pen_91It.txt") as f:
         for line in tiow(f,encoding="utf-8"):
             oMun = line[:6]         # Origin municipality
             dMun = line[11:17]      # Destination municipality
-            eWgt = int(line[17:-1]) # Edge weight (commuters)
+            commuters = int(line[17:-1]) # Edge weight (commuters)
 
             if oMun != dMun and ' ' not in dMun: # and ' ' not in oMun
-                if eWgt>temp:
-                    temp = eWgt
                 try:
                     oReg = dicMun2Reg[oMun] # Origin region
                     dReg = dicMun2Reg[dMun] # Destination region
 
-                    if oReg == dReg: # and eWgt!=0
+                    if oReg == dReg: # and commuters!=0
                         oI = dicReg2Mun[oReg][oMun][2] # [Local] origin index
                         dI = dicReg2Mun[dReg][dMun][2] # [Local] destination index
                         
-                        matricesReg[oReg][0,oI,dI] = 1
-                        matricesReg[dReg][0,dI,oI] = 1
-                        matricesReg[oReg][1,oI,dI] += eWgt
-                        matricesReg[dReg][1,dI,oI] = matricesReg[oReg][1,oI,dI]
-                        # The sum in «matricesReg[oReg][1,oI,dI] += eWgt» is necessary as there are repeating origin-destination links in the dataset
+                        matricesReg[oReg]['A'][oI,dI] = 1
+                        matricesReg[dReg]['A'][dI,oI] = 1
+                        matricesReg[oReg]['W'][oI,dI] += commuters
+                        matricesReg[dReg]['W'][dI,oI] = matricesReg[oReg]['W'][oI,dI]
+                        # The sum in «matricesReg[oReg]['W'][oI,dI] += commuters» is necessary as there are repeating origin-destination links in the dataset
 
                     oI = dicReg2Mun[oReg][oMun][1] # [Global] origin index
                     dI = dicReg2Mun[dReg][dMun][1] # [Global] destination index
                         
-                    matricesIt[0,oI,dI] = 1
-                    matricesIt[0,dI,oI] = 1
-                    matricesIt[1,oI,dI] += eWgt
-                    matricesIt[1,dI,oI] = matricesIt[1,oI,dI]
+                    matricesIt['A'][oI,dI] = 1
+                    matricesIt['A'][dI,oI] = 1
+                    matricesIt['W'][oI,dI] += commuters
+                    matricesIt['W'][dI,oI] = matricesIt[1,oI,dI]
                 except Exception:
                     continue
 
@@ -135,23 +134,21 @@ def ExtractAdjacencyMatrices(zipFile):
     ) as z:
         for i,M in enumerate(matricesReg.values()):
             path = (f"{"0" if i<9 else ""}{i+1}"
-                    f"AdjacencyMatrix{regList[i]}.txt")
-            Save2Zip(M[0,:,:],path,z)
+                    f"AdjacencyMatrix{dicCode2Reg[i]}.txt")
+            Save2Zip(M['A'],path,z)
 
             path = (f"{"0" if i<9 else ""}{i+1}"
-                    f"WeightedAdjacencyMatrix{regList[i]}.txt")
-            Save2Zip(M[1,:,:],path,z)
+                    f"WeightedAdjacencyMatrix{dicCode2Reg[i]}.txt")
+            Save2Zip(M['W'],path,z)
 
-        Save2Zip(matricesIt[0,:,:],"AdjacencyMatrixIt.txt",z)
-        Save2Zip(matricesIt[1,:,:],"WeightedAdjacencyMatrixIt.txt",z)
-
+        Save2Zip(matricesIt['A'],"AdjacencyMatrixIt.txt",z)
+        Save2Zip(matricesIt['W'],"WeightedAdjacencyMatrixIt.txt",z)
 
 def ReadAdjacencyMatrices(zipFile,idA,idW):
     with ZF(zipFile) as z:
-        A = SaveMatrixFromZip(z,idA)
-        W = SaveMatrixFromZip(z,idW)
+        A = MatrixFromZip(z,idA)
+        W = MatrixFromZip(z,idW)
     return A, W
-
 
 
 ### Auxiliary functions ###
@@ -162,8 +159,7 @@ def Save2Zip(M,path,z):
     data = buf.getvalue()
     z.writestr(path,data)
 
-
-def SaveMatrixFromZip(z,id):
+def MatrixFromZip(z,id):
     with z.open(id,"r") as f:
         M = np.loadtxt( # Decodes binary stream as UTF-8 text
             tiow(f,encoding="utf-8"),

@@ -4,11 +4,11 @@ from scipy.stats import lognorm, pareto
 import importlib
 from tqdm import tqdm
 
-import libAnalyseNetwork as libAN
-importlib.reload(libAN)
+import libFigures as libF
+importlib.reload(libF)
 
 import matplotlib.pyplot as plt
-libAN.SetTextStyle()
+libF.SetTextStyle()
 
 
 ### Main functions ###
@@ -118,19 +118,19 @@ def CityDistributionFig(cs,Nn):
 
     fig.text(.1,.95,fr"$N={Nn}\qquad$")
 
-    libAN.SetPlotStyle(
+    libF.SetPlotStyle(
         r"$s$",ax=ax[1],
         xScale="log",yScale="log"
     )
 
     # Style
-    libAN.SetPlotStyle(
+    libF.SetPlotStyle(
         r"$s$",r"$P(s)$",ax=ax[0],
         yNotation="sci" # ,xNotation="sci"
     )
 
-    libAN.CentrePlot()
-    libAN.SaveFig(fig,"CitySizeDistributionSardegna")
+    libF.CentrePlot()
+    libF.SaveFig(fig,"CitySizeDistributionSardegna")
 
 
 def CityAverageFig(ca,Nt,dt):
@@ -148,9 +148,9 @@ def CityAverageFig(ca,Nt,dt):
             linewidth=1,
         )
 
-    libAN.SetPlotStyle(r"$t$",r"$\langle s\rangle$")
-    libAN.CentrePlot()
-    libAN.SaveFig(fig,"AverageCitySizeSardegna")
+    libF.SetPlotStyle(r"$t$",r"$\langle s\rangle$")
+    libF.CentrePlot()
+    libF.SaveFig(fig,"AverageCitySizeSardegna")
 
 
 
