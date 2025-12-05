@@ -18,12 +18,13 @@ prm = libGUI.GUI() # Parameters
 
 if prm['runState']:
 
-    ### Network section ###
-
-    if prm['extData']:
+    ### Data extraction ###
+    if prm['extraction']:
         zipPath = "../Dati/matriciPendolarismo1991.zip"
         libED.ExtractAdjacencyMatrices(zipPath)
 
+
+    ### Matrices extraction ###
     A, W = libED.ReadAdjacencyMatrices(
         "../Dati/AdjacencyMatricesIt91.zip",
         "20AdjacencyMatrixSardegna.txt",
@@ -31,23 +32,25 @@ if prm['runState']:
     )
     Nn = A.shape[0] # Number of nodes
 
-    # Degrees
-    di = np.sum(A,axis=0) # Vectors of degrees
-    dk, Nk = np.unique(di,return_counts=True)
-    # Unique degrees and corresponding frequencies
-    # Pk = counts/N
 
-    # [Nonzero] Weights
-    wi = W[W>0]
-    wk, wNk = np.unique(wi,return_counts=True)
-    # Unique weights and corresponding frequencies
+    ### Network analysis ###
+    if prm['analysis']:
+        # Degrees
+        di = np.sum(A,axis=0) # Vectors of degrees
+        dk, Nk = np.unique(di,return_counts=True)
+        # Unique degrees and corresponding frequencies
+        # Pk = counts/N
 
-    # Strenghts
-    si = np.sum(W,axis=0)
-    sk, sNk = np.unique(si,return_counts=True)
-    # Unique strenghts and corresponding frequencies
+        # [Nonzero] Weights
+        wi = W[W>0]
+        wk, wNk = np.unique(wi,return_counts=True)
+        # Unique weights and corresponding frequencies
 
-    if prm['extData']:
+        # Strenghts
+        si = np.sum(W,axis=0)
+        sk, sNk = np.unique(si,return_counts=True)
+        # Unique strenghts and corresponding frequencies
+
         libAN.DegreeDistributionFig(di,Nn)
         libAN.WeightDistributionFig(wi)
         libAN.StrengthDistributionFig(si)
@@ -65,12 +68,14 @@ if prm['runState']:
         # mpld3.show()
 
 
-    ### Kinetic section ###
-
+    ### Kinetic simulation ###
     stateCities = libKT.MonteCarlo(
-        prm['sMax'],Nn,A,
-        prm['Nt'],prm['dt'],
-        prm['l'],prm['a'],prm['sigma']
+        prm['totalPop'],Nn,A,
+        prm['stepNumber'],
+        prm['timeStep'],
+        prm['attractivity'],
+        prm['convincibility'],
+        prm['deviation']
     )
     libKT.CityDistributionFig(stateCities.vtxState,Nn)
     libKT.CityAverageFig(stateCities.avgState,prm['Nt'],prm['dt'])

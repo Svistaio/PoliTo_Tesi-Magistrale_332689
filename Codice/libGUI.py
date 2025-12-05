@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
 
-global buttonFlat, dicObjects
-
 
 ### Main functions ###
 
 def GUI():
+    global dicObjects, regions
+
     #region Global settings
     window = tk.Tk() # Main window
     window.title('City Size Model')
@@ -16,18 +16,77 @@ def GUI():
     mainFrame = ttk.Frame() # Main frame
     mainFrame.grid(padx=pad,pady=pad/1.5)
 
-    fontStyle = ('JetBrains Mono',15)
-    # fontStyle = font.Font(family="JetBrains Mono", size=15)
+    dicLayout = {
+        'normalFontStyle':('JetBrains Mono',15),
+        'groupFontStyle':('JetBrains Mono',17,'bold'),
+        'groupVerSep':(30,5),
+        'groupColSep':15,
+        'groupRowSep':5
+    }
+
+    regions = {
+        'nameList':[
+            'Piemonte',
+            'ValledAosta',
+            'Lombardia',
+            'Trentino-Alto Adige',
+            'Veneto',
+            'Friuli-Venezia Giulia',
+            'Liguria',
+            'Emilia-Romagna',
+            'Toscana',
+            'Umbria',
+            'Marche',
+            'Lazio',
+            'Abruzzo',
+            'Molise',
+            'Campania',
+            'Puglia',
+            'Basilicata',
+            'Calabria',
+            'Sicilia',
+            'Sardegna'
+        ],
+        'popList':{ # Italian region sizes in 1991
+            'Piemonte':int(4302565),
+            'ValledAosta':int(115938),
+            'Lombardia':int(8856074),
+            'Trentino-AltoAdige':int(890360),
+            'Veneto':int(4380797),
+            'Friuli-Venezia Giulia':int(1197666),
+            'Liguria':int(1676282),
+            'Emilia-Romagna':int(3909512),
+            'Toscana':int(3529946),
+            'Umbria':int(811831),
+            'Marche':int(1429205),
+            'Lazio':int(5140371),
+            'Abruzzo':int(1249054),
+            'Molise':int(330900),
+            'Campania':int(5630280),
+            'Puglia':int(4031885),
+            'Basilicata':int(610528),
+            'Calabria':int(2070203),
+            'Sicilia':int(4966386),
+            'Sardegna':int(1648248),
+            'Italia':int(56778031)
+        } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
+    }
+    regions['codeList'] = {r:i for i,r in enumerate(regions['nameList'],start=1)}
+
     dicObjects = {
-        # Sardinia population in 1991
-        'totalPop':{ 'text':'S', 'value':int(1.6e6) },
+        'totalPop':{ 'text':'S', 'value':regions['popList']['Sardegna'] },
+        'attractivity':{ 'text':'λ', 'value':.75 },
+        'convincibility':{ 'text':'α', 'value':1 },
+        'deviation':{ 'text':'σ', 'value':5e-2 },
+        'regSelected':{ 'text':'Region selected', 'value':regions['nameList'][19] },
+        #
         'timeStep':{ 'text':'Δt', 'value':1e-2 },
         'stepNumber':{ 'text':'Nt', 'value':int(2e4) },
         'iterations':{ 'text':'Ni', 'value':int(1) },
-        'attractivity':{ 'text':'λ', 'value':.75 },
-        'speed':{ 'text':'a', 'value':1 },
-        'deviation':{ 'text':'σ', 'value':5e-2 },
-        'checkbox':{ 'text':'Extract data', 'value':False }
+        #
+        'extraction':{ 'text':'Extract data', 'value':False },
+        'analysis':{ 'text':'Network analysis', 'value':False },
+        'edgeWeights':{ 'text':'Edge weights', 'value':False },
     }
     #endregion
 
@@ -35,14 +94,13 @@ def GUI():
     popPrmLabel = ttk.Label(
         mainFrame,
         text=f'Population parameters',
-        font=fontStyle,
+        font=dicLayout['groupFontStyle'],
         anchor='s',
     )
-    popPrmLabel.grid(pady=(0,10))
+    popPrmLabel.grid(pady=(0,dicLayout['groupVerSep'][1]))
 
     popPrmFrame = ttk.Frame(mainFrame)
     popPrmFrame.grid()
-    colSep = 15; rowSep = 5
 
     # First row
     row = 0
@@ -50,14 +108,18 @@ def GUI():
         ttk.Entry,popPrmFrame,
         dicObjects['attractivity']['text'],
         dicObjects['attractivity']['value'],
-        fontStyle,rI=row,cI=0,px=(0,colSep),py=(0,0)
+        dicLayout['normalFontStyle'],
+        rI=row,cI=0,px=(0,dicLayout['groupColSep']),py=(0,0)
     )
-    dicObjects['speed']['obj'] = CreateLabelField(
+    dicObjects['convincibility']['obj'] = CreateLabelField(
         ttk.Entry,popPrmFrame,
-        dicObjects['speed']['text'],
-        dicObjects['speed']['value'],
-        fontStyle,rI=0,cI=1,px=(0,0),py=(0,0)
+        dicObjects['convincibility']['text'],
+        dicObjects['convincibility']['value'],
+        dicLayout['normalFontStyle'],
+        rI=0,cI=1,px=(0,0),py=(0,0)
     )
+
+    dicObjects['attractivity']['obj']['var'].trace_add("write",DeviationUpperLimit)
 
     # Second row
     row += 1
@@ -65,78 +127,115 @@ def GUI():
         ttk.Entry,popPrmFrame,
         dicObjects['totalPop']['text'],
         dicObjects['totalPop']['value'],
-        fontStyle,rI=row,cI=0,px=(0,colSep),py=(0,0)
+        dicLayout['normalFontStyle'],
+        rI=row,cI=0,px=(0,dicLayout['groupColSep']),py=(0,0)
     )
     dicObjects['deviation']['obj'] = CreateLabelField(
         tk.Scale,popPrmFrame,
         dicObjects['deviation']['text'],
         dicObjects['deviation']['value'],
-        fontStyle,rI=row,cI=1,px=(0,0),py=(0,0),
+        dicLayout['normalFontStyle'],
+        rI=row,cI=1,px=(0,0),py=(0,0),
         upperbound=1-dicObjects['attractivity']['obj']['var'].get()
     )
 
-    dicObjects['attractivity']['obj']['var'].trace_add("write",DeviationUpperLimit)
+
+    regLabel = ttk.Label(
+        master=mainFrame,
+        text=f'{dicObjects['regSelected']['text']}:',
+        font=dicLayout['normalFontStyle'],
+        anchor='s'
+    )
+    regLabel.grid(pady=(10,0))
+
+    stringVar = tk.StringVar(value=dicObjects['regSelected']['value'])
+    regComboBox = ttk.Combobox(
+        master=mainFrame,
+        values=regions['nameList'],
+        textvariable=stringVar,
+        font=dicLayout['normalFontStyle'],
+        width=20
+    )
+    regComboBox.grid()
+    dicObjects['regSelected']['obj'] = {
+        'wid':regComboBox,
+        'var':stringVar,
+    }
+    dicObjects['regSelected']['obj']['var'].trace_add("write",ChangePopulation)
     #endregion
 
     #region Time parameters
     timePrmLabel = ttk.Label(
         mainFrame,
         text=f'Time parameters',
-        font=fontStyle,
+        font=dicLayout['groupFontStyle'],
         anchor='s',
     )
-    timePrmLabel.grid(pady=(20,10))
+    timePrmLabel.grid(pady=dicLayout['groupVerSep'])
 
     timePrmFrame = ttk.Frame(mainFrame)
     timePrmFrame.grid()
-    colSep = 15
 
     # First row
-    row = 0
+    col = 0
     dicObjects['timeStep']['obj'] = CreateLabelField(
         ttk.Entry,timePrmFrame,
         dicObjects['timeStep']['text'],
         dicObjects['timeStep']['value'],
-        fontStyle,rI=row,cI=0,px=(0,0),py=(0,rowSep)
+        dicLayout['normalFontStyle'],
+        rI=0,cI=col,px=(0,dicLayout['groupColSep']),py=(0,0)
     )
-    row += 1
+    col += 1
     dicObjects['stepNumber']['obj'] = CreateLabelField(
         ttk.Entry,timePrmFrame,
         dicObjects['stepNumber']['text'],
         dicObjects['stepNumber']['value'],
-        fontStyle,rI=row,cI=0,px=(0,0),py=(0,rowSep)
-    )
-    row += 1
-    dicObjects['iterations']['obj'] = CreateLabelField(
-        ttk.Entry,timePrmFrame,
-        dicObjects['iterations']['text'],
-        dicObjects['iterations']['value'],
-        fontStyle,rI=row,cI=0,px=(0,0),py=(0,0)
+        dicLayout['normalFontStyle'],
+        rI=0,cI=col,px=(0,0),py=(0,0)
     )
     #endregion
 
-    #region Checkbox
+    #region Simulation parameters
     style = ttk.Style()
     style.configure(
         'ckb.TCheckbutton',
-        font=fontStyle
+        font=dicLayout['normalFontStyle']
     )
 
-    checkboxFrame = ttk.Frame(mainFrame)
-    checkboxFrame.grid(pady=(20,0))
-
-    inputVar = tk.BooleanVar(value=dicObjects['checkbox']['value'])
-    inputCheckBox = ttk.Checkbutton(
-        master=checkboxFrame,
-        text=dicObjects['checkbox']['text'],
-        variable=inputVar,
-        style='ckb.TCheckbutton',
+    simPrmLabel = ttk.Label(
+        mainFrame,
+        text=f'Simulation parameters',
+        font=dicLayout['groupFontStyle'],
+        anchor='s',
     )
-    inputCheckBox.grid()
-    dicObjects['checkbox']['obj'] = {
-        'wid':inputCheckBox,
-        'var':inputVar,
-    }
+    simPrmLabel.grid(pady=dicLayout['groupVerSep'])
+
+    simPrmFrame = ttk.Frame(mainFrame)
+    simPrmFrame.grid()
+
+    dicObjects['iterations']['obj'] = CreateLabelField(
+        ttk.Entry,simPrmFrame,
+        dicObjects['iterations']['text'],
+        dicObjects['iterations']['value'],
+        dicLayout['normalFontStyle'],
+        rI=0,cI=0,px=(0,0),py=(0,0)
+    )
+
+    dicObjects['extraction']['obj'] = CreateCheckBox(
+        simPrmFrame,'ckb.TCheckbutton',
+        dicObjects['extraction']['text'],
+        dicObjects['extraction']['value']
+    )
+    dicObjects['analysis']['obj'] = CreateCheckBox(
+        simPrmFrame,'ckb.TCheckbutton',
+        dicObjects['analysis']['text'],
+        dicObjects['analysis']['value']
+    )
+    dicObjects['edgeWeights']['obj'] = CreateCheckBox(
+        simPrmFrame,'ckb.TCheckbutton',
+        dicObjects['edgeWeights']['text'],
+        dicObjects['edgeWeights']['value']
+    )
     #endregion
 
     #region Buttons
@@ -145,7 +244,7 @@ def GUI():
         'btt.TButton',
         padding=(20,20),
         width=10,
-        font=(fontStyle[0],15)
+        font=(dicLayout['normalFontStyle'][0],15)
     )
 
     buttonFrame = ttk.Frame(mainFrame)
@@ -170,10 +269,23 @@ def GUI():
     CentrePlot(window)
     window.mainloop()
 
-    dicParameters = {'runState':buttonFlag}
+    #region Output
+    global buttonFlat, fileNamingRule
+
+    dicPrm = {'runState':buttonFlag}
     for key in dicObjects:
-        dicParameters[key] = dicObjects[key]['obj']['var'].get()
-    return dicParameters
+        dicPrm[key] = dicObjects[key]['obj']['var'].get()
+
+    regName = dicPrm['regSelected']
+    fileNamingRule = {
+        'subfolder':f'{regions['codeList'][regName]} {regName}',
+        'prefix':
+            f'{'A' if dicPrm['edgeWeights'] == 0 else 'W'}'
+            f'r{dicPrm['iterations']}'
+    }
+
+    return dicPrm
+    #endregion
 
 
 ### Auxilary functions ###
@@ -254,6 +366,25 @@ def CreateLabelField(
     }
     return dicRtr
 
+def CreateCheckBox(
+    frame,style,
+    fieldText,fieldValue,
+):
+    fieldVar = tk.BooleanVar(value=fieldValue)
+    fieldCheckBox = ttk.Checkbutton(
+        master=frame,
+        text=fieldText,
+        variable=fieldVar,
+        style=style,
+    )
+    fieldCheckBox.grid()
+
+    dicRtr = {
+        'wid':fieldCheckBox,
+        'var':fieldVar,
+    }
+    return dicRtr
+
 def RunCallBack(window):
     global buttonFlag
     buttonFlag = 1
@@ -284,6 +415,20 @@ def CentrePlot(window):
     window.geometry(f"{windowWidth}x{windowHeight}+{x}+{y}")
 
 def DeviationUpperLimit(*args):
-    l = dicObjects['attractivity']['obj']['var'].get()
-    res = dicObjects['deviation']['obj']['wid']['resolution']
-    dicObjects['deviation']['obj']['wid']['to'] = 1-l-res
+    global dicObjects
+    try:
+        l = dicObjects['attractivity']['obj']['var'].get()
+        if type(l) == float:
+            res = dicObjects['deviation']['obj']['wid']['resolution']
+            if l >= 1:
+                l=1-res
+                dicObjects['attractivity']['obj']['var'].set(l)
+            dicObjects['deviation']['obj']['wid']['to'] = 1-l-res
+    except Exception:
+        return
+
+def ChangePopulation(*args):
+    global dicObjects, regions
+    nameReg = dicObjects['regSelected']['obj']['var'].get()
+    popReg = regions['popList'][nameReg]
+    dicObjects['totalPop']['obj']['var'].set(popReg)

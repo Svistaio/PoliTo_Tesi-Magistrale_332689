@@ -1,6 +1,3 @@
-import os, sys
-from pathlib import Path
-
 import numpy as np
 from scipy.stats import lognorm, linregress
 import networkx as nx
@@ -10,14 +7,13 @@ import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
-# import tikzplotlib as tikzpl # It's necessary «matplotlib<3.8»
-# tikzpl.save(path)
-
 import mplcursors
 import mpld3
 
-import subprocess
+import importlib
 
+import libFigures as libF
+importlib.reload(libF)
 
 
 ### Main functions ###
@@ -122,10 +118,9 @@ def DegreeDistributionFig(di,Nn):
     )
 
     # Style
-    CentrePlot()
-    SetPlotStyle(r"$k$",r"$P(k)$",[0,300],[0,0.03])
-    SaveFig(fig,"DegreeDistributionSardegna")
-
+    libF.CentrePlot()
+    libF.SetPlotStyle(r"$k$",r"$P(k)$",[0,300],[0,0.03])
+    libF.SaveFig(fig,"DegreeDistributionSardegna")
 
 def ClusteringCoefficientFig(A,di,dk,Nk):
     fig = plt.figure()
@@ -188,12 +183,11 @@ def ClusteringCoefficientFig(A,di,dk,Nk):
     )
 
     # Style
-    CentrePlot()
-    SetPlotStyle(r"$k$",r"$C(k)$",[0,300],[0,0.8])
-    SaveFig(fig,"ClusteringCoefficientSardegna")
+    libF.CentrePlot()
+    libF.SetPlotStyle(r"$k$",r"$C(k)$",[0,300],[0,0.8])
+    libF.SaveFig(fig,"ClusteringCoefficientSardegna")
 
     return Ck
-
 
 def AssortativityFig(A,dk):
     fig = plt.figure()
@@ -224,12 +218,11 @@ def AssortativityFig(A,dk):
     )
 
     # Style
-    CentrePlot()
-    SetPlotStyle(r"$k$",r"$k_{nn}(k)$",[0,300],[40,95])
-    SaveFig(fig,"AssortativitySardegna")
+    libF.CentrePlot()
+    libF.SetPlotStyle(r"$k$",r"$k_{nn}(k)$",[0,300],[40,95])
+    libF.SaveFig(fig,"AssortativitySardegna")
 
     return knn
-
 
 def BetweennessCentralityFig(A,di):
     fig = plt.figure()
@@ -259,14 +252,13 @@ def BetweennessCentralityFig(A,di):
     )
 
     # Style
-    CentrePlot()
-    SetPlotStyle(
+    libF.CentrePlot()
+    libF.SetPlotStyle(
         r"$k$",r"$g(i)$",
         # [0.5e1,0.5e3],[1,0.5e5],
         xScale="log",yScale="log"
     )
-    SaveFig(fig,"BetweennessCentralitySardegna")
-
+    libF.SaveFig(fig,"BetweennessCentralitySardegna")
 
 def WeightDistributionFig(wi):
     fig = plt.figure()
@@ -332,13 +324,12 @@ def WeightDistributionFig(wi):
 
 
     # Style
-    CentrePlot()
-    SetPlotStyle(
+    libF.CentrePlot()
+    libF.SetPlotStyle(
         r"$w$",r"$P(w)$",
         xScale="log",yScale="log"
     )
-    SaveFig(fig,"WeightDistributionSardegna")
-
+    libF.SaveFig(fig,"WeightDistributionSardegna")
 
 def StrengthDistributionFig(si):
     fig = plt.figure()
@@ -409,13 +400,12 @@ def StrengthDistributionFig(si):
 
 
     # Style
-    CentrePlot()
-    SetPlotStyle(
+    libF.CentrePlot()
+    libF.SetPlotStyle(
         r"$s$",r"$P(s)$",
         xScale="log",yScale="log"
     )
-    SaveFig(fig,"StrengthDistributionSardegna")
-
+    libF.SaveFig(fig,"StrengthDistributionSardegna")
 
 def StrengthFromDegreeFig(si,di,dk,Nk):
     fig = plt.figure()
@@ -471,13 +461,12 @@ def StrengthFromDegreeFig(si,di,dk,Nk):
     )
 
     # Style
-    CentrePlot()
-    SetPlotStyle(
+    libF.CentrePlot()
+    libF.SetPlotStyle(
         r"$k$",r"$s(k)$",
         xScale="log",yScale="log"
     )
-    SaveFig(fig,"StrengthFromDegreeSardegna")
-
+    libF.SaveFig(fig,"StrengthFromDegreeSardegna")
 
 def WeightedClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck):
     fig, ax = plt.subplots(2,1)
@@ -531,16 +520,15 @@ def WeightedClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck):
     )
 
     # Style
-    SetPlotStyle(
+    libF.SetPlotStyle(
         r"$k$",r"$C^w_{\text{rel}}(k)$",
         xScale="log",yScale="log",
         ax=ax[1]
     )
 
 
-    CentrePlot()
-    SaveFig(fig,"WeightedClusteringCoefficientSardegna")
-
+    libF.CentrePlot()
+    libF.SaveFig(fig,"WeightedClusteringCoefficientSardegna")
 
 def WeightedAssortativityFig(W,dk,knn):
     fig, ax = plt.subplots(2,1)
@@ -561,7 +549,7 @@ def WeightedAssortativityFig(W,dk,knn):
     )
 
     # Style
-    SetPlotStyle(
+    libF.SetPlotStyle(
         r"$k$",r"$k_{nn}^w(k)$",
         xScale="log",yScale="log",
         ax=ax[0]
@@ -579,98 +567,12 @@ def WeightedAssortativityFig(W,dk,knn):
     )
 
     # Style
-    SetPlotStyle(
+    libF.SetPlotStyle(
         r"$k$",r"$k_{nn,rel}^w(k)$",
         xScale="log",yScale="log",
         ax=ax[1]
     )
 
 
-    CentrePlot()
-    SaveFig(fig,"WeightedAssortativitySardegna")
-
-
-
-### Auxiliary functions ###
-
-def CentrePlot():
-    fig = plt.gcf()
-    manager = plt.get_current_fig_manager()
-    manager.window.update_idletasks()
-
-    # Get screen size
-    screenW = manager.window.winfo_screenwidth()
-    screenH = manager.window.winfo_screenheight()
-
-    # Save figure size in pixels
-    figW, figH = fig.get_size_inches()*fig.dpi
-
-    # Centre coordinates
-    x = int((screenW-figW)/2)
-    y = int((screenH-figH)/2)
-
-    # Move the figure window
-    manager.window.geometry(f"+{x}+{y}")
-
-
-def SetTextStyle():
-    plt.rcParams["mathtext.fontset"] = "stix"
-    plt.rcParams["font.family"] = "serif"
-    plt.rcParams["font.serif"] = ["Times New Roman"]
-    plt.rcParams["font.size"] = 13
-SetTextStyle()
-
-
-def SetPlotStyle(
-        xLabel=None,yLabel=None,
-        xDom=None,yDom=None,
-        xScale="linear",yScale="linear",
-        xNotation="plain",yNotation="plain",
-        ax=None
-    ):
-    if ax is None: ax = plt.gca()
-
-    if xLabel: ax.set_xlabel(xLabel)
-    if yLabel: ax.set_ylabel(yLabel)
-
-    if xDom: ax.set_xlim(xDom)
-    if yDom: ax.set_ylim(yDom)
-
-    ax.set_xscale(xScale)
-    ax.set_yscale(yScale)
-
-    if xScale == "linear":
-        ax.ticklabel_format(style=xNotation,axis="x",scilimits=(0,0))
-    if yScale == "linear":
-        ax.ticklabel_format(style=yNotation,axis="y",scilimits=(0,0))
-
-    ax.grid(True,linestyle=":",linewidth=1)
-    ax.set_axisbelow(True)
-
-    _, labels = ax.get_legend_handles_labels()
-    if any(labels): ax.legend()
-    # Create a legend iff there are labels connected to graphs
-
-
-def SaveFig(fig,name):
-    pyFilePath = Path(__file__).resolve().parent.parent
-    folderFig = pyFilePath/"Figure"
-    Path(folderFig).mkdir(parents=True,exist_ok=True)
-
-    def ext(ext): return (folderFig/name).with_suffix(ext)
-    pdfFigPath  = ext(".pdf")
-    pngFigPath  = ext(".png")
-    htmlFigPath = ext(".html")
-
-    
-    plt.savefig(pdfFigPath,dpi=300,bbox_inches='tight')
-    # plt.savefig(pngFigPath,dpi=300,bbox_inches='tight')
-    # mpld3.save_html(fig,str(htmlFigPath))
-
-    # Open the pdf file (cross-platform)
-    if sys.platform.startswith("win"):
-        os.startfile(pdfFigPath)
-    elif sys.platform.startswith("darwin"):
-        subprocess.Popen(["open",str(pdfFigPath)])
-    else:
-        subprocess.Popen(["xdg-open",str(pdfFigPath)])
+    libF.CentrePlot()
+    libF.SaveFig(fig,"WeightedAssortativitySardegna")
