@@ -132,12 +132,12 @@ def ExtractAdjacencyMatrices(zipFile):
         compresslevel=9              # Max compression for «ZIP_DEFLATED»
         # https://docs.python.org/3/library/zipfile.html#zipfile-objects
     ) as z:
-        for i,M in enumerate(matricesReg.values()):
-            path = (f"{"0" if i<9 else ""}{i+1}"
+        for i,M in enumerate(matricesReg.values(),start=1):
+            path = (f"{"0" if i<9 else ""}{i}"
                     f"AdjacencyMatrix{dicCode2Reg[i]}.txt")
             Save2Zip(M['A'],path,z)
 
-            path = (f"{"0" if i<9 else ""}{i+1}"
+            path = (f"{"0" if i<9 else ""}{i}"
                     f"WeightedAdjacencyMatrix{dicCode2Reg[i]}.txt")
             Save2Zip(M['W'],path,z)
 

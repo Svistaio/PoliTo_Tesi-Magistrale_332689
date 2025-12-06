@@ -6,9 +6,12 @@
             "type": "shell",
             "command": "python \"${workspaceFolder}/Codice/main.py\"",
             "group": "none",
+            "problemMatcher": [], // Disables all end-of-task notifications
             "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
+                // "reveal": "always",  // The panel appears at the start of the task
+                "reveal": "silent",     // The panel appears only to show errors
+                // "panel": "dedicated" // Uses its own panel
+                "panel": "shared"       // Uses tha same panel as Python extension
             },
             "options": {
                 "cwd": "${fileDirname}"

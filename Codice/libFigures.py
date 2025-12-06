@@ -5,6 +5,10 @@ from pathlib import Path
 import subprocess
 
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import savefig
+from scipy.io import savemat
+
+global regCode
 
 
 ### Main functions ###
@@ -65,27 +69,53 @@ def SetPlotStyle(
     if any(labels): ax.legend()
     # Create a legend iff there are labels connected to graphs
 
-def SaveFig(fig,name):
-    # Add a cycle for each format (.pdf, .mat and .tex)
+def SaveFig(name,folder,dicData,figs=False):
+    global regCode
 
     pyFilePath = Path(__file__).resolve().parent.parent
-    folderFig = pyFilePath/"Figure"
-    Path(folderFig).mkdir(parents=True,exist_ok=True)
+    figPath = {}
 
-    def ext(ext): return (folderFig/name).with_suffix(ext)
-    pdfFigPath  = ext(".pdf")
-    pngFigPath  = ext(".png")
-    htmlFigPath = ext(".html")
+    for format in ['.pdf', '.mat']:
+        folderFig = pyFilePath/'Figure'/format/regCode/folder
+        Path(folderFig).mkdir(parents=True,exist_ok=True)
 
-    
-    plt.savefig(pdfFigPath,dpi=300,bbox_inches='tight')
-    # plt.savefig(pngFigPath,dpi=300,bbox_inches='tight')
-    # mpld3.save_html(fig,str(htmlFigPath))
+        def ext(figName,ext): return (folderFig/figName).with_suffix(ext)
+
+        # match folder:
+        #     case 'NA':
+        #         def ext(figName,ext): return (folderFig/figName).with_suffix(ext)
+        #     case 'KS':
+        #         def ext(figName,ext):
+        #             figName = regCode['prefix']+figName
+        #             return (folderFig/figName).with_suffix(ext)
+
+        match format:
+            case '.pdf':
+                figPath[format] = ext(name,format)
+                savefig(figPath[format],dpi=300,bbox_inches='tight')
+
+                sumatraPath = r"C:\Principale\Applicazioni\SumatraPDF\Versione 3.5.2\SumatraPDF-3.5.2-64.exe"
+                subprocess.Popen([sumatraPath,str(figPath[format])])
+
+            case '.mat':
+                if figs == False: # If there is only one figure
+                    figPath[format] = ext(name,format)
+                    savemat(figPath[format],dicData)
+                else: # Otherwise if there are subfigures
+                    for n,subfig in enumerate(dicData,start=1):
+                        figPath[format] = ext(name+'fig'+str(n),format)
+                        savemat(figPath[format],dicData[subfig])
 
     # Open the pdf file (cross-platform)
-    if sys.platform.startswith("win"):
-        os.startfile(pdfFigPath)
-    elif sys.platform.startswith("darwin"):
-        subprocess.Popen(["open",str(pdfFigPath)])
-    else:
-        subprocess.Popen(["xdg-open",str(pdfFigPath)])
+    # if sys.platform.startswith("win"):
+    #     os.startfile(pdfFigPath)
+    # elif sys.platform.startswith("darwin"):
+    #     subprocess.Popen(["open",str(pdfFigPath)])
+    # else:
+    #     subprocess.Popen(["xdg-open",str(pdfFigPath)])
+
+    # Other formats
+    # pngFigPath  = ext(".png")
+    # htmlFigPath = ext(".html")
+    # plt.savefig(pngFigPath,dpi=300,bbox_inches='tight')
+    # mpld3.save_html(fig,str(htmlFigPath))

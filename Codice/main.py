@@ -58,11 +58,11 @@ if prm['runState']:
         libAN.BetweennessCentralityFig(A,di)
         libAN.StrengthFromDegreeFig(si,di,dk,Nk)
 
-        Ck = libAN.ClusteringCoefficientFig(A,di,dk,Nk)
-        libAN.WeightedClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck)
+        Ck = libAN.AClusteringCoefficientFig(A,di,dk,Nk)
+        libAN.WClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck)
 
-        knn = libAN.AssortativityFig(A,dk)
-        libAN.WeightedAssortativityFig(W,dk,knn)
+        knn = libAN.AAssortativityFig(A,dk)
+        libAN.WAssortativityFig(W,dk,knn)
 
         # plt.show()
         # mpld3.show()
@@ -77,5 +77,13 @@ if prm['runState']:
         prm['convincibility'],
         prm['deviation']
     )
-    libKT.CityDistributionFig(stateCities.vtxState,Nn)
-    libKT.CityAverageFig(stateCities.avgState,prm['Nt'],prm['dt'])
+
+    libKT.CityDistributionFig(
+        stateCities.vtxState,
+        Nn
+    )
+    libKT.CityAverageFig(
+        stateCities.avgState,
+        prm['stepNumber'],
+        prm['timeStep']
+    )
