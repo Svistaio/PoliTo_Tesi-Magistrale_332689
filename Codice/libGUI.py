@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 
+import libFigures
+
 
 ### Main functions ###
 
 def GUI():
-    global dicObjects, regions
+    global dicObjects, dicReg
 
     #region Global settings
     window = tk.Tk() # Main window
@@ -24,10 +26,10 @@ def GUI():
         'groupRowSep':5
     }
 
-    regions = {
+    dicReg = {
         'nameList':[
             'Piemonte',
-            'ValledAosta',
+            "Valle d'Aosta",
             'Lombardia',
             'Trentino-Alto Adige',
             'Veneto',
@@ -71,14 +73,14 @@ def GUI():
             'Italia':int(56778031)
         } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
     }
-    regions['codeList'] = {r:i for i,r in enumerate(regions['nameList'],start=1)}
+    dicReg['codeList'] = {r:int(i) for i,r in enumerate(dicReg['nameList'],start=1)}
 
     dicObjects = {
-        'totalPop':{ 'text':'S', 'value':regions['popList']['Sardegna'] },
+        'totalPop':{ 'text':'S', 'value':dicReg['popList']['Sardegna'] },
         'attractivity':{ 'text':'λ', 'value':.75 },
         'convincibility':{ 'text':'α', 'value':1 },
         'deviation':{ 'text':'σ', 'value':5e-2 },
-        'regSelected':{ 'text':'Region selected', 'value':regions['nameList'][19] },
+        'regSelected':{ 'text':'Region selected', 'value':dicReg['nameList'][19] },
         #
         'timeStep':{ 'text':'Δt', 'value':1e-2 },
         'stepNumber':{ 'text':'Nt', 'value':int(2e4) },
@@ -151,7 +153,7 @@ def GUI():
     stringVar = tk.StringVar(value=dicObjects['regSelected']['value'])
     regComboBox = ttk.Combobox(
         master=mainFrame,
-        values=regions['nameList'],
+        values=dicReg['nameList'],
         textvariable=stringVar,
         font=dicLayout['normalFontStyle'],
         width=20
@@ -270,19 +272,20 @@ def GUI():
     window.mainloop()
 
     #region Output
-    global buttonFlat, fileNamingRule
+    global buttonFlag
 
     dicPrm = {'runState':buttonFlag}
     for key in dicObjects:
         dicPrm[key] = dicObjects[key]['obj']['var'].get()
 
     regName = dicPrm['regSelected']
-    fileNamingRule = {
-        'subfolder':f'{regions['codeList'][regName]} {regName}',
-        'prefix':
-            f'{'A' if dicPrm['edgeWeights'] == 0 else 'W'}'
-            f'r{dicPrm['iterations']}'
-    }
+    # namingRule = {
+    #     'code':f'{dicReg['codeList'][regName]}',
+    #     'prefix':
+    #         f'{'A' if dicPrm['edgeWeights'] == 0 else 'W'}'
+    #         f'r{dicPrm['iterations']}'
+    # }
+    libFigures.regCode = f'{dicReg['codeList'][regName]}'
 
     return dicPrm
     #endregion
@@ -428,7 +431,7 @@ def DeviationUpperLimit(*args):
         return
 
 def ChangePopulation(*args):
-    global dicObjects, regions
+    global dicObjects, dicReg
     nameReg = dicObjects['regSelected']['obj']['var'].get()
-    popReg = regions['popList'][nameReg]
+    popReg = dicReg['popList'][nameReg]
     dicObjects['totalPop']['obj']['var'].set(popReg)

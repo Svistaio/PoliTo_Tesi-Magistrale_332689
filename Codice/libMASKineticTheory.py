@@ -14,16 +14,16 @@ libF.SetTextStyle()
 ### Main functions ###
 
 def MonteCarlo(totP,Nn,A,Nt,dt,l,a,sigma):
-    stateCities = networkState(totP,Nn,A,Nt,l,a,sigma)
+    stateCities = NetworkState(totP,Nn,A,Nt,l,a,sigma)
 
     for nt in tqdm(range(Nt),desc="Updating states"):
         stateCities.updateState(dt,nt)
 
     return stateCities 
 
-
 def CityDistributionFig(cs,Nn):
     fig, ax = plt.subplots(1,2,figsize=(15,7))
+    dicData = {'plots':{'fig1':{},'fig2':{}},'style':{'fig1':{},'fig2':{}}}
 
     labels = ["Ext.","Apx."]
     colours = ["blue","red"]
@@ -32,23 +32,25 @@ def CityDistributionFig(cs,Nn):
     csMin = np.array((2,1)); csMax = np.array((2,1))
 
     for i,k in enumerate(cs):
+        idx = str(i+1)
         csAvr[i] = np.mean(cs[k]); csSum[i] = np.sum(cs[k])
         csMin[i] = np.min(cs[k]); csMax[i] = np.max(cs[k])
 
 
         ### Lognormal fit ###
-
         # Histogram plot
+        x = cs[k]; nBins = 30; l = f"{labels[i]} histogram"
         hgPlot = ax[0].hist(
-            cs[k],
+            x,
             # bins='auto',
-            bins=30,
+            bins=nBins,
             density=True,
             color=colours[i],
             edgecolor="none", # "black"
-            label=f"{labels[i]} histogram",
+            label=l,
             alpha=0.5
         )
+        dicData['plots']['fig1']['histogramPlot'+idx] = {'t':'histogram','x':x,'b':nBins,'l':l}
 
         shape, loc, scale = lognorm.fit(cs[k],floc=0)
         ax[0].plot(
@@ -61,16 +63,17 @@ def CityDistributionFig(cs,Nn):
         )
 
         s = np.linspace(0,np.max(cs[k]),500)
+        x = s; y = lognorm.pdf(s,shape,loc=loc,scale=scale)
+        l = f"{labels[i]} lognormal fit (ML)"
         fPlot = ax[0].plot(
-            s,lognorm.pdf(s,shape,loc=loc,scale=scale),
-            label=f"{labels[i]} lognormal fit (ML)", # Maximum likelyhood
+            x,y,label=l, # Maximum likelyhood
             color=colours[i],
             linewidth=1
         ) # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
+        dicData['plots']['fig1']['fitPlot'+idx] = {'t':'function','x':x,'y':y,'l':l}
 
 
         ### Power law fit ###
-
         csQuarter = np.percentile(cs[k],75)
         csTail = cs[k][cs[k] >= csQuarter]
         b, loc, scale = pareto.fit(csTail,floc=0,fscale=csQuarter) # b≈alpha
@@ -88,21 +91,27 @@ def CityDistributionFig(cs,Nn):
         # Model CCDF from the fitted Pareto
         ccdfFit = pareto.sf(csSort,b,loc=loc,scale=scale) # Survival function
 
+        x = csSort; y = ccdfEmp;
+        l = f"{labels[i]} empirical CCDF"
         ax[1].plot(
-            csSort,ccdfEmp,
+            x,y,
             marker="o",
             color=colours[i],
             linewidth=1,
             # linestyle="--",
             linestyle="none",
-            label=f"{labels[i]} empirical CCDF",
+            label=l,
             alpha=0.5
         )
+        dicData['plots']['fig2']['scatterPlot'+idx] = {'t':'scatter','x':x,'y':y,'l':l}
+
+        x = csSort; y = ccdfFit;
+        l = fr"{labels[i]} pareto fit$"
         ax[1].plot(
-            csSort,ccdfFit,
-            color=colours[i],
-            label=fr"{labels[i]} pareto fit$"
+            x,y,label=l,
+            color=colours[i]
         )
+        dicData['plots']['fig2']['fitPlot'+idx] = {'t':'function','x':x,'y':y,'l':l}
 
         fig.text(
             .5,.925+i*.05,
@@ -118,45 +127,59 @@ def CityDistributionFig(cs,Nn):
 
     fig.text(.1,.95,fr"$N={Nn}\qquad$")
 
-    libF.SetPlotStyle(
-        r"$s$",ax=ax[1],
-        xScale="log",yScale="log"
-    )
-
     # Style
+
+    xl = r"$s$"; yl = r"$P(s)$"
     libF.SetPlotStyle(
-        r"$s$",r"$P(s)$",ax=ax[0],
+        xl,yl,ax=ax[0],
         yNotation="sci" # ,xNotation="sci"
     )
+    dicData['style']['fig1']['scale'] = {'x':'lin','y':'lin'}
+    dicData['style']['fig1']['labels'] = {'x':xl,'y':yl}
+
+    xl = r"$s$"; yl = r"$P(s)$"
+    libF.SetPlotStyle(
+        xl,ax=ax[1],
+        xScale="log",yScale="log"
+    )
+    dicData['style']['fig2']['scale'] = {'x':'log','y':'log'}
+    dicData['style']['fig2']['labels'] = {'x':xl,'y':yl}
 
     libF.CentrePlot()
-    libF.SaveFig(fig,"CitySizeDistributionSardegna")
-
+    libF.SaveFig('CitySizeDistribution','KS',dicData)
 
 def CityAverageFig(ca,Nt,dt):
     fig = plt.figure()
+    dicData = {'plots':{},'style':{}}
 
     labels = ["Ext.","Apx."]
     colours = ["blue","red"]
     timeInterval = np.arange(Nt+1)*dt
 
     for i,k in enumerate(ca):
+        x = timeInterval; y = ca[k]
+        l = rf"{labels[i]} city size average $\langle s\rangle$"
         plt.plot(
-            timeInterval,ca[k],
-            label=rf"{labels[i]} city size average $\langle s\rangle$",
+            x,y,
+            label=l,
             color=colours[i],
             linewidth=1,
         )
+        dicData['plots']['functionPlot'+str(i)] = {'t':'function','x':x,'y':y,'l':l}
 
-    libF.SetPlotStyle(r"$t$",r"$\langle s\rangle$")
     libF.CentrePlot()
-    libF.SaveFig(fig,"AverageCitySizeSardegna")
 
+    xl = r"$t$"; yl = r"$\langle s\rangle$"
+    libF.SetPlotStyle(xl,yl)
+    dicData['style']['scale'] = {'x':'lin','y':'lin'}
+    dicData['style']['labels'] = {'x':xl,'y':yl}
+
+    libF.SaveFig('AverageCitySize','KS',dicData)
 
 
 ### Auxiliary functions ###
 
-class networkState:
+class NetworkState:
     def __init__(self,totP,Nn,A,Nt,l,a,sigma):
         # Uniform initial state for all vertices
         keys = ["ext","apx"]
@@ -217,7 +240,6 @@ class networkState:
         self.avgState["ext"][nt+1] = np.mean(newState["ext"])
         self.avgState["apx"][nt+1] = np.mean(newState["apx"])
 
-
 def NonLinearEmigration(
         si, # Interacting city size
         sr, # Receiving city size
@@ -230,7 +252,6 @@ def NonLinearEmigration(
     else:
         ef = 0
     return ef
-
 
 def StochasticFluctuations(sigma,E):
     alpha = ((1-E)**2)/(sigma**2)
@@ -248,7 +269,7 @@ def StochasticFluctuations(sigma,E):
 
 ### Discarded code ###
 
-#region Old implementation for fluctuations with a [forcefully] resampled Gaussian until the value picked ensures the post-interaction population positivity
+#region Old implementation for fluctuations with a [forcefully] resampled Gaussian until the value picked ensures the post-interaction population is positive
     # def StochasticFluctuations(sigma,E):
     #     while True:
     #         mu = np.random.normal(0,sigma,size=1)
