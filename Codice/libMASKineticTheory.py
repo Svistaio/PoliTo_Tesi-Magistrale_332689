@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.stats import lognorm, pareto
 
 import importlib
 from tqdm import tqdm
@@ -23,102 +22,45 @@ def MonteCarlo(totP,Nn,A,Nt,dt,l,a,sigma):
 
 def CityDistributionFig(cs,Nn):
     fig, ax = plt.subplots(1,2,figsize=(15,7))
-    dicData = {'plots':{'fig1':{},'fig2':{}},'style':{'fig1':{},'fig2':{}}}
+    dicData = {'fig1':{'plots':{},'style':{}},'fig2':{'plots':{},'style':{}}}
 
     labels = ["Ext.","Apx."]
     colours = ["blue","red"]
 
-    csAvr = np.array((2,1)); csSum = np.array((2,1))
-    csMin = np.array((2,1)); csMax = np.array((2,1))
-
-    for i,k in enumerate(cs):
-        idx = str(i+1)
-        csAvr[i] = np.mean(cs[k]); csSum[i] = np.sum(cs[k])
-        csMin[i] = np.min(cs[k]); csMax[i] = np.max(cs[k])
-
+    for i,type in enumerate(cs):
 
         ### Lognormal fit ###
-        # Histogram plot
-        x = cs[k]; nBins = 30; l = f"{labels[i]} histogram"
-        hgPlot = ax[0].hist(
-            x,
-            # bins='auto',
-            bins=nBins,
-            density=True,
-            color=colours[i],
-            edgecolor="none", # "black"
-            label=l,
-            alpha=0.5
-        )
-        dicData['plots']['fig1']['histogramPlot'+idx] = {'t':'histogram','x':x,'b':nBins,'l':l}
+        libF.CreateHistogramPlot(
+            cs[type],30,dicData['fig1'],
+            l=f"{labels[i]} histogram",
+            clr=colours[i],alfa=0.5,
+            idx=i+1,ax=ax[0]
+        ) # Histogram plot
 
-        shape, loc, scale = lognorm.fit(cs[k],floc=0)
-        ax[0].plot(
-            [csAvr[i],csAvr[i]],
-            [0,lognorm.pdf(csAvr[i],shape,loc=loc,scale=scale)],
-            label=fr"{labels[i]} mean value $\langle k\rangle$",
-            color=colours[i],
-            linewidth=1,
-            linestyle="--"
-        )
-
-        s = np.linspace(0,np.max(cs[k]),500)
-        x = s; y = lognorm.pdf(s,shape,loc=loc,scale=scale)
-        l = f"{labels[i]} lognormal fit (ML)"
-        fPlot = ax[0].plot(
-            x,y,label=l, # Maximum likelyhood
-            color=colours[i],
-            linewidth=1
-        ) # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
-        dicData['plots']['fig1']['fitPlot'+idx] = {'t':'function','x':x,'y':y,'l':l}
+        libF.CreateLognormalFitPlot(
+            cs[type],dicData['fig1'],
+            lAvr=fr"{labels[i]} mean value $\langle k\rangle$",
+            lFit=f"{labels[i]} lognormal fit (ML)",
+            clrAvr=colours[i],clrFit=colours[i],
+            idx=i+1,ax=ax[0]
+        ) # Fit plot
 
 
         ### Power law fit ###
-        csQuarter = np.percentile(cs[k],75)
-        csTail = cs[k][cs[k] >= csQuarter]
-        b, loc, scale = pareto.fit(csTail,floc=0,fscale=csQuarter) # b≈alpha
-
-        # # Select the last quarter of city sizes
-        # f = 1/4; v = binx>=csMin*(1-f)+csMax*f
-        # binx = (hgPlot[1][1:]+hgPlot[1][:-1])/2
-        # biny = hgPlot[0]
-
-        # Empirical CCDF on the tail
-        csSort = np.sort(csTail) # Ascending values
-        n = csSort.size
-        ccdfEmp = 1 - np.arange(1,n+1,dtype=float)/n # P(X≥x)
-
-        # Model CCDF from the fitted Pareto
-        ccdfFit = pareto.sf(csSort,b,loc=loc,scale=scale) # Survival function
-
-        x = csSort; y = ccdfEmp;
-        l = f"{labels[i]} empirical CCDF"
-        ax[1].plot(
-            x,y,
-            marker="o",
-            color=colours[i],
-            linewidth=1,
-            # linestyle="--",
-            linestyle="none",
-            label=l,
-            alpha=0.5
+        b = libF.CreateParetoFitPlot(
+            cs[type],dicData['fig2'],
+            lSct=f"{labels[i]} empirical CCDF",
+            lFit=fr"{labels[i]} pareto fit",
+            clrSct=colours[i],clrFit=colours[i],
+            idx=i+1,ax=ax[1]
         )
-        dicData['plots']['fig2']['scatterPlot'+idx] = {'t':'scatter','x':x,'y':y,'l':l}
-
-        x = csSort; y = ccdfFit;
-        l = fr"{labels[i]} pareto fit$"
-        ax[1].plot(
-            x,y,label=l,
-            color=colours[i]
-        )
-        dicData['plots']['fig2']['fitPlot'+idx] = {'t':'function','x':x,'y':y,'l':l}
 
         fig.text(
             .5,.925+i*.05,
-            fr"{labels[i]}: $\quad s_{{min}}={csMin[i]:.2f}\qquad$"
-            fr"$s_{{max}}={csMax[i]:.2f}\qquad$"
-            fr"$\langle s\rangle ={csAvr[i]:.2f}\qquad$"
-            fr"$s_{{\Sigma}}={csSum[i]:.2f}\qquad$"
+            fr"{labels[i]}: $\quad s_{{min}}={np.min(cs[type]):.2f}\qquad$"
+            fr"$s_{{max}}={np.max(cs[type]):.2f}\qquad$"
+            fr"$\langle s\rangle ={np.mean(cs[type]):.2f}\qquad$"
+            fr"$s_{{\Sigma}}={np.sum(cs[type]):.2f}\qquad$"
             fr"$\alpha={b:.2f}$",
             ha="center",
             # fontsize=10,
@@ -127,53 +69,44 @@ def CityDistributionFig(cs,Nn):
 
     fig.text(.1,.95,fr"$N={Nn}\qquad$")
 
+
     # Style
-
-    xl = r"$s$"; yl = r"$P(s)$"
-    libF.SetPlotStyle(
-        xl,yl,ax=ax[0],
-        yNotation="sci" # ,xNotation="sci"
+    libF.SetFigStyle(
+        r"$s$",r"$P(s)$",
+        yNotation="sci", # ,xNotation="sci"
+        ax=ax[0],data=dicData['fig1']
     )
-    dicData['style']['fig1']['scale'] = {'x':'lin','y':'lin'}
-    dicData['style']['fig1']['labels'] = {'x':xl,'y':yl}
 
-    xl = r"$s$"; yl = r"$P(s)$"
-    libF.SetPlotStyle(
-        xl,ax=ax[1],
-        xScale="log",yScale="log"
+    libF.SetFigStyle(
+        r"$s$",r"$P(s)$",
+        xScale="log",yScale="log",
+        ax=ax[1],data=dicData['fig2']
     )
-    dicData['style']['fig2']['scale'] = {'x':'log','y':'log'}
-    dicData['style']['fig2']['labels'] = {'x':xl,'y':yl}
 
-    libF.CentrePlot()
+
+    libF.CentreFig()
     libF.SaveFig('CitySizeDistribution','KS',dicData)
 
 def CityAverageFig(ca,Nt,dt):
     fig = plt.figure()
-    dicData = {'plots':{},'style':{}}
+    dicData = {'fig':{'plots':{},'style':{}}}
 
     labels = ["Ext.","Apx."]
     colours = ["blue","red"]
     timeInterval = np.arange(Nt+1)*dt
 
-    for i,k in enumerate(ca):
-        x = timeInterval; y = ca[k]
-        l = rf"{labels[i]} city size average $\langle s\rangle$"
-        plt.plot(
-            x,y,
-            label=l,
-            color=colours[i],
-            linewidth=1,
+    for i,type in enumerate(ca):
+        libF.CreateFunctionPlot(
+            timeInterval,ca[type],dicData['fig'],
+            l=rf"{labels[i]} city size average $\langle s\rangle$",
+            clr=colours[i],idx=i+1
         )
-        dicData['plots']['functionPlot'+str(i)] = {'t':'function','x':x,'y':y,'l':l}
 
-    libF.CentrePlot()
-
-    xl = r"$t$"; yl = r"$\langle s\rangle$"
-    libF.SetPlotStyle(xl,yl)
-    dicData['style']['scale'] = {'x':'lin','y':'lin'}
-    dicData['style']['labels'] = {'x':xl,'y':yl}
-
+    libF.CentreFig()
+    libF.SetFigStyle(
+        r"$t$",r"$\langle s\rangle$",
+        data=dicData['fig']
+    )
     libF.SaveFig('AverageCitySize','KS',dicData)
 
 

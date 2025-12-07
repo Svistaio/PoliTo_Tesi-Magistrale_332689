@@ -3,11 +3,17 @@ from tkinter import ttk
 
 import libFigures
 
+global buttonFlag
+buttonFlat = False
+
 
 ### Main functions ###
 
 def GUI():
     global dicObjects, dicReg
+
+    # Resets the default root before creating the GUI
+    tk._default_root = None
 
     #region Global settings
     window = tk.Tk() # Main window
@@ -15,7 +21,7 @@ def GUI():
     window.resizable(False,False)  # Disable resizing the window
 
     pad = 40
-    mainFrame = ttk.Frame() # Main frame
+    mainFrame = ttk.Frame(window) # Main frame
     mainFrame.grid(padx=pad,pady=pad/1.5)
 
     dicLayout = {
@@ -268,12 +274,10 @@ def GUI():
     #endregion
 
     # Run
-    CentrePlot(window)
+    CentreGUI(window)
     window.mainloop()
 
     #region Output
-    global buttonFlag
-
     dicPrm = {'runState':buttonFlag}
     for key in dicObjects:
         dicPrm[key] = dicObjects[key]['obj']['var'].get()
@@ -398,7 +402,7 @@ def StopCallBack(window):
     buttonFlag = 0
     window.destroy() # Close the window after stop button is pressed
 
-def CentrePlot(window):
+def CentreGUI(window):
     # Get screen width and height
     screenWidth = window.winfo_screenwidth()
     screenHeight = window.winfo_screenheight()
