@@ -12,7 +12,7 @@ importlib.reload(libGUI)
 import numpy as np
 
 
-### GUI ###
+### Graphic User Interface ###
 prm = libGUI.GUI() # Parameters
 
 

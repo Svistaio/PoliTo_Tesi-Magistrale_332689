@@ -8,7 +8,6 @@ mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import mplcursors
-import mpld3
 
 import importlib
 
@@ -20,9 +19,9 @@ importlib.reload(libF)
 
 def DegreeDistributionFig(di,Nn):
     fig = plt.figure()
-    dicData = {'plots':{},'style':{}}
+    dicData = {'fig':{'plots':{},'style':{}}}
 
-    kAvr = np.sum(di)/Nn
+    kAvr = np.mean(di)
     fig.text(
         0.8,0.25,
         fr"$N$={Nn}"f"\n"
@@ -37,27 +36,7 @@ def DegreeDistributionFig(di,Nn):
 
 
     # Histogram plot
-    x = di; nBins=25; l = "Histogram"
-    hgPlot = plt.hist(x,
-        # bins=int(np.mean(d)),
-        bins=nBins,
-        # bins=60,
-        density=True,
-        color="gray",
-        edgecolor="none", # "black"
-        label=l
-    )
-    dicData['plots']['histogramPlot'] = {'t':'histogram','x':x,'b':nBins,'l':l}
-
-    # hgPlot[0] = heights,
-    # hgPlot[1] = bin edges,
-    # hgPlot[2] = patches (Rectangle objects)
-
-    mplcursors.cursor(hgPlot[2],hover=False).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            r"$P^{bin}(k)$="f"{hgPlot[0][sel.index]:.3f}"
-        )
-    )
+    libF.CreateHistogramPlot(di,25,dicData['fig'])
 
     #region
         # Scatter plot
@@ -96,48 +75,21 @@ def DegreeDistributionFig(di,Nn):
 
 
     # SciPy fitting (ML)
-    shape, loc, scale = lognorm.fit(di,floc=0)
-    x = [kAvr,kAvr]; y = [0,lognorm.pdf(kAvr,shape,loc=loc,scale=scale)]
-    l = r"Mean value $\langle k\rangle$"
-    plt.plot(
-        x,y,label=l,
-        color="black",
-        linewidth=1,
-        linestyle="--"
-    )
-    dicData['plots']['meanPlot'] = {'t':'function','x':x,'y':y,'l':l}
-
-    x = np.linspace(0,np.max(di),500)
-    y = lognorm.pdf(x,shape,loc=loc,scale=scale)
-    l = "SciPy lognormal fit (ML)"
-    fPlot = plt.plot(
-        x,y,
-        label=l, # Maximum likelyhood
-        color="blue",
-        linewidth=1
-    ) # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
-    dicData['plots']['fitPlot'] = {'t':'function','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(fPlot,hover=False).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"k={sel.target[0]:.3f},LN(k)={sel.target[1]:.3f}"
-        )
-    )
+    libF.CreateLognormalFitPlot(di,dicData['fig'])
 
 
     # Style
-    libF.CentrePlot()
-
-    xl = r"$k$"; yl = r"$P(k)$"
-    libF.SetPlotStyle(xl,yl,[0,300],[0,0.03])
-    dicData['style']['scale'] = {'x':'lin','y':'lin'}
-    dicData['style']['labels'] = {'x':xl,'y':yl}
-
+    libF.CentreFig()
+    libF.SetFigStyle(
+        r"$k$",r"$P(k)$",
+        [0,300],[0,0.03],
+        data=dicData['fig']
+    )
     libF.SaveFig('DegreeDistribution','NA',dicData)
 
 def AClusteringCoefficientFig(A,di,dk,Nk):
     fig = plt.figure()
-    dicData = {'plots':{},'style':{}}
+    dicData = {'fig':{'plots':{},'style':{}}}
     
     G = nx.from_numpy_array(A)
     Cd = nx.clustering(G)
@@ -187,31 +139,22 @@ def AClusteringCoefficientFig(A,di,dk,Nk):
         color="black"
     )
 
-    x = dk; y = Ck; l = ''
-    sc = plt.scatter(x,y,color='black',s=16)
-    dicData['plots']['scatterPlot'] = {'t':'scatter','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(sc,hover=True).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"cx={dk[sel.index]:.3f},"
-            f"cy={Ck[sel.index]:.3f}"
-        )
-    )
+    libF.CreateScatterPlot(dk,Ck,dicData['fig'],l='')
 
     # Style
-    libF.CentrePlot()
-    xl = r"$k$"; yl = r"$C(k)$"
-    libF.SetPlotStyle(xl,yl,[0,300],[0,0.8])
-    dicData['style']['scale'] = {'x':'lin','y':'lin'}
-    dicData['style']['labels'] = {'x':xl,'y':yl}
-
+    libF.CentreFig()
+    libF.SetFigStyle(
+        r"$k$",r"$C(k)$",
+        [0,300],[0,0.8],
+        data=dicData['fig']
+    )
     libF.SaveFig('AClusteringCoefficient','NA',dicData)
 
     return Ck
 
 def AAssortativityFig(A,dk):
     fig = plt.figure()
-    dicData = {'plots':{},'style':{}}
+    dicData = {'fig':{'plots':{},'style':{}}}
     
     G = nx.from_numpy_array(A)
     ad = nx.average_neighbor_degree(G)
@@ -229,35 +172,27 @@ def AAssortativityFig(A,dk):
     )
 
     knn = np.array([ak[ki] for ki in dk])
-    x = dk; y = knn; l = ''
-    sc = plt.scatter(x,y,color='black',s=16)
-    dicData['plots']['scatterPlot'] = {'t':'scatter','x':x,'y':y,'l':l}
+    libF.CreateScatterPlot(dk,knn,dicData['fig'],l='')
 
-    mplcursors.cursor(sc,hover=True).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"cx={dk[sel.index]}, \
-            cy={knn[sel.index]}"
-        )
-    )
 
     # Style
-    libF.CentrePlot()
-
-    xl = r"$k$"; yl = r"$k_{nn}(k)$"
-    libF.SetPlotStyle(xl,yl,[0,300],[40,95])
-    dicData['style']['scale'] = {'x':'lin','y':'lin'}
-    dicData['style']['labels'] = {'x':xl,'y':yl}
-
+    libF.CentreFig()
+    libF.SetFigStyle(
+        r"$k$",r"$k_{nn}(k)$",
+        [0,300],[40,95],
+        data=dicData['fig']
+    )
     libF.SaveFig('AAssortativity','NA',dicData)
 
     return knn
 
 def BetweennessCentralityFig(A,di):
     fig = plt.figure()
-    dicData = {'plots':{},'style':{}}
+    dicData = {'fig':{'plots':{},'style':{}}}
     
     G = nx.from_numpy_array(A)
     bc = nx.betweenness_centrality(G,normalized=False)
+    bcd = np.array([bc[i] for i in range(len(di))])
 
     aAvr = np.mean(list(bc.values()))
     fig.text(
@@ -270,59 +205,26 @@ def BetweennessCentralityFig(A,di):
         color="black"
     )
 
-    bcd = np.array([bc[i] for i in range(len(di))])
-    x = di; y = bcd; l = ''
-    sc = plt.scatter(x,y,color='black',s=16)
-    dicData['plots']['scatterPlot'] = {'t':'scatter','x':x,'y':y,'l':l}
+    libF.CreateScatterPlot(di,bcd,dicData['fig'],l='')
 
-    mplcursors.cursor(sc,hover=True).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"cx={di[sel.index]:.3f}, \
-            cy={bcd[sel.index]:.3f}"
-        )
-    )
 
     # Style
-    libF.CentrePlot()
-
-    xl = r"$k$"; yl = r"$g(i)$"
-    libF.SetPlotStyle(
-        xl,yl,
+    libF.CentreFig()
+    libF.SetFigStyle(
+        r"$k$",r"$g(i)$",
         # [0.5e1,0.5e3],[1,0.5e5],
-        xScale="log",yScale="log"
+        xScale='log',yScale='log',
+        data=dicData['fig']
     )
-    dicData['style']['scale'] = {'x':'log','y':'log'}
-    dicData['style']['labels'] = {'x':xl,'y':yl}
-
     libF.SaveFig('BetweennessCentrality','NA',dicData)
 
 def WeightDistributionFig(wi):
     fig = plt.figure()
-    dicData = {'plots':{},'style':{}}
+    dicData = {'fig':{'plots':{},'style':{}}}
 
 
     # Histogram plot
-    x = wi; nBins = 20
-    l = "Histogram"
-    hgPlot = plt.hist(
-        x,
-        bins=np.logspace(np.log10(min(wi)),np.log10(max(wi)),20),
-        density=True,
-        color="gray",
-        edgecolor="none", # "black"
-        label=l
-    )
-    dicData['plots']['histogramPlot'] = {'t':'histogram','x':x,'b':nBins,'l':l}
-
-    # hgPlot[0] = heights,
-    # hgPlot[1] = bin edges,
-    # hgPlot[2] = patches (Rectangle objects)
-
-    mplcursors.cursor(hgPlot[2],hover=False).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            "$w^{bin}(k)$="f"{hgPlot[0][sel.index]:.3f}"
-        )
-    )
+    hgPlot = libF.CreateHistogramPlot(wi,20,dicData['fig'],scale='log')
 
 
     # SciPy regression
@@ -331,25 +233,7 @@ def WeightDistributionFig(wi):
     # sc = plt.scatter(binw,binPw,c='r',s=50)
 
     # Fit in log–log space
-    logBinw  = np.log10(binw)
-    logBinPw = np.log10(binPw)
-    slope, intercept, _, _, _ = linregress(logBinw,logBinPw)
-    regression = 10**(intercept+slope*logBinw)
-
-    x = binw; y = regression; l = "Regression"
-    fPlot = plt.plot(
-        x,y,label=l,
-        color="blue",
-        linewidth=1
-    )
-    dicData['plots']['regressionPlot'] = {'t':'function','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(fPlot,hover=False).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"k={sel.target[0]:.3f}, w(k)={sel.target[1]:.3f}"
-        )
-    )
-
+    slope = libF.CreateLogRegressionPlot(binw,binPw,dicData['fig'])
 
     kAvr = np.mean(wi)
     fig.text(
@@ -365,48 +249,21 @@ def WeightDistributionFig(wi):
 
 
     # Style
-    libF.CentrePlot()
-
-    xl = r"$w$"; yl = r"$P(w)$"
-    libF.SetPlotStyle(
-        xl,yl,
-        xScale="log",yScale="log"
+    libF.CentreFig()
+    libF.SetFigStyle(
+        r"$w$",r"$P(w)$",
+        xScale="log",yScale="log",
+        data=dicData['fig']
     )
-    dicData['style']['scale'] = {'x':'log','y':'log'}
-    dicData['style']['labels'] = {'x':xl,'y':yl}
-
     libF.SaveFig('WeightDistribution','NA',dicData)
 
 def StrengthDistributionFig(si):
     fig = plt.figure()
-    dicData = {'plots':{},'style':{}}
+    dicData = {'fig':{'plots':{},'style':{}}}
 
 
     # Histogram plot
-    x = si; nBins=20; l = "Histogram"
-    hgPlot = plt.hist(
-        x,
-        bins=np.logspace(
-            np.log10(min(x)),
-            np.log10(max(x)),
-            nBins
-        ),
-        density=True,
-        color="gray",
-        edgecolor="none", # "black"
-        label=l
-    )
-    dicData['plots']['histogramPlot'] = {'t':'histogram','x':x,'b':nBins,'l':l}
-
-    # hgPlot[0] = heights,
-    # hgPlot[1] = bin edges,
-    # hgPlot[2] = patches (Rectangle objects)
-
-    mplcursors.cursor(hgPlot[2],hover=False).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            "$w^{bin}(k)$="+f"{hgPlot[0][sel.index]:.3f}"
-        )
-    )
+    hgPlot = libF.CreateHistogramPlot(si,20,dicData['fig'],scale='log')
 
 
     # SciPy regression
@@ -416,25 +273,7 @@ def StrengthDistributionFig(si):
 
     # Fit in log–log space
     v = binPs>0; v[:6] = 0
-    logBins  = np.log10(bins[v])
-    logBinPs = np.log10(binPs[v])
-    slope, intercept, _, _, _ = linregress(logBins,logBinPs)
-    regression = 10**(intercept+slope*logBins)
-
-    x = bins[v]; y = regression; l = "Regression"
-    fPlot = plt.plot(
-        x,y,label=l,
-        color="blue",
-        linewidth=1
-    )
-    dicData['plots']['fitPlot'] = {'t':'function','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(fPlot,hover=False).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"k={sel.target[0]:.3f}, w(k)={sel.target[1]:.3f}"
-        )
-    )
-
+    slope = libF.CreateLogRegressionPlot(bins[v],binPs[v],dicData['fig'])
 
     kAvr = np.mean(si)
     fig.text(
@@ -450,21 +289,17 @@ def StrengthDistributionFig(si):
 
 
     # Style
-    libF.CentrePlot()
-
-    xl = r"$s$"; yl = r"$P(s)$"
-    libF.SetPlotStyle(
-        xl,yl,
-        xScale="log",yScale="log"
+    libF.CentreFig()
+    libF.SetFigStyle(
+        r"$s$",r"$P(s)$",
+        xScale="log",yScale="log",
+        data=dicData['fig']
     )
-    dicData['style']['scale'] = {'x':'log','y':'log'}
-    dicData['style']['labels'] = {'x':xl,'y':yl}
-
     libF.SaveFig('StrengthDistribution','NA',dicData)
 
 def StrengthFromDegreeFig(si,di,dk,Nk):
     fig = plt.figure()
-    dicData = {'plots':{},'style':{}}
+    dicData = {'fig':{'plots':{},'style':{}}}
 
 
     # Scatter
@@ -474,40 +309,10 @@ def StrengthFromDegreeFig(si,di,dk,Nk):
         sk[i] = np.sum(si[v])
         sk[i] /= Nk[i]
 
-    x = dk; y = sk; l = "Scatter plot"
-    sc = plt.scatter(
-        x,y,label=l,
-        color='black',
-        s=16
-    )
-    dicData['plots']['scatterPlot'] = {'t':'scatter','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(sc,hover=True).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"cx={dk[sel.index]:.3f}, \
-            cy={sk[sel.index]:.3f}"
-        )
-    )
-
+    libF.CreateScatterPlot(dk,sk,dicData['fig'])
 
     # Fit in log–log space
-    logdk = np.log10(dk); logsk = np.log10(sk)
-    slope, intercept, _, _, _ = linregress(logdk,logsk)
-    regression = 10**(intercept+slope*logdk)
-
-    x = dk; y = regression; l = "Regression"
-    fPlot = plt.plot(
-        x,y,label=l,
-        color="blue",
-        linewidth=1
-    )
-    dicData['plots']['regressionPlot'] = {'t':'function','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(fPlot,hover=False).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"k={sel.target[0]:.3f}, w(k)={sel.target[1]:.3f}"
-        )
-    )
+    slope = libF.CreateLogRegressionPlot(dk,sk,dicData['fig'])
 
     sAvr = np.mean(si)
     fig.text(
@@ -523,21 +328,17 @@ def StrengthFromDegreeFig(si,di,dk,Nk):
 
 
     # Style
-    libF.CentrePlot()
-
-    xl = r"$k$"; yl = r"$s(k)$"
-    libF.SetPlotStyle(
-        xl,yl,
-        xScale="log",yScale="log"
+    libF.CentreFig()
+    libF.SetFigStyle(
+        r"$k$",r"$s(k)$",
+        xScale="log",yScale="log",
+        data=dicData['fig']
     )
-    dicData['style']['scale'] = {'x':'log','y':'log'}
-    dicData['style']['labels'] = {'x':xl,'y':yl}
-
     libF.SaveFig('StrengthFromDegree','NA',dicData)
 
 def WClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck):
     fig, ax = plt.subplots(2,1)
-    dicData = {'plots':{'fig1':{},'fig2':{}},'style':{'fig1':{},'fig2':{}}}
+    dicData = {'fig1':{'plots':{},'style':{}},'fig2':{'plots':{},'style':{}}}
 
 
     # Manual counting
@@ -563,56 +364,33 @@ def WClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck):
         v = (di == ki)
         Ckw[i] = np.sum(Cd[v])/Nk[i]
 
-    x = dk; y = Ckw; l =''
-    sc = ax[0].scatter(x,y,color='black',s=16)
-    dicData['plots']['fig1']['scatterPlot'] = {'t':'scatter','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(sc,hover=True).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"cx={dk[sel.index]:.3f}, \
-            cy={Ckw[sel.index]:.3f}"
-        )
-    )
+    libF.CreateScatterPlot(dk,Ckw,dicData['fig1'],l='',ax=ax[0])
 
     # Style
-    xl = r"$k$"; yl = r"$C^w(k)$"
-    libF.SetPlotStyle(
-        xl,yl,
-        xScale="log",ax=ax[0]
+    libF.SetFigStyle(
+        r"$k$",r"$C^w(k)$",
+        xScale="log",ax=ax[0],
+        data=dicData['fig1']
     )
-    dicData['style']['fig1']['scale'] = {'x':'log','y':'lin'}
-    dicData['style']['fig1']['labels'] = {'x':xl,'y':yl}
 
 
     CkwRel= (Ckw-Ck)/Ck
-    x = dk; y = CkwRel; l = ''
-    sc = ax[1].scatter(x,y,color='black',s=16)
-    dicData['plots']['fig2']['scatterPlot'] = {'t':'scatter','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(sc,hover=True).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"cx={dk[sel.index]:.3f}, \
-            cy={CkwRel[sel.index]:.3f}"
-        )
-    )
+    libF.CreateScatterPlot(dk,CkwRel,dicData['fig2'],l='',ax=ax[1])
 
     # Style
-    xl = r"$k$"; yl = r"$C^w_{\text{rel}}(k)$"
-    libF.SetPlotStyle(
-        xl,yl,
+    libF.SetFigStyle(
+        r"$k$",r"$C^w_{\text{rel}}(k)$",
         xScale="log",yScale="log",
-        ax=ax[1]
+        ax=ax[1],data=dicData['fig2']
     )
-    dicData['style']['fig2']['scale'] = {'x':'log','y':'log'}
-    dicData['style']['fig2']['labels'] = {'x':xl,'y':yl}
 
 
-    libF.CentrePlot()
-    libF.SaveFig('WClusteringCoefficient','NA',dicData,figs=True)
+    libF.CentreFig()
+    libF.SaveFig('WClusteringCoefficient','NA',dicData)
 
 def WAssortativityFig(W,dk,knn):
     fig, ax = plt.subplots(2,1)
-    dicData = {'plots':{'fig1':{},'fig2':{}},'style':{'fig1':{},'fig2':{}}}
+    dicData = {'fig1':{'plots':{},'style':{}},'fig2':{'plots':{},'style':{}}}
 
     Gw = nx.from_numpy_array(W)
     # adw = nx.average_neighbor_degree(Gw,weight="weight")
@@ -620,50 +398,26 @@ def WAssortativityFig(W,dk,knn):
 
 
     knnw = np.array([akw[ki] for ki in dk])
-    x = dk; y = knnw; l = ''
-    sc = ax[0].scatter(x,y,color='black',s=16)
-    dicData['plots']['fig1']['scatterPlot'] = {'t':'scatter','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(sc,hover=True).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"cx={dk[sel.index]}"
-            f"cy={knn[sel.index]}"
-        )
-    )
+    libF.CreateScatterPlot(dk,knnw,dicData['fig1'],l='',ax=ax[0])
 
     # Style
-    xl = r"$k$"; yl = r"$k_{nn}^w(k)$"
-    libF.SetPlotStyle(
-        xl,yl,
+    libF.SetFigStyle(
+        r"$k$",r"$k_{nn}^w(k)$",
         xScale="log",yScale="log",
-        ax=ax[0]
+        ax=ax[0],data=dicData['fig1']
     )
-    dicData['style']['fig1']['scale'] = {'x':'log','y':'log'}
-    dicData['style']['fig1']['labels'] = {'x':xl,'y':yl}
 
 
     knnwRel = (knnw-knn)/knn
-    x = dk; y = knnwRel; l = ''
-    sc = ax[1].scatter(x,y,color='black',s=16)
-    dicData['plots']['fig2']['scatterPlot'] = {'t':'scatter','x':x,'y':y,'l':l}
-
-    mplcursors.cursor(sc,hover=True).connect(
-        "add",lambda sel: sel.annotation.set_text(
-            f"cx={dk[sel.index]}"
-            f"cy={knnwRel[sel.index]}"
-        )
-    )
+    libF.CreateScatterPlot(dk,knnwRel,dicData['fig2'],l='',ax=ax[1])
 
     # Style
-    xl = r"$k$"; yl = r"$k_{nn,rel}^w(k)$"
-    libF.SetPlotStyle(
-        xl,yl,
+    libF.SetFigStyle(
+        r"$k$",r"$k_{nn,rel}^w(k)$",
         xScale="log",yScale="log",
-        ax=ax[1]
+        ax=ax[1],data=dicData['fig2']
     )
-    dicData['style']['fig2']['scale'] = {'x':'log','y':'log'}
-    dicData['style']['fig2']['labels'] = {'x':xl,'y':yl}
 
 
-    libF.CentrePlot()
-    libF.SaveFig('WAssortativity','NA',dicData,figs=True)
+    libF.CentreFig()
+    libF.SaveFig('WAssortativity','NA',dicData)

@@ -1,8 +1,8 @@
-function funmat2tex(matpath,texpath)
+function mat2tex(matpath,texpath)
     s = load(matpath);
     f = string(fieldnames(s.plots));
 
-    figure("Visible","off");
+    figure('Visible','off');
     hold on
 
     for i = 1:numel(f)
@@ -23,6 +23,13 @@ function funmat2tex(matpath,texpath)
                 );
 
             case 'histogram'
+                histogram( ...
+                    s.plots.(field).x, ...
+                    'NumBins',s.plots.(field).b, ...
+                    'Normalization','pdf', ...
+                    'DisplayName',s.plots.(field).l ...
+                );
+
         end
     end
 
@@ -42,15 +49,17 @@ function funmat2tex(matpath,texpath)
     set(ax,'XScale',s.style.scale.x)
     set(ax,'YScale',s.style.scale.x)
 
-    % legend( ...
-    %     'Location','best',...
-    %     'interpreter','latex' ...
-    % );
+    if(s.style.legend == 1)
+        legend( ...
+            'Location','best',...
+            'interpreter','latex' ...
+        );
+    end
 
     matlab2tikz(texpath,'standalone',true);
-
 end
 
-matpath = "..\Figure\.mat\20\NA\AAssortativity.mat";
-texpath = "..\Figure\.tex\Prova.tex";
-funmat2tex(matpath,texpath)
+% matpath = '..\Figure\.mat\20\NA\AAssortativity.mat';
+% matpath = '..\Figure\.mat\20\NA\DegreeDistribution.mat';
+% texpath = '..\Figure\.tex\Prova.tex';
+% mat2tex(matpath,texpath)

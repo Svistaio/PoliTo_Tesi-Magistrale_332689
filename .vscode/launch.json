@@ -12,7 +12,8 @@
             // "program": "${file}",
             // "console": "integratedTerminal", // Open «Terminal» when debugging
             "console": "internalConsole",       // Open «Debug Console» when debugging 
-            "internalConsoleOptions": "openOnSessionStart",            
+            // "internalConsoleOptions": "openOnSessionStart", // Open the debug console once at the start of the session
+            "internalConsoleOptions": "neverOpen", // Never open the debug console
             "cwd": "${fileDirname}", // Set the python file directory as the current working directory (cwd)
         }
     ]
