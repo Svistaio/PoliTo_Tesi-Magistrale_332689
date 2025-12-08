@@ -53,13 +53,14 @@ def GUI():
             'Basilicata',
             'Calabria',
             'Sicilia',
-            'Sardegna'
+            'Sardegna',
+            'Italia'
         ],
         'popList':{ # Italian region sizes in 1991
             'Piemonte':int(4302565),
-            'ValledAosta':int(115938),
+            "Valle d'Aosta":int(115938),
             'Lombardia':int(8856074),
-            'Trentino-AltoAdige':int(890360),
+            'Trentino-Alto Adige':int(890360),
             'Veneto':int(4380797),
             'Friuli-Venezia Giulia':int(1197666),
             'Liguria':int(1676282),
@@ -79,7 +80,7 @@ def GUI():
             'Italia':int(56778031)
         } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
     }
-    dicReg['codeList'] = {r:int(i) for i,r in enumerate(dicReg['nameList'],start=1)}
+    dicReg['codeList'] = {r:int(i+1) for i,r in enumerate(dicReg['nameList'])}
 
     dicObjects = {
         'totalPop':{ 'text':'S', 'value':dicReg['popList']['Sardegna'] },
@@ -157,6 +158,7 @@ def GUI():
     regLabel.grid(pady=(10,0))
 
     stringVar = tk.StringVar(value=dicObjects['regSelected']['value'])
+    intVar = tk.IntVar(value=dicReg['codeList'][stringVar.get()])
     regComboBox = ttk.Combobox(
         master=mainFrame,
         values=dicReg['nameList'],
@@ -167,9 +169,10 @@ def GUI():
     regComboBox.grid()
     dicObjects['regSelected']['obj'] = {
         'wid':regComboBox,
-        'var':stringVar,
+        'var':intVar,
+        'lab':stringVar
     }
-    dicObjects['regSelected']['obj']['var'].trace_add("write",ChangePopulation)
+    dicObjects['regSelected']['obj']['lab'].trace_add("write",ChangePopulation)
     #endregion
 
     #region Time parameters
@@ -282,14 +285,8 @@ def GUI():
     for key in dicObjects:
         dicPrm[key] = dicObjects[key]['obj']['var'].get()
 
-    regName = dicPrm['regSelected']
-    # namingRule = {
-    #     'code':f'{dicReg['codeList'][regName]}',
-    #     'prefix':
-    #         f'{'A' if dicPrm['edgeWeights'] == 0 else 'W'}'
-    #         f'r{dicPrm['iterations']}'
-    # }
-    libFigures.regCode = f'{dicReg['codeList'][regName]}'
+    code = dicPrm['regSelected']
+    libFigures.regCode = f'{'0' if code<=9 else ''}{code}'
 
     return dicPrm
     #endregion
@@ -310,9 +307,9 @@ def CreateLabelField(
         padx=px,pady=py
     )
 
-    if type(fieldValue) == float:
+    if isinstance(fieldValue,float):
         fieldVar = tk.DoubleVar(value=fieldValue)
-    elif type(fieldValue) == int:
+    elif isinstance(fieldValue,int):
         fieldVar = tk.IntVar(value=fieldValue)
 
     fieldLabel = ttk.Label(
@@ -436,6 +433,10 @@ def DeviationUpperLimit(*args):
 
 def ChangePopulation(*args):
     global dicObjects, dicReg
-    nameReg = dicObjects['regSelected']['obj']['var'].get()
+    nameReg = dicObjects['regSelected']['obj']['lab'].get()
+
+    codeReg = dicReg['codeList'][nameReg]
     popReg = dicReg['popList'][nameReg]
+
     dicObjects['totalPop']['obj']['var'].set(popReg)
+    dicObjects['regSelected']['obj']['var'].set(codeReg)
