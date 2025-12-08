@@ -17,14 +17,14 @@ importlib.reload(libF)
 
 ### Main functions ###
 
-def DegreeDistributionFig(di,Nn):
+def DegreeDistributionFig(di):
     fig = plt.figure()
-    dicData = {'fig':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(1)
 
     kAvr = np.mean(di)
     fig.text(
         0.8,0.25,
-        fr"$N$={Nn}"f"\n"
+        fr"$N$={di.size}"f"\n"
         fr"$E$={int(np.sum(di)/2)}"f"\n"
         fr"$k_{{min}}$={np.min(di)}"f"\n"
         fr"$k_{{max}}$={np.max(di)}"f"\n"
@@ -89,7 +89,7 @@ def DegreeDistributionFig(di,Nn):
 
 def AClusteringCoefficientFig(A,di,dk,Nk):
     fig = plt.figure()
-    dicData = {'fig':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(1)
     
     G = nx.from_numpy_array(A)
     Cd = nx.clustering(G)
@@ -154,7 +154,7 @@ def AClusteringCoefficientFig(A,di,dk,Nk):
 
 def AAssortativityFig(A,dk):
     fig = plt.figure()
-    dicData = {'fig':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(1)
     
     G = nx.from_numpy_array(A)
     ad = nx.average_neighbor_degree(G)
@@ -188,7 +188,7 @@ def AAssortativityFig(A,dk):
 
 def BetweennessCentralityFig(A,di):
     fig = plt.figure()
-    dicData = {'fig':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(1)
     
     G = nx.from_numpy_array(A)
     bc = nx.betweenness_centrality(G,normalized=False)
@@ -220,7 +220,7 @@ def BetweennessCentralityFig(A,di):
 
 def WeightDistributionFig(wi):
     fig = plt.figure()
-    dicData = {'fig':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(1)
 
 
     # Histogram plot
@@ -259,7 +259,7 @@ def WeightDistributionFig(wi):
 
 def StrengthDistributionFig(si):
     fig = plt.figure()
-    dicData = {'fig':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(1)
 
 
     # Histogram plot
@@ -297,9 +297,9 @@ def StrengthDistributionFig(si):
     )
     libF.SaveFig('StrengthDistribution','NA',dicData)
 
-def StrengthFromDegreeFig(si,di,dk,Nk):
+def StrengthVsDegreeFig(si,di,dk,Nk):
     fig = plt.figure()
-    dicData = {'fig':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(1)
 
 
     # Scatter
@@ -334,11 +334,11 @@ def StrengthFromDegreeFig(si,di,dk,Nk):
         xScale="log",yScale="log",
         data=dicData['fig']
     )
-    libF.SaveFig('StrengthFromDegree','NA',dicData)
+    libF.SaveFig('StrengthVsDegree','NA',dicData)
 
 def WClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck):
     fig, ax = plt.subplots(2,1)
-    dicData = {'fig1':{'plots':{},'style':{}},'fig2':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(2)
 
 
     # Manual counting
@@ -390,7 +390,7 @@ def WClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck):
 
 def WAssortativityFig(W,dk,knn):
     fig, ax = plt.subplots(2,1)
-    dicData = {'fig1':{'plots':{},'style':{}},'fig2':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(2)
 
     Gw = nx.from_numpy_array(W)
     # adw = nx.average_neighbor_degree(Gw,weight="weight")

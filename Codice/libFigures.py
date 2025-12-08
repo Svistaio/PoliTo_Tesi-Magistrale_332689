@@ -147,12 +147,12 @@ def CreateFunctionPlot(
     )
 
     dicData['plots'][f'functionPlot{idx}'] = {
-        't':'function','x':x,'y':y,'l':l
+        't':'function','x':x,'y':y,'l':l,'c':clr
     }
 
 def CreateHistogramPlot(
     x,nBins,dicData,l='Histogram',
-    clr='gray',scale='lin',
+    clr='#808080',scale='lin',
     alfa=1,idx='',ax=None
 ):
     if ax is None: ax = plt.gca()
@@ -183,7 +183,7 @@ def CreateHistogramPlot(
         )
 
     dicData['plots'][f'histogramPlot{idx}'] = {
-        't':'histogram','x':x,'b':nBins,'l':l
+        't':'histogram','x':x,'b':nBins,'l':l,'c':clr,'a':alfa,'s':scale
     }
 
     # hgPlot[0] = heights,
@@ -212,7 +212,7 @@ def CreateScatterPlot(
         s=16)
 
     dicData['plots'][f'scatterPlot{idx}'] = {
-        't':'scatter','x':x,'y':y,'l':l
+        't':'scatter','x':x,'y':y,'l':l,'c':clr
     }
 
     mplcursors.cursor(sc,hover=True).connect(
@@ -249,11 +249,11 @@ def CreateLognormalFitPlot(
         linewidth=1
     ) # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
 
-    dicData['plots'][f'fitPlot{idx}'] = {
-        't':'function','x':xM,'y':yM,'l':lFit
-    }
     dicData['plots'][f'meanPlot{idx}'] = {
-        't':'function','x':xF,'y':yF,'l':lAvr
+        't':'function','x':xM,'y':yM,'l':lFit,'c':clrAvr
+    }
+    dicData['plots'][f'fitPlot{idx}'] = {
+        't':'function','x':xF,'y':yF,'l':lAvr,'c':clrFit
     }
 
     mplcursors.cursor(fPlot,hover=False).connect(
@@ -280,7 +280,9 @@ def CreateLogRegressionPlot(
         linewidth=1
     )
     
-    dicData['plots'][f'regressionPlot{idx}'] = {'t':'function','x':x,'y':y,'l':l}
+    dicData['plots'][f'regressionPlot{idx}'] = {
+        't':'function','x':x,'y':regression,'l':l,'c':clr
+    }
 
     mplcursors.cursor(fPlot,hover=False).connect(
         "add",lambda sel: sel.annotation.set_text(
@@ -323,13 +325,26 @@ def CreateParetoFitPlot(
     )
 
     dicData['plots'][f'ScatterPlot{idx}'] = {
-        't':'scatter','x':vSort,'y':ccdfEmp,'l':lSct
+        't':'scatter','x':vSort,'y':ccdfEmp,'l':lSct,'c':clrSct
     }
     dicData['plots'][f'FitPlot{idx}'] = {
-        't':'function','x':vSort,'y':ccdfFit,'l':lFit
+        't':'function','x':vSort,'y':ccdfFit,'l':lFit,'c':clrFit
     }
 
     return b
+
+def CreateDicData(nFig):
+    if not isinstance(nFig,int) or nFig <= 0:
+        raise ValueError('The number of figures must be a integer positive number')
+
+    dicData = {}
+    if nFig == 1:
+        dicData['fig'] = {'plots':{},'style':{}}
+    else:
+        for i in range(nFig):
+            dicData[f'fig{i+1}'] = {'plots':{},'style':{}}
+        
+    return dicData
 
 
 ### Discarded code ###

@@ -1,3 +1,4 @@
+
 import zipfile as zf
 from zipfile import ZipFile as ZF
 
@@ -13,85 +14,108 @@ import numpy as np
 
 ### Main functions ###
 
-def ExtractAdjacencyMatrices(zipFile):
-    # Conversion of «elencom91.xls» from the old format .xls to a more modern .csv 
-    with ZF(zipFile) as z:
-        b = z.read("elencom91.xls")  # Extract raw bytes from «elencom91.xls»
+def ExtractAdjacencyMatrices():
+    zipFile = '../Dati/MatriciPendolarismo1991.zip'
 
-    streamXLS = bio(b)  # Create a binary stream in RAM from the bytes «b»
+    # Conversion of «elencom91.xls» from the old format «.xls» to a more modern «.csv»
+    csvFile = xls2csv(zipFile,'elencom91.xls')
+
+    dicMun, dicReg = ReadMunRegCodes(csvFile)
+
+    BuildAdjacencyMatrices(
+        dicMun,dicReg,
+        zipFile,'Pen_91It.txt'
+    )
+
+    WriteAdjacencyMatrices(
+        '../Dati/DatiPendolarismo1991.zip',dicReg
+    )
+
+def ReadAdjacencyMatrices(code):
+    zipFile = '../Dati/DatiPendolarismo1991.zip'
+    pathA = f'{code}/A.txt'
+    pathW = f'{code}/W.txt'
+
+    with ZF(zipFile) as z:
+        A = MatrixFromZip(z,pathA)
+        W = MatrixFromZip(z,pathW)
+    return A, W
+
+
+### Auxiliary functions ###
+
+def xls2csv(zipFile,xlsFile):
+    with ZF(zipFile) as z:
+        b = z.read(xlsFile)  # Extract raw bytes from «elencom91.xls»
+
+    streamXls = bio(b)  # Create a binary stream in RAM from the bytes «b»
     df = pd.read_excel( # Read the Excel content
-        streamXLS,      # from «streamXLS»
+        streamXls,      # from «streamXLS»
         dtype=str,      # treating columns as strings
         engine="xlrd",  # using «xlrd»
         sheet_name=0    # for only the first worksheet
     ) # «df» stands for «DataFrame» from «pandas.DataFrame»
-    streamCSV = sio()   # Allocate a text buffer in RAM that behaves like a writable text file (UTF-8 encoding)
-    df.to_csv(          # Serialize «df» as CSV
-        streamCSV,      # into «streamCSV» and
+    streamCsv = sio()   # Allocate a text buffer in RAM that behaves like a writable text file (UTF-8 encoding)
+    df.to_csv(          # Serialize «df» as «.csv»
+        streamCsv,      # into «streamCSV» and
         index=False     # without the DataFrame’s row numbers
     )
-    streamCSV.seek(0)   # Reset the text buffer cursor to the start so it can be read from the beginning
+    streamCsv.seek(0)   # Reset the text buffer cursor to the start so it can be read from the beginning
 
+    return streamCsv
 
-    # Dictionary and number of the major municipalities
-    dicReg2Mun = {i:{'lI':0} for i in range(1,21)} # Local index
-    dicMun2Reg = {}
-    gI = 0 # Global index
+def ReadMunRegCodes(file):
+    # These two dictionary are necessary to link muicipalities and regions via their codes defined in «file», which will be useful later on to extract the actual data for the adjacency matrices
+    dicMun = {} # Dictionary to link municipality codes with region codes
+    dicReg = {
+        i+1:{
+            'li2Name':{}, # Dictionary to link local indices with the municipality name
+            'Code2li':{}, # Dictionary to link municipality code with local indices
+            'Nc':0  # Number of cities in a region
+        } for i in range(21)
+    } # The index 21 is arbitrarily associated to Italy viewed as the 21th region, hence its local index is actually the global one
 
-    reader = csv.reader(streamCSV)
+    reader = csv.reader(file)
     next(reader)  # Skip header line containing metadata labels
     for row in reader:
         try: # If the code is not empty
-            codeReg = int(row[0])
+            codeReg = int(row[0]) # Region code
+            codeMun = row[3]      # Municipality code
+            nameMun = row[4]      # Municipality name
 
-            codeMun = row[3]
-            nameMun = row[4]
-            list = [nameMun,gI,dicReg2Mun[codeReg]['lI']]
-            dicReg2Mun[codeReg][codeMun] = list
-            dicMun2Reg[codeMun] = codeReg
+            dicMun[codeMun] = codeReg
 
-            dicReg2Mun[codeReg]['lI'] += 1
-            gI+=1
+            li = dicReg[codeReg]['Nc'] # Local index
+            dicReg[codeReg]['li2Name'][li] = nameMun
+            dicReg[codeReg]['Code2li'][codeMun] = li
+
+            gi = dicReg[21]['Nc']      # Global index
+            dicReg[21]['li2Name'][gi] = nameMun
+            dicReg[21]['Code2li'][codeMun] = gi
+
+            dicReg[codeReg]['Nc'] += 1 # Update local number of cities
+            dicReg[21]['Nc'] +=1       # Upadte global number of cities
+
+            # In reality «codeMun» it's more like «Province code + Municipality code»
+
         except ValueError:
             continue # Ignore it otherwise
 
-    regList = [
-        'Piemonte',
-        'ValledAosta',
-        'Lombardia',
-        'Trentino-AltoAdige',
-        'Veneto',
-        'Friuli-Venezia Giulia',
-        'Liguria',
-        'Emilia-Romagna',
-        'Toscana',
-        'Umbria',
-        'Marche',
-        'Lazio',
-        'Abruzzo',
-        'Molise',
-        'Campania',
-        'Puglia',
-        'Basilicata',
-        'Calabria',
-        'Sicilia',
-        'Sardegna'
-    ]
-    dicCode2Reg = {i:r for i,r in enumerate(regList,start=1)}
-    
-    matricesIt  = {
-        'A':np.zeros((gI,gI),dtype=int), # 'A' == Adjacency matrix
-        'W':np.zeros((gI,gI),dtype=int)  # 'W' == Weighted adjacency matrix
-    }
-    matricesReg = {
-        k:{
-            'A':np.zeros((dicReg2Mun[k]['lI'],dicReg2Mun[k]['lI']),dtype=int),
-            'W':np.zeros((dicReg2Mun[k]['lI'],dicReg2Mun[k]['lI']),dtype=int)
-        }
-        for k in dicReg2Mun
-    }
+    return dicMun, dicReg
 
-    with ZF(zipFile) as z, z.open("Pen_91It.txt") as f:
+def BuildAdjacencyMatrices(
+    dicMun,dicReg,
+    zipFile,txtFile
+):
+    for r in dicReg:
+        for M in ['A','W']:
+            dicReg[r][M] = np.zeros(
+                (dicReg[r]['Nc'],dicReg[r]['Nc']),dtype=int
+            )
+            # 'A' == [Unitary] Adjacency matrix
+            # 'W' == Weighted adjacency matrix
+
+    with ZF(zipFile) as z, z.open(txtFile) as f:
         for line in tiow(f,encoding="utf-8"):
             oMun = line[:6]         # Origin municipality
             dMun = line[11:17]      # Destination municipality
@@ -99,63 +123,53 @@ def ExtractAdjacencyMatrices(zipFile):
 
             if oMun != dMun and ' ' not in dMun: # and ' ' not in oMun
                 try:
-                    oReg = dicMun2Reg[oMun] # Origin region
-                    dReg = dicMun2Reg[dMun] # Destination region
+                    oReg = dicMun[oMun] # Origin region
+                    dReg = dicMun[dMun] # Destination region
 
                     if oReg == dReg: # and commuters!=0
-                        oI = dicReg2Mun[oReg][oMun][2] # [Local] origin index
-                        dI = dicReg2Mun[dReg][dMun][2] # [Local] destination index
+                        oI = dicReg[oReg]['Code2li'][oMun] # Local origin index
+                        dI = dicReg[dReg]['Code2li'][dMun] # Local destination index
                         
-                        matricesReg[oReg]['A'][oI,dI] = 1
-                        matricesReg[dReg]['A'][dI,oI] = 1
-                        matricesReg[oReg]['W'][oI,dI] += commuters
-                        matricesReg[dReg]['W'][dI,oI] = matricesReg[oReg]['W'][oI,dI]
+                        dicReg[oReg]['A'][oI,dI] = 1
+                        dicReg[dReg]['A'][dI,oI] = 1
+                        dicReg[oReg]['W'][oI,dI] += commuters
+                        dicReg[dReg]['W'][dI,oI] = dicReg[oReg]['W'][oI,dI]
                         # The sum in «matricesReg[oReg]['W'][oI,dI] += commuters» is necessary as there are repeating origin-destination links in the dataset
 
-                    oI = dicReg2Mun[oReg][oMun][1] # [Global] origin index
-                    dI = dicReg2Mun[dReg][dMun][1] # [Global] destination index
+                    oI = dicReg[21]['Code2li'][oMun] # Global origin index
+                    dI = dicReg[21]['Code2li'][dMun] # Global destination index
                         
-                    matricesIt['A'][oI,dI] = 1
-                    matricesIt['A'][dI,oI] = 1
-                    matricesIt['W'][oI,dI] += commuters
-                    matricesIt['W'][dI,oI] = matricesIt[1,oI,dI]
+                    dicReg[21]['A'][oI,dI] = 1
+                    dicReg[21]['A'][dI,oI] = 1
+                    dicReg[21]['W'][oI,dI] += commuters
+                    dicReg[21]['W'][dI,oI] = dicReg[1,oI,dI]
                 except Exception:
                     continue
 
     # The if statement excludes municipalities whose codes are only partially written due to, I presume, typos from ISTAT
     # Instead, the try statement catches the few cases where the code does not match any municipality (so far only one: «022008»)
 
+def WriteAdjacencyMatrices(zipPath,dicReg):
     with ZF(
-        "../Dati/AdjacencyMatricesIt91.zip",
-        "w",
+        zipPath,'w',
         compression=zf.ZIP_DEFLATED, # Enable compression
         compresslevel=9              # Max compression for «ZIP_DEFLATED»
         # https://docs.python.org/3/library/zipfile.html#zipfile-objects
     ) as z:
-        for i,M in enumerate(matricesReg.values(),start=1):
-            path = (f"{"0" if i<9 else ""}{i}"
-                    f"AdjacencyMatrix{dicCode2Reg[i]}.txt")
-            Save2Zip(M['A'],path,z)
+        for r in range(21):
+            folder = f'{'0' if r+1<=9 else ''}{r+1}'
 
-            path = (f"{"0" if i<9 else ""}{i}"
-                    f"WeightedAdjacencyMatrix{dicCode2Reg[i]}.txt")
-            Save2Zip(M['W'],path,z)
-
-        Save2Zip(matricesIt['A'],"AdjacencyMatrixIt.txt",z)
-        Save2Zip(matricesIt['W'],"WeightedAdjacencyMatrixIt.txt",z)
-
-def ReadAdjacencyMatrices(zipFile,idA,idW):
-    with ZF(zipFile) as z:
-        A = MatrixFromZip(z,idA)
-        W = MatrixFromZip(z,idW)
-    return A, W
-
-
-### Auxiliary functions ###
+            for M in ['A', 'W']:
+                path = f'{folder}/{M}.txt'
+                Save2Zip(dicReg[r+1][M],path,z)
 
 def Save2Zip(M,path,z):
     buf = sio()
-    np.savetxt(buf,M,fmt="%d",delimiter=",")
+    np.savetxt(
+        buf,M,
+        fmt="%d",
+        delimiter=","
+    )
     data = buf.getvalue()
     z.writestr(path,data)
 

@@ -12,8 +12,12 @@ libF.SetTextStyle()
 
 ### Main functions ###
 
-def MonteCarlo(totP,Nn,A,Nt,dt,l,a,sigma):
-    stateCities = NetworkState(totP,Nn,A,Nt,l,a,sigma)
+def MonteCarlo(
+    A,totP,Nn,
+    l,a,s,
+    Nt,dt
+):
+    stateCities = NetworkState(totP,Nn,A,Nt,l,a,s)
 
     for nt in tqdm(range(Nt),desc="Updating states"):
         stateCities.updateState(dt,nt)
@@ -22,7 +26,7 @@ def MonteCarlo(totP,Nn,A,Nt,dt,l,a,sigma):
 
 def CityDistributionFig(cs,Nn):
     fig, ax = plt.subplots(1,2,figsize=(15,7))
-    dicData = {'fig1':{'plots':{},'style':{}},'fig2':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(2)
 
     labels = ["Ext.","Apx."]
     colours = ["blue","red"]
@@ -89,7 +93,7 @@ def CityDistributionFig(cs,Nn):
 
 def CityAverageFig(ca,Nt,dt):
     fig = plt.figure()
-    dicData = {'fig':{'plots':{},'style':{}}}
+    dicData = libF.CreateDicData(1)
 
     labels = ["Ext.","Apx."]
     colours = ["blue","red"]
