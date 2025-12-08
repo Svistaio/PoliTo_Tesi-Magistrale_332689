@@ -1,7 +1,6 @@
 
 import os, sys
 from pathlib import Path
-
 import subprocess
 
 import numpy as np
@@ -107,31 +106,31 @@ def SaveFig(
     subprocess.Popen(cmd,shell=True)
 
 
-    def cmdTeX(matPath,texPath):
-        m = matPath.as_posix()
-        t = texPath.as_posix()
+    # def cmdTeX(matPath,texPath):
+    #     m = matPath.as_posix()
+    #     t = texPath.as_posix()
 
-        cmd = (
-            r'matlab -batch "mat2tex('
-            fr"'{m}',"fr"'{t}'"r')"'
-        )
-        return cmd
+    #     cmd = (
+    #         r'matlab -batch "mat2tex('
+    #         fr"'{m}',"fr"'{t}'"r')"'
+    #     )
+    #     return cmd
 
-    for fig in dicData:
-        if fig == 'fig':
-            nome = name
-        else:
-            nome = name+fig
+    # for fig in dicData:
+    #     if fig == 'fig':
+    #         nome = name
+    #     else:
+    #         nome = name+fig
 
-        format = '.mat'
-        dicPath[format] = figPath(nome,format)
-        savemat(dicPath[format],dicData[fig])
+    #     format = '.mat'
+    #     dicPath[format] = figPath(nome,format)
+    #     savemat(dicPath[format],dicData[fig])
 
-        format = '.tex'
-        dicPath[format] = figPath(nome,format)
+    #     format = '.tex'
+    #     dicPath[format] = figPath(nome,format)
 
-        cmd = cmdTeX(dicPath['.mat'],dicPath[format])
-        subprocess.run(cmd,shell=True)
+    #     cmd = cmdTeX(dicPath['.mat'],dicPath[format])
+    #     subprocess.run(cmd,shell=True)
 
 def CreateFunctionPlot(
     x,y,dicData,l='Function',
@@ -209,7 +208,8 @@ def CreateScatterPlot(
         x,y,
         label=l,
         color=clr,
-        s=16)
+        s=16
+    )
 
     dicData['plots'][f'scatterPlot{idx}'] = {
         't':'scatter','x':x,'y':y,'l':l,'c':clr

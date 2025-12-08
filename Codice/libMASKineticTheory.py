@@ -10,199 +10,251 @@ import matplotlib.pyplot as plt
 libF.SetTextStyle()
 
 
-### Main functions ###
+### Main class ###
 
-def MonteCarlo(
-    A,totP,Nn,
-    l,a,s,
-    Nt,dt
-):
-    stateCities = NetworkState(totP,Nn,A,Nt,l,a,s)
+class KineticSimulation: # NetworkState
+    def __init__(self,dicPrm,dicReg):
+        #region Initial data dump
+        self.li2Name = dicReg['li2Name']
+        self.typ = ["ext","apx"]
+        self.Ni = dicPrm['iterations']
 
-    for nt in tqdm(range(Nt),desc="Updating states"):
-        stateCities.updateState(dt,nt)
+        self.l = dicPrm['attractivity']
+        self.a = dicPrm['convincibility']
+        self.s = dicPrm['deviation']
+        #endregion
 
-    return stateCities 
+        #region City size vectors
+        self.Nc = dicReg['Nc']
 
-def CityDistributionFig(cs,Nn):
-    fig, ax = plt.subplots(1,2,figsize=(15,7))
-    dicData = libF.CreateDicData(2)
+        self.P = dicPrm['totalPop']
+        self.Nt = dicPrm['stepNumber']
+        self.dt = dicPrm['timeStep']
 
-    labels = ["Ext.","Apx."]
-    colours = ["blue","red"]
-
-    for i,type in enumerate(cs):
-
-        ### Lognormal fit ###
-        libF.CreateHistogramPlot(
-            cs[type],30,dicData['fig1'],
-            l=f"{labels[i]} histogram",
-            clr=colours[i],alfa=0.5,
-            idx=i+1,ax=ax[0]
-        ) # Histogram plot
-
-        libF.CreateLognormalFitPlot(
-            cs[type],dicData['fig1'],
-            lAvr=fr"{labels[i]} mean value $\langle k\rangle$",
-            lFit=f"{labels[i]} lognormal fit (ML)",
-            clrAvr=colours[i],clrFit=colours[i],
-            idx=i+1,ax=ax[0]
-        ) # Fit plot
-
-
-        ### Power law fit ###
-        b = libF.CreateParetoFitPlot(
-            cs[type],dicData['fig2'],
-            lSct=f"{labels[i]} empirical CCDF",
-            lFit=fr"{labels[i]} pareto fit",
-            clrSct=colours[i],clrFit=colours[i],
-            idx=i+1,ax=ax[1]
-        )
-
-        fig.text(
-            .5,.925+i*.05,
-            fr"{labels[i]}: $\quad s_{{min}}={np.min(cs[type]):.2f}\qquad$"
-            fr"$s_{{max}}={np.max(cs[type]):.2f}\qquad$"
-            fr"$\langle s\rangle ={np.mean(cs[type]):.2f}\qquad$"
-            fr"$s_{{\Sigma}}={np.sum(cs[type]):.2f}\qquad$"
-            fr"$\alpha={b:.2f}$",
-            ha="center",
-            # fontsize=10,
-            color="black"
-        )
-
-    fig.text(.1,.95,fr"$N={Nn}\qquad$")
-
-
-    # Style
-    libF.SetFigStyle(
-        r"$s$",r"$P(s)$",
-        yNotation="sci", # ,xNotation="sci"
-        ax=ax[0],data=dicData['fig1']
-    )
-
-    libF.SetFigStyle(
-        r"$s$",r"$P(s)$",
-        xScale="log",yScale="log",
-        ax=ax[1],data=dicData['fig2']
-    )
-
-
-    libF.CentreFig()
-    libF.SaveFig('CitySizeDistribution','KS',dicData)
-
-def CityAverageFig(ca,Nt,dt):
-    fig = plt.figure()
-    dicData = libF.CreateDicData(1)
-
-    labels = ["Ext.","Apx."]
-    colours = ["blue","red"]
-    timeInterval = np.arange(Nt+1)*dt
-
-    for i,type in enumerate(ca):
-        libF.CreateFunctionPlot(
-            timeInterval,ca[type],dicData['fig'],
-            l=rf"{labels[i]} city size average $\langle s\rangle$",
-            clr=colours[i],idx=i+1
-        )
-
-    libF.CentreFig()
-    libF.SetFigStyle(
-        r"$t$",r"$\langle s\rangle$",
-        data=dicData['fig']
-    )
-    libF.SaveFig('AverageCitySize','KS',dicData)
-
-
-### Auxiliary functions ###
-
-class NetworkState:
-    def __init__(self,totP,Nn,A,Nt,l,a,sigma):
-        # Uniform initial state for all vertices
-        keys = ["ext","apx"]
-
-        self.vtxState   = {
-            keys[0]:np.ones((Nn,1),dtype=float)*(totP/Nn),
-            keys[1]:np.ones((Nn,1),dtype=float)*(totP/Nn),
+        self.vrtState   = { # Uniform initial state for all vertices
+            self.typ[0]:np.ones((self.Nc,1),dtype=float)*(self.P/self.Nc),
+            self.typ[1]:np.ones((self.Nc,1),dtype=float)*(self.P/self.Nc),
         }
-        self.avgState    = {
-            keys[0]:np.zeros((Nt+1,1),dtype=float),
-            keys[1]:np.zeros((Nt+1,1),dtype=float)
+        self.avrState    = {
+            self.typ[0]:np.zeros((self.Nt+1,1),dtype=float),
+            self.typ[1]:np.zeros((self.Nt+1,1),dtype=float)
         }
-        for k in self.avgState:
-            self.avgState[k][0] = totP/Nn 
 
-        # Exact Adjacency matrix
-        self.A  = A
+        for t in self.avrState: # Initial average state
+            self.avrState[t][0] = self.P/self.Nc
+        #endregion 
+
+        #region Exact [Weighted] Adjacency matrix
+        if dicPrm['edgeWeights']:
+            T  = dicReg['W']/np.max(dicReg['W'])
+        else:
+            T  = dicReg['A']
         
         # Approximated adjacency matrix
-        Mn = np.sum(A)
-        wO = np.sum(A,axis=1,keepdims=True)
-        wI = np.sum(A,axis=0,keepdims=True)
-        self.R  = wO@wI/Mn
+        Mn = np.sum(T)
+        wO = np.sum(T,axis=1,keepdims=True)
+        wI = np.sum(T,axis=0,keepdims=True)
+        R  = wO@wI/Mn
         # In my case wO=wI but it's better to define them in the most general way
 
-        self.M = {keys[0]:self.A, keys[1]:self.R}
+        self.M = {self.typ[0]:T, self.typ[1]:R}
+        #endregion
 
-        def E(si,sr): return NonLinearEmigration(si,sr,l,a)
-        self.E = E
+    def MonteCarloAlgorithm(self):
+        Nt = self.Nt
 
-        def ga(E): return StochasticFluctuations(sigma,E)
-        self.ga = ga
+        for nt in tqdm(range(Nt),desc="Updating states"):
+            self.UpdateState(nt)
 
-        self.Nn = Nn # Number of nodes
+    def UpdateState(self,nt):
+        dt = self.dt
 
-    def updateState(self,dt,nt):
-        oldState = self.vtxState
-        newState = {k: v.copy() for k, v in self.vtxState.items()}
+        oldState = self.vrtState
+        newState = {k: v.copy() for k,v in self.vrtState.items()}
  
-        P = np.random.permutation(self.Nn)
+        P = np.random.permutation(self.Nc)
+        halfNc = int(np.floor(self.Nc/2))
+        pi = P[:halfNc]; pr = P[halfNc+1:]
 
-        halfN = int(np.floor(self.Nn/2))
-        p1 = P[:halfN]; p2 = P[halfN+1:]
+        for i in range(halfNc):
+            for t in self.typ:
+                # It's assumed node pi(i) is the interacting node while node ps(i) is the receiving one
 
-        for i in range(halfN):
-            for k in self.M:
-                # It's assumed node p1(i) is the interacting node while node p2(i) is the receiving one
-
-                p = float(np.clip(self.M[k][p1[i],p2[i]]*dt,0,1))
+                p = float(np.clip(self.M[t][pi[i],pr[i]]*dt,0,1))
                 theta = np.random.binomial(1,p)
-                si = oldState[k][p1[i]]; sr = oldState[k][p2[i]]
+                si = oldState[t][pi[i]]; sr = oldState[t][pr[i]]
 
-                E = self.E(si,sr); ga = self.ga(E)
-                newState[k][p1[i]] = si*(1-theta)+theta*si*(1-E+ga) 
-                newState[k][p2[i]] = sr*(1-theta)+theta*(sr+si*E)
+                E = self.NonLinearEmigration(si,sr)
+                ga = self.StochasticFluctuations(E)
 
-        self.vtxState = newState
-        self.avgState["ext"][nt+1] = np.mean(newState["ext"])
-        self.avgState["apx"][nt+1] = np.mean(newState["apx"])
+                newState[t][pi[i]] = si*(1-theta)+theta*si*(1-E+ga) 
+                newState[t][pr[i]] = sr*(1-theta)+theta*(sr+si*E)
 
-def NonLinearEmigration(
-        si, # Interacting city size
-        sr, # Receiving city size
-        l,  # Maximum emigration rate
-        a   # Emigration intensity
-    ):
-    if si != 0:
-        rs = sr/si               # Relative population ratio
-        ef = l*(rs**a)/(1+rs**a) # Actual emigration rate
-    else:
-        ef = 0
-    return ef
+        self.vrtState = newState
+        for t in self.typ:
+            self.avrState[t][nt+1] = np.mean(newState[t])
 
-def StochasticFluctuations(sigma,E):
-    alpha = ((1-E)**2)/(sigma**2)
-    theta = (sigma**2)/(1-E)
+    def NonLinearEmigration(
+            self,
+            si, # Interacting city size
+            sr, # Receiving city size
+        ):
+        l = self.l; a = self.a
 
-    if alpha<=1:
-        raise ValueError(
-            "α must be >1 to have a non-degenerate gamma distribution,"
-            " and thus always admissible fluctuations"
+        if si != 0:
+            rs = sr/si               # Relative population ratio
+            ef = l*(rs**a)/(1+rs**a) # Actual emigration rate
+        else:
+            ef = 0
+        return ef
+
+    def StochasticFluctuations(self,E):
+        sigma = self.s
+
+        alpha = ((1-E)**2)/(sigma**2)
+        theta = (sigma**2)/(1-E)
+
+        if alpha<=1:
+            raise ValueError("α must be >1 to have a non-degenerate gamma distribution, and thus always admissible fluctuations")
+
+        ga = np.random.gamma(alpha,theta) # Initial sampling
+
+        return ga+E-1 # Final left translation
+
+    def SizeDistrFitsFig(self):
+        cs = self.vrtState; Nc = self.Nc; Ni = self.Ni
+
+        fig, ax = plt.subplots(1,2,figsize=(15,6))
+        dicData = libF.CreateDicData(2)
+
+        labels = {self.typ[0]:'Ext.',self.typ[1]:'Apx.'}
+        colours = {self.typ[0]:'blue',self.typ[1]:'red'}
+
+        for i,t in enumerate(self.typ): # i[ndex] and t[ype]
+
+            ### Lognormal fit ###
+            libF.CreateHistogramPlot(
+                cs[t],30,dicData['fig1'],
+                l=f"{labels[t]} histogram",
+                clr=colours[t],alfa=0.5,
+                idx=i+1,ax=ax[0]
+            ) # Histogram plot
+
+            libF.CreateLognormalFitPlot(
+                cs[t],dicData['fig1'],
+                lAvr=fr"{labels[t]} mean value $\langle k\rangle$",
+                lFit=f"{labels[t]} lognormal fit (ML)",
+                clrAvr=colours[t],clrFit=colours[t],
+                idx=i+1,ax=ax[0]
+            ) # Fit plot
+
+
+            ### Power law fit ###
+            b = libF.CreateParetoFitPlot(
+                cs[t],dicData['fig2'],
+                lSct=f"{labels[t]} empirical CCDF",
+                lFit=fr"{labels[t]} pareto fit",
+                clrSct=colours[t],clrFit=colours[t],
+                idx=i+1,ax=ax[1]
+            )
+
+            fig.text(
+                .5,.975-i*.05,
+                fr"{labels[t]}: $\quad s_{{min}}={np.min(cs[t]):.2f}\qquad$"
+                fr"$s_{{max}}={np.max(cs[t]):.2f}\qquad$"
+                fr"$\langle s\rangle ={np.mean(cs[t]):.2f}\qquad$"
+                fr"$s_{{\Sigma}}={np.sum(cs[t]):.2f}\qquad$"
+                fr"$\alpha={b:.2f}$",
+                ha="center",
+                # fontsize=10,
+                color="black"
+            )
+
+        self.lbl = labels
+        self.clr = colours
+
+        si = np.argsort(cs['ext'],axis=0)
+        for i in range(-1,-6,-1):
+            fig.text(
+                .625,.4+i*.03,
+                fr'${self.li2Name[int(si[i])]}='
+                fr'{int(cs['ext'][int(si[i])]):.2e}$'
+                ,
+                ha="center",
+                # fontsize=10,
+                color="black"
+            )
+
+        fig.text(.1,.95,fr"$Nc={Nc}\qquadNi={Ni}$")
+
+
+        # Style
+        libF.SetFigStyle(
+            r"$s$",r"$P(s)$",
+            yNotation="sci", # ,xNotation="sci"
+            ax=ax[0],data=dicData['fig1']
         )
 
-    ga = np.random.gamma(alpha,theta)
-    return ga+E-1
+        libF.SetFigStyle(
+            r"$s$",r"$P(s)$",
+            xScale="log",yScale="log",
+            ax=ax[1],data=dicData['fig2']
+        )
 
+
+        libF.CentreFig()
+        libF.SaveFig('CitySizeDistribution','KS',dicData)
+
+    def SizeAverageFig(self):
+        ca = self.avrState; Nt = self.Nt; dt = self.dt
+
+        fig = plt.figure()
+        dicData = libF.CreateDicData(1)
+
+        labels = ["Ext.","Apx."]
+        colours = ["blue","red"]
+        timeInterval = np.arange(Nt+1)*dt
+
+        for i,type in enumerate(ca):
+            libF.CreateFunctionPlot(
+                timeInterval,ca[type],dicData['fig'],
+                l=rf"{labels[i]} city size average $\langle s\rangle$",
+                clr=colours[i],idx=i+1
+            )
+
+        libF.CentreFig()
+        libF.SetFigStyle(
+            r"$t$",r"$\langle s\rangle$",
+            data=dicData['fig']
+        )
+        libF.SaveFig('AverageCitySize','KS',dicData)
+
+    def SizeVsDegreeFig(self):
+        cs = self.vrtState
+        di = {t:np.sum(self.M[t],axis=0) for t in self.typ}
+
+        fig, ax = plt.subplots(1,2,figsize=(15,6))
+        dicData = libF.CreateDicData(2)
+
+        for i,scale in enumerate(['lin','log']):
+            for t in self.typ:
+                libF.CreateScatterPlot(
+                    di[t],cs[t],dicData[f'fig{i+1}'],
+                    l=self.lbl[t],
+                    clr=self.clr[t],
+                    idx=i+1,ax=ax[i]
+                )
+
+            libF.SetFigStyle(
+                r'$k$',r'$cs(k)$',
+                yScale=scale,
+                data=dicData[f'fig{i+1}']
+            )
+
+        libF.CentreFig()
+        libF.SaveFig('SizeVsDegree','KS',dicData)
+
+    # def SizeDistrEvolutionFig(self):
 
 ### Discarded code ###
 
@@ -214,4 +266,4 @@ def StochasticFluctuations(sigma,E):
     #             break
     #     # The conditions «mu>E-1» and «mu<E» are necessary to have the total emigration rage 1-E+μ between 0 and 1
     #     return mu
-#endregion
+#endregion I save it since I find it an interesting wrong approach
