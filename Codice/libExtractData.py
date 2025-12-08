@@ -7,7 +7,7 @@ from io import BytesIO as bio
 from io import StringIO as sio
 
 import pandas as pd
-import csv
+import csv, json
 
 import numpy as np
 
@@ -17,7 +17,7 @@ import numpy as np
 def ExtractAdjacencyMatrices():
     zipFile = '../Dati/MatriciPendolarismo1991.zip'
 
-    # Conversion of «elencom91.xls» from the old format «.xls» to a more modern «.csv»
+    # Conversion of «elencom91.xls» from the old format «.xls» to a more manageable «.csv»
     csvFile = xls2csv(zipFile,'elencom91.xls')
 
     dicMun, dicReg = ReadMunRegCodes(csvFile)
@@ -33,13 +33,36 @@ def ExtractAdjacencyMatrices():
 
 def ReadAdjacencyMatrices(code):
     zipFile = '../Dati/DatiPendolarismo1991.zip'
-    pathA = f'{code}/A.txt'
-    pathW = f'{code}/W.txt'
+    dicReg = {}
+
+    el = {
+        'A':'.txt','W':'.txt',
+        'li2Name':'.json',
+        'Name2li':'.json',
+        'Nc':'.json'
+    }
 
     with ZF(zipFile) as z:
-        A = MatrixFromZip(z,pathA)
-        W = MatrixFromZip(z,pathW)
-    return A, W
+        for data in el:
+            path = f'{code}/{data}{el[data]}'
+            with z.open(path,'r') as f:
+                match data:
+                    case 'A' | 'W':
+                        dicReg[data] = np.loadtxt(
+                            tiow(f,encoding='utf-8'),
+                            delimiter=",",
+                            dtype=int
+                        ) # Decodes binary stream as UTF-8 text
+
+                    case 'li2Name':
+                        dicReg[data] = {
+                            int(k): v for k, v in json.load(f).items()
+                        } # This is necessary since the keys of a «.json» file are always strings, hence they have to be converted to integer if originally they were such
+
+                    case 'Nc' | 'Name2li':
+                        dicReg[data] = json.load(f)
+
+    return dicReg
 
 
 ### Auxiliary functions ###
@@ -70,6 +93,7 @@ def ReadMunRegCodes(file):
     dicReg = {
         i+1:{
             'li2Name':{}, # Dictionary to link local indices with the municipality name
+            'Name2li':{}, # Dictionary to link local indices with the municipality name
             'Code2li':{}, # Dictionary to link municipality code with local indices
             'Nc':0  # Number of cities in a region
         } for i in range(21)
@@ -87,10 +111,12 @@ def ReadMunRegCodes(file):
 
             li = dicReg[codeReg]['Nc'] # Local index
             dicReg[codeReg]['li2Name'][li] = nameMun
+            dicReg[codeReg]['Name2li'][nameMun] = li
             dicReg[codeReg]['Code2li'][codeMun] = li
 
             gi = dicReg[21]['Nc']      # Global index
             dicReg[21]['li2Name'][gi] = nameMun
+            dicReg[21]['Name2li'][nameMun] = gi
             dicReg[21]['Code2li'][codeMun] = gi
 
             dicReg[codeReg]['Nc'] += 1 # Update local number of cities
@@ -127,27 +153,34 @@ def BuildAdjacencyMatrices(
                     dReg = dicMun[dMun] # Destination region
 
                     if oReg == dReg: # and commuters!=0
-                        oI = dicReg[oReg]['Code2li'][oMun] # Local origin index
-                        dI = dicReg[dReg]['Code2li'][dMun] # Local destination index
-                        
-                        dicReg[oReg]['A'][oI,dI] = 1
-                        dicReg[dReg]['A'][dI,oI] = 1
-                        dicReg[oReg]['W'][oI,dI] += commuters
-                        dicReg[dReg]['W'][dI,oI] = dicReg[oReg]['W'][oI,dI]
-                        # The sum in «matricesReg[oReg]['W'][oI,dI] += commuters» is necessary as there are repeating origin-destination links in the dataset
+                        UpdateMatrices(
+                            dicReg,commuters,
+                            oReg,dReg,oMun,dMun
+                        )
 
-                    oI = dicReg[21]['Code2li'][oMun] # Global origin index
-                    dI = dicReg[21]['Code2li'][dMun] # Global destination index
-                        
-                    dicReg[21]['A'][oI,dI] = 1
-                    dicReg[21]['A'][dI,oI] = 1
-                    dicReg[21]['W'][oI,dI] += commuters
-                    dicReg[21]['W'][dI,oI] = dicReg[1,oI,dI]
+                    UpdateMatrices(
+                        dicReg,commuters,
+                        21,21,oMun,dMun
+                    )
                 except Exception:
                     continue
 
     # The if statement excludes municipalities whose codes are only partially written due to, I presume, typos from ISTAT
     # Instead, the try statement catches the few cases where the code does not match any municipality (so far only one: «022008»)
+
+def UpdateMatrices(
+    dicReg,commuters,
+    oReg,dReg,oMun,dMun
+):
+    oI = dicReg[oReg]['Code2li'][oMun] # Local/Global origin index
+    dI = dicReg[dReg]['Code2li'][dMun] # Local/Global destination index
+    # The index is considered global iff «oReg=dReg=21»
+    
+    dicReg[oReg]['A'][oI,dI] = 1
+    dicReg[dReg]['A'][dI,oI] = 1
+    dicReg[oReg]['W'][oI,dI] += commuters
+    dicReg[dReg]['W'][dI,oI] += commuters
+    # The sum in «matricesReg[oReg]['W'][oI,dI] += commuters» is necessary as there are repeating origin-destination links in the dataset
 
 def WriteAdjacencyMatrices(zipPath,dicReg):
     with ZF(
@@ -156,28 +189,42 @@ def WriteAdjacencyMatrices(zipPath,dicReg):
         compresslevel=9              # Max compression for «ZIP_DEFLATED»
         # https://docs.python.org/3/library/zipfile.html#zipfile-objects
     ) as z:
+        el = {
+            'A':'.txt','W':'.txt',
+            'li2Name':'.json',
+            'Name2li':'.json',
+            'Nc':'.json'
+        }
+
         for r in range(21):
             folder = f'{'0' if r+1<=9 else ''}{r+1}'
 
-            for M in ['A', 'W']:
-                path = f'{folder}/{M}.txt'
-                Save2Zip(dicReg[r+1][M],path,z)
+            for data in el:
+                buf = sio()
+                path = f'{folder}/{data}{el[data]}'
 
-def Save2Zip(M,path,z):
-    buf = sio()
-    np.savetxt(
-        buf,M,
-        fmt="%d",
-        delimiter=","
-    )
-    data = buf.getvalue()
-    z.writestr(path,data)
+                match data:
+                    case 'A' | 'W':
+                        np.savetxt(
+                            buf,dicReg[r+1][data],
+                            fmt="%d",delimiter=","
+                        ) # Save the matrix in the zip as a «.txt» file
+                        
+                    case 'Name2li':
+                        json.dump(
+                            dicReg[r+1][data],
+                            buf,indent=3
+                        ) # Save the dictionary in the zip as a «.json» file
 
-def MatrixFromZip(z,id):
-    with z.open(id,"r") as f:
-        M = np.loadtxt( # Decodes binary stream as UTF-8 text
-            tiow(f,encoding="utf-8"),
-            delimiter=",",
-            dtype=int
-        )
-    return M
+                    case 'li2Name':
+                        json.dump(
+                            dicReg[r+1][data],
+                            buf,indent=3
+                        ) # Save the dictionary in the zip as a «.json» file
+
+                    case 'Nc':
+                        json.dump(dicReg[r+1][data],buf)
+                        # Save the number of cities in the zip as a «.json» file
+
+                value = buf.getvalue()
+                z.writestr(path,value)

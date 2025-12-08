@@ -1,3 +1,4 @@
+
 import importlib
 
 import libAnalyseNetwork as libAN
@@ -8,8 +9,6 @@ import libMASKineticTheory as libKT
 importlib.reload(libKT)
 import libGUI
 importlib.reload(libGUI)
-
-import numpy as np
 
 
 ### Graphic User Interface ###
@@ -24,63 +23,34 @@ if dicPrm['runState']:
 
 
     ### Matrices extraction ###
-    A, W = libED.ReadAdjacencyMatrices(dicPrm['regSelected'])
-    dicPrm['numberCities'] = A.shape[0] # Number of nodes
+    dicReg = libED.ReadAdjacencyMatrices(dicPrm['regSelected'])
 
 
     ### Network analysis ###
     if dicPrm['analysis']:
-        # Degrees
-        di = np.sum(A,axis=0) # Vectors of degrees
-        dk, Nk = np.unique(di,return_counts=True)
-        # Unique degrees and corresponding frequencies
-        # Pk = counts/N
+        clsNA = libAN.NetworkAnalysis(dicReg)
 
-        # [Nonzero] Weights
-        wi = W[W>0]
-        wk, wNk = np.unique(wi,return_counts=True)
-        # Unique weights and corresponding frequencies
+        clsNA.DegreeDistributionFig()
+        clsNA.WeightDistributionFig()
+        clsNA.StrengthDistributionFig()
 
-        # Strenghts
-        si = np.sum(W,axis=0)
-        sk, sNk = np.unique(si,return_counts=True)
-        # Unique strenghts and corresponding frequencies
+        clsNA.BetweennessCentralityFig()
+        clsNA.StrengthVsDegreeFig()
 
-        libAN.DegreeDistributionFig(di)
-        libAN.WeightDistributionFig(wi)
-        libAN.StrengthDistributionFig(si)
+        clsNA.AClusteringCoefficientFig()
+        clsNA.WClusteringCoefficientFig()
 
-        libAN.BetweennessCentralityFig(A,di)
-        libAN.StrengthVsDegreeFig(si,di,dk,Nk)
+        clsNA.AAssortativityFig()
+        clsNA.WAssortativityFig()
 
-        Ck = libAN.AClusteringCoefficientFig(A,di,dk,Nk)
-        libAN.WClusteringCoefficientFig(A,W,si,di,dk,Nk,Ck)
-
-        knn = libAN.AAssortativityFig(A,dk)
-        libAN.WAssortativityFig(W,dk,knn)
-
-        # plt.show()
-        # mpld3.show()
+        # clsNA.ShowFig()
 
 
     ### Kinetic simulation ###
-    # stateCities = libKT.MonteCarlo(
-    #     A,
-    #     dicPrm['totalPop'],
-    #     dicPrm['numberCities'],
-    #     dicPrm['attractivity'],
-    #     dicPrm['convincibility'],
-    #     dicPrm['deviation'],
-    #     dicPrm['stepNumber'],
-    #     dicPrm['timeStep']
-    # )
+    clsKS = libKT.KineticSimulation(dicPrm,dicReg)
 
-    # libKT.CityDistributionFig(
-    #     stateCities.vtxState,
-    #     dicPrm['numberCities']
-    # )
-    # libKT.CityAverageFig(
-    #     stateCities.avgState,
-    #     dicPrm['stepNumber'],
-    #     dicPrm['timeStep']
-    # )
+    clsKS.MonteCarloAlgorithm()
+    clsKS.SizeDistrFitsFig()
+    clsKS.SizeAverageFig()
+    clsKS.SizeVsDegreeFig()
+    # clsKS.SizeDistrEvolutionFig()
