@@ -26,25 +26,27 @@ class KineticSimulation: # NetworkState
 
         #region City size vectors
         self.Nc = dicReg['Nc']
+        self.P  = dicPrm['totalPop']
+        self.p0 = self.P/self.Nc
 
-        self.P = dicPrm['totalPop']
         self.Nt = dicPrm['stepNumber']
         self.dt = dicPrm['timeStep']
 
-        self.vrtState   = { # Uniform initial state for all vertices
-            self.typ[0]:np.ones((self.Nc,1),dtype=float)*(self.P/self.Nc),
-            self.typ[1]:np.ones((self.Nc,1),dtype=float)*(self.P/self.Nc),
+        self.vrtState    = { # Uniform initial state for all vertices
+            t:np.zeros((self.Nc,),dtype=float) for t in self.typ
         }
         self.avrState    = {
-            self.typ[0]:np.zeros((self.Nt+1,1),dtype=float),
-            self.typ[1]:np.zeros((self.Nt+1,1),dtype=float)
+            t:np.zeros((self.Nt+1,),dtype=float) for t in self.typ
         }
 
         for t in self.avrState: # Initial average state
-            self.avrState[t][0] = self.P/self.Nc
+            self.vrtState[t][:] = self.p0
+            self.avrState[t][0] = self.p0
         #endregion 
 
         #region Exact [Weighted] Adjacency matrix
+        self.di = np.sum(dicReg['A'],axis=0)
+
         if dicPrm['edgeWeights']:
             T  = dicReg['W']/np.max(dicReg['W'])
         else:
@@ -62,9 +64,19 @@ class KineticSimulation: # NetworkState
 
     def MonteCarloAlgorithm(self):
         Nt = self.Nt
+        self.Ns = 5000 # Number of screenshots [not considering the initial state]
+        
+        self.screenshots = {
+            t:np.ones((self.Nc,self.Ns+1),dtype=float)*self.p0 for t in self.typ
+        }
+        self.ns = [i*self.Nt/self.Ns for i in range(self.Ns+1)]
+        ns2i = {ns:i for i,ns in enumerate(self.ns)}
 
         for nt in tqdm(range(Nt),desc="Updating states"):
             self.UpdateState(nt)
+            if nt+1 in ns2i:
+                for t in self.typ:
+                    self.screenshots[t][:,ns2i[nt+1]] = self.vrtState[t].copy()
 
     def UpdateState(self,nt):
         dt = self.dt
@@ -84,7 +96,7 @@ class KineticSimulation: # NetworkState
                 theta = np.random.binomial(1,p)
                 si = oldState[t][pi[i]]; sr = oldState[t][pr[i]]
 
-                E = self.NonLinearEmigration(si,sr)
+                E = self.NonLinearEmigration(si,sr,pi[i],pr[i])
                 ga = self.StochasticFluctuations(E)
 
                 newState[t][pi[i]] = si*(1-theta)+theta*si*(1-E+ga) 
@@ -98,12 +110,17 @@ class KineticSimulation: # NetworkState
             self,
             si, # Interacting city size
             sr, # Receiving city size
+            ii,
+            ir
         ):
-        l = self.l; a = self.a
+        l = self.l; a = self.a; di = self.di
 
         if si != 0:
-            rs = sr/si               # Relative population ratio
-            ef = l*(rs**a)/(1+rs**a) # Actual emigration rate
+            rs = (sr/si)*(di[ir]/di[ii]) # Relative population ratio
+            ef = l*(rs/a)/(1+rs/a) # Actual emigration rate
+
+            # rs = sr/si # Relative population ratio
+            # ef = l*(rs**a)/(1+rs**a) # Actual emigration rate
         else:
             ef = 0
         return ef
@@ -121,7 +138,7 @@ class KineticSimulation: # NetworkState
 
         return ga+E-1 # Final left translation
 
-    def SizeDistrFitsFig(self):
+    def SizeDistrFittingsFig(self):
         cs = self.vrtState; Nc = self.Nc; Ni = self.Ni
 
         fig, ax = plt.subplots(1,2,figsize=(15,6))
@@ -139,7 +156,6 @@ class KineticSimulation: # NetworkState
                 clr=colours[t],alfa=0.5,
                 idx=i+1,ax=ax[0]
             ) # Histogram plot
-
             libF.CreateLognormalFitPlot(
                 cs[t],dicData['fig1'],
                 lAvr=fr"{labels[t]} mean value $\langle k\rangle$",
@@ -173,47 +189,37 @@ class KineticSimulation: # NetworkState
         self.lbl = labels
         self.clr = colours
 
-        si = np.argsort(cs['ext'],axis=0)
-        for i in range(-1,-6,-1):
-            fig.text(
-                .625,.4+i*.03,
-                fr'${self.li2Name[int(si[i])]}='
-                fr'{int(cs['ext'][int(si[i])]):.2e}$'
-                ,
-                ha="center",
-                # fontsize=10,
-                color="black"
-            )
-
         fig.text(.1,.95,fr"$Nc={Nc}\qquadNi={Ni}$")
 
 
         # Style
         libF.SetFigStyle(
-            r"$s$",r"$P(s)$",
+            r"$cs$",r"$P(cs)$",
             yNotation="sci", # ,xNotation="sci"
             ax=ax[0],data=dicData['fig1']
         )
 
         libF.SetFigStyle(
-            r"$s$",r"$P(s)$",
+            r"$cs$",r"$P(cs)$",
             xScale="log",yScale="log",
             ax=ax[1],data=dicData['fig2']
         )
 
 
         libF.CentreFig()
-        libF.SaveFig('CitySizeDistribution','KS',dicData)
+        libF.SaveFig('SizeDistributionFittings','KS',dicData)
 
-    def SizeAverageFig(self):
-        ca = self.avrState; Nt = self.Nt; dt = self.dt
+    def AverageSizeFig(self):
+        ca = {
+            t:[self.avrState[t][int(i)] for i in self.ns] for t in self.typ
+        }
+        timeInterval = np.array(self.ns)*self.dt
 
         fig = plt.figure()
         dicData = libF.CreateDicData(1)
 
         labels = ["Ext.","Apx."]
         colours = ["blue","red"]
-        timeInterval = np.arange(Nt+1)*dt
 
         for i,type in enumerate(ca):
             libF.CreateFunctionPlot(
@@ -224,14 +230,48 @@ class KineticSimulation: # NetworkState
 
         libF.CentreFig()
         libF.SetFigStyle(
-            r"$t$",r"$\langle s\rangle$",
+            r"$t$",r"$\langle cs\rangle$",
             data=dicData['fig']
         )
-        libF.SaveFig('AverageCitySize','KS',dicData)
+        libF.SaveFig('AverageSize','KS',dicData)
+
+    def SizeEvolutionsFig(self):
+        screenshots = self.screenshots
+        Nc = self.Nc
+        timeInterval = np.array(self.ns)*self.dt
+
+        fig, ax = plt.subplots(1,2,figsize=(15,6))
+        ax[0].set_title('Exact'); ax[1].set_title('Approximated')
+        dicData = libF.CreateDicData(2)
+
+        clrmap = plt.get_cmap('plasma')
+        colours = [clrmap(i/(Nc-1)) for i in range(Nc)]
+
+        sMax = np.max([np.max(screenshots[t][:,-1]) for t in self.typ])
+
+        for i,t in enumerate(self.typ): # i[ndex] and t[ype]
+            for c in range(Nc):
+                libF.CreateFunctionPlot(
+                    timeInterval,
+                    screenshots[t][c,:]/sMax,
+                    dicData[f'fig{i+1}'],
+                    clr=colours[c],#alfa=0.4,
+                    idx=c+1,ax=ax[i]
+                ) # Histogram plot
+
+            libF.SetFigStyle(
+                r"$t$",r"$s$",
+                # yNotation="sci", # ,xNotation="sci"
+                ax=ax[i],data=dicData[f'fig{i+1}']
+            ) # Style
+
+
+        libF.CentreFig()
+        libF.SaveFig('SizeEvolutions','KS',dicData)
 
     def SizeVsDegreeFig(self):
         cs = self.vrtState
-        di = {t:np.sum(self.M[t],axis=0) for t in self.typ}
+        di = {t:self.di for t in self.typ}
 
         fig, ax = plt.subplots(1,2,figsize=(15,6))
         dicData = libF.CreateDicData(2)
@@ -247,14 +287,61 @@ class KineticSimulation: # NetworkState
 
             libF.SetFigStyle(
                 r'$k$',r'$cs(k)$',
-                yScale=scale,
-                data=dicData[f'fig{i+1}']
+                yScale=scale,xScale=scale,
+                ax=ax[i],data=dicData[f'fig{i+1}']
+            )
+
+        si = np.argsort(cs['ext'],axis=0)
+        for i in range(-1,-6,-1):
+            fig.text(
+                .65,.4+i*.03,
+                fr'${self.li2Name[si[i]]}='
+                fr'{cs['ext'][si[i]]:.2e}$'
+                ,
+                ha="center",
+                # fontsize=10,
+                color="black"
             )
 
         libF.CentreFig()
         libF.SaveFig('SizeVsDegree','KS',dicData)
 
-    # def SizeDistrEvolutionFig(self):
+    def SizeDistrEvolutionFig(self):
+        screenshots = self.screenshots
+
+        fig, ax = plt.subplots(1,2,figsize=(15,6))
+        ax[0].set_title('Exact'); ax[1].set_title('Approximated')
+        dicData = libF.CreateDicData(2)
+
+        samples = 6
+        clrmap = plt.get_cmap('plasma')
+        colours = [clrmap(i/(samples-1)) for i in range(samples)]
+
+        sMax = np.max([np.max(screenshots[t][:,-1]) for t in self.typ])
+        bins = np.linspace(0,sMax,26)
+
+        ts = [i*self.Nt/self.Ns for i in range(self.Ns+1)]
+
+        for i,t in enumerate(self.typ): # i[ndex] and t[ype]
+            for j,s in enumerate(np.linspace(0,self.Ns,samples,dtype=int)):
+                libF.CreateHistogramPlot(
+                    screenshots[t][:,s],bins,
+                    dicData[f'fig{i+1}'],
+                    l=f"t = {int(ts[s]*self.dt)}",
+                    clr=colours[j],alfa=0.4,
+                    idx=j+1,ax=ax[i],norm=False
+                ) # Histogram plot
+
+            libF.SetFigStyle(
+                r"$cs$",r"$P(cs)$",
+                yNotation="sci", # ,xNotation="sci"
+                ax=ax[i],data=dicData[f'fig{i+1}']
+            ) # Style
+
+
+        libF.CentreFig()
+        libF.SaveFig('SizeDistributionEvolution','KS',dicData)
+
 
 ### Discarded code ###
 

@@ -85,13 +85,13 @@ def GUI():
 
     dicObjects = {
         'totalPop':{ 'text':'S', 'value':dicReg['popList']['Sardegna'] },
-        'attractivity':{ 'text':'λ', 'value':.75 },
-        'convincibility':{ 'text':'α', 'value':1 },
+        'attractivity':{ 'text':'λ', 'value':.05 },
+        'convincibility':{ 'text':'α', 'value':4 },
         'deviation':{ 'text':'σ', 'value':5e-2 },
         'regSelected':{ 'text':'Region selected', 'value':dicReg['nameList'][19] },
         #
         'timeStep':{ 'text':'Δt', 'value':1e-2 },
-        'stepNumber':{ 'text':'Nt', 'value':int(2e4) },
+        'stepNumber':{ 'text':'Nt', 'value':int(2e5) },
         'iterations':{ 'text':'Ni', 'value':int(1) },
         #
         'extraction':{ 'text':'Extract data', 'value':False },

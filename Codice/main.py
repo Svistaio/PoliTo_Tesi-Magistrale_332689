@@ -50,7 +50,8 @@ if dicPrm['runState']:
     clsKS = libKT.KineticSimulation(dicPrm,dicReg)
 
     clsKS.MonteCarloAlgorithm()
-    clsKS.SizeDistrFitsFig()
-    clsKS.SizeAverageFig()
+    clsKS.SizeDistrFittingsFig()
+    clsKS.AverageSizeFig()
     clsKS.SizeVsDegreeFig()
-    # clsKS.SizeDistrEvolutionFig()
+    clsKS.SizeDistrEvolutionFig()
+    clsKS.SizeEvolutionsFig()

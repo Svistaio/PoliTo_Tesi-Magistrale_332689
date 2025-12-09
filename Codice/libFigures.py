@@ -133,12 +133,12 @@ def SaveFig(
     #     subprocess.run(cmd,shell=True)
 
 def CreateFunctionPlot(
-    x,y,dicData,l='Function',
+    x,y,dicData,l=None,
     clr='black',idx='',ax=None
 ):
     if ax is None: ax = plt.gca()
 
-    plt.plot(
+    ax.plot(
         x,y,
         label=l,
         color=clr,
@@ -152,7 +152,7 @@ def CreateFunctionPlot(
 def CreateHistogramPlot(
     x,nBins,dicData,l='Histogram',
     clr='#808080',scale='lin',
-    alfa=1,idx='',ax=None
+    alfa=1,idx='',ax=None,norm=True
 ):
     if ax is None: ax = plt.gca()
 
@@ -160,7 +160,7 @@ def CreateHistogramPlot(
         hgPlot = ax.hist(
             x,
             bins=nBins, # 'auto'
-            density=True,
+            density=norm,
             color=clr,
             edgecolor="none", # "black"
             label=l,
@@ -174,7 +174,7 @@ def CreateHistogramPlot(
                 np.log10(max(x)),
                 nBins
             ),
-            density=True,
+            density=norm,
             color=clr,
             edgecolor="none", # "black"
             label=l,
