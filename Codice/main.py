@@ -12,23 +12,22 @@ importlib.reload(libGUI)
 
 
 ### Graphic User Interface ###
-dicPrm = libGUI.GUI() # Parameters
+clsPrm = libGUI.GUI() # Parameters
 
 
-if dicPrm['runState']:
+if clsPrm.simFlag:
 
     ### Data extraction ###
-    if dicPrm['extraction']:
-        libED.ExtractAdjacencyMatrices()
+    if clsPrm.extraction: libED.ExtractAdjacencyMatrices()
 
 
     ### Matrices extraction ###
-    dicReg = libED.ReadAdjacencyMatrices(dicPrm['regSelected'])
+    clsReg = libED.ReadAdjacencyMatrices(clsPrm.regSelected)
 
 
     ### Network analysis ###
-    if dicPrm['analysis']:
-        clsNA = libAN.NetworkAnalysis(dicReg)
+    if clsPrm.analysis:
+        clsNA = libAN.NetworkAnalysis(clsPrm,clsReg)
 
         clsNA.DegreeDistributionFig()
         clsNA.WeightDistributionFig()
@@ -47,7 +46,7 @@ if dicPrm['runState']:
 
 
     ### Kinetic simulation ###
-    clsKS = libKT.KineticSimulation(dicPrm,dicReg)
+    clsKS = libKT.KineticSimulation(clsPrm,clsReg)
 
     clsKS.MonteCarloAlgorithm()
     clsKS.SizeDistrFittingsFig()

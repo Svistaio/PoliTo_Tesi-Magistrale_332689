@@ -12,10 +12,8 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import savefig
 import mplcursors
 
-global regCode
 
-
-### Main functions ###
+### Main functions and class ###
 
 def CentreFig():
     fig = plt.gcf()
@@ -80,60 +78,8 @@ def SetFigStyle(
     data['style']['scale'] = {'x':xScale,'y':yScale}
     data['style']['labels'] = {'x':xLabel,'y':yLabel}
 
-def SaveFig(
-    name,folder,dicData
-):
-    global regCode
-
-    projectPath = Path(__file__).resolve().parent.parent
-    for format in ['.pdf','.mat','.tex']:
-        folderPath = projectPath/'Figure'/format/regCode/folder
-        Path(folderPath).mkdir(parents=True,exist_ok=True)
-    # Define the folder path and create all the missing ones if necessary
-
-    def figPath(figName,ext):
-        return (projectPath/'Figure'/ext/regCode/folder/figName).with_suffix(ext)
-
-
-    dicPath = {}
-
-    format = '.pdf'
-    dicPath[format] = figPath(name,format)
-    savefig(dicPath[format],dpi=300,bbox_inches='tight')
-
-    sumatraPath = r"..\.vscode\SumatraPDF.lnk"
-    cmd = f'"{sumatraPath}" "{str(dicPath[format])}"'
-    subprocess.Popen(cmd,shell=True)
-
-
-    # def cmdTeX(matPath,texPath):
-    #     m = matPath.as_posix()
-    #     t = texPath.as_posix()
-
-    #     cmd = (
-    #         r'matlab -batch "mat2tex('
-    #         fr"'{m}',"fr"'{t}'"r')"'
-    #     )
-    #     return cmd
-
-    # for fig in dicData:
-    #     if fig == 'fig':
-    #         nome = name
-    #     else:
-    #         nome = name+fig
-
-    #     format = '.mat'
-    #     dicPath[format] = figPath(nome,format)
-    #     savemat(dicPath[format],dicData[fig])
-
-    #     format = '.tex'
-    #     dicPath[format] = figPath(nome,format)
-
-    #     cmd = cmdTeX(dicPath['.mat'],dicPath[format])
-    #     subprocess.run(cmd,shell=True)
-
 def CreateFunctionPlot(
-    x,y,dicData,l=None,
+    x,y,figData,l=None,
     clr='black',idx='',ax=None
 ):
     if ax is None: ax = plt.gca()
@@ -145,12 +91,12 @@ def CreateFunctionPlot(
         linewidth=1,
     )
 
-    dicData['plots'][f'functionPlot{idx}'] = {
+    figData['plots'][f'functionPlot{idx}'] = {
         't':'function','x':x,'y':y,'l':l,'c':clr
     }
 
 def CreateHistogramPlot(
-    x,nBins,dicData,l='Histogram',
+    x,nBins,figData,l='Histogram',
     clr='#808080',scale='lin',
     alfa=1,idx='',ax=None,norm=True
 ):
@@ -181,7 +127,7 @@ def CreateHistogramPlot(
             alpha=alfa
         )
 
-    dicData['plots'][f'histogramPlot{idx}'] = {
+    figData['plots'][f'histogramPlot{idx}'] = {
         't':'histogram','x':x,'b':nBins,'l':l,'c':clr,'a':alfa,'s':scale
     }
 
@@ -198,7 +144,7 @@ def CreateHistogramPlot(
     return hgPlot
 
 def CreateScatterPlot(
-    x,y,dicData,
+    x,y,figData,
     l='Scatter',clr='black',
     idx='',ax=None
 ):
@@ -211,7 +157,7 @@ def CreateScatterPlot(
         s=16
     )
 
-    dicData['plots'][f'scatterPlot{idx}'] = {
+    figData['plots'][f'scatterPlot{idx}'] = {
         't':'scatter','x':x,'y':y,'l':l,'c':clr
     }
 
@@ -222,7 +168,7 @@ def CreateScatterPlot(
     )
 
 def CreateLognormalFitPlot(
-    v,dicData,lAvr='Average value',
+    v,figData,lAvr='Average value',
     lFit='Lognormal fit (ML)', # Minimum likelihood
     clrAvr='black',clrFit='blue',
     idx='',ax=None
@@ -249,10 +195,10 @@ def CreateLognormalFitPlot(
         linewidth=1
     ) # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
 
-    dicData['plots'][f'meanPlot{idx}'] = {
+    figData['plots'][f'meanPlot{idx}'] = {
         't':'function','x':xM,'y':yM,'l':lFit,'c':clrAvr
     }
-    dicData['plots'][f'fitPlot{idx}'] = {
+    figData['plots'][f'fitPlot{idx}'] = {
         't':'function','x':xF,'y':yF,'l':lAvr,'c':clrFit
     }
 
@@ -263,7 +209,7 @@ def CreateLognormalFitPlot(
     )
 
 def CreateLogRegressionPlot(
-    x,y,dicData,
+    x,y,figData,
     l='Regression',clr='blue',
     idx='',ax=None
 ):
@@ -280,7 +226,7 @@ def CreateLogRegressionPlot(
         linewidth=1
     )
     
-    dicData['plots'][f'regressionPlot{idx}'] = {
+    figData['plots'][f'regressionPlot{idx}'] = {
         't':'function','x':x,'y':regression,'l':l,'c':clr
     }
 
@@ -293,7 +239,7 @@ def CreateLogRegressionPlot(
     return slope
 
 def CreateParetoFitPlot(
-    v,dicData,
+    v,figData,
     lSct='Scatter',lFit='Pareto fit (ML)', # Minimum likelihood
     clrSct='black',clrFit='black',
     idx='',ax=None
@@ -311,7 +257,7 @@ def CreateParetoFitPlot(
     # Complementary Cumulative Distribution Function
 
     CreateScatterPlot(
-        vSort,ccdfEmp,dicData,
+        vSort,ccdfEmp,figData,
         l=lSct,clr=clrSct,ax=ax
     )
 
@@ -324,30 +270,103 @@ def CreateParetoFitPlot(
         color=clrFit
     )
 
-    dicData['plots'][f'ScatterPlot{idx}'] = {
+    figData['plots'][f'ScatterPlot{idx}'] = {
         't':'scatter','x':vSort,'y':ccdfEmp,'l':lSct,'c':clrSct
     }
-    dicData['plots'][f'FitPlot{idx}'] = {
+    figData['plots'][f'FitPlot{idx}'] = {
         't':'function','x':vSort,'y':ccdfFit,'l':lFit,'c':clrFit
     }
 
     return b
 
-def CreateDicData(nFig):
-    if not isinstance(nFig,int) or nFig <= 0:
-        raise ValueError('The number of figures must be a integer positive number')
+class FigData():
+    def __init__(self,clsPrm,folder):
+        self.folder = folder
+        self.projectPath = Path(__file__).resolve().parent.parent
 
-    dicData = {}
-    if nFig == 1:
-        dicData['fig'] = {'plots':{},'style':{}}
-    else:
-        for i in range(nFig):
-            dicData[f'fig{i+1}'] = {'plots':{},'style':{}}
-        
-    return dicData
+        self.regCode = str(clsPrm.regSelected)
+        self.PdfPopUp = clsPrm.PdfPopUp
+        self.LaTeXConversion = clsPrm.LaTeXConversion
 
+    def SetFigs(self,nFig):
+        if not isinstance(nFig,int) or nFig <= 0:
+            raise ValueError('The number of figures must be a integer positive number')
+
+        if nFig == 1:
+            self.fig = {'plots':{},'style':{}}
+        else:
+            for i in range(nFig):
+                setattr(self,f'fig{i+1}',{'plots':{},'style':{}})
+
+        self.nFig = nFig
+
+    def SaveFig(self,name):
+        self.name = [name]
+        self.SaveFig2pdf()
+
+        if self.nFig>1:
+            self.name = [f'{self.name}fig{f+1}' for f in range(self.nFig)]
+
+        if self.LaTeXConversion:
+            for f in range(self.nFig):
+                self.SaveFig2mat(f)
+                self.SaveFig2tex(f)
+
+    def SaveFig2pdf(self):
+        format = '.pdf'
+        self.CreateFolders(format)
+        pdfPath = self.FigPath(self.name[0],format)
+
+        savefig(
+            pdfPath,
+            dpi=300,
+            bbox_inches='tight'
+        )
+
+        if self.PdfPopUp:
+            sumatraPath = r"..\.vscode\SumatraPDF.lnk"
+            cmd = f'"{sumatraPath}" "{str(pdfPath)}"'
+            subprocess.Popen(cmd,shell=True)
+
+    def SaveFig2mat(self,f):
+        format = '.mat'
+        self.CreateFolders(format)
+
+        self.matPath = self.FigPath(self.name[f],format)
+        savemat(self.matPath,getattr(self,f'fig{f+1}'))
+
+    def SaveFig2tex(self,f):
+        format = '.tex'
+        self.CreateFolders(format)
+
+        texPath = self.FigPath(self.name[f],format)
+        cmd = self.cmdTeX(self.matPath,texPath)
+        subprocess.run(cmd,shell=True)
+
+    def CreateFolders(self,format):
+        folderPath = self.projectPath/'Figure'/format/self.regCode/self.folder
+        Path(folderPath).mkdir(parents=True,exist_ok=True)
+        # Define the folder path and create all the missing ones if necessary
+
+    def FigPath(self,figName,ext):
+        return (
+            self.projectPath/'Figure'/
+            ext/self.regCode/
+            self.folder/figName
+        ).with_suffix(ext)
+
+    def cmdTeX(matPath,texPath):
+        m = matPath.as_posix()
+        t = texPath.as_posix()
+
+        cmd = (
+            r'matlab -batch "mat2tex('
+            fr"'{m}',"fr"'{t}'"r')"'
+        )
+        return cmd
 
 ### Discarded code ###
+
 #region From «SaveFig()» 
     #region Different naming rule between the folders
         # match folder:
