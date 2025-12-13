@@ -187,7 +187,12 @@ def CreateLognormalFitPlot(
     )
 
     # Fit plot
-    xF = np.linspace(0,np.max(v),500)
+    # xF = np.linspace(0,np.max(v),500)
+    xF = np.logspace(
+        np.log10(np.min(v)),
+        np.log10(np.max(v)),
+        500
+    )
     yF = lognorm.pdf(xF,shape,loc=loc,scale=scale)
     fPlot = ax.plot(
         xF,yF,label=lFit, # Maximum likelyhood

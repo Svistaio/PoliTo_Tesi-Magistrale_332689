@@ -15,7 +15,7 @@ importlib.reload(libF)
 
 ### Main class ###
 
-class NetworkAnalysis:
+class NetworkAnalysis():
     def __init__(self,clsPrm,clsReg):
         self.A = clsReg.A
         self.W = clsReg.W
