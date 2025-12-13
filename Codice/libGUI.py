@@ -11,6 +11,8 @@ class GUI(tk.Tk):
         tk._default_root = None
 
         #region Parameters
+        self.simFlag = False
+
         self.regNameList = [
             'Piemonte',
             "Valle d'Aosta",
@@ -63,7 +65,7 @@ class GUI(tk.Tk):
 
         self.totalPop = Parameter('S',self.regPopList['Sardegna'])
         self.attractivity = Parameter( 'λ' ,.05)
-        self.convincibility = Parameter('α',1)
+        self.convincibility = Parameter('α',.01)
         self.deviation = Parameter('σ',5e-2)
         self.regSelected = Parameter(
             'Region selected',
@@ -72,7 +74,7 @@ class GUI(tk.Tk):
         )
 
         self.timeStep = Parameter('Δt',1e-2)
-        self.stepNumber = Parameter('Nt',int(2e4))
+        self.stepNumber = Parameter('Nt',int(10e6))
         self.iterations = Parameter('Ni',int(1))
 
         self.extraction = Parameter('Extract data',False)
