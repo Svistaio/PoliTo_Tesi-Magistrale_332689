@@ -1,4 +1,6 @@
 
+from pathlib import Path
+
 import zipfile as zf
 from zipfile import ZipFile as ZF
 
@@ -15,7 +17,8 @@ import numpy as np
 ### Main function and class ###
 
 def ExtractAdjacencyMatrices():
-    zipFile = '../Dati/MatriciPendolarismo1991.zip'
+    projectPath = Path(__file__).resolve().parent.parent
+    zipFile = projectPath/'Dati'/'MatriciPendolarismo1991.zip'
 
     # Conversion of «elencom91.xls» from the old format «.xls» to a more manageable «.csv»
     csvFile = xls2csv(zipFile,'elencom91.xls')
@@ -27,13 +30,13 @@ def ExtractAdjacencyMatrices():
         zipFile,'Pen_91It.txt'
     )
 
-    WriteAdjacencyMatrices(
-        '../Dati/DatiPendolarismo1991.zip',dicReg
-    )
+    zipFile = projectPath/'Dati'/'DatiPendolarismo1991.zip'
+    WriteAdjacencyMatrices(zipFile,dicReg)
 
 class ReadAdjacencyMatrices():
     def __init__(self,code):
-        zipFile = '../Dati/DatiPendolarismo1991.zip'
+        projectPath = Path(__file__).resolve().parent.parent
+        zipFile = projectPath/'Dati'/'DatiPendolarismo1991.zip'
 
         el = {
             'A':'.txt','W':'.txt',
@@ -65,6 +68,38 @@ class ReadAdjacencyMatrices():
 
                         case 'Nc' | 'Name2li':
                             setattr(self,data,json.load(f))
+
+def WriteSimulationData(lbl,si,cs,typ,li2Name,Ni):
+    lbl = [t.replace('.','') for t in lbl]
+
+    projectPath = Path(__file__).resolve().parent.parent
+    zipFile = projectPath/'Dati'/'SimulationData.zip'
+
+    with ZF(
+        zipFile,'w',
+        compression=zf.ZIP_DEFLATED,
+        compresslevel=9
+    ) as z:
+        for r in range(Ni):
+            dicName2SortedPop = {
+                t:{
+                    li2Name[i]:cs[r,i,t] for i in si[r,::-1,t]
+                } for t in typ
+            }
+
+            folder = f"{0 if r+1<10 else ''}{r+1}"
+            for t in typ:
+                buf = sio()
+                path = f'{folder}/{lbl[t]}CitySizesFinal.json'
+                json.dump(list(cs[r,:,t]),buf)
+                value = buf.getvalue()
+                z.writestr(path,value)
+
+                buf = sio()
+                path = f'{folder}/{lbl[t]}CitySizesSorted.json'
+                json.dump(dicName2SortedPop[t],buf)
+                value = buf.getvalue()
+                z.writestr(path,value)
 
 
 ### Auxiliary functions ###
@@ -199,7 +234,7 @@ def WriteAdjacencyMatrices(zipPath,dicReg):
         }
 
         for r in range(21):
-            folder = f'{'0' if r+1<=9 else ''}{r+1}'
+            folder = f'{'0' if r+1<10 else ''}{r+1}'
 
             for data in el:
                 buf = sio()

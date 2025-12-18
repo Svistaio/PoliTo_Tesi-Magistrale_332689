@@ -2,16 +2,54 @@
 import tkinter as tk
 from tkinter import ttk
 
+import numpy as np
+
+from multiprocessing import shared_memory
 
 ### Main class ###
 
-class GUI(tk.Tk):
+class ParametersGUI(tk.Tk):
     def __init__(self):
         # Resets the default root before creating the GUI
         tk._default_root = None
 
+        #region Window
+        super().__init__() # Main window
+        self.title('City Size Model')
+        self.resizable(False,False) # Disable resizing the window
+        self.bind('<Escape>',lambda e: self.SetSimulationState(False))
+        self.bind('<space>',lambda e: self.SetSimulationState(True))
+        #endregion
+
         #region Parameters
-        self.simFlag = False
+        self.regPopList = { # Italian region sizes in 1991
+            'Piemonte':int(4302565),
+            "Valle d'Aosta":int(115938),
+            'Lombardia':int(8856074),
+            'Trentino-Alto Adige':int(890360),
+            'Veneto':int(4380797),
+            'Friuli-Venezia Giulia':int(1197666),
+            'Liguria':int(1676282),
+            'Emilia-Romagna':int(3909512),
+            'Toscana':int(3529946),
+            'Umbria':int(811831),
+            'Marche':int(1429205),
+            'Lazio':int(5140371),
+            'Abruzzo':int(1249054),
+            'Molise':int(330900),
+            'Campania':int(5630280),
+            'Puglia':int(4031885),
+            'Basilicata':int(610528),
+            'Calabria':int(2070203),
+            'Sicilia':int(4966386),
+            'Sardegna':int(1648248),
+            'Italia':int(56778031)
+        } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
+        self.population = Parameter('S',self.regPopList['Sardegna'])
+
+        self.attractivity = Parameter( 'λ' ,.05)
+        self.convincibility = Parameter('α',.01)
+        self.deviation = Parameter('σ',5e-2)
 
         self.regNameList = [
             'Piemonte',
@@ -36,64 +74,45 @@ class GUI(tk.Tk):
             'Sardegna',
             'Italia'
         ]
-        self.regPopList = { # Italian region sizes in 1991
-            'Piemonte':int(4302565),
-            "Valle d'Aosta":int(115938),
-            'Lombardia':int(8856074),
-            'Trentino-Alto Adige':int(890360),
-            'Veneto':int(4380797),
-            'Friuli-Venezia Giulia':int(1197666),
-            'Liguria':int(1676282),
-            'Emilia-Romagna':int(3909512),
-            'Toscana':int(3529946),
-            'Umbria':int(811831),
-            'Marche':int(1429205),
-            'Lazio':int(5140371),
-            'Abruzzo':int(1249054),
-            'Molise':int(330900),
-            'Campania':int(5630280),
-            'Puglia':int(4031885),
-            'Basilicata':int(610528),
-            'Calabria':int(2070203),
-            'Sicilia':int(4966386),
-            'Sardegna':int(1648248),
-            'Italia':int(56778031)
-        } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
-        self.regCodeList = {
-            r:int(i+1) for i,r in enumerate(self.regNameList)
-        }
-
-        self.totalPop = Parameter('S',self.regPopList['Sardegna'])
-        self.attractivity = Parameter( 'λ' ,.05)
-        self.convincibility = Parameter('α',.01)
-        self.deviation = Parameter('σ',5e-2)
-        self.regSelected = Parameter(
+        self.region = Parameter(
             'Region selected',
             self.regNameList[19],
             list=self.regNameList
         )
+        self.regCodeList = {
+            r:i+1 for i,r in enumerate(self.regNameList)
+        }
 
-        self.timeStep = Parameter('Δt',1e-2)
-        self.stepNumber = Parameter('Nt',int(10e6))
-        self.iterations = Parameter('Ni',int(1))
+        self.timestep = Parameter('Δt',1e-2)
+        self.timesteps = Parameter('Nt',int(1e6))
+        self.iterations = Parameter('Ni',int(9))
+        # self.progressBar = Parameter('Progress Bar',True)
 
         self.extraction = Parameter('Extract data',False)
         self.analysis = Parameter('Network analysis',False)
         self.edgeWeights = Parameter('Edge weights',False)
 
+        self.intLawList = [
+            'l*(rs^a)/(1+rs^a)',
+            'l*(rsk/a)/(1+rsk/a)',
+            'l*(rsk^a)/(1+rsk^a)',
+            '(1-z)*efl+z*efs',
+        ]
+        self.interactingLaw = Parameter(
+            'Interacting law',
+            self.intLawList[3],
+            list=self.intLawList
+        )
+        self.intLawCodeList = {
+            r:i for i,r in enumerate(self.intLawList)
+        }
+
         self.PdfPopUp = Parameter('Open PDF',False)
         self.LaTeXConversion = Parameter('LaTeX Conversion',False)
+        self.screenshots = Parameter('Ns',int(1000)) # Number of screenshots [not considering the initial state]
+        self.smoothingFactor = Parameter('Sf',int(10))
 
-        self.runButton = Parameter('Run',True)
-        self.stopButton = Parameter('Stop',False)
-        #endregion
-
-        #region GUI Window
-        super().__init__() # Main window
-        self.title('City Size Model')
-        self.resizable(False,False) # Disable resizing the window
-        self.bind('<Escape>',lambda e: self.SetSimulationState(Parameter(value=False)))
-        # self.bind('<A>',lambda e: self.SetSimulationState(Parameter(value=True)))
+        self.simFlag = Parameter(var=tk.BooleanVar(value=False))
         #endregion
 
         #region Frames
@@ -111,21 +130,22 @@ class GUI(tk.Tk):
         popPrmFrame.LabelEntry(self.convincibility)
         self.SetConvincibility()
 
-        popPrmFrame.LabelEntry(self.totalPop)
+        popPrmFrame.LabelEntry(self.population)
         self.attractivity.var.trace_add("write",self.SetDeviationUpperLimit)
         self.attractivity.var.trace_add("write",self.SetConvincibility)
 
-        popPrmFrame.LabelComboBox(self.regSelected)
-        self.regSelected.var.trace_add("write",self.SetPopulation)
+        popPrmFrame.LabelComboBox(self.region)
+        self.region.var.trace_add("write",self.SetPopulation)
 
 
         timePrmFrame = Frame(
             mainFrame,pos=(0,1),pad=pad,
             title='Time parameters'#,labelWidth=3
         )
-        timePrmFrame.LabelEntry(self.timeStep,colSpan=timePrmFrame.nCol)
-        timePrmFrame.LabelEntry(self.stepNumber,colSpan=timePrmFrame.nCol)
+        timePrmFrame.LabelEntry(self.timestep,colSpan=timePrmFrame.nCol)
+        timePrmFrame.LabelEntry(self.timesteps,colSpan=timePrmFrame.nCol)
         timePrmFrame.LabelEntry(self.iterations,colSpan=timePrmFrame.nCol)
+        # timePrmFrame.CheckBox(self.progressBar)
 
 
         simPrmFrame = Frame(
@@ -135,6 +155,7 @@ class GUI(tk.Tk):
         simPrmFrame.CheckBox(self.extraction)
         simPrmFrame.CheckBox(self.analysis)
         simPrmFrame.CheckBox(self.edgeWeights)
+        simPrmFrame.LabelComboBox(self.interactingLaw)
 
 
         ppcPrmFrame = Frame(
@@ -143,6 +164,18 @@ class GUI(tk.Tk):
         )
         ppcPrmFrame.CheckBox(self.PdfPopUp)
         ppcPrmFrame.CheckBox(self.LaTeXConversion)
+        ppcPrmFrame.LabelSlider(
+            self.screenshots,
+            (1,self.timesteps.var.get()),
+            1,
+            colSpan=ppcPrmFrame.nCol
+        )
+        ppcPrmFrame.LabelSlider(
+            self.smoothingFactor,
+            (1,self.screenshots.var.get()),
+            1,
+            colSpan=ppcPrmFrame.nCol
+        )
 
 
         buttonFrame = Frame(
@@ -150,46 +183,16 @@ class GUI(tk.Tk):
             colSpan=mainFrame.nCol
         )
         buttonFrame.Button(
-            self.runButton,
-            lambda: self.SetSimulationState(self.runButton)
+            'Run',lambda: self.SetSimulationState(True)
         )
         buttonFrame.Button(
-            self.stopButton,
-            lambda: self.SetSimulationState(self.stopButton)
+            'Stop',lambda: self.SetSimulationState(False)
         )
         #endregion
 
         # GUI call
-        self.CentreGUI()
+        CentreGUI(self)
         self.mainloop()
-
-        for name, value in self.__dict__.items():
-            if isinstance(value,Parameter):
-                if value.var is not None:
-                    setattr(self,name,value.var.get())
-                    # value.val = value.var.get()
-        
-        self.regSelected = self.regCodeList[self.regSelected]
-
-    # Functions
-    def CentreGUI(self):
-        # Get screen width and height
-        screenWidth = self.winfo_screenwidth()
-        screenHeight = self.winfo_screenheight()
-
-        # Update window size
-        self.update_idletasks()
-
-        # Measure window size
-        windowWidth = self.winfo_width()
-        windowHeight = self.winfo_height()
-
-        # Calculate new centred coordinates
-        x = (screenWidth // 2) - (windowWidth // 2)
-        y = (screenHeight // 2) - (windowHeight // 2)
-
-        # Set geometry
-        self.geometry(f"{windowWidth}x{windowHeight}+{x}+{y}")
 
     # Callbacks
     def SetDeviationUpperLimit(self,*args):
@@ -205,20 +208,112 @@ class GUI(tk.Tk):
             return
 
     def SetPopulation(self,*args):
-        nameReg = self.regSelected.var.get()
+        nameReg = self.region.var.get()
         popReg = self.regPopList[nameReg]
-        self.totalPop.var.set(popReg)
+        self.population.var.set(popReg)
 
     def SetConvincibility(self,*args):
         l = self.attractivity.var.get()
         self.convincibility.var.set(l/0.01-1)
 
-    def SetSimulationState(self,data):
-        self.simFlag = data.val
+    def SetSimulationState(self,state):
+        self.simFlag.var.set(state)
         self.destroy() # Close the window after any button is pressed
 
+    # Functions
+    def GatherParameters(self):
+        parameters = {}
+        for attribute, value in self.__dict__.items():
+            if isinstance(value,Parameter):
+                parameters[attribute] = value.var.get()
+                # if value.var is not None:
+                # setattr(self,name,value.var.get())
+                # value.val = value.var.get()
+        
+        parameters['region'] = self.regCodeList[self.region.var.get()]
+        parameters['interactingLaw'] = self.intLawCodeList[self.interactingLaw.var.get()]
 
-### Auxilary classes ###
+        return Parameters(**parameters)
+
+class ProgressGUI(tk.Tk):
+    def __init__(
+        self,Ni,Nt,
+        namep,namee,named
+    ):
+        #region Window
+        super().__init__()
+        self.resizable(False,False)
+        self.title("Simulation Progress")
+        self.iconify() # Start minimized
+        #endregion
+
+        #region Parameters
+        shmp = shared_memory.SharedMemory(name=namep); self.shmp = shmp
+        shme = shared_memory.SharedMemory(name=namee); self.shme = shme
+        shmd = shared_memory.SharedMemory(name=named); self.shmd = shmd
+
+        self.progress = np.ndarray((Ni,),dtype=np.int64,buffer=shmp.buf)
+        self.elapsed = np.ndarray((Ni,),dtype=np.float64,buffer=shme.buf)
+        self.done = np.ndarray((Ni,),dtype=np.int8,buffer=shmd.buf)
+
+        self.Ni = Ni
+        self.Nt = Nt
+        # self.d = [False]*Ni
+        #endregion
+
+        #region Frames
+        pad = 20; pad = (pad,pad)
+        mainFrame = Frame(self,pad=pad,normalFontStyle=('JetBrains Mono',11))
+        pad = 5; pad = (pad,pad)
+
+        self.bars = []; self.status = []
+        for i in range(Ni):
+            progressBarFrame = Frame(mainFrame,nCol=3,pos=(i,0),pad=pad)
+
+            label = f"p{'0' if i+1<10 else ''}{i+1}" # Process
+            setattr(self,label,Parameter(text=label+':'))
+            progressBarFrame.Label(getattr(self,label),width=4)
+
+            progressBarFrame.ProgressBar(getattr(self,label),Nt)
+
+            status = f"s{'0' if i+1<10 else ''}{i+1}"
+            setattr(self,status,Parameter(text=''))
+            progressBarFrame.Label(
+                getattr(self,status),width=60,
+                pad=((0,0),(0,0)),anchor='c'
+            )
+
+            self.bars.append(getattr(self,label).wid)
+            self.status.append(getattr(self,status).wid)
+        #endregion
+
+        CentreGUI(self)
+        self.after(50,self.PoolInfo)
+
+    def PoolInfo(self):
+        Ni = self.Ni
+
+        for p in range(Ni):
+            nt = int(self.progress[p])
+            el = float(self.elapsed[p])
+
+            if el != 0:
+                self.bars[p]['value'] = nt
+                ips = max(1,nt)/max(el,1e-10) # Iterations per second
+                self.status[p]['text'] = (
+                    f'{nt}/{self.Nt} ['
+                    f'{TimeFormatter(nt/ips)}<'
+                    f'{TimeFormatter((self.Nt-nt)/ips)} '
+                    # f'[{nt/ips:.2f}<{(self.Nt-nt)/ips:.2f}, '
+                    f'{ips:.2f}it/s]'
+                )
+
+        if np.all(self.done):
+            self.destroy()
+        else:
+            self.after(50,self.PoolInfo)
+
+### Auxiliary classes ###
 
 class Frame(ttk.Frame):
     def __init__(
@@ -226,7 +321,9 @@ class Frame(ttk.Frame):
         nCol=2,colSpan=1,
         title=None,sticky='n',
         pos=(0,0),pad=((0,0),(0,0)),
-        labelWidth = None
+        labelWidth = None,
+        normalFontStyle = None,
+        titleFontStyle = None
     ):
         super().__init__(parent,borderwidth=0)
 
@@ -243,8 +340,21 @@ class Frame(ttk.Frame):
         self.entryWidth = 13
         self.comboBoxWidth = 20
 
-        self.normalFontStyle = ('JetBrains Mono',15)
-        self.titleFontStyle = ('JetBrains Mono',17,'bold')
+        if normalFontStyle is None:
+            if isinstance(parent,Frame):
+                self.normalFontStyle = parent.normalFontStyle
+            else:
+                self.normalFontStyle = ('JetBrains Mono',15)
+        else:
+            self.normalFontStyle = normalFontStyle
+
+        if titleFontStyle is None:
+            if isinstance(parent,Frame):
+                self.titleFontStyle = parent.titleFontStyle
+            else:
+                self.titleFontStyle = ('JetBrains Mono',17,'bold')
+        else:
+            self.titleFontStyle = titleFontStyle
 
         if title is not None:
             self.SetTitle(title)
@@ -298,19 +408,22 @@ class Frame(ttk.Frame):
 
     # Default widgets
     def Label(
-        self,data,width=None,
-        anchor='e',colSpan=1,
+        self,
+        data,
+        width=None,
+        anchor='e',
+        colSpan=1,
         pad=((0,3),2)
     ):
         if width is None: width=self.labelWidth
-        fieldLabel = ttk.Label(
+        data.wid = ttk.Label(
             master=self,
-            text=data.text+':',
+            text=data.text,
             font=self.normalFontStyle,
             anchor=anchor,
             width=width
         )
-        fieldLabel.grid(
+        data.wid.grid(
             row=self.cRow,
             column=self.cCol,
             columnspan=colSpan,
@@ -334,7 +447,13 @@ class Frame(ttk.Frame):
         )
         self.NextColumn()
         
-    def Slider(self,data,bounds,res,extremes):
+    def Slider(
+        self,
+        data,
+        bounds,
+        res,
+        extremes
+    ):
         # Measure the character length in pixels
         fieldInput = ttk.Entry(
             master=self,
@@ -364,12 +483,13 @@ class Frame(ttk.Frame):
         )
         self.NextColumn()
 
-    def ComboBox(self,data,colSpan=1):
+    def ComboBox(self,data,colSpan=1,state='readonly'):
         self.CheckDataType(data)
         data.wid = ttk.Combobox(
             master=self,
             values=data.list,
             textvariable=data.var,
+            state=state,
             font=self.normalFontStyle,
             width=self.comboBoxWidth
         )
@@ -406,7 +526,7 @@ class Frame(ttk.Frame):
 
         self.NextColumn(colSpan)
 
-    def Button(self,data,callBack):
+    def Button(self,text,callBack):
         style = ttk.Style()
         style.configure(
             'btt.TButton',
@@ -416,7 +536,7 @@ class Frame(ttk.Frame):
         )
         button = ttk.Button(
             self,
-            text=data.text,
+            text=text,
             command=callBack,
             style="btt.TButton"
         )
@@ -424,6 +544,18 @@ class Frame(ttk.Frame):
             row=self.cRow,
             column=self.cCol,
             padx=2
+        )
+        self.NextColumn()
+
+    def ProgressBar(self,data,max,width=400):
+        data.wid = ttk.Progressbar(
+            master=self,
+            maximum=max,
+            length=width
+        )
+        data.wid.grid(
+            row=self.cRow,
+            column=self.cCol,
         )
         self.NextColumn()
 
@@ -442,6 +574,7 @@ class Frame(ttk.Frame):
             labelWidth=labelWidth
         )
 
+        data.text += ':'
         fieldFrame.Label(data,labelWidth)
         fieldFrame.Entry(data)
 
@@ -450,27 +583,41 @@ class Frame(ttk.Frame):
     def LabelSlider(
         self,data,bounds,res,
         extremes=(True,True),
-        labelWidth=None
+        labelWidth=None,
+        colSpan=1
     ):
         fieldFrame = Frame(
             self,pos=(self.cRow,self.cCol),
+            colSpan=colSpan,
             pad=(self.pCol,self.pRow)
         )
 
-        fieldFrame.Label(data,labelWidth)
-        fieldFrame.Slider(data,bounds,res,extremes)
+        data.text += ':'
+        fieldFrame.Label(
+            data,
+            width=labelWidth
+        )
+        fieldFrame.Slider(
+            data,
+            bounds,
+            res,
+            extremes
+        )
 
-        self.NextColumn()
+        self.NextColumn(colSpan)
 
     def LabelComboBox(self,data,colSpan=2):
         fieldFrame = Frame(
-            self,pos=(self.cRow,self.cCol),
+            self,
+            pos=(self.cRow,self.cCol),
             colSpan=colSpan,
             pad=((0,0),(10,0))
         )
 
+        data.text += ':'
         fieldFrame.Label(
-            data,colSpan=colSpan,
+            data,
+            colSpan=colSpan,
             pad=((0,0),(0,0)),
             anchor='s'
         )
@@ -499,11 +646,40 @@ class Parameter():
         self.var  = var
         self.wid  = wid
 
+class Parameters():
+    def __init__(self,**kwargs):
+        for text,value in kwargs.items():
+            setattr(self,text,value)
+
+def CentreGUI(window):
+    # Get screen width and height
+    screenWidth = window.winfo_screenwidth()
+    screenHeight = window.winfo_screenheight()
+
+    # Update window size
+    window.update_idletasks()
+
+    # Measure window size
+    windowWidth = window.winfo_width()
+    windowHeight = window.winfo_height()
+
+    # Calculate new centred coordinates
+    x = (screenWidth // 2) - (windowWidth // 2)
+    y = (screenHeight // 2) - (windowHeight // 2)
+
+    # Set geometry
+    window.geometry(f"{windowWidth}x{windowHeight}+{x}+{y}")
+
+def TimeFormatter(seconds):
+    m, s = divmod(seconds,60)
+    h, m = divmod(m,60)
+    return f"{h:.0f}:{m:.0f}:{s:.0f}"
+
 
 ### Discarded code ###
 
 #region Old and worse GUI implementation without classes
-    """
+"""
     def GUI():
         global dicObjects, dicReg
 
@@ -932,5 +1108,5 @@ class Parameter():
 
         dicObjects['totalPop']['obj']['var'].set(popReg)
         dicObjects['regSelected']['obj']['var'].set(codeReg)
-    """
+"""
 #endregion

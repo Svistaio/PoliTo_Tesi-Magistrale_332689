@@ -1,57 +1,67 @@
 
-import importlib
-
-import libAnalyseNetwork as libAN
-importlib.reload(libAN)
-import libExtractData as libED
-importlib.reload(libED)
-import libMASKineticTheory as libKT
-importlib.reload(libKT)
-import libGUI
-importlib.reload(libGUI)
+from multiprocessing import freeze_support
 
 
-### Graphic User Interface ###
-clsPrm = libGUI.GUI() # Parameters
+def main():
+    import importlib
+
+    import libGUI
+    import libExtractData as libED
+    import libAnalyseNetwork as libAN
+    import libMASKineticTheory as libKT
+
+    importlib.reload(libGUI)
+    importlib.reload(libED)
+    importlib.reload(libAN)
+    importlib.reload(libKT)
+
+    ### Graphic User Interface ###
+    clsGUI = libGUI.ParametersGUI()
+    clsPrm = clsGUI.GatherParameters() # Parameters
 
 
-if clsPrm.simFlag:
+    if clsPrm.simFlag:
 
-    ### Data extraction ###
-    if clsPrm.extraction: libED.ExtractAdjacencyMatrices()
-
-
-    ### Matrices extraction ###
-    clsReg = libED.ReadAdjacencyMatrices(clsPrm.regSelected)
+        ### Data extraction ###
+        if clsPrm.extraction: libED.ExtractAdjacencyMatrices()
 
 
-    ### Network analysis ###
-    if clsPrm.analysis:
-        clsNA = libAN.NetworkAnalysis(clsPrm,clsReg)
-
-        clsNA.DegreeDistributionFig()
-        clsNA.WeightDistributionFig()
-        clsNA.StrengthDistributionFig()
-
-        clsNA.BetweennessCentralityFig()
-        clsNA.StrengthVsDegreeFig()
-
-        clsNA.AClusteringCoefficientFig()
-        clsNA.WClusteringCoefficientFig()
-
-        clsNA.AAssortativityFig()
-        clsNA.WAssortativityFig()
-
-        # clsNA.ShowFig()
+        ### Matrices extraction ###
+        clsReg = libED.ReadAdjacencyMatrices(clsPrm.region)
 
 
-    ### Kinetic simulation ###
-    clsKS = libKT.KineticSimulation(clsPrm,clsReg)
+        ### Network analysis ###
+        if clsPrm.analysis:
+            clsNA = libAN.NetworkAnalysis(clsPrm,clsReg)
 
-    clsKS.MonteCarloAlgorithm()
+            clsNA.DegreeDistributionFig()
+            clsNA.WeightDistributionFig()
+            clsNA.StrengthDistributionFig()
 
-    clsKS.SizeDistrFittingsFig()
-    clsKS.AverageSizeFig()
-    clsKS.SizeVsDegreeFig()
-    clsKS.SizeDistrEvolutionFig()
-    clsKS.SizeEvolutionsFig()
+            clsNA.BetweennessCentralityFig()
+            clsNA.StrengthVsDegreeFig()
+
+            clsNA.AClusteringCoefficientFig()
+            clsNA.WClusteringCoefficientFig()
+
+            clsNA.AAssortativityFig()
+            clsNA.WAssortativityFig()
+
+            # clsNA.ShowFig()
+
+
+        ### Kinetic simulation ###
+        clsKS = libKT.KineticSimulation(clsPrm,clsReg)
+        clsKS.MonteCarloSimulation()
+
+        clsKS.SizeDistrFittingsFig()
+        clsKS.AverageSizeFig()
+        clsKS.SizeVsDegreeFig()
+        clsKS.SizeDistrEvolutionFig()
+        clsKS.SizeEvolutionsFig()
+
+        # clsKS.ShowFig()
+
+if __name__ == "__main__":
+    freeze_support()
+    main()
