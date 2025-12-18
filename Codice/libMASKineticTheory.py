@@ -1,213 +1,340 @@
 
 import numpy as np
+from scipy import stats
 from numba import njit
+
+import time
+from concurrent.futures import ProcessPoolExecutor
+import multiprocessing as mp
+from multiprocessing import shared_memory
+# from tqdm import tqdm
 
 import matplotlib.pyplot as plt
 
-from tqdm import tqdm
-
 import importlib
+
+import libGUI
+importlib.reload(libGUI)
+import libExtractData as libED
+importlib.reload(libED)
 import libFigures as libF
 importlib.reload(libF)
 
 
 ### Main class ###
 
-class KineticSimulation(): # NetworkState
+class KineticSimulation():
     def __init__(self,clsPrm,clsReg):
-        #region Initial data dump
-        self.li2Name = clsReg.li2Name
+        self.il = int(clsPrm.interactingLaw)
+
+        self.l = float(clsPrm.attractivity)
+        self.a = float(clsPrm.convincibility)
+        self.s = float(clsPrm.deviation)
+
+        self.Nc = int(clsReg.Nc)
+        self.P  = int(clsPrm.population)
+        self.p0 = float(self.P/self.Nc)
+
+        self.dt = float(clsPrm.timestep)
+        self.Nt = int(clsPrm.timesteps)
+        self.Ns = int(clsPrm.screenshots)
+
         self.Ni = clsPrm.iterations
+        Nc = clsReg.Nc; self.Nc = Nc
+        self.li2Name = clsReg.li2Name
 
-        self.l = clsPrm.attractivity
-        self.a = clsPrm.convincibility
-        self.s = clsPrm.deviation
+        dt = clsPrm.timestep; self.dt = dt
+        Nt = clsPrm.timesteps; self.Nt = Nt
 
-        self.Nc = clsReg.Nc
-        self.P  = clsPrm.totalPop
-        self.p0 = self.P/self.Nc
+        Ns = clsPrm.screenshots; self.Ns = Ns
+        ns = np.array(
+            [i*Nt/Ns for i in range(Ns+1)],
+            dtype=np.int64
+        ); self.ns = ns
 
-        self.Nt = clsPrm.stepNumber
-        self.dt = clsPrm.timeStep
-        self.Ns = 100 # Number of screenshots [not considering the initial state]
-        #endregion
+        sf = clsPrm.smoothingFactor; self.sf = sf
+        ks = int(Ns/sf); self.ks = ks # Kernerl size
+        self.times = ns[::ks]*dt
 
-        #region City size vectors
-        # Arbitrarly the index «0» is chosen to mean the exact simulation while «1» the approximate one
-        self.typ = (0,1)
-        self.lbl = ("Ext.","Apx.")
-        self.clr = ("blue","red")
+        di = np.sum(
+            clsReg.A,axis=0,
+            dtype=np.int64
+        ); self.di = di
+        # Inverse degrees
+        self.invdi = np.array(1/di,dtype=np.float64)
 
-        # Uniform initial state for all vertices
-        self.vrtState = np.ones((self.Nc,2),dtype=float)*self.p0
-        self.avrState = np.ones((self.Ns+1,2),dtype=float)*self.p0
-        self.screenshots = np.ones((self.Nc,self.Ns+1,2),dtype=float)*self.p0
+        M = np.zeros((Nc,Nc,2),dtype=np.float64)
 
-        self.ns = np.array([i*self.Nt/self.Ns for i in range(self.Ns+1)])
-        self.times = self.ns*self.dt
-        #endregion 
-
-        #region Exact [Weighted] Adjacency matrix
-        self.di = np.sum(clsReg.A,axis=0)
-        self.M = np.zeros((self.Nc,self.Nc,2),dtype=float)
-
+        # Exact [Weighted] Adjacency matrix
         if clsPrm.edgeWeights:
-            self.M[:,:,0] = clsReg.W/np.max(clsReg.W)
+            M[:,:,0] = clsReg.W/np.max(clsReg.W)
         else:
-            self.M[:,:,0] = clsReg.A
+            M[:,:,0] = clsReg.A
         
         # Approximated adjacency matrix
-        Mn = np.sum(self.M[:,:,0])
-        wO = np.sum(self.M[:,:,0],axis=1,keepdims=True)
-        wI = np.sum(self.M[:,:,0],axis=0,keepdims=True)
-        self.M[:,:,1]  = wO@wI/Mn
+        Mn = np.sum(M[:,:,0])
+        wO = np.sum(M[:,:,0],axis=1,keepdims=True)
+        wI = np.sum(M[:,:,0],axis=0,keepdims=True)
+        M[:,:,1]  = wO@wI/Mn
         # In this case wO=wI but it's better to define them in the most general way
-        #endregion
+
+        self.Mdt = M*dt
+        self.typ = np.array([0,1],dtype=np.int64)
+
+        self.lbl = ("Ext.","Apx.")
+        self.clr = ("blue","red")
 
         self.figData = libF.FigData(clsPrm,'KS')
 
     # Simulation
-    def MonteCarloAlgorithm(self):
-        ns2i = {ns:i for i,ns in enumerate(self.ns)}
-        # dt = self.dt; M = self.M
+    def MonteCarloSimulation(self):
+        Ni = self.Ni
+        Nc = self.Nc
+        p0 = self.p0
 
-        def UpdateState(vrtState): 
-           return EvolveState(
-                vrtState,self.Nc,self.dt,
-                self.M,self.l,self.a,self.di,
-                self.s,np.array(self.typ)
-            )
+        Nt = self.Nt
+        Ns = self.Ns
+        ns = self.ns
 
-        for nt in tqdm(range(self.Nt),desc="Updating states"):
-            self.vrtState = UpdateState(self.vrtState)
-            if nt+1 in ns2i:
-                for t in self.typ:
-                    self.avrState[ns2i[nt+1],t] = np.mean(self.vrtState[:,t])
-                    self.screenshots[:,ns2i[nt+1],t] = self.vrtState[:,t].copy()
+        invdi = self.invdi
+        di = self.di
 
-        self.WriteSimulationData()
+        Mdt = self.Mdt
+        l = self.l
+        a = self.a
+        s = self.s
+        il = self.il
+        typ = self.typ
 
-    def WriteSimulationData(self):
-        import zipfile as zf
-        from zipfile import ZipFile as ZF
-        from io import StringIO as sio
-        import json
+        process = range(Ni)
 
-        typ = self.typ; li2Name = self.li2Name
-        lbl = self.lbl; vrtState = self.vrtState
+        # with Manager() as mgr:
+        #     q = mgr.Queue()
 
-        si = np.argsort(vrtState,axis=0)
-        dicName2SortedPop = {
-            t:{
-                li2Name[i]:vrtState[i,t] for i in si[::-1,t]
-            } for t in typ
-        }
-        self.si = si
+        progress = np.zeros(Ni,dtype=np.int64)
+        elapsed = np.zeros(Ni,dtype=np.float64)
+        done = np.zeros(Ni,dtype=np.int8)
 
-        with ZF(
-            '../Dati/SimulationData.zip','w',
-            compression=zf.ZIP_DEFLATED,compresslevel=9
-        ) as z:
-            for t in typ:
-                buf = sio()
-                name = f'{lbl[t]}CitySizesFinal.json'
-                json.dump(list(vrtState[:,t]),buf)
-                value = buf.getvalue()
-                z.writestr(name,value)
+        shmp = shared_memory.SharedMemory(create=True,size=progress.nbytes)
+        shme = shared_memory.SharedMemory(create=True,size=elapsed.nbytes)
+        shmd = shared_memory.SharedMemory(create=True,size=done.nbytes)
 
-                buf = sio()
-                name = f'{lbl[t]}CitySizesSorted.json'
-                json.dump(dicName2SortedPop[t],buf)
-                value = buf.getvalue()
-                z.writestr(name,value)
+        np.ndarray(progress.shape,progress.dtype,shmp.buf)[:] = 0
+        np.ndarray(elapsed.shape,elapsed.dtype,shme.buf)[:] = 0
+        np.ndarray(done.shape,done.dtype,shmd.buf)[:] = 0
+
+        bar = libGUI.ProgressGUI(
+            Ni,Nt,
+            shmp.name,
+            shme.name,
+            shmd.name
+        )
+
+        ctx = mp.get_context("spawn")
+        with ProcessPoolExecutor(
+            max_workers=3,
+            mp_context=ctx
+        ) as executor:
+            futures = {}
+            for p in process:
+                futures[p] = executor.submit(
+                    MonteCarloAlgorithm,
+                    p,Ni,Nc,Ns,ns,p0,
+                    di,invdi,Mdt,
+                    l,a,s,il,typ,
+                    shmp.name,
+                    shme.name,
+                    shmd.name
+                )
+            bar.mainloop()
+
+        shmp.close(); shmp.unlink()
+        shme.close(); shme.unlink()
+        shmd.close(); shmd.unlink()
+
+        data = [None]*Ni
+        for p, fut in futures.items():
+            data[p] = fut.result()
+        self.data = data
+
+        self.EvaluateSimulationData()
+        libED.WriteSimulationData(
+            self.lbl,
+            self.siVrt,
+            self.vrtState,
+            typ,
+            self.li2Name,
+            Ni
+        )
+
+    def EvaluateSimulationData(self):
+        Ni = self.Ni
+        data = self.data
+        sf = self.sf
+        ks = self.ks
+
+        def Convolve(v):
+            Nrw, _, Nty = v.shape # Number of rows, times and types
+
+            filter = np.array([float(1/ks)]*ks)
+            sv = np.zeros((Nrw,sf+1,Nty),dtype=float) # Smoothed vector
+
+            for r in range(Nrw):
+                for t in range(Nty):
+                    sv[r,0,t] = v[r,0,t].copy()
+                    conv = np.convolve(
+                        v[r,1:,t],
+                        filter,
+                        'valid'
+                    )
+                    sv[r,1:,t] = conv[::ks].copy()
+            
+            return sv
+
+        self.vrtState = np.array([data[p][0] for p in range(Ni)])
+        screenshots = np.array([data[p][1] for p in range(Ni)])
+        self.avrState = Convolve(np.mean(screenshots,axis=1))
+
+        self.nodeAvrVrtState = np.mean(self.vrtState,axis=1)
+        self.nodeMinVrtState = np.min(self.vrtState,axis=1)
+        self.nodeMaxVrtState = np.max(self.vrtState,axis=1)
+        self.nodeSumVrtState = np.sum(self.vrtState,axis=1)
+
+        if Ni>1:
+            self.ta = stats.t.ppf(0.975,df=Ni-1)
+
+            self.itAvrVrtState = np.mean(self.vrtState,axis=0)
+            self.itAvrScreenshots = np.mean(screenshots,axis=0)
+            self.itAvrConvScreenshots = Convolve(np.mean(screenshots,axis=0))
+        else:
+            self.ta = None
+
+            self.itAvrVrtState = self.vrtState[0,:,:]
+            self.itAvrScreenshots = screenshots[0,:,:,:]
+            self.itAvrConvScreenshots = Convolve(screenshots[0,:,:,:])
+
+        self.siVrt = np.argsort(self.vrtState,axis=1)
+        self.siAvr = np.argsort(self.itAvrVrtState,axis=0)
 
     # Figures
     def SizeDistrFittingsFig(self):
-        cs = self.vrtState; typ = self.typ
-        lbl = self.lbl; clr = self.clr
-        Nc = self.Nc; Ni = self.Ni
+        Ni = self.Ni
+        Nc = self.Nc
+        ta = self.ta
+
+        cs = self.vrtState
+        csAvr = self.nodeAvrVrtState
+        csMin = self.nodeMinVrtState
+        csMax = self.nodeMaxVrtState
+        csSum = self.nodeSumVrtState
         figData = self.figData
+
+        typ = self.typ
+        lbl = self.lbl
+        clr = self.clr
 
         fig, ax = plt.subplots(1,2,figsize=(15,6))
         figData.SetFigs(2)
 
         for t in typ: # t[ype]
-            sMax = np.max(cs[:,t]); sMin = np.min(cs[:,t])
-            bins = np.logspace(np.log10(sMin),np.log10(sMax),25)
-
             ### Lognormal fit ###
             libF.CreateHistogramPlot(
-                cs[:,t],bins,figData.fig1,
-                l=f"{lbl[t]} histogram",
-                clr=clr[t],alfa=0.5,
-                idx=t+1,ax=ax[0]
+                cs[:,:,t],24,
+                figData.fig1,
+                Ni=Ni,
+                ta=ta,
+                label=f"{lbl[t]} histogram",
+                color=clr[t],
+                scale='log',
+                alpha=0.5,
+                idx=t+1,
+                ax=ax[0]
             ) # Histogram plot
+
             libF.CreateLognormalFitPlot(
-                cs[:,t],figData.fig1,
-                lAvr=fr"{lbl[t]} mean value $\langle k\rangle$",
-                lFit=f"{lbl[t]} lognormal fit (ML)",
-                clrAvr=clr[t],clrFit=clr[t],
-                idx=t+1,ax=ax[0]
+                cs[:,:,t],
+                figData.fig1,
+                Ni=Ni,
+                ta=ta,
+                labelAvr=fr"{lbl[t]} mean value $\langle k\rangle$",
+                labelFit=f"{lbl[t]} lognormal fit (ML)",
+                colorAvr=clr[t],
+                colorFit=clr[t],
+                idx=t+1,
+                ax=ax[0]
             ) # Fit plot
 
             ### Power law fit ###
             b = libF.CreateParetoFitPlot(
-                cs[:,t],figData.fig2,
-                lSct=f"{lbl[t]} empirical CCDF",
-                lFit=fr"{lbl[t]} pareto fit",
-                clrSct=clr[t],clrFit=clr[t],
-                idx=t+1,ax=ax[1]
+                cs[:,:,t],
+                figData.fig2,
+                Ni=Ni,
+                ta=ta,
+                labelSct=f"{lbl[t]} empirical CCDF",
+                labelFit=fr"{lbl[t]} pareto fit",
+                colorSct=clr[t],
+                colorFit=clr[t],
+                idx=t+1,
+                ax=ax[1]
             )
 
             fig.text(
                 .5,.975-t*.05,
-                fr"{lbl[t]}: $\quad s_{{min}}={np.min(cs[:,t]):.2f}\qquad$"
-                fr"$s_{{max}}={np.max(cs[t]):.2f}\qquad$"
-                fr"$\langle s\rangle ={np.mean(cs[t]):.2f}\qquad$"
-                fr"$s_{{\Sigma}}={np.sum(cs[t]):.2f}\qquad$"
-                fr"$\alpha={b:.2f}$",
-                ha="center",color="black"#,fontsize=10,
+                fr'{lbl[t]}:$\quad$'+
+                DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
+                DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
+                DataString(csAvr[:,t],Ni,ta,r'\langle s\rangle')+
+                DataString(csSum[:,t],Ni,ta,r's_{{\Sigma}}',format='.2e')+
+                DataString(b,Ni,ta,r'\alpha',space=False),
+                ha='center',color='black'#,fontsize=10,
             )
 
-        fig.text(.1,.95,fr"$Nc={Nc}\qquadNi={Ni}$")
-
+        fig.text(.1,.975,fr'$Nc={Nc}$',ha='center')
+        fig.text(.1,.925,fr'$Ni={Ni}$',ha='center')
 
         # Style
         libF.SetFigStyle(
-            r"$cs$",r"$P(cs)$",
-            yNotation="sci",xScale='log', # ,xNotation="sci"
+            r'$cs$',r'$P(cs)$',
+            yNotation='sci',xScale='log', # ,xNotation="sci"
             ax=ax[0],data=figData.fig1
         )
 
         libF.SetFigStyle(
-            r"$cs$",r"$P(cs)$",
-            xScale="log",yScale="log",
+            r'$cs$',r'$P(cs)$',
+            xScale='log',yScale='log',
             ax=ax[1],data=figData.fig2
         )
 
-
-        libF.CentreFig()
+        # CentreFig()
         figData.SaveFig('SizeDistributionFittings')
 
     def AverageSizeFig(self):
-        ca = self.avrState
-        lbl = self.lbl; clr = self.clr
+        Ni = self.Ni
+        ta = self.ta
+
         times = self.times
+        ca = self.avrState
         figData = self.figData
+        
+        lbl = self.lbl
+        clr = self.clr
 
         fig = plt.figure()
         figData.SetFigs(1)
 
-        # np.convolve()
         for t in self.typ:
             libF.CreateFunctionPlot(
-                times,ca[:,t],
+                times,
+                ca[:,:,t],
                 figData.fig,
-                l=rf"{lbl[t]} city size average $\langle s\rangle$",
-                clr=clr[t],idx=t+1
+                Ni=Ni,
+                ta=ta,
+                label=rf"{lbl[t]} city size average $\langle s\rangle$",
+                color=clr[t],
+                idx=t+1
             )
 
-        libF.CentreFig()
+        # CentreFig()
         libF.SetFigStyle(
             r"$t$",r"$\langle cs\rangle$",
             data=figData.fig
@@ -215,11 +342,16 @@ class KineticSimulation(): # NetworkState
         figData.SaveFig('AverageSize')
 
     def SizeVsDegreeFig(self):
-        cs = self.vrtState; typ = self.typ
-        lbl = self.lbl; clr = self.clr
-        di = self.di; si = self.si
-        li2Name = self.li2Name
+        di = self.di
+        cs = self.itAvrVrtState
         figData = self.figData
+
+        typ = self.typ
+        lbl = self.lbl
+        clr = self.clr
+
+        si = self.siAvr
+        li2Name = self.li2Name
 
         fig, ax = plt.subplots(1,2,figsize=(15,6))
         figData.SetFigs(2)
@@ -229,35 +361,46 @@ class KineticSimulation(): # NetworkState
                 libF.CreateScatterPlot(
                     di,cs[:,t],
                     getattr(figData,f'fig{i+1}'),
-                    l=lbl[t],clr=clr[t],
-                    idx=i+1,ax=ax[i]
+                    label=lbl[t],
+                    color=clr[t],
+                    idx=i+1,
+                    ax=ax[i]
                 )
 
             libF.SetFigStyle(
                 r'$k$',r'$cs(k)$',
-                yScale='log',xScale=scale,ax=ax[i],
-                data=getattr(figData,f'fig{i+1}')
+                yScale='log',xScale=scale,
+                data=getattr(figData,f'fig{i+1}'),
+                ax=ax[i]
             )
 
-        for i in range(-1,-6,-1):
-            fig.text(
-                .4,.3+i*.03,
-                fr'${li2Name[si[i,0]]}='
-                fr'{cs[si[i,0],0]:.2e}$'
-                ,
-                ha="center",
-                # fontsize=10,
-                color="black"
-            )
+        for t in typ:
+            for i in range(-1,-6,-1):
+                fig.text(
+                    .4,.5-.2*t+i*.03,
+                    DataString(
+                        cs[si[i,t],t],
+                        head=li2Name[si[i,t]],
+                        format='.2e',
+                        space=False
+                    ),
+                    ha="center",
+                    # fontsize=10,
+                    color=clr[t]
+                )
 
-        libF.CentreFig()
+        # CentreFig()
         figData.SaveFig('SizeVsDegree')
 
     def SizeDistrEvolutionFig(self):
-        screenshots = self.screenshots
-        typ = self.typ; dt = self.dt
-        ns = self.ns; Ns = self.Ns
+        screenshots = self.itAvrScreenshots
         figData = self.figData
+
+        ns = self.ns
+        Ns = self.Ns
+
+        typ = self.typ
+        dt = self.dt
 
         fig, ax = plt.subplots(1,2,figsize=(15,6))
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
@@ -270,33 +413,41 @@ class KineticSimulation(): # NetworkState
         sMax = np.max(screenshots[:,-1,:])
         # bins = np.linspace(0,sMax,26)
         sMin = np.min(screenshots[:,-1,:])
-        bins = np.logspace(np.log10(sMin),np.log10(sMax),26)
 
         for t in typ: # t[ype]
             for j,s in enumerate(np.linspace(0,Ns,samples,dtype=int)):
                 libF.CreateHistogramPlot(
-                    screenshots[:,s,t],bins,
+                    screenshots[:,s,t],21,
                     getattr(figData,f'fig{t+1}'),
-                    l=f"t = {int(ns[s]*dt)}",
-                    clr=colours[j],alfa=0.4,
-                    idx=j+1,ax=ax[t],norm=False
+                    limits=(sMin,sMax),
+                    scale='log',
+                    label=f"t = {int(ns[s]*dt)}",
+                    color=colours[j],
+                    alpha=0.4,
+                    idx=j+1,
+                    ax=ax[t],
+                    norm=False
                 ) # Histogram plot
 
             libF.SetFigStyle(
                 r"$cs$",r"$P(cs)$",
                 yNotation="sci", # ,xNotation="sci"
-                xScale='log',ax=ax[t],
+                xScale='log',
+                yScale='log',
+                ax=ax[t],
                 data=getattr(figData,f'fig{t+1}')
             ) # Style
 
-        libF.CentreFig()
+        # CentreFig()
         figData.SaveFig('SizeDistributionEvolution')
 
     def SizeEvolutionsFig(self):
-        screenshots = self.screenshots
-        Nc = self.Nc; typ = self.typ
-        figData = self.figData
+        Nc = self.Nc
+        typ = self.typ
+
         times = self.times
+        screenshots = self.itAvrConvScreenshots
+        figData = self.figData
 
         fig, ax = plt.subplots(1,2,figsize=(15,6))
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
@@ -312,8 +463,9 @@ class KineticSimulation(): # NetworkState
                 libF.CreateFunctionPlot(
                     times,screenshots[c,:,t],#/sMax
                     getattr(figData,f'fig{t+1}'),
-                    clr=colours[c],#alfa=0.4,
-                    idx=c+1,ax=ax[t]
+                    color=colours[c],#alfa=0.4,
+                    idx=c+1,
+                    ax=ax[t]
                 ) # Histogram plot
 
             libF.SetFigStyle(
@@ -323,71 +475,146 @@ class KineticSimulation(): # NetworkState
                 data=getattr(figData,f'fig{t+1}')
             ) # Style
 
-        libF.CentreFig()
+        # CentreFig()
         figData.SaveFig('SizeEvolutions')
+
+    def ShowFig(self):
+        plt.show()
 
 
 ### Auxiliary functions ###
 
-@njit
-def EvolveState(oldState,Nc,dt,M,l,a,di,s,typ):
-    newState = oldState.copy()
+def MonteCarloAlgorithm(
+    p,Ni,Nc,Ns,ns,p0,
+    di,invdi,Mdt,
+    l,a,s,il,typ,
+    namep,namee,named
+):
+    # Uniform initial state for all vertices
+    vrtState = np.full((Nc,2),p0,dtype=np.float64)
+    screenshots = np.full((Nc,Ns+1,2),p0,dtype=np.float64)
 
-    P = np.random.permutation(Nc)
-    halfNc = int(np.floor(Nc/2))
-    pi = P[:halfNc]; pr = P[halfNc:]
+    nk = ns[1]
+    nsid = 1
 
-    for i in range(halfNc):
-        for t in typ:
-            # It's assumed node pi(i) is the interacting node while node ps(i) is the receiving one
+    shmp = shared_memory.SharedMemory(name=namep)
+    shme = shared_memory.SharedMemory(name=namee)
+    shmd = shared_memory.SharedMemory(name=named)
 
-            p = M[pi[i],pr[i],t]*dt
-            p = 1 if p>1 else (0 if p<0 else p)
+    try:
+        progress = np.ndarray((Ni,),dtype=np.int64,buffer=shmp.buf)
+        elapsed = np.ndarray((Ni,),dtype=np.float64,buffer=shme.buf)
+        done = np.ndarray((Ni,),dtype=np.int8,buffer=shmd.buf)
 
+        EvolveState(
+            vrtState,
+            Nc,nk,Mdt,
+            l,a,s,il,
+            di,invdi,typ
+        ) # Warm-up iteration to avoid polluting the initial time t0
+        screenshots[:,nsid,0] = vrtState[:,0]
+        screenshots[:,nsid,1] = vrtState[:,1]
+        nsid += 1
+
+        t0 = time.perf_counter()
+        for ns in range(Ns-1):
+            EvolveState(
+                vrtState,
+                Nc,nk,Mdt,
+                l,a,s,il,
+                di,invdi,typ
+            )
+
+            progress[p] = (ns+2)*nk
+            elapsed[p] = time.perf_counter()-t0
+            # q.put((p,(ns+2)*nk,time.perf_counter()-t0))
+
+            screenshots[:,nsid,0] = vrtState[:,0]
+            screenshots[:,nsid,1] = vrtState[:,1]
+            nsid += 1
+
+        progress[p] = Ns*nk
+        elapsed[p] = time.perf_counter()-t0
+        done[p] = True
+        # q.put((p,'done',time.perf_counter()-t0))
+
+        return vrtState, screenshots
+
+    finally:
+        shmp.close()
+        shme.close()
+        shmd.close()
+
+@njit(cache=True)
+def EvolveState(
+    cs,Nc,nk,Mdt,
+    l,a,s,il,
+    di,idi,typ
+):
+    for _ in range(nk):
+        P = np.random.permutation(Nc)
+        halfNc = Nc//2
+        pi = P[:halfNc]; pr = P[halfNc:]
+
+        for i in range(halfNc):
+            # t = 0
+            p = Mdt[pi[i],pr[i],0]
             theta = np.random.binomial(1,p)
-            si = oldState[pi[i],t]; sr = oldState[pr[i],t]
+            if theta == 1:
+                # si = oldState[pi[i],0]; sr = oldState[pr[i],0]
+                si = cs[pi[i],0]; sr = cs[pr[i],0]
+                e = NonLinearEmigration(si,pi[i],sr,pr[i],di,idi,il,l,a)
+                ga = StochasticFluctuations(s,e)
 
-            E = NonLinearEmigration(si,pi[i],sr,pr[i],l,a,di)
-            ga = StochasticFluctuations(s,E)
+                cs[pi[i],0] = si*(1-e+ga) 
+                cs[pr[i],0] = sr+si*e
 
-            newState[pi[i],t] = si*(1-theta)+theta*si*(1-E+ga) 
-            newState[pr[i],t] = sr*(1-theta)+theta*(sr+si*E)
+            # t = 1
+            p = Mdt[pi[i],pr[i],1]
+            theta = np.random.binomial(1,p)
+            if theta == 1:
+                # si = oldState[pi[i],1]; sr = oldState[pr[i],1]
+                si = cs[pi[i],1]; sr = cs[pr[i],1]
+                e = NonLinearEmigration(si,pi[i],sr,pr[i],di,idi,il,l,a)
+                ga = StochasticFluctuations(s,e)
 
-    return newState
+                cs[pi[i],1] = si*(1-e+ga) 
+                cs[pr[i],1] = sr+si*e
 
-@njit
+            # p = 1 if p>1 else (0 if p<0 else p)
+
+@njit(cache=True)
 def NonLinearEmigration(
         si,ii, # Interacting city size
         sr,ir, # Receiving city size
-        l,a,di
+        di,idi,
+        il,l,a
     ):
+    if si <= 0: return 0
 
-    if si != 0:
-        # 4
-        # rsk = (sr/si)*(di[ir]/di[ii]) # Relative population ratio
-        # efl = l*(rsk**a)/(1+rsk**a)    # Actual emigration rate for the lumping fraction
+    if il == 0:
+        rs = sr/si                 # Relative population ratio
+        return l*(rs**a)/(1+rs**a) # Actual emigration rate
 
-        # rsk = (si/sr)*(di[ii]/di[ir]) # Inverse relative population ratio
-        # efs = l*(rsk**a)/(1+rsk**a)    # Actual emigration rate for the separation fraction
+    elif il == 1:
+        rsk = (sr/si)*(di[ir]*idi[ii]) # Relative population ratio
+        return l*(rsk/a)/(1+rsk/a)   # Actual emigration rate
 
-        # z = .1
-        # return (1-z)*efl+z*efs
+    elif il == 2:
+        rsk = (sr/si)*(di[ir]*idi[ii]) # Relative population ratio
+        return l*(rsk**a)/(1+rsk**a)  # Actual emigration rate
 
-        #3
-        rsk = (sr/si)*(di[ir]/di[ii]) # Relative population ratio
-        return l*(rsk**a)/(1+rsk**a)   # Actual emigration rate
-
-        # 2
-        # rs = (sr/si)*(di[ir]/di[ii]) # Relative population ratio
-        # return l*(rsk/a)/(1+rsk/a)     # Actual emigration rate
-
-        # 1
-        # rs = sr/si                 # Relative population ratio
-        # return l*(rs**a)/(1+rs**a) # Actual emigration rate
     else:
-        return 0
+        rsk = (sr/si)*(di[ir]*idi[ii]) # Relative population ratio
+        efl = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the lumping fraction
 
-@njit
+        rsk = (si/sr)*(di[ii]*idi[ir]) # Inverse relative population ratio
+        efs = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the separation fraction
+
+        z = .1
+        return (1-z)*efl+z*efs
+
+@njit(cache=True)
 def StochasticFluctuations(sigma,E):
     alpha = ((1-E)**2)/(sigma**2)
     theta = (sigma**2)/(1-E)
@@ -399,14 +626,78 @@ def StochasticFluctuations(sigma,E):
 
     return ga+E-1 # Final left translation
 
+def DataString(
+    data,
+    Ni=1,
+    ta=None,
+    head='',
+    format='.2f',
+    space=True
+):
+    (value,error) = libF.EvaluateConfidenceInterval(data,ta,Ni)
+    
+    space = r'\qquad' if space else ''
+    if error is None:
+        return fr'${head}={value:{format}}{space}$'
+    else:
+        return fr'${head}={value:{format}}\pm{error:.2f}{space}$'
+
+
 ### Discarded code ###
 
 #region Old implementation for fluctuations with a [forcefully] resampled Gaussian until the value picked ensures the post-interaction population is positive
-    # def StochasticFluctuations(sigma,E):
-    #     while True:
-    #         mu = np.random.normal(0,sigma,size=1)
-    #         if mu>E-1: #and mu<E:
-    #             break
-    #     # The conditions «mu>E-1» and «mu<E» are necessary to have the total emigration rage 1-E+μ between 0 and 1
-    #     return mu
+"""
+    def StochasticFluctuations(sigma,E):
+        while True:
+            mu = np.random.normal(0,sigma,size=1)
+            if mu>E-1: #and mu<E:
+                break
+        # The conditions «mu>E-1» and «mu<E» are necessary to have the total emigration rage 1-E+μ between 0 and 1
+        return mu
+"""
 #endregion I save it since I find it an interesting wrong approach
+
+#region Old implementation for the progress bar from «MonteCarloAlgorithm()» insinde the terminal, which can only be used with one process
+"""
+    bar = tqdm(
+        range(Nt),
+        desc=f"Updating states {p}",
+        position=p,
+        leave=False,
+        dynamic_ncols=True,
+        # ascii=True,
+        mininterval=0.2,
+        smoothing=0.5,
+        miniters=100
+    )
+    if (nt+1) % 100 == 0:
+        bar.update(100)
+"""
+#endregion
+
+#region Alternative with the «.map()» method in «MonteCarloSimulation()» which cannot be used with «libGUI.ProgessGUI()»
+"""
+    self.data = list(
+        executor.map(
+            RunSingleProcess,
+            [clsPrm]*Ni,
+            [clsReg]*Ni
+        )
+    )
+"""
+#endregion
+
+#region Progress bar selection
+"""
+if clsPrm.progressBar:
+else:
+    with ProcessPoolExecutor(max_workers=3) as executor:
+        futures = {}
+        for p in process:
+            futures[p] = executor.submit(
+                MonteCarloAlgorithm,
+                clsPrm,clsReg,p,di,
+                np.array(typ,dtype=np.int64)
+            )
+"""
+#endregion

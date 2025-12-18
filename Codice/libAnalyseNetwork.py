@@ -1,12 +1,8 @@
 
 import numpy as np
-from scipy.stats import lognorm, linregress
 import networkx as nx
 
-import matplotlib as mpl
-mpl.use('TkAgg')
 import matplotlib.pyplot as plt
-import mpld3
 
 import importlib
 import libFigures as libF
@@ -41,9 +37,10 @@ class NetworkAnalysis():
 
     def DegreeDistributionFig(self):
         di = self.di
+        figData = self.figData
 
         fig = plt.figure()
-        self.figData.SetFigs(1)
+        figData.SetFigs(1)
 
         kAvr = np.mean(di)
         fig.text(
@@ -60,7 +57,7 @@ class NetworkAnalysis():
 
 
         # Histogram plot
-        libF.CreateHistogramPlot(di,25,self.figData.fig)
+        libF.CreateHistogramPlot(di,25,figData.fig)
 
         #region
             # Scatter plot
@@ -99,36 +96,37 @@ class NetworkAnalysis():
 
 
         # SciPy fitting (ML)
-        libF.CreateLognormalFitPlot(di,self.figData.fig)
+        libF.CreateLognormalFitPlot(di,figData.fig)
 
 
         # Style
-        libF.CentreFig()
+        # libF.CentreFig()
         libF.SetFigStyle(
             r"$k$",r"$P(k)$",
             [0,300],[0,0.03],
-            data=self.figData.fig
+            data=figData.fig
         )
-        self.figData.SaveFig('DegreeDistribution')
+        figData.SaveFig('DegreeDistribution')
 
     def WeightDistributionFig(self):
         wi = self.wi
+        figData = self.figData
 
         fig = plt.figure()
-        self.figData.SetFigs(1)
+        figData.SetFigs(1)
 
 
         # Histogram plot
-        hgPlot = libF.CreateHistogramPlot(wi,20,self.figData.fig,scale='log')
+        binw, binPw = libF.CreateHistogramPlot(wi,19,figData.fig,scale='log')
 
 
         # SciPy regression
-        binw = (hgPlot[1][1:]+hgPlot[1][:-1])/2
-        binPw = hgPlot[0]
+        # binw = (hgPlot[1][1:]+hgPlot[1][:-1])/2
+        # binPw = hgPlot[0]
         # sc = plt.scatter(binw,binPw,c='r',s=50)
 
         # Fit in log–log space
-        slope = libF.CreateLogRegressionPlot(binw,binPw,self.figData.fig)
+        slope = libF.CreateLogRegressionPlot(binw,binPw,figData.fig)
 
         kAvr = np.mean(wi)
         fig.text(
@@ -144,33 +142,34 @@ class NetworkAnalysis():
 
 
         # Style
-        libF.CentreFig()
+        # libF.CentreFig()
         libF.SetFigStyle(
             r"$w$",r"$P(w)$",
             xScale="log",yScale="log",
-            data=self.figData.fig
+            data=figData.fig
         )
-        self.figData.SaveFig('WeightDistribution')
+        figData.SaveFig('WeightDistribution')
 
     def StrengthDistributionFig(self):
         si = self.si
+        figData = self.figData
 
         fig = plt.figure()
-        self.figData.SetFigs(1)
+        figData.SetFigs(1)
 
 
         # Histogram plot
-        hgPlot = libF.CreateHistogramPlot(si,20,self.figData.fig,scale='log')
+        bins, binPs = libF.CreateHistogramPlot(si,20,figData.fig,scale='log')
 
 
         # SciPy regression
-        bins = (hgPlot[1][1:]+hgPlot[1][:-1])/2
-        binPs = hgPlot[0]
+        # bins = (hgPlot[1][1:]+hgPlot[1][:-1])/2
+        # binPs = hgPlot[0]
         # sc = plt.scatter(binw,binPw,c='r',s=50)
 
         # Fit in log–log space
         v = binPs>0; v[:6] = 0
-        slope = libF.CreateLogRegressionPlot(bins[v],binPs[v],self.figData.fig)
+        slope = libF.CreateLogRegressionPlot(bins[v],binPs[v],figData.fig)
 
         kAvr = np.mean(si)
         fig.text(
@@ -186,19 +185,21 @@ class NetworkAnalysis():
 
 
         # Style
-        libF.CentreFig()
+        # libF.CentreFig()
         libF.SetFigStyle(
             r"$s$",r"$P(s)$",
             xScale="log",yScale="log",
-            data=self.figData.fig
+            data=figData.fig
         )
-        self.figData.SaveFig('StrengthDistribution')
+        figData.SaveFig('StrengthDistribution')
 
     def BetweennessCentralityFig(self):
-        A = self.A; di = self.di
+        A = self.A
+        di = self.di
+        figData = self.figData
 
         fig = plt.figure()
-        self.figData.SetFigs(1)
+        figData.SetFigs(1)
         
         G = nx.from_numpy_array(A)
         bc = nx.betweenness_centrality(G,normalized=False)
@@ -215,11 +216,15 @@ class NetworkAnalysis():
             color="black"
         )
 
-        libF.CreateScatterPlot(di,bcd,self.figData.fig,l='')
+        libF.CreateScatterPlot(
+            di,bcd,
+            self.figData.fig,
+            label=''
+        )
 
 
         # Style
-        libF.CentreFig()
+        # libF.CentreFig()
         libF.SetFigStyle(
             r"$k$",r"$g(i)$",
             # [0.5e1,0.5e3],[1,0.5e5],
@@ -229,11 +234,14 @@ class NetworkAnalysis():
         self.figData.SaveFig('BetweennessCentrality')
 
     def StrengthVsDegreeFig(self):
-        si = self.si; di = self.di
-        dk = self.dk; Nk = self.Nk
+        si = self.si
+        di = self.di
+        dk = self.dk
+        Nk = self.Nk
+        figData = self.figData
 
         fig = plt.figure()
-        self.figData.SetFigs(1)
+        figData.SetFigs(1)
 
 
         # Scatter
@@ -243,10 +251,10 @@ class NetworkAnalysis():
             sk[i] = np.sum(si[v])
             sk[i] /= Nk[i]
 
-        libF.CreateScatterPlot(dk,sk,self.figData.fig)
+        libF.CreateScatterPlot(dk,sk,figData.fig)
 
         # Fit in log–log space
-        slope = libF.CreateLogRegressionPlot(dk,sk,self.figData.fig)
+        slope = libF.CreateLogRegressionPlot(dk,sk,figData.fig)
 
         sAvr = np.mean(si)
         fig.text(
@@ -262,20 +270,23 @@ class NetworkAnalysis():
 
 
         # Style
-        libF.CentreFig()
+        # libF.CentreFig()
         libF.SetFigStyle(
             r"$k$",r"$s(k)$",
             xScale="log",yScale="log",
-            data=self.figData.fig
+            data=figData.fig
         )
-        self.figData.SaveFig('StrengthVsDegree')
+        figData.SaveFig('StrengthVsDegree')
 
     def AClusteringCoefficientFig(self):
-        A = self.A; di = self.di
-        dk = self.dk; Nk = self.Nk
+        A = self.A
+        di = self.di
+        dk = self.dk
+        Nk = self.Nk
+        figData = self.figData
 
         fig = plt.figure()
-        self.figData.SetFigs(1)
+        figData.SetFigs(1)
         
         G = nx.from_numpy_array(A)
         Cd = nx.clustering(G)
@@ -326,24 +337,31 @@ class NetworkAnalysis():
             color="black"
         )
 
-        libF.CreateScatterPlot(dk,Ck,self.figData.fig,l='')
+        libF.CreateScatterPlot(dk,Ck,figData.fig,label='')
 
         # Style
-        libF.CentreFig()
+        # libF.CentreFig()
         libF.SetFigStyle(
             r"$k$",r"$C(k)$",
             [0,300],[0,0.8],
-            data=self.figData.fig
+            data=figData.fig
         )
-        self.figData.SaveFig('AClusteringCoefficient')
+        figData.SaveFig('AClusteringCoefficient')
 
     def WClusteringCoefficientFig(self):
-        A = self.A; W = self.W;
-        si = self.si; di = self.di; dk = self.dk
-        Nk = self.Nk; Ck = self.Ck
+        A = self.A
+        W = self.W
+
+        si = self.si
+        di = self.di
+        dk = self.dk
+        Nk = self.Nk
+        Ck = self.Ck
+
+        figData = self.figData
 
         fig, ax = plt.subplots(2,1)
-        self.figData.SetFigs(2)
+        figData.SetFigs(2)
 
 
         # Manual counting
@@ -369,36 +387,40 @@ class NetworkAnalysis():
             v = (di == ki)
             Ckw[i] = np.sum(Cd[v])/Nk[i]
 
-        libF.CreateScatterPlot(dk,Ckw,self.figData.fig1,l='',ax=ax[0])
+        libF.CreateScatterPlot(dk,Ckw,figData.fig1,label='',ax=ax[0])
 
         # Style
         libF.SetFigStyle(
             r"$k$",r"$C^w(k)$",
-            xScale="log",ax=ax[0],
-            data=self.figData.fig1
+            xScale="log",
+            ax=ax[0],
+            data=figData.fig1
         )
 
 
         CkwRel= (Ckw-Ck)/Ck
-        libF.CreateScatterPlot(dk,CkwRel,self.figData.fig2,l='',ax=ax[1])
+        libF.CreateScatterPlot(dk,CkwRel,figData.fig2,label='',ax=ax[1])
         self.CkwRel = CkwRel
 
         # Style
         libF.SetFigStyle(
             r"$k$",r"$C^w_{\text{rel}}(k)$",
             xScale="log",yScale="log",
-            ax=ax[1],data=self.figData.fig2
+            ax=ax[1],
+            data=figData.fig2
         )
 
 
-        libF.CentreFig()
-        self.figData.SaveFig('WClusteringCoefficient')
+        # libF.CentreFig()
+        figData.SaveFig('WClusteringCoefficient')
 
     def AAssortativityFig(self):
-        A = self.A; dk = self.dk
+        A = self.A
+        dk = self.dk
+        figData = self.figData
 
         fig = plt.figure()
-        self.figData.SetFigs(1)
+        figData.SetFigs(1)
         
         G = nx.from_numpy_array(A)
         ad = nx.average_neighbor_degree(G)
@@ -416,24 +438,27 @@ class NetworkAnalysis():
         )
 
         knn = np.array([ak[ki] for ki in dk])
-        libF.CreateScatterPlot(dk,knn,self.figData.fig,l='')
+        libF.CreateScatterPlot(dk,knn,figData.fig,label='')
         self.knn = knn
 
 
         # Style
-        libF.CentreFig()
+        # libF.CentreFig()
         libF.SetFigStyle(
             r"$k$",r"$k_{nn}(k)$",
             [0,300],[40,95],
-            data=self.figData.fig
+            data=figData.fig
         )
-        self.figData.SaveFig('AAssortativity')
+        figData.SaveFig('AAssortativity')
 
     def WAssortativityFig(self):
-        W = self.W; dk = self.dk; knn = self.knn
+        W = self.W
+        dk = self.dk
+        knn = self.knn
+        figData = self.figData
 
         fig, ax = plt.subplots(2,1)
-        self.figData.SetFigs(2)
+        figData.SetFigs(2)
 
         Gw = nx.from_numpy_array(W)
         # adw = nx.average_neighbor_degree(Gw,weight="weight")
@@ -441,30 +466,31 @@ class NetworkAnalysis():
 
 
         knnw = np.array([akw[ki] for ki in dk])
-        libF.CreateScatterPlot(dk,knnw,self.figData.fig1,l='',ax=ax[0])
+        libF.CreateScatterPlot(dk,knnw,figData.fig1,label='',ax=ax[0])
 
         # Style
         libF.SetFigStyle(
             r"$k$",r"$k_{nn}^w(k)$",
             xScale="log",yScale="log",
-            ax=ax[0],data=self.figData.fig1
+            ax=ax[0],
+            data=figData.fig1
         )
 
 
         knnwRel = (knnw-knn)/knn
-        libF.CreateScatterPlot(dk,knnwRel,self.figData.fig2,l='',ax=ax[1])
+        libF.CreateScatterPlot(dk,knnwRel,figData.fig2,label='',ax=ax[1])
 
         # Style
         libF.SetFigStyle(
             r"$k$",r"$k_{nn,rel}^w(k)$",
             xScale="log",yScale="log",
-            ax=ax[1],data=self.figData.fig2
+            ax=ax[1],
+            data=figData.fig2
         )
 
 
-        libF.CentreFig()
-        self.figData.SaveFig('WAssortativity')
+        # libF.CentreFig()
+        figData.SaveFig('WAssortativity')
 
     def ShowFig(self):
         plt.show()
-        mpld3.show()
