@@ -9,7 +9,8 @@ import multiprocessing as mp
 from multiprocessing import shared_memory
 # from tqdm import tqdm
 
-import matplotlib.pyplot as plt
+from matplotlib.pyplot import get_cmap
+from matplotlib.colors import LogNorm
 
 import importlib
 
@@ -81,8 +82,9 @@ class KineticSimulation():
         self.Mdt = M*dt
         self.typ = np.array([0,1],dtype=np.int64)
 
-        self.lbl = ("Ext.","Apx.")
-        self.clr = ("blue","red")
+        self.lbl = ('Ext.','Apx.')
+        self.clr = ('#0072B2','#D55E00')
+        # self.clr = ('blue','red')
 
         self.figData = libF.FigData(clsPrm,'KS')
 
@@ -107,9 +109,6 @@ class KineticSimulation():
         typ = self.typ
 
         process = range(Ni)
-
-        # with Manager() as mgr:
-        #     q = mgr.Queue()
 
         progress = np.zeros(Ni,dtype=np.int64)
         elapsed = np.zeros(Ni,dtype=np.float64)
@@ -141,7 +140,7 @@ class KineticSimulation():
                     MonteCarloAlgorithm,
                     p,Ni,Nc,Ns,ns,p0,
                     di,invdi,Mdt,
-                    l,a,s,il,typ,
+                    l,a,s,il,typ.size,
                     shmp.name,
                     shme.name,
                     shmd.name
@@ -227,26 +226,28 @@ class KineticSimulation():
         csMin = self.nodeMinVrtState
         csMax = self.nodeMaxVrtState
         csSum = self.nodeSumVrtState
-        figData = self.figData
 
         typ = self.typ
         lbl = self.lbl
         clr = self.clr
 
-        fig, ax = plt.subplots(1,2,figsize=(15,6))
-        figData.SetFigs(2)
+        figData = self.figData
+        fig, ax = figData.SetFigs(1,2,size=(15,6))
+
+        sMax = cs.max(); sMin = cs.min()
 
         for t in typ: # t[ype]
             ### Lognormal fit ###
             libF.CreateHistogramPlot(
-                cs[:,:,t],24,
+                cs[:,:,t],30,
                 figData.fig1,
+                limits=(sMin,sMax),
+                scale='log',
                 Ni=Ni,
                 ta=ta,
                 label=f"{lbl[t]} histogram",
                 color=clr[t],
-                scale='log',
-                alpha=0.5,
+                alpha=(0.35,0.45),
                 idx=t+1,
                 ax=ax[0]
             ) # Histogram plot
@@ -254,12 +255,16 @@ class KineticSimulation():
             libF.CreateLognormalFitPlot(
                 cs[:,:,t],
                 figData.fig1,
+                limits=(sMin,sMax),
+                scale='log',
                 Ni=Ni,
                 ta=ta,
-                labelAvr=fr"{lbl[t]} mean value $\langle k\rangle$",
-                labelFit=f"{lbl[t]} lognormal fit (ML)",
-                colorAvr=clr[t],
-                colorFit=clr[t],
+                label=(
+                    fr"{lbl[t]} mean value $\langle k\rangle$",
+                    f"{lbl[t]} lognormal fit (ML)"
+                ),
+                color=(clr[t],clr[t]),
+                alpha=(1,0.15),
                 idx=t+1,
                 ax=ax[0]
             ) # Fit plot
@@ -268,12 +273,15 @@ class KineticSimulation():
             b = libF.CreateParetoFitPlot(
                 cs[:,:,t],
                 figData.fig2,
+                upperbound=sMax,
                 Ni=Ni,
                 ta=ta,
-                labelSct=f"{lbl[t]} empirical CCDF",
-                labelFit=fr"{lbl[t]} pareto fit",
-                colorSct=clr[t],
-                colorFit=clr[t],
+                label=(
+                    f"{lbl[t]} empirical CCDF",
+                    fr"{lbl[t]} pareto fit"
+                ),
+                color=(clr[t],clr[t]),
+                alpha=((0.6,0.3),(1,0.15)),
                 idx=t+1,
                 ax=ax[1]
             )
@@ -284,9 +292,12 @@ class KineticSimulation():
                 DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
                 DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
                 DataString(csAvr[:,t],Ni,ta,r'\langle s\rangle')+
-                DataString(csSum[:,t],Ni,ta,r's_{{\Sigma}}',format='.2e')+
+                DataString(
+                    csSum[:,t],Ni,ta,r's_{{\Sigma}}',
+                    formatVal='.2e',formatErr='.2e'
+                )+
                 DataString(b,Ni,ta,r'\alpha',space=False),
-                ha='center',color='black'#,fontsize=10,
+                ha='center',color=clr[t]
             )
 
         fig.text(.1,.975,fr'$Nc={Nc}$',ha='center')
@@ -314,13 +325,12 @@ class KineticSimulation():
 
         times = self.times
         ca = self.avrState
-        figData = self.figData
         
         lbl = self.lbl
         clr = self.clr
 
-        fig = plt.figure()
-        figData.SetFigs(1)
+        figData = self.figData
+        fig = figData.SetFigs()
 
         for t in self.typ:
             libF.CreateFunctionPlot(
@@ -331,6 +341,7 @@ class KineticSimulation():
                 ta=ta,
                 label=rf"{lbl[t]} city size average $\langle s\rangle$",
                 color=clr[t],
+                alpha=(1,0.15),
                 idx=t+1
             )
 
@@ -344,7 +355,6 @@ class KineticSimulation():
     def SizeVsDegreeFig(self):
         di = self.di
         cs = self.itAvrVrtState
-        figData = self.figData
 
         typ = self.typ
         lbl = self.lbl
@@ -353,8 +363,8 @@ class KineticSimulation():
         si = self.siAvr
         li2Name = self.li2Name
 
-        fig, ax = plt.subplots(1,2,figsize=(15,6))
-        figData.SetFigs(2)
+        figData = self.figData
+        fig, ax = figData.SetFigs(1,2,size=(15,6))
 
         for i,scale in enumerate(['lin','log']):
             for t in typ:
@@ -363,7 +373,7 @@ class KineticSimulation():
                     getattr(figData,f'fig{i+1}'),
                     label=lbl[t],
                     color=clr[t],
-                    idx=i+1,
+                    idx=t+1,
                     ax=ax[i]
                 )
 
@@ -381,7 +391,7 @@ class KineticSimulation():
                     DataString(
                         cs[si[i,t],t],
                         head=li2Name[si[i,t]],
-                        format='.2e',
+                        formatVal='.2e',
                         space=False
                     ),
                     ha="center",
@@ -394,24 +404,22 @@ class KineticSimulation():
 
     def SizeDistrEvolutionFig(self):
         screenshots = self.itAvrScreenshots
-        figData = self.figData
 
         ns = self.ns
         Ns = self.Ns
 
-        typ = self.typ
         dt = self.dt
+        typ = self.typ
 
-        fig, ax = plt.subplots(1,2,figsize=(15,6))
+        figData = self.figData
+        fig, ax = figData.SetFigs(1,2,size=(15,6))
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
-        figData.SetFigs(2)
 
         samples = 6
-        clrmap = plt.get_cmap('plasma')
+        clrmap = get_cmap('inferno') # magma
         colours = [clrmap(i/(samples-1)) for i in range(samples)]
 
         sMax = np.max(screenshots[:,-1,:])
-        # bins = np.linspace(0,sMax,26)
         sMin = np.min(screenshots[:,-1,:])
 
         for t in typ: # t[ype]
@@ -422,7 +430,7 @@ class KineticSimulation():
                     limits=(sMin,sMax),
                     scale='log',
                     label=f"t = {int(ns[s]*dt)}",
-                    color=colours[j],
+                    color=colours[j][:-1],
                     alpha=0.4,
                     idx=j+1,
                     ax=ax[t],
@@ -447,24 +455,42 @@ class KineticSimulation():
 
         times = self.times
         screenshots = self.itAvrConvScreenshots
+
+        di = self.di
+        sf = self.sf
+
         figData = self.figData
-
-        fig, ax = plt.subplots(1,2,figsize=(15,6))
+        fig, ax = figData.SetFigs(1,2,size=(15,6))
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
-        figData.SetFigs(2)
 
-        clrmap = plt.get_cmap('plasma')
-        colours = [clrmap(i/(Nc-1)) for i in range(Nc)]
+        dk, _ = np.unique(di,return_counts=True); Nk = dk.size
+        screenshotsk = np.zeros((Nk,sf+1,2),dtype=np.float64)
+        for i,k in enumerate(dk):
+            bk = di == k
+            screenshotsk[i,:,:] = screenshots[bk,:,:].mean(axis=0)
 
-        # sMax = np.max(screenshots[:,-1,:])
+        clrmap = get_cmap('inferno') # magma
+        # colours = [clrmap(i/(Nc-1)) for i in range(Nc)]
+        labels = ['']*Nk
+        idx = np.linspace(0,Nk-1,6,dtype=np.int64)
+        for i in idx: labels[i] = f'k={dk[i]}'
 
         for t in typ: # t[ype]
-            for c in range(Nc):
+            norm = LogNorm(
+                vmin=screenshotsk[:,-1,t].min(),
+                vmax=screenshotsk[:,-1,t].max(),
+            )
+            colours = clrmap(norm(screenshotsk[:,-1,t]))
+
+            for k in range(Nk):
                 libF.CreateFunctionPlot(
-                    times,screenshots[c,:,t],#/sMax
+                    times,screenshotsk[k,:,t],
                     getattr(figData,f'fig{t+1}'),
-                    color=colours[c],#alfa=0.4,
-                    idx=c+1,
+                    color=colours[k,:],
+                    alpha=0.8,
+                    linewidth=1,
+                    label=labels[k],
+                    idx=k+1,
                     ax=ax[t]
                 ) # Histogram plot
 
@@ -479,7 +505,9 @@ class KineticSimulation():
         figData.SaveFig('SizeEvolutions')
 
     def ShowFig(self):
-        plt.show()
+        from matplotlib.pyplot import show
+        show()
+
 
 
 ### Auxiliary functions ###
@@ -490,9 +518,13 @@ def MonteCarloAlgorithm(
     l,a,s,il,typ,
     namep,namee,named
 ):
+    # rng = np.random.default_rng() # Even though it's recommended by Numpy it is not efficiently implemented in Numba, hence it halves the iterations per second if used
+
     # Uniform initial state for all vertices
-    vrtState = np.full((Nc,2),p0,dtype=np.float64)
-    screenshots = np.full((Nc,Ns+1,2),p0,dtype=np.float64)
+    vrtState = np.full((Nc,typ),p0,dtype=np.float64)
+    screenshots = np.full((Nc,Ns+1,typ),p0,dtype=np.float64)
+
+    P = np.arange(Nc,dtype=np.int64)
 
     nk = ns[1]
     nsid = 1
@@ -507,10 +539,9 @@ def MonteCarloAlgorithm(
         done = np.ndarray((Ni,),dtype=np.int8,buffer=shmd.buf)
 
         EvolveState(
-            vrtState,
-            Nc,nk,Mdt,
-            l,a,s,il,
-            di,invdi,typ
+            vrtState,P,Nc,
+            nk,Mdt,l,a,s,il,
+            di,invdi#,rng
         ) # Warm-up iteration to avoid polluting the initial time t0
         screenshots[:,nsid,0] = vrtState[:,0]
         screenshots[:,nsid,1] = vrtState[:,1]
@@ -519,10 +550,9 @@ def MonteCarloAlgorithm(
         t0 = time.perf_counter()
         for ns in range(Ns-1):
             EvolveState(
-                vrtState,
-                Nc,nk,Mdt,
-                l,a,s,il,
-                di,invdi,typ
+                vrtState,P,Nc,
+                nk,Mdt,l,a,s,il,
+                di,invdi,#rng
             )
 
             progress[p] = (ns+2)*nk
@@ -547,41 +577,60 @@ def MonteCarloAlgorithm(
 
 @njit(cache=True)
 def EvolveState(
-    cs,Nc,nk,Mdt,
-    l,a,s,il,
-    di,idi,typ
+    cs,P,Nc,nk,
+    Mdt,l,a,s,il,
+    di,idi#,rng
 ):
     for _ in range(nk):
-        P = np.random.permutation(Nc)
-        halfNc = Nc//2
-        pi = P[:halfNc]; pr = P[halfNc:]
+        FYDInPlaceShuffle(P,Nc)
+        # P = np.random.permutation(Nc)
+        # pi = P[:hNc]; pr = P[hNc:]
 
-        for i in range(halfNc):
+        hNc = Nc//2 # Nc half
+        for i in range(hNc):
+            ii = P[i]; ir = P[i+hNc]
+
             # t = 0
-            p = Mdt[pi[i],pr[i],0]
-            theta = np.random.binomial(1,p)
+            p = Mdt[ii,ir,0]
+            theta = np.random.random() < p
+
             if theta == 1:
-                # si = oldState[pi[i],0]; sr = oldState[pr[i],0]
-                si = cs[pi[i],0]; sr = cs[pr[i],0]
-                e = NonLinearEmigration(si,pi[i],sr,pr[i],di,idi,il,l,a)
+                si = cs[ii,0]; sr = cs[ir,0]
+
+                e = NonLinearEmigration(si,ii,sr,ir,di,idi,il,l,a)
                 ga = StochasticFluctuations(s,e)
 
-                cs[pi[i],0] = si*(1-e+ga) 
-                cs[pr[i],0] = sr+si*e
+                cs[ii,0] = si*(1-e+ga) 
+                cs[ir,0] = sr+si*e
 
             # t = 1
-            p = Mdt[pi[i],pr[i],1]
-            theta = np.random.binomial(1,p)
+            p = Mdt[ii,ir,1]
+            theta = np.random.random() < p
+
             if theta == 1:
-                # si = oldState[pi[i],1]; sr = oldState[pr[i],1]
-                si = cs[pi[i],1]; sr = cs[pr[i],1]
-                e = NonLinearEmigration(si,pi[i],sr,pr[i],di,idi,il,l,a)
+                si = cs[ii,1]; sr = cs[ir,1]
+
+                e = NonLinearEmigration(si,ii,sr,ir,di,idi,il,l,a)
                 ga = StochasticFluctuations(s,e)
 
-                cs[pi[i],1] = si*(1-e+ga) 
-                cs[pr[i],1] = sr+si*e
+                cs[ii,1] = si*(1-e+ga) 
+                cs[ir,1] = sr+si*e
 
             # p = 1 if p>1 else (0 if p<0 else p)
+            # theta = np.random.binomial(1,p)
+
+@njit(cache=True)
+def FYDInPlaceShuffle(v,n):
+    for i in range(n-1,0,-1):
+        j = np.random.randint(0,i+1)
+        tmp = v[i]
+        v[i] = v[j]
+        v[j] = tmp
+
+        # In randint i+1 is necessary to include the i-th index
+
+    # Fisher–Yates–Durstenfeld [in-place] shuffle
+    # https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
 
 @njit(cache=True)
 def NonLinearEmigration(
@@ -605,6 +654,8 @@ def NonLinearEmigration(
         return l*(rsk**a)/(1+rsk**a)  # Actual emigration rate
 
     else:
+        if sr <= 0: return 0
+
         rsk = (sr/si)*(di[ir]*idi[ii]) # Relative population ratio
         efl = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the lumping fraction
 
@@ -619,8 +670,8 @@ def StochasticFluctuations(sigma,E):
     alpha = ((1-E)**2)/(sigma**2)
     theta = (sigma**2)/(1-E)
 
-    if alpha<=1:
-        raise ValueError("α must be >1 to have a non-degenerate gamma distribution, and thus always admissible fluctuations")
+    # if alpha<=1:
+    #     raise ValueError("α must be >1 to have a non-degenerate gamma distribution, and thus always admissible fluctuations")
 
     ga = np.random.gamma(alpha,theta) # Initial sampling
 
@@ -631,16 +682,17 @@ def DataString(
     Ni=1,
     ta=None,
     head='',
-    format='.2f',
+    formatVal='.2f',
+    formatErr='.2f',
     space=True
 ):
     (value,error) = libF.EvaluateConfidenceInterval(data,ta,Ni)
     
     space = r'\qquad' if space else ''
     if error is None:
-        return fr'${head}={value:{format}}{space}$'
+        return fr'${head}={value:{formatVal}}{space}$'
     else:
-        return fr'${head}={value:{format}}\pm{error:.2f}{space}$'
+        return fr'${head}={value:{formatVal}}\pm{error:{formatErr}}{space}$'
 
 
 ### Discarded code ###

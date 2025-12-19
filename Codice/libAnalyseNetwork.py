@@ -2,8 +2,6 @@
 import numpy as np
 import networkx as nx
 
-import matplotlib.pyplot as plt
-
 import importlib
 import libFigures as libF
 importlib.reload(libF)
@@ -13,34 +11,33 @@ importlib.reload(libF)
 
 class NetworkAnalysis():
     def __init__(self,clsPrm,clsReg):
-        self.A = clsReg.A
-        self.W = clsReg.W
-        self.n = clsReg.Nc
+        A = clsReg.A; self.A = A
+        W = clsReg.W; self.W = W
+        n = clsReg.Nc; self.n = n
 
         # Degrees
-        self.di = np.sum(self.A,axis=0) # Vectors of degrees
-        self.dk, self.Nk = np.unique(self.di,return_counts=True)
+        di = np.sum(A,axis=0); self.di = di # Vectors of degrees
+        self.dk, self.Nk = np.unique(di,return_counts=True)
         # Unique degrees and corresponding frequencies
         # Pk = counts/N
 
         # [Nonzero] Weights
-        self.wi = self.W[self.W>0]
-        self.wk, self.wNk = np.unique(self.wi,return_counts=True)
+        wi = W[W>0]; self.wi = wi
+        self.wk, self.wNk = np.unique(wi,return_counts=True)
         # Unique weights and corresponding frequencies
 
         # Strenghts
-        self.si = np.sum(self.W,axis=0)
-        self.sk, self.sNk = np.unique(self.si,return_counts=True)
+        si = np.sum(W,axis=0); self.si = si
+        self.sk, self.sNk = np.unique(si,return_counts=True)
         # Unique strenghts and corresponding frequencies
 
         self.figData = libF.FigData(clsPrm,'NA')
 
     def DegreeDistributionFig(self):
         di = self.di
-        figData = self.figData
 
-        fig = plt.figure()
-        figData.SetFigs(1)
+        figData = self.figData
+        fig = figData.SetFigs()
 
         kAvr = np.mean(di)
         fig.text(
@@ -110,10 +107,9 @@ class NetworkAnalysis():
 
     def WeightDistributionFig(self):
         wi = self.wi
-        figData = self.figData
 
-        fig = plt.figure()
-        figData.SetFigs(1)
+        figData = self.figData
+        fig = figData.SetFigs()
 
 
         # Histogram plot
@@ -152,10 +148,9 @@ class NetworkAnalysis():
 
     def StrengthDistributionFig(self):
         si = self.si
-        figData = self.figData
 
-        fig = plt.figure()
-        figData.SetFigs(1)
+        figData = self.figData
+        fig = figData.SetFigs()
 
 
         # Histogram plot
@@ -196,10 +191,9 @@ class NetworkAnalysis():
     def BetweennessCentralityFig(self):
         A = self.A
         di = self.di
-        figData = self.figData
 
-        fig = plt.figure()
-        figData.SetFigs(1)
+        figData = self.figData
+        fig = figData.SetFigs()
         
         G = nx.from_numpy_array(A)
         bc = nx.betweenness_centrality(G,normalized=False)
@@ -238,10 +232,9 @@ class NetworkAnalysis():
         di = self.di
         dk = self.dk
         Nk = self.Nk
-        figData = self.figData
 
-        fig = plt.figure()
-        figData.SetFigs(1)
+        figData = self.figData
+        fig = figData.SetFigs()
 
 
         # Scatter
@@ -283,10 +276,9 @@ class NetworkAnalysis():
         di = self.di
         dk = self.dk
         Nk = self.Nk
-        figData = self.figData
 
-        fig = plt.figure()
-        figData.SetFigs(1)
+        figData = self.figData
+        fig = figData.SetFigs()
         
         G = nx.from_numpy_array(A)
         Cd = nx.clustering(G)
@@ -358,10 +350,9 @@ class NetworkAnalysis():
         Nk = self.Nk
         Ck = self.Ck
 
-        figData = self.figData
 
-        fig, ax = plt.subplots(2,1)
-        figData.SetFigs(2)
+        figData = self.figData
+        fig, ax = figData.SetFigs(2)
 
 
         # Manual counting
@@ -417,10 +408,9 @@ class NetworkAnalysis():
     def AAssortativityFig(self):
         A = self.A
         dk = self.dk
-        figData = self.figData
 
-        fig = plt.figure()
-        figData.SetFigs(1)
+        figData = self.figData
+        fig = figData.SetFigs()
         
         G = nx.from_numpy_array(A)
         ad = nx.average_neighbor_degree(G)
@@ -455,10 +445,9 @@ class NetworkAnalysis():
         W = self.W
         dk = self.dk
         knn = self.knn
-        figData = self.figData
 
-        fig, ax = plt.subplots(2,1)
-        figData.SetFigs(2)
+        figData = self.figData
+        fig, ax = figData.SetFigs(2)
 
         Gw = nx.from_numpy_array(W)
         # adw = nx.average_neighbor_degree(Gw,weight="weight")
@@ -493,4 +482,5 @@ class NetworkAnalysis():
         figData.SaveFig('WAssortativity')
 
     def ShowFig(self):
-        plt.show()
+        from matplotlib.pyplot import show
+        show()
