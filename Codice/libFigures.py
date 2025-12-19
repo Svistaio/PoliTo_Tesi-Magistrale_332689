@@ -73,34 +73,37 @@ class FigData():
         self.PdfPopUp = clsPrm.PdfPopUp
         self.LaTeXConversion = clsPrm.LaTeXConversion
 
-    def SetFigs(self,nFig):
+    def SetFigs(self,nCol=1,nRow=1,size=None):
+        nFig = nCol*nRow; self.nFig = nFig
+
         if not isinstance(nFig,int) or nFig <= 0:
             raise ValueError('The number of figures must be a integer positive number')
 
-        if nFig == 1:
-            self.fig = {'plots':{},'style':{}}
-        else:
-            for i in range(nFig):
-                setattr(self,f'fig{i+1}',{'plots':{},'style':{}})
+        for i in range(nFig):
+            setattr(self,f'fig{i+1}',{'plots':{},'style':{}})
 
-        self.nFig = nFig
+        if nFig == 1:
+            self.fig = self.fig1
+            return plt.figure()
+        else:
+            return plt.subplots(nCol,nRow,figsize=size)
 
     def SaveFig(self,name):
-        self.name = [name]
-        self.SaveFig2pdf()
+        self.SaveFig2pdf(name)
 
-        if self.nFig>1:
-            self.name = [f'{self.name}fig{f+1}' for f in range(self.nFig)]
+        self.names = [
+            f'{name}fig{f+1}' for f in range(self.nFig)
+        ] if self.nFig>1 else [name]
 
         if self.LaTeXConversion:
             for f in range(self.nFig):
                 self.SaveFig2mat(f)
                 self.SaveFig2tex(f)
 
-    def SaveFig2pdf(self):
+    def SaveFig2pdf(self,name):
         format = '.pdf'
         self.CreateFolders(format)
-        pdfPath = self.FigPath(self.name[0],format)
+        pdfPath = self.FigPath(name,format)
 
         savefig(
             pdfPath,
@@ -109,23 +112,23 @@ class FigData():
         )
 
         if self.PdfPopUp:
-            sumatraPath = r"..\.vscode\SumatraPDF.lnk"
-            cmd = f'"{sumatraPath}" "{str(pdfPath)}"'
+            sumatraPath = self.projectPath/'.vscode'/'SumatraPDF.lnk'
+            cmd = f'"{str(sumatraPath)}" "{str(pdfPath)}"'
             subprocess.Popen(cmd,shell=True)
 
     def SaveFig2mat(self,f):
         format = '.mat'
         self.CreateFolders(format)
 
-        self.matPath = self.FigPath(self.name[f],format)
+        self.matPath = self.FigPath(self.names[f],format)
         savemat(self.matPath,getattr(self,f'fig{f+1}'))
 
     def SaveFig2tex(self,f):
         format = '.tex'
         self.CreateFolders(format)
 
-        texPath = self.FigPath(self.name[f],format)
-        cmd = self.cmdTeX(self.matPath,texPath)
+        self.texPath = self.FigPath(self.names[f],format)
+        cmd = self.cmdTeX()
         subprocess.run(cmd,shell=True)
 
     def CreateFolders(self,format):
@@ -140,9 +143,9 @@ class FigData():
             self.folder/figName
         ).with_suffix(ext)
 
-    def cmdTeX(matPath,texPath):
-        m = matPath.as_posix()
-        t = texPath.as_posix()
+    def cmdTeX(self):
+        m = self.matPath.as_posix()
+        t = self.texPath.as_posix()
 
         cmd = (
             r'matlab -batch "mat2tex('
@@ -176,10 +179,11 @@ def CreateFunctionPlot(
     Ni=1,
     ta=None,
     yErr=True,
-    label=None,
+    label='',
     linestyle='-',
     linewidth=1,
     color='black',
+    alpha=1,
     idx='',
     ax=None
 ):
@@ -192,29 +196,48 @@ def CreateFunctionPlot(
             label=label,
             color=color,
             linestyle=linestyle,
-            linewidth=linewidth
+            linewidth=linewidth,
+            alpha=alpha
         )
         figData['plots'][f'functionPlot{idx}'] = {
-            't':'function','x':x,'y':y,'l':label,'c':color
+            't':'function','x':x,'y':y,
+            'l':label,'c':color
         }
 
     else:
         if yErr:
             avrFunc, err95Func = EvaluateConfidenceInterval(y,ta,Ni)
-            y = avrFunc; xerr95 = None; yerr95 = err95Func
+
+            # To avoid [a possible] lower negative confidence interva, the error has to be clipped
+            lowerEstimate = np.maximum(avrFunc-err95Func,0)
+            yerr95 = np.array([
+                avrFunc-lowerEstimate,
+                err95Func
+            ]); xerr95 = None; y = avrFunc
+
         else:
             avrFunc, err95Func = EvaluateConfidenceInterval(x,ta,Ni)
             x = avrFunc; xerr95 = err95Func; yerr95 = None
+
+            # To avoid [a possible] lower negative confidence interva, the error has to be clipped
+            lowerEstimate = np.maximum(avrFunc-err95Func,0)
+            xerr95 = np.array([
+                avrFunc-lowerEstimate,
+                err95Func
+            ]); yerr95 = None; x = avrFunc
 
         ax.plot(
             x,y,
             label=label,
             color=color,
             linestyle=linestyle,
-            linewidth=linewidth
+            linewidth=linewidth,
+            alpha=alpha[0],
+            zorder=4
         )
         figData['plots'][f'functionPlot{idx}'] = {
-            't':'function','x':x,'y':y,'l':label,'c':color
+            't':'function','x':x,'y':y,
+            'l':label,'c':color
         }
 
         CreateConfidenceIntervalPlot(
@@ -223,7 +246,7 @@ def CreateFunctionPlot(
             typ='functionfill',
             xerr95=xerr95,
             yerr95=yerr95,
-            alfa=0.5,
+            alpha=alpha[1],
             clr=color,
             ax=ax,
             idx=idx
@@ -257,10 +280,12 @@ def CreateScatterPlot(
             label=label,
             color=color,
             s=size,
+            edgecolor='none',
             alpha=alpha
         )
         figData['plots'][f'scatterPlot{idx}'] = {
-            't':'scatter','x':x,'y':y,'l':label,'c':color
+            't':'scatter','x':x,'y':y,
+            'l':label,'c':color,'a':alpha
         }
     else:
         if yErr:
@@ -272,10 +297,13 @@ def CreateScatterPlot(
                 label=label,
                 color=color,
                 s=size,
-                alpha=alpha
+                edgecolor='none',
+                alpha=alpha[0],
+                zorder=5
             )
-            figData['plots'][f'functionPlot{idx}'] = {
-                't':'function','x':x,'y':avrSct,'l':label,'c':color
+            figData['plots'][f'scatterPlot{idx}'] = {
+                't':'scatter','x':x,'y':avrSct,
+                'l':label,'c':color,'a':alpha
             }
 
             CreateConfidenceIntervalPlot(
@@ -283,11 +311,11 @@ def CreateScatterPlot(
                 avrSct,
                 figData,
                 typ='errorbar',
-                yerr95=err95Sct,
+                yerr95=np.array([err95Sct,err95Sct]),
                 clr=color,
+                alpha=alpha[0],
                 ax=ax,
-                idx=idx,
-                alfa=0.5
+                idx=idx
             )
 
         else:
@@ -299,10 +327,13 @@ def CreateScatterPlot(
                 label=label,
                 color=color,
                 s=size,
-                alpha=alpha
+                edgecolor='none',
+                alpha=alpha[0],
+                zorder=5
             )
-            figData['plots'][f'functionPlot{idx}'] = {
-                't':'function','x':avrSct,'y':y,'l':label,'c':color
+            figData['plots'][f'scatterPlot{idx}'] = {
+                't':'scatter','x':avrSct,'y':y,
+                'l':label,'c':color,'a':alpha
             }
 
             CreateConfidenceIntervalPlot(
@@ -310,11 +341,11 @@ def CreateScatterPlot(
                 y,
                 figData,
                 typ='errorbar',
-                xerr95=err95Sct,
+                xerr95=np.array([err95Sct,err95Sct]),
                 clr=color,
+                alpha=alpha[1],
                 ax=ax,
-                idx=idx,
-                alfa=0.5
+                idx=idx
             )
 
     # mplcursors.cursor(sct,hover=True).connect(
@@ -342,7 +373,8 @@ def CreateHistogramPlot(
     def HistogramPlot(
         binEdges,
         binMidPoints,
-        binAverages
+        binAverages,
+        alpha=alpha
     ):
         hgPlot = ax.hist(
             binMidPoints,
@@ -356,8 +388,8 @@ def CreateHistogramPlot(
         )
 
         figData['plots'][f'histogramPlot{idx}'] = {
-            't':'histogram','x':binAverages,'b':binEdges,
-            'l':label,'c':color,'a':alpha,'s':'log'
+            't':'histogram','l':label,'c':color,'a':alpha,
+            'x':binMidPoints,'b':binEdges,'w':binAverages
         }
 
         # hgPlot[0] = heights,
@@ -396,7 +428,7 @@ def CreateHistogramPlot(
         if x.ndim != 1: x = x.ravel()
 
         binAverages, _ = np.histogram(x,binEdges,density=norm)
-        HistogramPlot(binEdges,binMidPoints,binAverages)
+        HistogramPlot(binEdges,binMidPoints,binAverages,alpha)
 
         return binMidPoints, binAverages
     else:
@@ -408,14 +440,13 @@ def CreateHistogramPlot(
             [hgData[r][0] for r in range(Ni)],ta,Ni
         )
 
-        HistogramPlot(binEdges,binMidPoints,binAverages)
+        HistogramPlot(binEdges,binMidPoints,binAverages,alpha[0])
 
-        # To avoid [possible] lower negative confidence intervals in the lower and upper tails, they have to be clipped
+        # To avoid [a possible] lower negative confidence interval in the lower tail, the error has to be clipped
         lowerBinEstimate = np.maximum(binAverages-hgErr95,0)
-        upperBinEstimate = binAverages+hgErr95
         binErr95 = np.array([
             binAverages-lowerBinEstimate,
-            upperBinEstimate-binAverages
+            hgErr95
         ])
 
         CreateConfidenceIntervalPlot(
@@ -427,7 +458,7 @@ def CreateHistogramPlot(
             clr=color,
             ax=ax,
             idx=idx,
-            alfa=alpha
+            alpha=alpha[1]
         )
 
         return binMidPoints, binAverages
@@ -471,22 +502,41 @@ def CreateLogRegressionPlot(
 def CreateLognormalFitPlot(
     v,
     figData,
+    limits=None,
+    scale='lin',
     Ni=1,
     ta=None,
-    labelAvr='Average value',
-    labelFit='Lognormal fit (ML)', # Minimum likelihood
-    colorAvr='black',
-    colorFit='blue',
+    label=(
+        'Lognormal fit (ML)',
+        'Average value'
+    ), # Minimum likelihood
+    color=(
+        'blue',
+        'black'
+    ),
+    alpha=1,
     idx='',
     ax=None
 ):
     if ax is None: ax=plt.gca()
 
-    xF = np.logspace(
-        np.log10(np.quantile(v,0)),
-        np.log10(np.quantile(v,1)),
-        500
-    )
+    if limits is None:
+        vMin = np.min(v); vMax=np.max(v)
+    else:
+        vMin = limits[0]; vMax=limits[1]
+
+    if scale == 'lin':
+        xF = np.linspace(
+            vMin,
+            vMax,
+            500
+        )
+    else:
+        xF = np.logspace(
+            np.log10(vMin),
+            np.log10(vMax),
+            500
+        )
 
     if Ni == 1:
         shape, loc, scale = stats.lognorm.fit(v,floc=0)
@@ -519,9 +569,10 @@ def CreateLognormalFitPlot(
         figData,
         Ni=Ni,
         ta=ta,
-        label=labelFit,
+        label=label[0],
         # linewidth=1,
-        color=colorFit,
+        color=color[0],
+        alpha=alpha,
         idx=idx,
         ax=ax
     )
@@ -533,10 +584,10 @@ def CreateLognormalFitPlot(
     #     Ni=Ni,
     #     ta=ta,
     #     yErr=False,
-    #     label=labelAvr,
+    #     label=label[1],
     #     # linewidth=1,
     #     linestyle="--",
-    #     color=colorAvr,
+    #     color=color[1],
     #     idx=idx,
     #     ax=ax
     # )
@@ -544,22 +595,35 @@ def CreateLognormalFitPlot(
 def CreateParetoFitPlot(
     v,
     figData,
+    upperbound=None,
     Ni=1,
     ta=None,
-    labelSct='Scatter',
-    labelFit='Pareto fit (ML)', # Minimum likelihood
-    colorSct='black',
-    colorFit='black',
+    label=(
+        'Scatter',
+        'Pareto fit (ML)' # Minimum likelihood
+    ),
+    color=(
+        'black',
+        'black'
+    ),
+    alpha=1,
     idx='',
     ax=None
 ):
     if ax is None: ax=plt.gca()
 
-    xF = np.logspace(
-        np.log10(np.quantile(v,0.75)),
-        np.log10(np.quantile(v,1)),
-        100
-    )
+    if upperbound is None:
+        xF = np.logspace(
+            np.log10(np.quantile(v,0.75)),
+            np.log10(v.max()),
+            100
+        )
+    else:
+        xF = np.logspace(
+            np.log10(np.quantile(v,0.75)),
+            np.log10(upperbound),
+            100
+        )
 
     if Ni == 1:
         # Select the last quarter of city sizes
@@ -610,9 +674,11 @@ def CreateParetoFitPlot(
         ta=ta,
         size=10,
         yErr=False,
-        label=labelSct,
-        color=colorSct,
-        ax=ax
+        label=label[0],
+        color=color[0],
+        alpha=alpha[0],
+        ax=ax,
+        idx=idx
     )
 
     CreateFunctionPlot(
@@ -620,9 +686,10 @@ def CreateParetoFitPlot(
         figData,
         Ni=Ni,
         ta=ta,
-        label=labelFit,
         # linewidth=1,
-        color=colorFit,
+        label=label[1],
+        color=color[1],
+        alpha=alpha[1],
         ax=ax,
         idx=idx
     )
@@ -649,8 +716,7 @@ def EvaluateConfidenceInterval(
             return (data,None)
 
 def CreateConfidenceIntervalPlot(
-    x,
-    y,
+    x,y,
     figData,
     typ='errorbar',
     yerr95=None,
@@ -659,7 +725,7 @@ def CreateConfidenceIntervalPlot(
     fmt='none',
     ax=None,
     idx='',
-    alfa=1
+    alpha=0.5
 ):
     if ax is None: ax = plt.gca()
 
@@ -680,35 +746,48 @@ def CreateConfidenceIntervalPlot(
                 markerfacecoloralt=clr,
                 markeredgecolor=clr,
                 markeredgewidth=0,
-                alpha=alfa
+                alpha=alpha,
+                zorder=1
             )
-            figData['plots'][f'{typ}{idx}'] = {
-                't':typ,'x':x,'y':y,'ye':yerr95,
-                'l':'','c':clr,'a':alfa,
-            }
+            if xerr95 is None:
+                figData['plots'][f'{typ}{idx}'] = {
+                    't':typ,'x':x,'y':y,
+                    'e':'y','ye':yerr95,
+                    'l':'','c':clr,'a':alpha,
+                }
+            else:
+                figData['plots'][f'{typ}{idx}'] = {
+                    't':typ,'x':x,'y':y,
+                    'e':'x','xe':xerr95,
+                    'l':'','c':clr,'a':alpha,
+                }
 
         case 'functionfill':
             if xerr95 is None:
                 ax.fill_between(
-                    x,y+yerr95,y-yerr95,
+                    x,y-yerr95[0],y+yerr95[1],
                     facecolor=clr,
-                    alpha=alfa,
-                    linewidth=0
+                    alpha=alpha,
+                    linewidth=0,
+                    zorder=2
                 )
-                figData['plots'][f'{typ}y{idx}'] = {
-                    't':typ,'x':x,'y':y,'ye':yerr95,
-                    'l':'','c':clr,'a':alfa,
+                figData['plots'][f'{typ}{idx}'] = {
+                    't':typ,'x':x,'y':y,
+                    'e':'y','ye':yerr95,
+                    'l':'','c':clr,'a':alpha,
                 }
             else:
                 ax.fill_betweenx(
-                    y,x+xerr95,x-xerr95,
+                    y,x-xerr95[0],x+xerr95[1],
                     facecolor=clr,
-                    alpha=alfa,
-                    linewidth=0
+                    alpha=alpha,
+                    linewidth=0,
+                    zorder=2
                 )
-                figData['plots'][f'{typ}x{idx}'] = {
-                    't':typ,'x':x,'y':y,'xe':xerr95,
-                    'l':'','c':clr,'a':alfa,
+                figData['plots'][f'{typ}{idx}'] = {
+                    't':typ,'x':x,'y':y,
+                    'e':'x','xe':xerr95,
+                    'l':'','c':clr,'a':alpha,
                 }
 
 

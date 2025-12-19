@@ -13,8 +13,10 @@ import csv, json
 
 import numpy as np
 
+from libGUI import Parameters
 
-### Main function and class ###
+
+### Main functions ###
 
 def ExtractAdjacencyMatrices():
     projectPath = Path(__file__).resolve().parent.parent
@@ -33,41 +35,38 @@ def ExtractAdjacencyMatrices():
     zipFile = projectPath/'Dati'/'DatiPendolarismo1991.zip'
     WriteAdjacencyMatrices(zipFile,dicReg)
 
-class ReadAdjacencyMatrices():
-    def __init__(self,code):
-        projectPath = Path(__file__).resolve().parent.parent
-        zipFile = projectPath/'Dati'/'DatiPendolarismo1991.zip'
+def ReadAdjacencyMatrices(code):
+    projectPath = Path(__file__).resolve().parent.parent
+    zipFile = projectPath/'Dati'/'DatiPendolarismo1991.zip'
 
-        el = {
-            'A':'.txt','W':'.txt',
-            'li2Name':'.json',
-            'Name2li':'.json',
-            'Nc':'.json'
-        }
+    el = {
+        'A':'.txt','W':'.txt',
+        'li2Name':'.json',
+        'Name2li':'.json',
+        'Nc':'.json'
+    }
+    parameters = {}
 
-        with ZF(zipFile) as z:
-            for data in el:
-                path = f'{code}/{data}{el[data]}'
-                with z.open(path,'r') as f:
-                    match data:
-                        case 'A' | 'W':
-                            setattr(
-                                self,data,
-                                np.loadtxt(
-                                    tiow(f,encoding='utf-8'),
-                                    delimiter=",",dtype=int
-                                ) # Decodes binary stream as UTF-8 text
-                            )
+    with ZF(zipFile) as z:
+        for data in el:
+            path = f'{code}/{data}{el[data]}'
+            with z.open(path,'r') as f:
+                match data:
+                    case 'A' | 'W':
+                        parameters[data] = np.loadtxt(
+                            tiow(f,encoding='utf-8'),
+                            delimiter=",",dtype=int
+                        ) # Decodes binary stream as UTF-8 text
 
-                        case 'li2Name':
-                            setattr(
-                                self,data,
-                                {int(k): v for k, v in json.load(f).items()}
-                                # This is necessary since the keys of a «.json» file are always strings, hence they have to be converted to integer if originally they were such
-                            )
+                    case 'li2Name':
+                        parameters[data] = {
+                            int(k): v for k, v in json.load(f).items()
+                        } # This is necessary since the keys of a «.json» file are always strings, hence they have to be converted to integer if originally they were such
 
-                        case 'Nc' | 'Name2li':
-                            setattr(self,data,json.load(f))
+                    case 'Nc' | 'Name2li':
+                        parameters[data] = json.load(f)
+
+    return Parameters(**parameters)
 
 def WriteSimulationData(lbl,si,cs,typ,li2Name,Ni):
     lbl = [t.replace('.','') for t in lbl]

@@ -84,8 +84,8 @@ class ParametersGUI(tk.Tk):
         }
 
         self.timestep = Parameter('Δt',1e-2)
-        self.timesteps = Parameter('Nt',int(1e6))
-        self.iterations = Parameter('Ni',int(9))
+        self.timesteps = Parameter('Nt',int(1e5))
+        self.iterations = Parameter('Ni',int(3))
         # self.progressBar = Parameter('Progress Bar',True)
 
         self.extraction = Parameter('Extract data',False)
@@ -109,7 +109,7 @@ class ParametersGUI(tk.Tk):
 
         self.PdfPopUp = Parameter('Open PDF',False)
         self.LaTeXConversion = Parameter('LaTeX Conversion',False)
-        self.screenshots = Parameter('Ns',int(1000)) # Number of screenshots [not considering the initial state]
+        self.screenshots = Parameter('Ns',int(100)) # Number of screenshots [not considering the initial state]
         self.smoothingFactor = Parameter('Sf',int(10))
 
         self.simFlag = Parameter(var=tk.BooleanVar(value=False))
