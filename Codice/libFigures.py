@@ -358,7 +358,7 @@ def CreateHistogramPlot(
     x,nBins,
     figData,
     limits=None,
-    scale='lin',
+    xScale='lin',
     Ni=1,
     ta=None,
     label='Histogram',
@@ -407,7 +407,7 @@ def CreateHistogramPlot(
     else:
         xMin = limits[0]; xMax=limits[1]
 
-    if scale == 'lin':
+    if xScale == 'lin':
         binPoints = np.linspace(
             xMin,
             xMax,
@@ -503,7 +503,7 @@ def CreateLognormalFitPlot(
     v,
     figData,
     limits=None,
-    scale='lin',
+    xScale='lin',
     Ni=1,
     ta=None,
     label=(
@@ -525,7 +525,7 @@ def CreateLognormalFitPlot(
     else:
         vMin = limits[0]; vMax=limits[1]
 
-    if scale == 'lin':
+    if xScale == 'lin':
         xF = np.linspace(
             vMin,
             vMax,
@@ -596,7 +596,7 @@ def CreateParetoFitPlot(
     v,
     figData,
     upperbound=None,
-    yscale='lin',
+    yScale='lin',
     Ni=1,
     ta=None,
     label=(
@@ -636,7 +636,7 @@ def CreateParetoFitPlot(
         n = vSort.size
         ccdfEmp = (
             n-np.arange(1,n+1,dtype=float)
-            +(0.5 if yscale == 'log' else 0)
+            +(0.5 if yScale == 'log' else 0)
         )/n # P(X≥x)
         """
         Complementary Cumulative Distribution Function
@@ -682,7 +682,7 @@ def CreateParetoFitPlot(
         n = vTails[0].size
         ccdfEmp = (
             n-np.arange(1,n+1,dtype=float)
-            +(0.5 if yscale == 'log' else 0)
+            +(0.5 if yScale == 'log' else 0)
         )/n # P(X≥x)
         """
         Complementary Cumulative Distribution Function

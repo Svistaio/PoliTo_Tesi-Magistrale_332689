@@ -124,7 +124,7 @@ function mat2tex(matpath,texpath)
                 h.LineStyle = "none";
                 h.HandleVisibility = "off";
                 h.Color = s.plots.(field).c;
-                h.CapSize  = 5;
+                % h.CapSize  = 5;
                 h.Marker = 'none';
 
             case 'functionfill'

@@ -33,22 +33,14 @@ class KineticSimulation():
         self.s = float(clsPrm.deviation)
         self.z = float(clsPrm.zetaFraction)
 
-        self.Nc = int(clsReg.Nc)
-        self.P  = int(clsPrm.population)
-        self.p0 = float(self.P/self.Nc)
-
-        self.dt = float(clsPrm.timestep)
-        self.Nt = int(clsPrm.timesteps)
-        self.Ns = int(clsPrm.screenshots)
-
-        self.Ni = clsPrm.iterations
-        Nc = clsReg.Nc; self.Nc = Nc
+        self.Ni = int(clsPrm.iterations)
+        Nc = int(clsReg.Nc); self.Nc = Nc
         self.li2Name = clsReg.li2Name
 
-        dt = clsPrm.timestep; self.dt = dt
-        Nt = clsPrm.timesteps; self.Nt = Nt
+        dt = float(clsPrm.timestep); self.dt = dt
+        Nt = int(clsPrm.timesteps); self.Nt = Nt
 
-        Ns = clsPrm.screenshots; self.Ns = Ns
+        Ns = int(clsPrm.screenshots); self.Ns = Ns
         ns = np.array(
             [i*Nt/Ns for i in range(Ns+1)],
             dtype=np.int64
@@ -64,6 +56,10 @@ class KineticSimulation():
         ); self.di = di
         # Inverse degrees
         self.invdi = np.array(1/di,dtype=np.float64)
+
+        self.R = int(clsPrm.region)
+        self.P = int(clsPrm.population)
+        self.p0 = float(self.P/self.Nc)
 
         M = np.zeros((Nc,Nc,2),dtype=np.float64)
 
@@ -220,9 +216,7 @@ class KineticSimulation():
 
     # Figures
     def SizeDistrFittingsFig(self):
-        il = self.il
         Ni = self.Ni
-        Nc = self.Nc
         ta = self.ta
 
         cs = self.vrtState
@@ -246,12 +240,12 @@ class KineticSimulation():
                 cs[:,:,t],30,
                 figData.fig1,
                 limits=(sMin,sMax),
-                scale='log',
+                xScale='log',
                 Ni=Ni,
                 ta=ta,
                 label=f"{lbl[t]} histogram",
                 color=clr[t],
-                alpha=(0.35,0.45),
+                alpha=(0.35,0.45) if Ni>1 else 0.35,
                 idx=t+1,
                 ax=ax[0]
             ) # Histogram plot
@@ -260,7 +254,7 @@ class KineticSimulation():
                 cs[:,:,t],
                 figData.fig1,
                 limits=(sMin,sMax),
-                scale='log',
+                xScale='log',
                 Ni=Ni,
                 ta=ta,
                 label=(
@@ -268,7 +262,7 @@ class KineticSimulation():
                     f"{lbl[t]} lognormal fit (ML)"
                 ),
                 color=(clr[t],clr[t]),
-                alpha=(1,0.15),
+                alpha=(1,0.15) if Ni>1 else 1,
                 idx=t+1,
                 ax=ax[0]
             ) # Fit plot
@@ -278,7 +272,7 @@ class KineticSimulation():
                 cs[:,:,t],
                 figData.fig2,
                 upperbound=sMax,
-                yscale='log',
+                yScale='log',
                 Ni=Ni,
                 ta=ta,
                 label=(
@@ -286,7 +280,7 @@ class KineticSimulation():
                     fr"{lbl[t]} pareto fit"
                 ),
                 color=(clr[t],clr[t]),
-                alpha=((0.6,0.3),(1,0.15)),
+                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
                 idx=t+1,
                 ax=ax[1]
             )
@@ -296,7 +290,7 @@ class KineticSimulation():
                 cs[:,:,t],
                 figData.fig3,
                 upperbound=sMax,
-                yscale='lin',
+                yScale='lin',
                 Ni=Ni,
                 ta=ta,
                 label=(
@@ -304,7 +298,7 @@ class KineticSimulation():
                     fr"{lbl[t]} pareto fit"
                 ),
                 color=(clr[t],clr[t]),
-                alpha=((0.6,0.3),(1,0.15)),
+                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
                 idx=t+1,
                 ax=ax[2]
             )
@@ -319,13 +313,32 @@ class KineticSimulation():
                     csSum[:,t],Ni,ta,r's_{{\Sigma}}',
                     formatVal='.2e',formatErr='.2e'
                 )+
-                DataString(b,Ni,ta,r'\alpha',space=False),
+                DataString(b,Ni,ta,r'\beta',space=False),
                 ha='center',color=clr[t]
             )
 
-        fig.text(.1,.975,fr'$Nc={Nc}$',ha='center')
-        fig.text(.1,.925,fr'$Ni={Ni}$',ha='center')
-        fig.text(.9,.925,fr'$il={il}$',ha='center')
+        fig.text(.1,.975,fr'$Nc={self.Nc}$',ha='center')
+        fig.text(.1,.925,fr'$R={self.R}$',ha='center')
+
+        p = .95; i = 0; d = 0.035
+        fig.text(p-i*d,.975,fr'$Ns={self.Ns}$',ha='center')
+        fig.text(p-i*d,.925,fr'$sf={self.sf}$',ha='center')
+
+        i += 1
+        fig.text(p-i*d,.975,fr'$Ni={Ni}$',ha='center')
+        fig.text(p-i*d,.925,fr'$dt={self.dt}$',ha='center')
+
+        i += 1
+        fig.text(p-i*d,.975,fr'$\sigma={self.s}$',ha='center')
+        fig.text(p-i*d,.925,fr'$il={self.il}$',ha='center')
+
+        i += 1
+        fig.text(p-i*d,.975,fr'$\lambda={self.l}$',ha='center')
+        fig.text(p-i*d,.925,fr'$\alpha={self.a}$',ha='center')
+
+        i += 1
+        if self.il == 3:
+            fig.text(p-i*d,.95,fr'$z={self.z}$',ha='center')
 
         # Style
         libF.SetFigStyle(
@@ -371,7 +384,7 @@ class KineticSimulation():
                 ta=ta,
                 label=rf"{lbl[t]} city size average $\langle s\rangle$",
                 color=clr[t],
-                alpha=(1,0.15),
+                alpha=(1,0.15) if Ni>1 else 1,
                 idx=t+1
             )
 
@@ -458,7 +471,7 @@ class KineticSimulation():
                     screenshots[:,s,t],21,
                     getattr(figData,f'fig{t+1}'),
                     limits=(sMin,sMax),
-                    scale='log',
+                    xScale='log',
                     label=f"t = {int(ns[s]*dt)}",
                     color=colours[j][:-1],
                     alpha=0.4,
@@ -500,17 +513,20 @@ class KineticSimulation():
             screenshotsk[i,:,:] = screenshots[bk,:,:].mean(axis=0)
 
         clrmap = get_cmap('inferno') # magma
+        norm = LogNorm(vmin=dk.min(),vmax=dk.max())
+        colours = clrmap(norm(dk[::-1]))
         # colours = [clrmap(i/(Nc-1)) for i in range(Nc)]
+
         labels = ['']*Nk
         idx = np.linspace(0,Nk-1,6,dtype=np.int64)
         for i in idx: labels[i] = f'k={dk[i]}'
 
         for t in typ: # t[ype]
-            norm = LogNorm(
-                vmin=screenshotsk[:,-1,t].min(),
-                vmax=screenshotsk[:,-1,t].max(),
-            )
-            colours = clrmap(norm(screenshotsk[:,-1,t]))
+            # norm = LogNorm(
+            #     vmin=screenshotsk[:,-1,t].min(),
+            #     vmax=screenshotsk[:,-1,t].max()
+            # )
+            # colours = clrmap(norm(screenshotsk[:,-1,t]))
 
             for k in range(Nk):
                 libF.CreateFunctionPlot(
@@ -537,7 +553,6 @@ class KineticSimulation():
     def ShowFig(self):
         from matplotlib.pyplot import show
         show()
-
 
 
 ### Auxiliary functions ###
@@ -627,7 +642,11 @@ def EvolveState(
             if theta == 1:
                 si = cs[ii,0]; sr = cs[ir,0]
 
-                e = NonLinearEmigration(si,ii,sr,ir,di,idi,il,l,a,z)
+                e = NonLinearEmigration(
+                    si,di[ii],idi[ii],
+                    sr,di[ir],idi[ir],
+                    il,l,a,z
+                )
                 ga = StochasticFluctuations(s,e)
 
                 cs[ii,0] = si*(1-e+ga) 
@@ -640,7 +659,11 @@ def EvolveState(
             if theta == 1:
                 si = cs[ii,1]; sr = cs[ir,1]
 
-                e = NonLinearEmigration(si,ii,sr,ir,di,idi,il,l,a,z)
+                e = NonLinearEmigration(
+                    si,di[ii],idi[ii],
+                    sr,di[ir],idi[ir],
+                    il,l,a,z
+                )
                 ga = StochasticFluctuations(s,e)
 
                 cs[ii,1] = si*(1-e+ga) 
@@ -664,9 +687,8 @@ def FYDInPlaceShuffle(v,n):
 
 @njit(cache=True)
 def NonLinearEmigration(
-        si,ii, # Interacting city size
-        sr,ir, # Receiving city size
-        di,idi,
+        si,di,idi, # Interacting city size
+        sr,dr,idr, # Receiving city size
         il,l,a,z
     ):
     if si <= 0: return 0
@@ -676,23 +698,26 @@ def NonLinearEmigration(
         return l*(rs**a)/(1+rs**a) # Actual emigration rate
 
     elif il == 1:
-        rsk = (sr/si)*(di[ir]*idi[ii]) # Relative population ratio
+        rsk = (sr/si)*(dr*idi) # Relative population ratio
         return l*(rsk/a)/(1+rsk/a)   # Actual emigration rate
 
     elif il == 2:
-        rsk = (sr/si)*(di[ir]*idi[ii]) # Relative population ratio
+        rsk = (sr/si)*(dr*idi) # Relative population ratio
         return l*(rsk**a)/(1+rsk**a)  # Actual emigration rate
 
-    else:
+    elif il == 3:
         if sr <= 0: return 0
 
-        rsk = (sr/si)*(di[ir]*idi[ii]) # Relative population ratio
+        rsk = (sr/si)*(dr*idi) # Relative population ratio
         efl = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the lumping fraction
 
-        rsk = (si/sr)*(di[ii]*idi[ir]) # Inverse relative population ratio
+        rsk = (si/sr)*(di*idr) # Inverse relative population ratio
         efs = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the separation fraction
 
         return (1-z)*efl+z*efs
+    else:
+        rsk = (sr/si)*(dr*idi)    # Relative population ratio
+        return l*(rsk/(1+rsk))**a # Actual emigration rate
 
 @njit(cache=True)
 def StochasticFluctuations(sigma,E):
