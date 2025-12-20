@@ -10,6 +10,7 @@ from io import StringIO as sio
 
 import pandas as pd
 import csv, json
+import geopandas as gpd
 
 import numpy as np
 
@@ -20,20 +21,26 @@ from libGUI import Parameters
 
 def ExtractAdjacencyMatrices():
     projectPath = Path(__file__).resolve().parent.parent
-    zipFile = projectPath/'Dati'/'MatriciPendolarismo1991.zip'
+    matrixZipPath = projectPath/'Dati'/'MatriciPendolarismo1991.zip'
+    coordZipPath = projectPath/'Dati'/'LimitiRegioni1991.zip'
+    shpPath = (
+        f"zip://{coordZipPath}"
+        "!Limiti1991_g/Com1991_g/Com1991_g_WGS84.shp"
+    )
+
 
     # Conversion of «elencom91.xls» from the old format «.xls» to a more manageable «.csv»
-    csvFile = xls2csv(zipFile,'elencom91.xls')
+    csvFile = xls2csv(matrixZipPath,'elencom91.xls')
 
-    dicMun, dicReg = ReadMunRegCodes(csvFile)
+    dicMun,dicReg = ReadMunRegCodes(csvFile,shpPath)
 
     BuildAdjacencyMatrices(
         dicMun,dicReg,
-        zipFile,'Pen_91It.txt'
+        matrixZipPath,'Pen_91It.txt'
     )
 
-    zipFile = projectPath/'Dati'/'DatiPendolarismo1991.zip'
-    WriteAdjacencyMatrices(zipFile,dicReg)
+    matrixZipPath = projectPath/'Dati'/'DatiPendolarismo1991.zip'
+    WriteAdjacencyMatrices(matrixZipPath,dicReg)
 
 def ReadAdjacencyMatrices(code):
     projectPath = Path(__file__).resolve().parent.parent
@@ -42,6 +49,7 @@ def ReadAdjacencyMatrices(code):
     el = {
         'A':'.txt','W':'.txt',
         'li2Name':'.json',
+        'li2Coord':'.json',
         'Name2li':'.json',
         'Nc':'.json'
     }
@@ -66,39 +74,14 @@ def ReadAdjacencyMatrices(code):
                     case 'Nc' | 'Name2li':
                         parameters[data] = json.load(f)
 
+                    case 'li2Coord':
+                        tmp = json.load(f)
+                        parameters[data] = np.array(
+                            [tmp[str(i)] for i in range(len(tmp))],
+                            dtype=np.float64
+                        )
+
     return Parameters(**parameters)
-
-def WriteSimulationData(lbl,si,cs,typ,li2Name,Ni):
-    lbl = [t.replace('.','') for t in lbl]
-
-    projectPath = Path(__file__).resolve().parent.parent
-    zipFile = projectPath/'Dati'/'SimulationData.zip'
-
-    with ZF(
-        zipFile,'w',
-        compression=zf.ZIP_DEFLATED,
-        compresslevel=9
-    ) as z:
-        for r in range(Ni):
-            dicName2SortedPop = {
-                t:{
-                    li2Name[i]:cs[r,i,t] for i in si[r,::-1,t]
-                } for t in typ
-            }
-
-            folder = f"{0 if r+1<10 else ''}{r+1}"
-            for t in typ:
-                buf = sio()
-                path = f'{folder}/{lbl[t]}CitySizesFinal.json'
-                json.dump(list(cs[r,:,t]),buf)
-                value = buf.getvalue()
-                z.writestr(path,value)
-
-                buf = sio()
-                path = f'{folder}/{lbl[t]}CitySizesSorted.json'
-                json.dump(dicName2SortedPop[t],buf)
-                value = buf.getvalue()
-                z.writestr(path,value)
 
 
 ### Auxiliary functions ###
@@ -123,19 +106,21 @@ def xls2csv(zipFile,xlsFile):
 
     return streamCsv
 
-def ReadMunRegCodes(file):
+def ReadMunRegCodes(matrixFile,coordFile):
     # These two dictionary are necessary to link muicipalities and regions via their codes defined in «file», which will be useful later on to extract the actual data for the adjacency matrices
     dicMun = {} # Dictionary to link municipality codes with region codes
     dicReg = {
         i+1:{
-            'li2Name':{}, # Dictionary to link local indices with the municipality name
-            'Name2li':{}, # Dictionary to link local indices with the municipality name
-            'Code2li':{}, # Dictionary to link municipality code with local indices
+            'li2Name':{},  # Dictionary to link local indices with the municipality name
+            'li2Coord':{}, # Dictionary to link local indices with the municipality representative point
+            'Name2li':{},  # Dictionary to link local indices with the municipality name
+            'Code2li':{},  # Dictionary to link municipality code with local indices
             'Nc':0  # Number of cities in a region
         } for i in range(21)
     } # The index 21 is arbitrarily associated to Italy viewed as the 21th region, hence its local index is actually the global one
 
-    reader = csv.reader(file)
+    gdf = gpd.read_file(coordFile).set_index('PRO_COM_T').geometry.representative_point()
+    reader = csv.reader(matrixFile)
     next(reader)  # Skip header line containing metadata labels
     for row in reader:
         try: # If the code is not empty
@@ -147,6 +132,7 @@ def ReadMunRegCodes(file):
 
             li = dicReg[codeReg]['Nc'] # Local index
             dicReg[codeReg]['li2Name'][li] = nameMun
+            dicReg[codeReg]['li2Coord'][li] = [gdf[codeMun].x,gdf[codeMun].y]
             dicReg[codeReg]['Name2li'][nameMun] = li
             dicReg[codeReg]['Code2li'][codeMun] = li
 
@@ -228,6 +214,7 @@ def WriteAdjacencyMatrices(zipPath,dicReg):
         el = {
             'A':'.txt','W':'.txt',
             'li2Name':'.json',
+            'li2Coord':'.json',
             'Name2li':'.json',
             'Nc':'.json'
         }
@@ -246,21 +233,47 @@ def WriteAdjacencyMatrices(zipPath,dicReg):
                             fmt="%d",delimiter=","
                         ) # Save the matrix in the zip as a «.txt» file
                         
-                    case 'Name2li':
+                    case 'Name2li' | 'li2Name' | 'li2Coord' | 'Nc':
                         json.dump(
                             dicReg[r+1][data],
                             buf,indent=3
                         ) # Save the dictionary in the zip as a «.json» file
 
-                    case 'li2Name':
-                        json.dump(
-                            dicReg[r+1][data],
-                            buf,indent=3
-                        ) # Save the dictionary in the zip as a «.json» file
+                    # case 'Nc':
+                    #     json.dump(dicReg[r+1][data],buf)
+                    #     # Save the number of cities in the zip as a «.json» file
 
-                    case 'Nc':
-                        json.dump(dicReg[r+1][data],buf)
-                        # Save the number of cities in the zip as a «.json» file
+                value = buf.getvalue()
+                z.writestr(path,value)
 
+def WriteSimulationData(lbl,si,cs,typ,li2Name,Ni):
+    lbl = [t.replace('.','') for t in lbl]
+
+    projectPath = Path(__file__).resolve().parent.parent
+    zipFile = projectPath/'Dati'/'SimulationData.zip'
+
+    with ZF(
+        zipFile,'w',
+        compression=zf.ZIP_DEFLATED,
+        compresslevel=9
+    ) as z:
+        for r in range(Ni):
+            dicName2SortedPop = {
+                t:{
+                    li2Name[i]:cs[r,i,t] for i in si[r,::-1,t]
+                } for t in typ
+            }
+
+            folder = f"{0 if r+1<10 else ''}{r+1}"
+            for t in typ:
+                buf = sio()
+                path = f'{folder}/{lbl[t]}CitySizesFinal.json'
+                json.dump(list(cs[r,:,t]),buf)
+                value = buf.getvalue()
+                z.writestr(path,value)
+
+                buf = sio()
+                path = f'{folder}/{lbl[t]}CitySizesSorted.json'
+                json.dump(dicName2SortedPop[t],buf)
                 value = buf.getvalue()
                 z.writestr(path,value)

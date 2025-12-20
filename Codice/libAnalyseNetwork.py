@@ -113,7 +113,7 @@ class NetworkAnalysis():
 
 
         # Histogram plot
-        binw, binPw = libF.CreateHistogramPlot(wi,19,figData.fig,scale='log')
+        binw, binPw = libF.CreateHistogramPlot(wi,19,figData.fig,xScale='log')
 
 
         # SciPy regression
@@ -154,7 +154,7 @@ class NetworkAnalysis():
 
 
         # Histogram plot
-        bins, binPs = libF.CreateHistogramPlot(si,20,figData.fig,scale='log')
+        bins, binPs = libF.CreateHistogramPlot(si,20,figData.fig,xScale='log')
 
 
         # SciPy regression

@@ -45,11 +45,11 @@ class ParametersGUI(tk.Tk):
             'Sardegna':int(1648248),
             'Italia':int(56778031)
         } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
-        self.population = Parameter('S',self.regPopList['Sardegna'])
+        self.population = Parameter('S',int(1))
 
-        self.attractivity = Parameter( 'λ' ,5e-2)
-        self.convincibility = Parameter('α',1e-2)
-        self.deviation = Parameter('σ',5e-2)
+        self.attractivity = Parameter('λ',float(1))
+        self.convincibility = Parameter('α',float(1))
+        self.deviation = Parameter('σ',float(1))
 
         self.regNameList = [
             'Piemonte',
@@ -76,18 +76,18 @@ class ParametersGUI(tk.Tk):
         ]
         self.region = Parameter(
             'Region selected',
-            self.regNameList[19],
+            'region',
             list=self.regNameList
         )
         self.regCodeList = {
             r:i+1 for i,r in enumerate(self.regNameList)
         }
 
-        self.zetaFraction = Parameter('z',1e-1)
+        self.zetaFraction = Parameter('z',float(1))
 
-        self.timestep = Parameter('Δt',1e-2)
-        self.timesteps = Parameter('Nt',int(1e6))
-        self.iterations = Parameter('Ni',int(9))
+        self.timestep = Parameter('Δt',float(1))
+        self.timesteps = Parameter('Nt',int(1))
+        self.iterations = Parameter('Ni',int(1))
         # self.progressBar = Parameter('Progress Bar',True)
 
         self.extraction = Parameter('Extract data',False)
@@ -99,10 +99,11 @@ class ParametersGUI(tk.Tk):
             'l*(rsk/a)/(1+rsk/a)',
             'l*(rsk^a)/(1+rsk^a)',
             '(1-z)*efl_k^a+z*efs_k^a',
+            'l*(rsk^a)/(1+rsk)^a'
         ]
         self.interactingLaw = Parameter(
             'Interacting law',
-            self.intLawList[3],
+            'law',
             list=self.intLawList
         )
         self.intLawCodeList = {
@@ -111,13 +112,13 @@ class ParametersGUI(tk.Tk):
 
         self.PdfPopUp = Parameter('Open PDF',False)
         self.LaTeXConversion = Parameter('LaTeX Conversion',False)
-        self.screenshots = Parameter('Ns',int(100)) # Number of screenshots [not considering the initial state]
-        self.smoothingFactor = Parameter('Sf',int(10))
+        self.screenshots = Parameter('Ns',int(1)) # Number of screenshots [not considering the initial state]
+        self.smoothingFactor = Parameter('Sf',int(1))
 
         self.simFlag = Parameter(var=tk.BooleanVar(value=False))
         #endregion
 
-        #region Frames
+        #region Parameter Frames
         pad = 20; pad = (pad,pad)
         mainFrame = Frame(self,pad=pad)
         pad = 15; pad = (pad,pad)
@@ -160,9 +161,6 @@ class ParametersGUI(tk.Tk):
 
         simPrmFrame.LabelComboBox(self.interactingLaw)
         self.interactingLaw.var.trace_add("write",self.InteractingLawCallBack)
-        self.InteractingLawCallBack()
-        if self.interactingLaw.var.get() == '(1-z)*efl_k^a+z*efs_k^a':
-            self.SetConvincibility()
 
 
         ppcPrmFrame = Frame(
@@ -193,12 +191,88 @@ class ParametersGUI(tk.Tk):
                 self.smoothingFactor,self.screenshots
             )
         )
+        #endregion
 
+        #region Case studies
+        self.caseStudiesDict = {
+            'Default':{
+                # self.population:self.regPopList['Sardegna'],
+                self.attractivity:5e-2,
+                self.convincibility:1e-2,
+                self.deviation:5e-2,
+                self.region:self.regNameList[19],
+                self.zetaFraction:1e-1,
+                self.timestep:1e-2,
+                self.timesteps:int(1e7),
+                self.iterations:int(15),
+                self.extraction:False,
+                self.analysis:False,
+                self.edgeWeights:False,
+                self.interactingLaw:self.intLawList[3],
+                self.PdfPopUp:False,
+                self.LaTeXConversion:False,
+                self.screenshots:int(100),
+                self.smoothingFactor:int(10),
+            },
+            '2° Interacting Law':{
+                # self.population:self.regPopList['Sardegna'],
+                self.attractivity:0.05,
+                self.convincibility:4,
+                self.deviation:0.05,
+                self.region:self.regNameList[19],
+                self.zetaFraction:1e-1,
+                self.timestep:1e-2,
+                self.timesteps:int(1e6),
+                self.iterations:1,
+                self.extraction:False,
+                self.analysis:False,
+                self.edgeWeights:False,
+                self.interactingLaw:self.intLawList[1],
+                self.PdfPopUp:False,
+                self.LaTeXConversion:False,
+                # self.screenshots:int(100),
+                # self.smoothingFactor:int(10),
+            },
+            '4° Interacting Law':{
+                # self.population:self.population.var.get(),
+                self.attractivity:0.1,
+                self.convincibility:0.1,
+                self.deviation:0.05,
+                self.region:self.regNameList[19],
+                self.zetaFraction:1e-1,
+                self.timestep:1e-2,
+                self.timesteps:int(1e7),
+                self.iterations:9,
+                self.extraction:False,
+                self.analysis:False,
+                self.edgeWeights:False,
+                self.interactingLaw:self.intLawList[1],
+                self.PdfPopUp:False,
+                self.LaTeXConversion:False,
+                # self.screenshots:int(100),
+                # self.smoothingFactor:int(10),
+            },
+        }
+        self.caseStudy = Parameter(
+            'Case studies',
+            list(self.caseStudiesDict.keys())[0],
+            list=list(self.caseStudiesDict.keys()),
+        )
+        #endregion
 
+        #region Button frame
         buttonFrame = Frame(
             mainFrame,pos=(2,0),pad=pad,
             colSpan=mainFrame.nCol
         )
+
+        buttonFrame.LabelComboBox(
+            self.caseStudy,
+            colSpan=buttonFrame.nCol,
+            pad=((0,0),(0,10))
+        )
+        self.caseStudy.var.trace_add("write",self.SetCaseStudy)
+
         buttonFrame.Button(
             'Run',lambda: self.SetSimulationState(True)
         )
@@ -206,6 +280,12 @@ class ParametersGUI(tk.Tk):
             'Stop',lambda: self.SetSimulationState(False)
         )
         #endregion
+
+        # CallBack calls
+        self.SetCaseStudy()
+        self.InteractingLawCallBack()
+        if self.intLawCodeList[self.interactingLaw.var.get()] == 3:
+            self.SetConvincibility()
 
         # GUI call
         CentreGUI(self)
@@ -238,7 +318,7 @@ class ParametersGUI(tk.Tk):
         self.destroy() # Close the window after any button is pressed
 
     def InteractingLawCallBack(self,*args):
-        if self.interactingLaw.var.get() == '(1-z)*efl_k^a+z*efs_k^a':
+        if self.intLawCodeList[self.interactingLaw.var.get()] == 3:
             self.zetaFraction.frame.grid()
             self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
@@ -260,6 +340,11 @@ class ParametersGUI(tk.Tk):
         if prm.cbid is not None:
             prm.var.trace_remove("write",prm.cbid)
             prm.cbid = None
+
+    def SetCaseStudy(self,*args):
+        caseStudy = self.caseStudy.var.get()
+        for prm,val in self.caseStudiesDict[caseStudy].items():
+            prm.var.set(val)
 
     # Functions
     def GatherParameters(self):
@@ -647,12 +732,17 @@ class Frame(ttk.Frame):
 
         self.NextColumn(colSpan)
 
-    def LabelComboBox(self,data,colSpan=2):
+    def LabelComboBox(
+        self,
+        data,
+        colSpan=2,
+        pad=((0,0),(10,0))
+    ):
         data.frame = Frame(
             self,
             pos=(self.cRow,self.cCol),
             colSpan=colSpan,
-            pad=((0,0),(10,0))
+            pad=pad
         )
 
         data.text += ':'
