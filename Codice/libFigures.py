@@ -596,6 +596,7 @@ def CreateParetoFitPlot(
     v,
     figData,
     upperbound=None,
+    yscale='lin',
     Ni=1,
     ta=None,
     label=(
@@ -633,14 +634,33 @@ def CreateParetoFitPlot(
         # Empirical CCDF on the tail
         vSort = np.sort(vTail) # Ascending values
         n = vSort.size
-        ccdfEmp = 1-np.arange(1,n+1,dtype=float)/n # P(X≥x)
-        # Complementary Cumulative Distribution Function
-        # Formally it should be «1-np.arange(1,n+1,dtype=float)/Nc-(Nc-n)/Nc», but since the only relevant information is the Pareto index, the exact probability value can be omitted
-        xS = vSort; yS = ccdfEmp
+        ccdfEmp = (
+            n-np.arange(1,n+1,dtype=float)
+            +(0.5 if yscale == 'log' else 0)
+        )/n # P(X≥x)
+        """
+        Complementary Cumulative Distribution Function
+        Formally it should be
+        
+            1-np.arange(1,n+1,dtype=float)/Nc-(Nc-n)/Nc=
+            (n-np.arange(1,n+1,dtype=float))/Nc=
+            [(n-np.arange(1,n+1,dtype=float))/n][n/Nc]
+        
+        hence the correct variables are:
+        
+            xS = vSort
+            yS = (n-np.arange(1,n+1,dtype=float))/n*(n/Nc)
+            yF = ccdfFit*(n/Nc)
+
+        without the constant translation 0.5, which is just necessary to avoid having a zero value at the tail end in a log-log plot.
+
+        However, since the only relevant information is the Pareto index, the exact probability value can be omitted
+        """
 
         b, loc, scale = stats.pareto.fit(vTail,floc=0,fscale=vQuarter) # b≈alpha
         ccdfFit = stats.pareto.sf(xF,b,loc=loc,scale=scale) # Survival function
-        yF = ccdfFit
+
+        xS = vSort; yS = ccdfEmp; yF = ccdfFit
 
     else:
         vTails  = [None]*Ni
@@ -659,13 +679,30 @@ def CreateParetoFitPlot(
             b[r], loc, scale = stats.pareto.fit(vTail,floc=0,fscale=vQuarter) # b≈alpha
             ccdfFit[r] = stats.pareto.sf(xF,b[r],loc=loc,scale=scale) # Survival function
 
-        yF = ccdfFit
-
         n = vTails[0].size
-        ccdfEmp = 1-np.arange(1,n+1,dtype=float)/n # P(X≥x)
-        # Complementary Cumulative Distribution Function
-        # Formally it should be «1-np.arange(1,n+1,dtype=float)/Nc-(Nc-n)/Nc», but since the only relevant information is the Pareto index, the exact probability value can be omitted
-        xS = vTails; yS = ccdfEmp
+        ccdfEmp = (
+            n-np.arange(1,n+1,dtype=float)
+            +(0.5 if yscale == 'log' else 0)
+        )/n # P(X≥x)
+        """
+        Complementary Cumulative Distribution Function
+        Formally it should be
+        
+            1-np.arange(1,n+1,dtype=float)/Nc-(Nc-n)/Nc=
+            (n-np.arange(1,n+1,dtype=float))/Nc=
+            [(n-np.arange(1,n+1,dtype=float))/n][n/Nc]
+        
+        hence the correct variables are:
+
+            xS = vTails
+            yS = (n-np.arange(1,n+1,dtype=float))/n*(n/Nc)
+            yF = [ccdfFit[r]*(n/Nc) for r in range(Ni)]
+
+        without the constant translation 0.5, which is just necessary to avoid having a zero value at the tail end in a log-log plot.
+
+        However, since the only relevant information is the Pareto index, the exact probability value can be omitted
+        """
+        xS = vTails; yS = ccdfEmp; yF = ccdfFit
 
     CreateScatterPlot(
         xS,yS,

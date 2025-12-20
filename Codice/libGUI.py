@@ -47,8 +47,8 @@ class ParametersGUI(tk.Tk):
         } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
         self.population = Parameter('S',self.regPopList['Sardegna'])
 
-        self.attractivity = Parameter( 'λ' ,.05)
-        self.convincibility = Parameter('α',.01)
+        self.attractivity = Parameter( 'λ' ,5e-2)
+        self.convincibility = Parameter('α',1e-2)
         self.deviation = Parameter('σ',5e-2)
 
         self.regNameList = [
@@ -83,9 +83,11 @@ class ParametersGUI(tk.Tk):
             r:i+1 for i,r in enumerate(self.regNameList)
         }
 
+        self.zetaFraction = Parameter('z',1e-1)
+
         self.timestep = Parameter('Δt',1e-2)
-        self.timesteps = Parameter('Nt',int(1e5))
-        self.iterations = Parameter('Ni',int(3))
+        self.timesteps = Parameter('Nt',int(1e6))
+        self.iterations = Parameter('Ni',int(9))
         # self.progressBar = Parameter('Progress Bar',True)
 
         self.extraction = Parameter('Extract data',False)
@@ -96,7 +98,7 @@ class ParametersGUI(tk.Tk):
             'l*(rs^a)/(1+rs^a)',
             'l*(rsk/a)/(1+rsk/a)',
             'l*(rsk^a)/(1+rsk^a)',
-            '(1-z)*efl+z*efs',
+            '(1-z)*efl_k^a+z*efs_k^a',
         ]
         self.interactingLaw = Parameter(
             'Interacting law',
@@ -128,11 +130,11 @@ class ParametersGUI(tk.Tk):
         popPrmFrame.LabelSlider(self.deviation,(0,1),0.001,(True,False))
         self.SetDeviationUpperLimit()
         popPrmFrame.LabelEntry(self.convincibility)
-        self.SetConvincibility()
 
         popPrmFrame.LabelEntry(self.population)
         self.attractivity.var.trace_add("write",self.SetDeviationUpperLimit)
-        self.attractivity.var.trace_add("write",self.SetConvincibility)
+
+        popPrmFrame.LabelEntry(self.zetaFraction,colSpan=2)
 
         popPrmFrame.LabelComboBox(self.region)
         self.region.var.trace_add("write",self.SetPopulation)
@@ -155,7 +157,12 @@ class ParametersGUI(tk.Tk):
         simPrmFrame.CheckBox(self.extraction)
         simPrmFrame.CheckBox(self.analysis)
         simPrmFrame.CheckBox(self.edgeWeights)
+
         simPrmFrame.LabelComboBox(self.interactingLaw)
+        self.interactingLaw.var.trace_add("write",self.InteractingLawCallBack)
+        self.InteractingLawCallBack()
+        if self.interactingLaw.var.get() == '(1-z)*efl_k^a+z*efs_k^a':
+            self.SetConvincibility()
 
 
         ppcPrmFrame = Frame(
@@ -170,11 +177,21 @@ class ParametersGUI(tk.Tk):
             1,
             colSpan=ppcPrmFrame.nCol
         )
+        self.timesteps.var.trace_add(
+            "write",lambda *args: self.SetSliderUpperLimit(
+                self.screenshots,self.timesteps
+            )
+        )
         ppcPrmFrame.LabelSlider(
             self.smoothingFactor,
             (1,self.screenshots.var.get()),
             1,
             colSpan=ppcPrmFrame.nCol
+        )
+        self.screenshots.var.trace_add(
+            "write",lambda *args: self.SetSliderUpperLimit(
+                self.smoothingFactor,self.screenshots
+            )
         )
 
 
@@ -198,14 +215,14 @@ class ParametersGUI(tk.Tk):
     def SetDeviationUpperLimit(self,*args):
         try:
             l = self.attractivity.var.get()
-            if type(l) == float:
+            if isinstance(l,float):
                 res = self.deviation.wid['resolution']
                 if l >= 1:
                     l=1-res
                     self.attractivity.var.set(l)
                 self.deviation.wid['to'] = 1-l-res
         except Exception:
-            return
+            pass
 
     def SetPopulation(self,*args):
         nameReg = self.region.var.get()
@@ -219,6 +236,30 @@ class ParametersGUI(tk.Tk):
     def SetSimulationState(self,state):
         self.simFlag.var.set(state)
         self.destroy() # Close the window after any button is pressed
+
+    def InteractingLawCallBack(self,*args):
+        if self.interactingLaw.var.get() == '(1-z)*efl_k^a+z*efs_k^a':
+            self.zetaFraction.frame.grid()
+            self.EnableCallBack(self.attractivity,self.SetConvincibility)
+        else:
+            self.zetaFraction.frame.grid_remove()
+            self.DisableCallBack(self.attractivity)
+
+    def SetSliderUpperLimit(self,slider,ref):
+        try:
+            val = ref.var.get()
+        except Exception:
+            return
+        slider.wid["to"] = val
+
+    def EnableCallBack(self,prm,clb):
+        if prm.cbid is None:
+            prm.cbid = prm.var.trace_add("write",clb)
+
+    def DisableCallBack(self,prm):
+        if prm.cbid is not None:
+            prm.var.trace_remove("write",prm.cbid)
+            prm.cbid = None
 
     # Functions
     def GatherParameters(self):
@@ -284,7 +325,7 @@ class ProgressGUI(tk.Tk):
             )
 
             self.bars.append(getattr(self,label).wid)
-            self.status.append(getattr(self,status).wid)
+            self.status.append(getattr(self,status).lbl)
         #endregion
 
         CentreGUI(self)
@@ -416,14 +457,14 @@ class Frame(ttk.Frame):
         pad=((0,3),2)
     ):
         if width is None: width=self.labelWidth
-        data.wid = ttk.Label(
+        data.lbl = ttk.Label(
             master=self,
             text=data.text,
             font=self.normalFontStyle,
             anchor=anchor,
             width=width
         )
-        data.wid.grid(
+        data.lbl.grid(
             row=self.cRow,
             column=self.cCol,
             columnspan=colSpan,
@@ -567,7 +608,7 @@ class Frame(ttk.Frame):
     ):
         if labelWidth is None: labelWidth=self.labelWidth 
         
-        fieldFrame = Frame(
+        data.frame = Frame(
             self,colSpan=colSpan,
             pos=(self.cRow,self.cCol),
             pad=(self.pCol,self.pRow),
@@ -575,8 +616,8 @@ class Frame(ttk.Frame):
         )
 
         data.text += ':'
-        fieldFrame.Label(data,labelWidth)
-        fieldFrame.Entry(data)
+        data.frame.Label(data,labelWidth)
+        data.frame.Entry(data)
 
         self.NextColumn(colSpan)
 
@@ -586,18 +627,18 @@ class Frame(ttk.Frame):
         labelWidth=None,
         colSpan=1
     ):
-        fieldFrame = Frame(
+        data.frame = Frame(
             self,pos=(self.cRow,self.cCol),
             colSpan=colSpan,
             pad=(self.pCol,self.pRow)
         )
 
         data.text += ':'
-        fieldFrame.Label(
+        data.frame.Label(
             data,
             width=labelWidth
         )
-        fieldFrame.Slider(
+        data.frame.Slider(
             data,
             bounds,
             res,
@@ -607,7 +648,7 @@ class Frame(ttk.Frame):
         self.NextColumn(colSpan)
 
     def LabelComboBox(self,data,colSpan=2):
-        fieldFrame = Frame(
+        data.frame = Frame(
             self,
             pos=(self.cRow,self.cCol),
             colSpan=colSpan,
@@ -615,13 +656,13 @@ class Frame(ttk.Frame):
         )
 
         data.text += ':'
-        fieldFrame.Label(
+        data.frame.Label(
             data,
             colSpan=colSpan,
             pad=((0,0),(0,0)),
             anchor='s'
         )
-        fieldFrame.ComboBox(data,colSpan)
+        data.frame.ComboBox(data,colSpan)
 
         self.NextColumn(colSpan)
 
@@ -637,14 +678,24 @@ class Frame(ttk.Frame):
 
 class Parameter():
     def __init__(
-        self,text=None,value=None,
-        list=None,var=None,wid=None
+        self,
+        text=None,
+        value=None,
+        lbl=None,
+        var=None,
+        wid=None,
+        frame=None,
+        list=None,
+        cbid=None # CallBack id
     ):
         self.text = text
         self.val  = value
-        self.list = list
+        self.lbl  = lbl
         self.var  = var
         self.wid  = wid
+        self.frame = frame
+        self.list = list
+        self.cbid = cbid
 
 class Parameters():
     def __init__(self,**kwargs):
