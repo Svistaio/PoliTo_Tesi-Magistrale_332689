@@ -31,6 +31,7 @@ class KineticSimulation():
         self.l = float(clsPrm.attractivity)
         self.a = float(clsPrm.convincibility)
         self.s = float(clsPrm.deviation)
+        self.z = float(clsPrm.zetaFraction)
 
         self.Nc = int(clsReg.Nc)
         self.P  = int(clsPrm.population)
@@ -105,6 +106,7 @@ class KineticSimulation():
         l = self.l
         a = self.a
         s = self.s
+        z = self.z
         il = self.il
         typ = self.typ
 
@@ -140,7 +142,8 @@ class KineticSimulation():
                     MonteCarloAlgorithm,
                     p,Ni,Nc,Ns,ns,p0,
                     di,invdi,Mdt,
-                    l,a,s,il,typ.size,
+                    l,a,s,z,il,
+                    typ.size,
                     shmp.name,
                     shme.name,
                     shmd.name
@@ -217,6 +220,7 @@ class KineticSimulation():
 
     # Figures
     def SizeDistrFittingsFig(self):
+        il = self.il
         Ni = self.Ni
         Nc = self.Nc
         ta = self.ta
@@ -232,7 +236,7 @@ class KineticSimulation():
         clr = self.clr
 
         figData = self.figData
-        fig, ax = figData.SetFigs(1,2,size=(15,6))
+        fig, ax = figData.SetFigs(1,3,size=(23,6))
 
         sMax = cs.max(); sMin = cs.min()
 
@@ -269,11 +273,12 @@ class KineticSimulation():
                 ax=ax[0]
             ) # Fit plot
 
-            ### Power law fit ###
+            ### Power law fit log-log ###
             b = libF.CreateParetoFitPlot(
                 cs[:,:,t],
                 figData.fig2,
                 upperbound=sMax,
+                yscale='log',
                 Ni=Ni,
                 ta=ta,
                 label=(
@@ -284,6 +289,24 @@ class KineticSimulation():
                 alpha=((0.6,0.3),(1,0.15)),
                 idx=t+1,
                 ax=ax[1]
+            )
+
+            ### Power law fit log-lin ###
+            b = libF.CreateParetoFitPlot(
+                cs[:,:,t],
+                figData.fig3,
+                upperbound=sMax,
+                yscale='lin',
+                Ni=Ni,
+                ta=ta,
+                label=(
+                    f"{lbl[t]} empirical CCDF",
+                    fr"{lbl[t]} pareto fit"
+                ),
+                color=(clr[t],clr[t]),
+                alpha=((0.6,0.3),(1,0.15)),
+                idx=t+1,
+                ax=ax[2]
             )
 
             fig.text(
@@ -302,6 +325,7 @@ class KineticSimulation():
 
         fig.text(.1,.975,fr'$Nc={Nc}$',ha='center')
         fig.text(.1,.925,fr'$Ni={Ni}$',ha='center')
+        fig.text(.9,.925,fr'$il={il}$',ha='center')
 
         # Style
         libF.SetFigStyle(
@@ -314,6 +338,12 @@ class KineticSimulation():
             r'$cs$',r'$P(cs)$',
             xScale='log',yScale='log',
             ax=ax[1],data=figData.fig2
+        )
+
+        libF.SetFigStyle(
+            r'$cs$',r'$P(cs)$',
+            xScale='log',yScale='lin',
+            ax=ax[2],data=figData.fig3
         )
 
         # CentreFig()
@@ -515,7 +545,7 @@ class KineticSimulation():
 def MonteCarloAlgorithm(
     p,Ni,Nc,Ns,ns,p0,
     di,invdi,Mdt,
-    l,a,s,il,typ,
+    l,a,s,z,il,typ,
     namep,namee,named
 ):
     # rng = np.random.default_rng() # Even though it's recommended by Numpy it is not efficiently implemented in Numba, hence it halves the iterations per second if used
@@ -540,8 +570,8 @@ def MonteCarloAlgorithm(
 
         EvolveState(
             vrtState,P,Nc,
-            nk,Mdt,l,a,s,il,
-            di,invdi#,rng
+            nk,Mdt,l,a,s,z,
+            il,di,invdi#,rng
         ) # Warm-up iteration to avoid polluting the initial time t0
         screenshots[:,nsid,0] = vrtState[:,0]
         screenshots[:,nsid,1] = vrtState[:,1]
@@ -551,8 +581,8 @@ def MonteCarloAlgorithm(
         for ns in range(Ns-1):
             EvolveState(
                 vrtState,P,Nc,
-                nk,Mdt,l,a,s,il,
-                di,invdi,#rng
+                nk,Mdt,l,a,s,z,
+                il,di,invdi,#rng
             )
 
             progress[p] = (ns+2)*nk
@@ -578,8 +608,8 @@ def MonteCarloAlgorithm(
 @njit(cache=True)
 def EvolveState(
     cs,P,Nc,nk,
-    Mdt,l,a,s,il,
-    di,idi#,rng
+    Mdt,l,a,s,z,
+    il,di,idi#,rng
 ):
     for _ in range(nk):
         FYDInPlaceShuffle(P,Nc)
@@ -597,7 +627,7 @@ def EvolveState(
             if theta == 1:
                 si = cs[ii,0]; sr = cs[ir,0]
 
-                e = NonLinearEmigration(si,ii,sr,ir,di,idi,il,l,a)
+                e = NonLinearEmigration(si,ii,sr,ir,di,idi,il,l,a,z)
                 ga = StochasticFluctuations(s,e)
 
                 cs[ii,0] = si*(1-e+ga) 
@@ -610,7 +640,7 @@ def EvolveState(
             if theta == 1:
                 si = cs[ii,1]; sr = cs[ir,1]
 
-                e = NonLinearEmigration(si,ii,sr,ir,di,idi,il,l,a)
+                e = NonLinearEmigration(si,ii,sr,ir,di,idi,il,l,a,z)
                 ga = StochasticFluctuations(s,e)
 
                 cs[ii,1] = si*(1-e+ga) 
@@ -637,7 +667,7 @@ def NonLinearEmigration(
         si,ii, # Interacting city size
         sr,ir, # Receiving city size
         di,idi,
-        il,l,a
+        il,l,a,z
     ):
     if si <= 0: return 0
 
@@ -662,7 +692,6 @@ def NonLinearEmigration(
         rsk = (si/sr)*(di[ii]*idi[ir]) # Inverse relative population ratio
         efs = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the separation fraction
 
-        z = .1
         return (1-z)*efl+z*efs
 
 @njit(cache=True)
