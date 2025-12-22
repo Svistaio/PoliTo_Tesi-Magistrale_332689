@@ -50,11 +50,13 @@ class KineticSimulation():
         self.times = ns[::ks]*dt
 
         di = np.sum(
-            clsReg.A,axis=0,
-            dtype=np.int64
-        ); self.di = di
+            clsReg.A,axis=1,
+            dtype=np.int64,
+            keepdims=True
+        ); self.di = di.reshape((Nc,))
         # Inverse degrees
-        self.invdi = np.array(1/di,dtype=np.float64)
+        invdi = np.array(1/di,dtype=np.float64)
+        self.D = di@invdi.T
 
         self.R = int(clsPrm.region)
         self.P = int(clsPrm.population)
@@ -95,8 +97,7 @@ class KineticSimulation():
         Ns = self.Ns
         ns = self.ns
 
-        invdi = self.invdi
-        di = self.di
+        D = self.D
 
         Mdt = self.Mdt
         l = self.l
@@ -104,7 +105,7 @@ class KineticSimulation():
         s = self.s
         z = self.z
         il = self.il
-        typ = self.typ
+        typ = self.typ.size
 
         process = range(Ni)
 
@@ -137,16 +138,16 @@ class KineticSimulation():
                 for p in process:
                     futures[p] = executor.submit(
                         MonteCarloAlgorithm,
-                        p,Ni,Nc,Ns,ns,p0,
-                        di,invdi,Mdt,
+                        p,Ni,Nc,Ns,ns,
+                        p0,D,Mdt,typ,
                         l,a,s,z,il,
-                        typ.size,
                         gui=True,
                         namep=shmp.name,
                         namee=shme.name,
                         named=shmd.name
                     )
                 bar.mainloop()
+
 
             shmp.close(); shmp.unlink()
             shme.close(); shme.unlink()
@@ -162,10 +163,9 @@ class KineticSimulation():
                 for p in process:
                     futures[p] = executor.submit(
                         MonteCarloAlgorithm,
-                        p,Ni,Nc,Ns,ns,p0,
-                        di,invdi,Mdt,
+                        p,Ni,Nc,Ns,ns,
+                        p0,D,Mdt,typ,
                         l,a,s,z,il,
-                        typ.size,
                     )
 
         data = [None]*Ni
@@ -178,7 +178,7 @@ class KineticSimulation():
             self.lbl,
             self.siVrt,
             self.vrtState,
-            typ,
+            self.typ,
             self.li2Name,
             Ni
         )
@@ -205,6 +205,7 @@ class KineticSimulation():
                     )
                     sv[r,1:,t] = conv[::ks].copy()
             
+            # This functions applies the mean every ks unit of the Ns screenshots
             return sv
 
         self.vrtState = np.array([data[p][0] for p in range(Ni)])
@@ -221,14 +222,13 @@ class KineticSimulation():
 
             self.itAvrVrtState = np.mean(self.vrtState,axis=0)
             self.itAvrScreenshots = np.mean(screenshots,axis=0)
-            self.itAvrConvScreenshots = Convolve(np.mean(screenshots,axis=0))
         else:
             self.ta = None
 
             self.itAvrVrtState = self.vrtState[0,:,:]
             self.itAvrScreenshots = screenshots[0,:,:,:]
-            self.itAvrConvScreenshots = Convolve(screenshots[0,:,:,:])
 
+        self.itAvrConvScreenshots = Convolve(self.itAvrScreenshots)
         self.siVrt = np.argsort(self.vrtState,axis=1)
         self.siAvr = np.argsort(self.itAvrVrtState,axis=0)
 
@@ -355,7 +355,7 @@ class KineticSimulation():
         fig.text(p-i*d,.925,fr'$\alpha={self.a}$',ha='center')
 
         i += 1
-        if self.il in (2,4):
+        if self.il in (2,4,6):
             fig.text(p-i*d,.95,fr'$ζ={self.z}$',ha='center')
 
         # Style
@@ -511,7 +511,7 @@ class KineticSimulation():
         figData.SaveFig('SizeDistributionEvolution')
 
     def SizeEvolutionsFig(self):
-        Nc = self.Nc
+        # Nc = self.Nc
         typ = self.typ
 
         times = self.times
@@ -576,9 +576,9 @@ class KineticSimulation():
 ### Auxiliary functions ###
 
 def MonteCarloAlgorithm(
-    p,Ni,Nc,Ns,ns,p0,
-    di,invdi,Mdt,
-    l,a,s,z,il,typ,
+    p,Ni,Nc,Ns,ns,
+    p0,D,Mdt,typ,
+    l,a,s,z,il,
     gui=False,
     namep=None,
     namee=None,
@@ -596,8 +596,8 @@ def MonteCarloAlgorithm(
     nsid = 1
 
     if gui: # If ProgressGUI is required
-        if namep is None or namee is None or named is None:
-            raise ValueError('GUI requires namep, namee and named for shared memory')
+        # if namep is None or namee is None or named is None:
+        #     raise ValueError('GUI requires namep, namee and named for shared memory')
 
         shmp = shared_memory.SharedMemory(name=namep)
         shme = shared_memory.SharedMemory(name=namee)
@@ -610,8 +610,8 @@ def MonteCarloAlgorithm(
 
             EvolveState(
                 vrtState,P,Nc,
-                nk,Mdt,l,a,s,z,
-                il,di,invdi#,rng
+                nk,Mdt,D,il,
+                l,a,s,z#,rng
             ) # Warm-up iteration to avoid polluting the initial time t0
             screenshots[:,nsid,0] = vrtState[:,0]
             screenshots[:,nsid,1] = vrtState[:,1]
@@ -621,8 +621,8 @@ def MonteCarloAlgorithm(
             for ns in range(Ns-1):
                 EvolveState(
                     vrtState,P,Nc,
-                    nk,Mdt,l,a,s,z,
-                    il,di,invdi,#rng
+                    nk,Mdt,D,il,
+                    l,a,s,z#,rng
                 )
 
                 progress[p] = (ns+2)*nk
@@ -648,8 +648,8 @@ def MonteCarloAlgorithm(
     else:
         EvolveState(
             vrtState,P,Nc,
-            nk,Mdt,l,a,s,z,
-            il,di,invdi#,rng
+            nk,Mdt,D,il,
+            l,a,s,z#,rng
         ) # Warm-up iteration to avoid polluting the initial time t0
         screenshots[:,nsid,0] = vrtState[:,0]
         screenshots[:,nsid,1] = vrtState[:,1]
@@ -659,8 +659,8 @@ def MonteCarloAlgorithm(
         for ns in range(Ns-1):
             EvolveState(
                 vrtState,P,Nc,
-                nk,Mdt,l,a,s,z,
-                il,di,invdi,#rng
+                nk,Mdt,D,il,
+                l,a,s,z#,rng
             )
             screenshots[:,nsid,0] = vrtState[:,0]
             screenshots[:,nsid,1] = vrtState[:,1]
@@ -671,8 +671,8 @@ def MonteCarloAlgorithm(
 @njit(cache=True)
 def EvolveState(
     cs,P,Nc,nk,
-    Mdt,l,a,s,z,
-    il,di,idi#,rng
+    Mdt,D,il,
+    l,a,s,z#,rng
 ):
     for _ in range(nk):
         FYDInPlaceShuffle(P,Nc)
@@ -691,8 +691,7 @@ def EvolveState(
                 si = cs[ii,0]; sr = cs[ir,0]
 
                 e = NonLinearEmigration(
-                    si,di[ii],idi[ii],
-                    sr,di[ir],idi[ir],
+                    si,sr,D[ir,ii],
                     il,l,a,z
                 )
                 ga = StochasticFluctuations(s,e)
@@ -708,8 +707,7 @@ def EvolveState(
                 si = cs[ii,1]; sr = cs[ir,1]
 
                 e = NonLinearEmigration(
-                    si,di[ii],idi[ii],
-                    sr,di[ir],idi[ir],
+                    si,sr,D[ir,ii],
                     il,l,a,z
                 )
                 ga = StochasticFluctuations(s,e)
@@ -735,49 +733,66 @@ def FYDInPlaceShuffle(v,n):
 
 @njit(cache=True)
 def NonLinearEmigration(
-        si,di,idi, # Interacting city size
-        sr,dr,idr, # Receiving city size
+        si,  # Interacting city size
+        sr,  # Receiving city size
+        Dri, # Matrix of ratios dr/di
         il,l,a,z
     ):
     if si <= 0: return 0
 
     if il == 0:
-        rs = sr/si                 # Relative population ratio
-        return l*(rs**a)/(1+rs**a) # Actual emigration rate
+        rs = sr/si
+        return l*(rs**a)/(1+rs**a)
 
     elif il == 1:
-        rsk = (sr/si)*(dr*idi)     # Relative population ratio
-        return l*(rsk/a)/(1+rsk/a) # Actual emigration rate
+        rsk = (sr/si)*Dri
+        return l*(rsk/a)/(1+rsk/a)
 
     elif il == 2:
         if sr <= 0: return 0
 
-        rsk = (sr/si)*(dr*idi)      # Relative population ratio
-        efl = l*(rsk/a)/(1+rsk/a)   # Actual emigration rate for the lumping fraction
+        rsk = (sr/si)*Dri
+        efl = l*(rsk/a)/(1+rsk/a)
 
-        irsk = (si/sr)*(di*idr)     # Inverse relative population ratio
-        efs = l*(irsk/a)/(1+irsk/a) # Actual emigration rate for the separation fraction
+        irsk = 1/rsk
+        efs = l*(irsk/a)/(1+irsk/a)
 
         return (1-z)*efl+z*efs
 
     elif il == 3:
-        rsk = (sr/si)*(dr*idi)       # Relative population ratio
-        return l*(rsk**a)/(1+rsk**a) # Actual emigration rate
+        rsk = (sr/si)*Dri
+        return l*(rsk**a)/(1+rsk**a)
 
     elif il == 4:
         if sr <= 0: return 0
 
-        rsk = (sr/si)*(dr*idi)        # Relative population ratio
-        efl = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the lumping fraction
+        rsk = (sr/si)*Dri
+        efl = l*(rsk**a)/(1+rsk**a)
 
-        irsk = (si/sr)*(di*idr)       # Inverse relative population ratio
-        efs = l*(irsk**a)/(1+irsk**a) # Actual emigration rate for the separation fraction
+        irsk = 1/rsk
+        efs = l*(irsk**a)/(1+irsk**a)
 
         return (1-z)*efl+z*efs
 
+    elif il == 5:
+        rsk = (sr/si)*Dri
+        return l*(rsk/(1+rsk))**a
+
     else:
-        rsk = (sr/si)*(dr*idi)    # Relative population ratio
-        return l*(rsk/(1+rsk))**a # Actual emigration rate
+        if sr <= 0: return 0
+
+        rsk = (sr/si)*Dri
+        efl = l*(rsk/(1+rsk))**a
+
+        irsk = 1/rsk
+        efs = l*(irsk/(1+irsk))**a
+
+        return (1-z)*efl+z*efs
+
+        # rsk = (sr/si)*(dr*idi)  # Relative population*degree ratio
+        # irsk = (si/sr)*(di*idr) # Inverse relative population*degree ratio
+        # efl                     # Actual emigration rate for the lumping fraction
+        # efs                     # Actual emigration rate for the separation fraction
 
     # Numba does not support officially the match structure, hence, even if it appears to work, it's better to use an «if/elif/else» one the sake of performance and stability
 

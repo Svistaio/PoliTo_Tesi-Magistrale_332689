@@ -3,17 +3,17 @@ from multiprocessing import freeze_support
 
 
 def main():
-    import importlib
-
     import libGUI
     import libExtractData as libED
     import libAnalyseNetwork as libAN
     import libMASKineticTheory as libKT
 
+    import importlib
     importlib.reload(libGUI)
     importlib.reload(libED)
     importlib.reload(libAN)
     importlib.reload(libKT)
+
 
     ### Graphic User Interface ###
     clsGUI = libGUI.ParametersGUI()
