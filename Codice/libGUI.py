@@ -83,23 +83,24 @@ class ParametersGUI(tk.Tk):
             r:i+1 for i,r in enumerate(self.regNameList)
         }
 
-        self.zetaFraction = Parameter('z',float(1))
+        self.zetaFraction = Parameter('ζ',float(1))
 
         self.timestep = Parameter('Δt',float(1))
         self.timesteps = Parameter('Nt',int(1))
         self.iterations = Parameter('Ni',int(1))
-        # self.progressBar = Parameter('Progress Bar',True)
+        self.progressBar = Parameter('Progress Bar',True)
 
         self.extraction = Parameter('Extract data',False)
         self.analysis = Parameter('Network analysis',False)
         self.edgeWeights = Parameter('Edge weights',False)
 
         self.intLawList = [
-            'l*(rs^a)/(1+rs^a)',
-            'l*(rsk/a)/(1+rsk/a)',
-            'l*(rsk^a)/(1+rsk^a)',
-            '(1-z)*efl_k^a+z*efs_k^a',
-            'l*(rsk^a)/(1+rsk)^a'
+            'λ(rs^α)/(1+rs^α)',      # 0
+            'λ(rsk/α)/(1+rsk/α)',    # 1
+            '(1-ζ)efl_k/α+ζefs_k/α', # 2
+            'λ(rsk^α)/(1+rsk^α)',    # 3
+            '(1-ζ)efl_k^α+ζefs_k^α', # 4
+            'λ[rsk/(1+rsk)]^α'       # 5
         ]
         self.interactingLaw = Parameter(
             'Interacting law',
@@ -121,14 +122,21 @@ class ParametersGUI(tk.Tk):
         #region Parameter Frames
         pad = 20; pad = (pad,pad)
         mainFrame = Frame(self,pad=pad)
-        pad = 15; pad = (pad,pad)
+        pad = 15; pad = (1.25*pad,pad)
 
         popPrmFrame = Frame(
-            mainFrame,pos=(0,0),pad=pad,
+            mainFrame,
+            pad=pad,
             title='Population parameters'
         )
-        popPrmFrame.LabelSlider(self.attractivity,(0,1),0.01,(False,False))
-        popPrmFrame.LabelSlider(self.deviation,(0,1),0.001,(True,False))
+        popPrmFrame.LabelSlider(
+            self.attractivity,(0,1),0.01,
+            extremes=(False,False)
+        )
+        popPrmFrame.LabelSlider(
+            self.deviation,(0,1),0.001,
+            extremes=(True,False)
+        )
         self.SetDeviationUpperLimit()
         popPrmFrame.LabelEntry(self.convincibility)
 
@@ -142,17 +150,19 @@ class ParametersGUI(tk.Tk):
 
 
         timePrmFrame = Frame(
-            mainFrame,pos=(0,1),pad=pad,
+            mainFrame,
+            pad=pad,
             title='Time parameters'#,labelWidth=3
         )
         timePrmFrame.LabelEntry(self.timestep,colSpan=timePrmFrame.nCol)
         timePrmFrame.LabelEntry(self.timesteps,colSpan=timePrmFrame.nCol)
         timePrmFrame.LabelEntry(self.iterations,colSpan=timePrmFrame.nCol)
-        # timePrmFrame.CheckBox(self.progressBar)
+        timePrmFrame.CheckBox(self.progressBar)
 
 
         simPrmFrame = Frame(
-            mainFrame,pos=(1,0),pad=pad,
+            mainFrame,
+            pad=pad,
             title='Simulation parameters'
         )
         simPrmFrame.CheckBox(self.extraction)
@@ -164,7 +174,8 @@ class ParametersGUI(tk.Tk):
 
 
         ppcPrmFrame = Frame(
-            mainFrame,pos=(1,1),pad=pad,
+            mainFrame,
+            pad=pad,
             title='Postprocessing parameters'
         )
         ppcPrmFrame.CheckBox(self.PdfPopUp)
@@ -198,32 +209,34 @@ class ParametersGUI(tk.Tk):
             'Default':{
                 # self.population:self.regPopList['Sardegna'],
                 self.attractivity:5e-2,
-                self.convincibility:1e-2,
+                self.convincibility:5e-1,
                 self.deviation:5e-2,
                 self.region:self.regNameList[19],
                 self.zetaFraction:1e-1,
                 self.timestep:1e-2,
-                self.timesteps:int(1e7),
-                self.iterations:int(15),
+                self.timesteps:int(1e6),
+                self.iterations:15,
+                self.progressBar:True,
                 self.extraction:False,
                 self.analysis:False,
                 self.edgeWeights:False,
-                self.interactingLaw:self.intLawList[3],
+                self.interactingLaw:self.intLawList[4],
                 self.PdfPopUp:False,
                 self.LaTeXConversion:False,
                 self.screenshots:int(100),
                 self.smoothingFactor:int(10),
             },
-            '2° Interacting Law':{
+            'λ(rsk/α)/(1+rsk/α)':{
                 # self.population:self.regPopList['Sardegna'],
-                self.attractivity:0.05,
-                self.convincibility:4,
-                self.deviation:0.05,
+                self.attractivity:5e-2,
+                # self.convincibility:4,
+                self.deviation:5e-2,
                 self.region:self.regNameList[19],
-                self.zetaFraction:1e-1,
+                # self.zetaFraction:1e-1,
                 self.timestep:1e-2,
-                self.timesteps:int(1e6),
-                self.iterations:1,
+                self.timesteps:int(5e5),
+                self.iterations:15,
+                self.progressBar:True,
                 self.extraction:False,
                 self.analysis:False,
                 self.edgeWeights:False,
@@ -233,20 +246,61 @@ class ParametersGUI(tk.Tk):
                 # self.screenshots:int(100),
                 # self.smoothingFactor:int(10),
             },
-            '4° Interacting Law':{
+            '(1-ζ)efl_k/α+ζefs_k/':{
+                # self.population:self.regPopList['Sardegna'],
+                self.attractivity:5e-2,
+                # self.convincibility:4,
+                self.deviation:5e-2,
+                self.region:self.regNameList[19],
+                # self.zetaFraction:1e-1,
+                self.timestep:1e-2,
+                self.timesteps:int(1e7),
+                self.iterations:15,
+                self.progressBar:True,
+                self.extraction:False,
+                self.analysis:False,
+                self.edgeWeights:False,
+                self.interactingLaw:self.intLawList[2],
+                self.PdfPopUp:False,
+                self.LaTeXConversion:False,
+                # self.screenshots:int(100),
+                # self.smoothingFactor:int(10),
+            },
+            'λ(rsk^α)/(1+rsk^α)':{
                 # self.population:self.population.var.get(),
-                self.attractivity:0.1,
-                self.convincibility:0.1,
-                self.deviation:0.05,
+                self.attractivity:5e-2,
+                self.convincibility:3e-1,
+                self.deviation:5e-2,
                 self.region:self.regNameList[19],
                 self.zetaFraction:1e-1,
                 self.timestep:1e-2,
                 self.timesteps:int(1e7),
-                self.iterations:9,
+                self.iterations:15,
+                self.progressBar:True,
                 self.extraction:False,
                 self.analysis:False,
                 self.edgeWeights:False,
-                self.interactingLaw:self.intLawList[1],
+                self.interactingLaw:self.intLawList[3],
+                self.PdfPopUp:False,
+                self.LaTeXConversion:False,
+                # self.screenshots:int(100),
+                # self.smoothingFactor:int(10),
+            },
+            'λ[rsk/(1+rsk)]^α':{
+                # self.population:self.population.var.get(),
+                self.attractivity:5e-2,
+                self.convincibility:3e-1,
+                self.deviation:5e-2,
+                self.region:self.regNameList[19],
+                self.zetaFraction:1e-1,
+                self.timestep:1e-2,
+                self.timesteps:int(1e7),
+                self.iterations:15,
+                self.progressBar:True,
+                self.extraction:False,
+                self.analysis:False,
+                self.edgeWeights:False,
+                self.interactingLaw:self.intLawList[5],
                 self.PdfPopUp:False,
                 self.LaTeXConversion:False,
                 # self.screenshots:int(100),
@@ -256,13 +310,14 @@ class ParametersGUI(tk.Tk):
         self.caseStudy = Parameter(
             'Case studies',
             list(self.caseStudiesDict.keys())[0],
-            list=list(self.caseStudiesDict.keys()),
+            list=list(self.caseStudiesDict.keys()),#[1:]
         )
         #endregion
 
         #region Button frame
         buttonFrame = Frame(
-            mainFrame,pos=(2,0),pad=pad,
+            mainFrame,
+            pad=pad,
             colSpan=mainFrame.nCol
         )
 
@@ -281,13 +336,8 @@ class ParametersGUI(tk.Tk):
         )
         #endregion
 
-        # CallBack calls
-        self.SetCaseStudy()
-        self.InteractingLawCallBack()
-        if self.intLawCodeList[self.interactingLaw.var.get()] == 3:
-            self.SetConvincibility()
-
         # GUI call
+        self.SetCaseStudy()
         CentreGUI(self)
         self.mainloop()
 
@@ -318,11 +368,14 @@ class ParametersGUI(tk.Tk):
         self.destroy() # Close the window after any button is pressed
 
     def InteractingLawCallBack(self,*args):
-        if self.intLawCodeList[self.interactingLaw.var.get()] == 3:
+        if self.intLawCodeList[self.interactingLaw.var.get()] in (2,4):
             self.zetaFraction.frame.grid()
-            self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
             self.zetaFraction.frame.grid_remove()
+
+        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2):
+            self.EnableCallBack(self.attractivity,self.SetConvincibility)
+        else:
             self.DisableCallBack(self.attractivity)
 
     def SetSliderUpperLimit(self,slider,ref):
@@ -345,6 +398,10 @@ class ParametersGUI(tk.Tk):
         caseStudy = self.caseStudy.var.get()
         for prm,val in self.caseStudiesDict[caseStudy].items():
             prm.var.set(val)
+
+        self.InteractingLawCallBack()
+        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2):
+            self.SetConvincibility()
 
     # Functions
     def GatherParameters(self):
@@ -389,12 +446,17 @@ class ProgressGUI(tk.Tk):
 
         #region Frames
         pad = 20; pad = (pad,pad)
-        mainFrame = Frame(self,pad=pad,normalFontStyle=('JetBrains Mono',11))
+        mainFrame = Frame(
+            self,
+            nCol=1,
+            pad=pad,
+            normalFontStyle=('JetBrains Mono',11)
+        )
         pad = 5; pad = (pad,pad)
 
-        self.bars = []; self.status = []
+        self.frames = []; self.bars = []; self.status = []
         for i in range(Ni):
-            progressBarFrame = Frame(mainFrame,nCol=3,pos=(i,0),pad=pad)
+            progressBarFrame = Frame(mainFrame,nCol=3,pad=pad)
 
             label = f"p{'0' if i+1<10 else ''}{i+1}" # Process
             setattr(self,label,Parameter(text=label+':'))
@@ -405,21 +467,32 @@ class ProgressGUI(tk.Tk):
             status = f"s{'0' if i+1<10 else ''}{i+1}"
             setattr(self,status,Parameter(text=''))
             progressBarFrame.Label(
-                getattr(self,status),width=60,
-                pad=((0,0),(0,0)),anchor='c'
+                getattr(self,status),
+                width=60,
+                pad=((0,0),(0,0)),
+                anchor='c'
             )
 
+            self.frames.append(progressBarFrame)
             self.bars.append(getattr(self,label).wid)
             self.status.append(getattr(self,status).lbl)
+
+        progressBarFrame = Frame(mainFrame,sticky='e')
+        self.completion = Parameter(text=f'0/{Ni}',val=0)
+        progressBarFrame.Label(self.completion)
+
+        shown = 10; self.shown = shown
+        if Ni>shown:
+            for i in range(Ni-shown):
+                self.frames[shown+i].grid_remove()
+        self.removed = [False]*Ni
         #endregion
 
         CentreGUI(self)
-        self.after(50,self.PoolInfo)
+        self.after(100,self.PoolInfo)
 
     def PoolInfo(self):
-        Ni = self.Ni
-
-        for p in range(Ni):
+        for p in range(self.Ni):
             nt = int(self.progress[p])
             el = float(self.elapsed[p])
 
@@ -434,19 +507,33 @@ class ProgressGUI(tk.Tk):
                     f'{ips:.2f}it/s]'
                 )
 
+            if self.done[p] and not self.removed[p]:
+                nextFrame = self.shown+self.completion.val
+                if nextFrame<self.Ni:
+                    self.frames[nextFrame].grid()
+                    self.frames[p].grid_remove()
+
+                self.completion.val+=1
+                self.removed[p] = True
+
+                self.completion.lbl['text']=f'{self.completion.val}/{self.Ni}'
+
         if np.all(self.done):
             self.destroy()
         else:
-            self.after(50,self.PoolInfo)
+            self.after(100,self.PoolInfo)
 
 ### Auxiliary classes ###
 
 class Frame(ttk.Frame):
     def __init__(
         self,parent,
-        nCol=2,colSpan=1,
-        title=None,sticky='n',
-        pos=(0,0),pad=((0,0),(0,0)),
+        nCol=2,
+        colSpan=1,
+        title=None,
+        sticky='n',
+        pos=None,
+        pad=((0,0),(0,0)),
         labelWidth = None,
         normalFontStyle = None,
         titleFontStyle = None
@@ -485,10 +572,19 @@ class Frame(ttk.Frame):
         if title is not None:
             self.SetTitle(title)
 
+        if isinstance(parent,Frame):
+            if pos is None:
+                pos = (parent.cRow,parent.cCol)
+            parent.NextColumn(colSpan)
+        else:
+            pos = (0,0) # Main frame position
+
         self.grid(
-            row=pos[0],column=pos[1],
+            row=pos[0],
+            column=pos[1],
             columnspan=colSpan,
-            padx=pad[0],pady=pad[1],
+            padx=pad[0],
+            pady=pad[1],
             sticky=sticky
         )
 
@@ -511,9 +607,9 @@ class Frame(ttk.Frame):
             self.NextRow()
 
         if self.cCol == 0:
-            self.pCol[0] = 0
+            self.pCol[1] = 0
         else:
-            self.pCol[0] = 15
+            self.pCol[1] = 10
 
     def SeteColumn(self,column): self.cCol = column
 
@@ -538,7 +634,9 @@ class Frame(ttk.Frame):
         data,
         width=None,
         anchor='e',
+        sticky=None,
         colSpan=1,
+        pos=None,
         pad=((0,3),2)
     ):
         if width is None: width=self.labelWidth
@@ -549,12 +647,16 @@ class Frame(ttk.Frame):
             anchor=anchor,
             width=width
         )
+
+        row = self.cRow if pos is None else pos[0]
+        col = self.cCol if pos is None else pos[1]
+
         data.lbl.grid(
-            row=self.cRow,
-            column=self.cCol,
+            row=row,
+            column=col,
             columnspan=colSpan,
             padx=pad[0],pady=pad[1],
-            # sticky='e'
+            sticky=sticky
         )
         self.NextColumn(colSpan)
 
@@ -689,13 +791,14 @@ class Frame(ttk.Frame):
     def LabelEntry(
         self,data,
         colSpan=1,
+        pos=None,
         labelWidth=None
     ):
         if labelWidth is None: labelWidth=self.labelWidth 
         
         data.frame = Frame(
             self,colSpan=colSpan,
-            pos=(self.cRow,self.cCol),
+            pos=pos,
             pad=(self.pCol,self.pRow),
             labelWidth=labelWidth
         )
@@ -704,17 +807,17 @@ class Frame(ttk.Frame):
         data.frame.Label(data,labelWidth)
         data.frame.Entry(data)
 
-        self.NextColumn(colSpan)
-
     def LabelSlider(
         self,data,bounds,res,
         extremes=(True,True),
+        pos=None,
         labelWidth=None,
         colSpan=1
     ):
         data.frame = Frame(
-            self,pos=(self.cRow,self.cCol),
+            self,
             colSpan=colSpan,
+            pos=pos,
             pad=(self.pCol,self.pRow)
         )
 
@@ -730,17 +833,16 @@ class Frame(ttk.Frame):
             extremes
         )
 
-        self.NextColumn(colSpan)
-
     def LabelComboBox(
         self,
         data,
         colSpan=2,
+        pos=None,
         pad=((0,0),(10,0))
     ):
         data.frame = Frame(
             self,
-            pos=(self.cRow,self.cCol),
+            pos=pos,
             colSpan=colSpan,
             pad=pad
         )
@@ -753,8 +855,6 @@ class Frame(ttk.Frame):
             anchor='s'
         )
         data.frame.ComboBox(data,colSpan)
-
-        self.NextColumn(colSpan)
 
     def CheckDataType(self,data):
         if isinstance(data.val,float):
@@ -770,7 +870,7 @@ class Parameter():
     def __init__(
         self,
         text=None,
-        value=None,
+        val=None,
         lbl=None,
         var=None,
         wid=None,
@@ -779,7 +879,7 @@ class Parameter():
         cbid=None # CallBack id
     ):
         self.text = text
-        self.val  = value
+        self.val  = val
         self.lbl  = lbl
         self.var  = var
         self.wid  = wid

@@ -12,12 +12,10 @@ from multiprocessing import shared_memory
 from matplotlib.pyplot import get_cmap
 from matplotlib.colors import LogNorm
 
-import importlib
+from libGUI import ProgressGUI
+from libExtractData import WriteSimulationData
 
-import libGUI
-importlib.reload(libGUI)
-import libExtractData as libED
-importlib.reload(libED)
+import importlib
 import libFigures as libF
 importlib.reload(libF)
 
@@ -37,6 +35,7 @@ class KineticSimulation():
         Nc = int(clsReg.Nc); self.Nc = Nc
         self.li2Name = clsReg.li2Name
 
+        self.progressBar = clsPrm.progressBar
         dt = float(clsPrm.timestep); self.dt = dt
         Nt = int(clsPrm.timesteps); self.Nt = Nt
 
@@ -91,6 +90,7 @@ class KineticSimulation():
         Nc = self.Nc
         p0 = self.p0
 
+        progressBar = self.progressBar
         Nt = self.Nt
         Ns = self.Ns
         ns = self.ns
@@ -108,47 +108,65 @@ class KineticSimulation():
 
         process = range(Ni)
 
-        progress = np.zeros(Ni,dtype=np.int64)
-        elapsed = np.zeros(Ni,dtype=np.float64)
-        done = np.zeros(Ni,dtype=np.int8)
+        if progressBar: 
+            progress = np.zeros(Ni,dtype=np.int64)
+            elapsed = np.zeros(Ni,dtype=np.float64)
+            done = np.zeros(Ni,dtype=np.int8)
 
-        shmp = shared_memory.SharedMemory(create=True,size=progress.nbytes)
-        shme = shared_memory.SharedMemory(create=True,size=elapsed.nbytes)
-        shmd = shared_memory.SharedMemory(create=True,size=done.nbytes)
+            shmp = shared_memory.SharedMemory(create=True,size=progress.nbytes)
+            shme = shared_memory.SharedMemory(create=True,size=elapsed.nbytes)
+            shmd = shared_memory.SharedMemory(create=True,size=done.nbytes)
 
-        np.ndarray(progress.shape,progress.dtype,shmp.buf)[:] = 0
-        np.ndarray(elapsed.shape,elapsed.dtype,shme.buf)[:] = 0
-        np.ndarray(done.shape,done.dtype,shmd.buf)[:] = 0
+            np.ndarray(progress.shape,progress.dtype,shmp.buf)[:] = 0
+            np.ndarray(elapsed.shape,elapsed.dtype,shme.buf)[:] = 0
+            np.ndarray(done.shape,done.dtype,shmd.buf)[:] = 0
 
-        bar = libGUI.ProgressGUI(
-            Ni,Nt,
-            shmp.name,
-            shme.name,
-            shmd.name
-        )
+            bar = ProgressGUI(
+                Ni,Nt,
+                shmp.name,
+                shme.name,
+                shmd.name
+            )
 
-        ctx = mp.get_context("spawn")
-        with ProcessPoolExecutor(
-            max_workers=3,
-            mp_context=ctx
-        ) as executor:
-            futures = {}
-            for p in process:
-                futures[p] = executor.submit(
-                    MonteCarloAlgorithm,
-                    p,Ni,Nc,Ns,ns,p0,
-                    di,invdi,Mdt,
-                    l,a,s,z,il,
-                    typ.size,
-                    shmp.name,
-                    shme.name,
-                    shmd.name
-                )
-            bar.mainloop()
+            ctx = mp.get_context("spawn")
+            with ProcessPoolExecutor(
+                max_workers=3,
+                mp_context=ctx
+            ) as executor:
+                futures = {}
+                for p in process:
+                    futures[p] = executor.submit(
+                        MonteCarloAlgorithm,
+                        p,Ni,Nc,Ns,ns,p0,
+                        di,invdi,Mdt,
+                        l,a,s,z,il,
+                        typ.size,
+                        gui=True,
+                        namep=shmp.name,
+                        namee=shme.name,
+                        named=shmd.name
+                    )
+                bar.mainloop()
 
-        shmp.close(); shmp.unlink()
-        shme.close(); shme.unlink()
-        shmd.close(); shmd.unlink()
+            shmp.close(); shmp.unlink()
+            shme.close(); shme.unlink()
+            shmd.close(); shmd.unlink()
+
+        else:
+            ctx = mp.get_context("spawn")
+            with ProcessPoolExecutor(
+                max_workers=3,
+                mp_context=ctx
+            ) as executor:
+                futures = {}
+                for p in process:
+                    futures[p] = executor.submit(
+                        MonteCarloAlgorithm,
+                        p,Ni,Nc,Ns,ns,p0,
+                        di,invdi,Mdt,
+                        l,a,s,z,il,
+                        typ.size,
+                    )
 
         data = [None]*Ni
         for p, fut in futures.items():
@@ -156,7 +174,7 @@ class KineticSimulation():
         self.data = data
 
         self.EvaluateSimulationData()
-        libED.WriteSimulationData(
+        WriteSimulationData(
             self.lbl,
             self.siVrt,
             self.vrtState,
@@ -337,8 +355,8 @@ class KineticSimulation():
         fig.text(p-i*d,.925,fr'$\alpha={self.a}$',ha='center')
 
         i += 1
-        if self.il == 3:
-            fig.text(p-i*d,.95,fr'$z={self.z}$',ha='center')
+        if self.il in (2,4):
+            fig.text(p-i*d,.95,fr'$ζ={self.z}$',ha='center')
 
         # Style
         libF.SetFigStyle(
@@ -561,7 +579,10 @@ def MonteCarloAlgorithm(
     p,Ni,Nc,Ns,ns,p0,
     di,invdi,Mdt,
     l,a,s,z,il,typ,
-    namep,namee,named
+    gui=False,
+    namep=None,
+    namee=None,
+    named=None
 ):
     # rng = np.random.default_rng() # Even though it's recommended by Numpy it is not efficiently implemented in Numba, hence it halves the iterations per second if used
 
@@ -574,15 +595,57 @@ def MonteCarloAlgorithm(
     nk = ns[1]
     nsid = 1
 
-    shmp = shared_memory.SharedMemory(name=namep)
-    shme = shared_memory.SharedMemory(name=namee)
-    shmd = shared_memory.SharedMemory(name=named)
+    if gui: # If ProgressGUI is required
+        if namep is None or namee is None or named is None:
+            raise ValueError('GUI requires namep, namee and named for shared memory')
 
-    try:
-        progress = np.ndarray((Ni,),dtype=np.int64,buffer=shmp.buf)
-        elapsed = np.ndarray((Ni,),dtype=np.float64,buffer=shme.buf)
-        done = np.ndarray((Ni,),dtype=np.int8,buffer=shmd.buf)
+        shmp = shared_memory.SharedMemory(name=namep)
+        shme = shared_memory.SharedMemory(name=namee)
+        shmd = shared_memory.SharedMemory(name=named)
 
+        try:
+            progress = np.ndarray((Ni,),dtype=np.int64,buffer=shmp.buf)
+            elapsed = np.ndarray((Ni,),dtype=np.float64,buffer=shme.buf)
+            done = np.ndarray((Ni,),dtype=np.int8,buffer=shmd.buf)
+
+            EvolveState(
+                vrtState,P,Nc,
+                nk,Mdt,l,a,s,z,
+                il,di,invdi#,rng
+            ) # Warm-up iteration to avoid polluting the initial time t0
+            screenshots[:,nsid,0] = vrtState[:,0]
+            screenshots[:,nsid,1] = vrtState[:,1]
+            nsid += 1
+
+            t0 = time.perf_counter()
+            for ns in range(Ns-1):
+                EvolveState(
+                    vrtState,P,Nc,
+                    nk,Mdt,l,a,s,z,
+                    il,di,invdi,#rng
+                )
+
+                progress[p] = (ns+2)*nk
+                elapsed[p] = time.perf_counter()-t0
+                # q.put((p,(ns+2)*nk,time.perf_counter()-t0))
+
+                screenshots[:,nsid,0] = vrtState[:,0]
+                screenshots[:,nsid,1] = vrtState[:,1]
+                nsid += 1
+
+            progress[p] = Ns*nk
+            elapsed[p] = time.perf_counter()-t0
+            done[p] = True
+            # q.put((p,'done',time.perf_counter()-t0))
+
+            return vrtState, screenshots
+
+        finally:
+            shmp.close()
+            shme.close()
+            shmd.close()
+
+    else:
         EvolveState(
             vrtState,P,Nc,
             nk,Mdt,l,a,s,z,
@@ -599,26 +662,11 @@ def MonteCarloAlgorithm(
                 nk,Mdt,l,a,s,z,
                 il,di,invdi,#rng
             )
-
-            progress[p] = (ns+2)*nk
-            elapsed[p] = time.perf_counter()-t0
-            # q.put((p,(ns+2)*nk,time.perf_counter()-t0))
-
             screenshots[:,nsid,0] = vrtState[:,0]
             screenshots[:,nsid,1] = vrtState[:,1]
             nsid += 1
 
-        progress[p] = Ns*nk
-        elapsed[p] = time.perf_counter()-t0
-        done[p] = True
-        # q.put((p,'done',time.perf_counter()-t0))
-
         return vrtState, screenshots
-
-    finally:
-        shmp.close()
-        shme.close()
-        shmd.close()
 
 @njit(cache=True)
 def EvolveState(
@@ -698,26 +746,40 @@ def NonLinearEmigration(
         return l*(rs**a)/(1+rs**a) # Actual emigration rate
 
     elif il == 1:
-        rsk = (sr/si)*(dr*idi) # Relative population ratio
-        return l*(rsk/a)/(1+rsk/a)   # Actual emigration rate
+        rsk = (sr/si)*(dr*idi)     # Relative population ratio
+        return l*(rsk/a)/(1+rsk/a) # Actual emigration rate
 
     elif il == 2:
-        rsk = (sr/si)*(dr*idi) # Relative population ratio
-        return l*(rsk**a)/(1+rsk**a)  # Actual emigration rate
-
-    elif il == 3:
         if sr <= 0: return 0
 
-        rsk = (sr/si)*(dr*idi) # Relative population ratio
-        efl = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the lumping fraction
+        rsk = (sr/si)*(dr*idi)      # Relative population ratio
+        efl = l*(rsk/a)/(1+rsk/a)   # Actual emigration rate for the lumping fraction
 
-        rsk = (si/sr)*(di*idr) # Inverse relative population ratio
-        efs = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the separation fraction
+        irsk = (si/sr)*(di*idr)     # Inverse relative population ratio
+        efs = l*(irsk/a)/(1+irsk/a) # Actual emigration rate for the separation fraction
 
         return (1-z)*efl+z*efs
+
+    elif il == 3:
+        rsk = (sr/si)*(dr*idi)       # Relative population ratio
+        return l*(rsk**a)/(1+rsk**a) # Actual emigration rate
+
+    elif il == 4:
+        if sr <= 0: return 0
+
+        rsk = (sr/si)*(dr*idi)        # Relative population ratio
+        efl = l*(rsk**a)/(1+rsk**a)   # Actual emigration rate for the lumping fraction
+
+        irsk = (si/sr)*(di*idr)       # Inverse relative population ratio
+        efs = l*(irsk**a)/(1+irsk**a) # Actual emigration rate for the separation fraction
+
+        return (1-z)*efl+z*efs
+
     else:
         rsk = (sr/si)*(dr*idi)    # Relative population ratio
         return l*(rsk/(1+rsk))**a # Actual emigration rate
+
+    # Numba does not support officially the match structure, hence, even if it appears to work, it's better to use an «if/elif/else» one the sake of performance and stability
 
 @njit(cache=True)
 def StochasticFluctuations(sigma,E):
