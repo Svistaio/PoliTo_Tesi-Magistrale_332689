@@ -17,6 +17,7 @@ class ParametersGUI(tk.Tk):
         super().__init__() # Main window
         self.title('City Size Model')
         self.resizable(False,False) # Disable resizing the window
+
         self.bind('<Escape>',lambda e: self.SetSimulationState(False))
         self.bind('<space>',lambda e: self.SetSimulationState(True))
         #endregion
@@ -95,12 +96,13 @@ class ParametersGUI(tk.Tk):
         self.edgeWeights = Parameter('Edge weights',False)
 
         self.intLawList = [
-            'λ(rs^α)/(1+rs^α)',      # 0
-            'λ(rsk/α)/(1+rsk/α)',    # 1
-            '(1-ζ)efl_k/α+ζefs_k/α', # 2
-            'λ(rsk^α)/(1+rsk^α)',    # 3
-            '(1-ζ)efl_k^α+ζefs_k^α', # 4
-            'λ[rsk/(1+rsk)]^α'       # 5
+            'λ(rs^α)/(1+rs^α)',         # 0
+            'λ(rsk/α)/(1+rsk/α)',       # 1
+            '(1-ζ)efl_k/α+ζefs_k/α',    # 2
+            'λ(rsk^α)/(1+rsk^α)',       # 3
+            '(1-ζ)efl_k^α+ζefs_k^α',    # 4
+            'λ[rsk/(1+rsk)]^α',         # 5
+            '(1-ζ)[efl_k]^α+ζ[efs_k]^α' # 6
         ]
         self.interactingLaw = Parameter(
             'Interacting law',
@@ -215,7 +217,7 @@ class ParametersGUI(tk.Tk):
                 self.zetaFraction:1e-1,
                 self.timestep:1e-2,
                 self.timesteps:int(1e6),
-                self.iterations:15,
+                self.iterations:30,
                 self.progressBar:True,
                 self.extraction:False,
                 self.analysis:False,
@@ -338,7 +340,11 @@ class ParametersGUI(tk.Tk):
 
         # GUI call
         self.SetCaseStudy()
+
+        self.update_idletasks()
         CentreGUI(self)
+        self.deiconify()
+
         self.mainloop()
 
     # Callbacks
@@ -360,20 +366,26 @@ class ParametersGUI(tk.Tk):
         self.population.var.set(popReg)
 
     def SetConvincibility(self,*args):
-        l = self.attractivity.var.get()
-        self.convincibility.var.set(l/0.01-1)
+        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2):
+            l = self.attractivity.var.get()
+            self.convincibility.var.set(np.round(l/.01-1,decimals=2))
+        else:
+            l = self.attractivity.var.get()
+            self.convincibility.var.set(
+                np.round(np.log10(.01/l)/np.log10(.5),decimals=2)
+            )
 
     def SetSimulationState(self,state):
         self.simFlag.var.set(state)
         self.destroy() # Close the window after any button is pressed
 
     def InteractingLawCallBack(self,*args):
-        if self.intLawCodeList[self.interactingLaw.var.get()] in (2,4):
+        if self.intLawCodeList[self.interactingLaw.var.get()] in (2,4,6):
             self.zetaFraction.frame.grid()
         else:
             self.zetaFraction.frame.grid_remove()
 
-        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2):
+        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2,5,6):
             self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
             self.DisableCallBack(self.attractivity)
@@ -425,7 +437,11 @@ class ProgressGUI(tk.Tk):
     ):
         #region Window
         super().__init__()
+
         self.resizable(False,False)
+        self.grid_rowconfigure(0,weight=1)
+        self.grid_columnconfigure(0,weight=1)
+
         self.title("Simulation Progress")
         self.iconify() # Start minimized
         #endregion
@@ -445,18 +461,34 @@ class ProgressGUI(tk.Tk):
         #endregion
 
         #region Frames
-        pad = 20; pad = (pad,pad)
-        mainFrame = Frame(
-            self,
-            nCol=1,
-            pad=pad,
-            normalFontStyle=('JetBrains Mono',11)
-        )
-        pad = 5; pad = (pad,pad)
+        shown = 10
 
+        padmf = 20; pad = (padmf,padmf)
+        if Ni>shown:
+            mainFrame = Frame(
+                self,
+                nCol=2,
+                pad=pad,
+                normalFontStyle=('JetBrains Mono',11),
+                sticky="nsew"
+            )
+            barsFrame = mainFrame.ScrollFrame(
+                nCol=1,
+                normalFontStyle=('JetBrains Mono',11)
+            )
+        else:
+            mainFrame = Frame(
+                self,
+                nCol=1,
+                pad=pad,
+                normalFontStyle=('JetBrains Mono',11)
+            )
+            barsFrame = mainFrame
+
+        padpb = 5; pad = (padpb,padpb)
         self.frames = []; self.bars = []; self.status = []
         for i in range(Ni):
-            progressBarFrame = Frame(mainFrame,nCol=3,pad=pad)
+            progressBarFrame = Frame(barsFrame,nCol=3,pad=pad)
 
             label = f"p{'0' if i+1<10 else ''}{i+1}" # Process
             setattr(self,label,Parameter(text=label+':'))
@@ -477,18 +509,29 @@ class ProgressGUI(tk.Tk):
             self.bars.append(getattr(self,label).wid)
             self.status.append(getattr(self,status).lbl)
 
-        progressBarFrame = Frame(mainFrame,sticky='e')
-        self.completion = Parameter(text=f'0/{Ni}',val=0)
-        progressBarFrame.Label(self.completion)
+        padcf = padpb
+        completionFrame = Frame(
+            mainFrame,
+            colSpan=mainFrame.nCol,
+            # sticky='se',
+            pad=((0,0),(padcf,0))
+        )
+        self.completion = Parameter(text=f'0/{Ni}')
+        completionFrame.Label(self.completion)
 
-        shown = 10; self.shown = shown
         if Ni>shown:
-            for i in range(Ni-shown):
-                self.frames[shown+i].grid_remove()
-        self.removed = [False]*Ni
+            self.update_idletasks()
+            guiw = barsFrame.winfo_width()+2*padmf
+            guih = (
+                (progressBarFrame.winfo_height()+2*padpb)*shown
+                +2*padmf+completionFrame.winfo_height()+padcf
+            )
+            self.geometry(f'{guiw}x{guih}')
         #endregion
 
-        CentreGUI(self)
+        self.centered = False
+        self.bind("<Map>",lambda e:self.CenterWhenActive())
+
         self.after(100,self.PoolInfo)
 
     def PoolInfo(self):
@@ -507,21 +550,22 @@ class ProgressGUI(tk.Tk):
                     f'{ips:.2f}it/s]'
                 )
 
-            if self.done[p] and not self.removed[p]:
-                nextFrame = self.shown+self.completion.val
-                if nextFrame<self.Ni:
-                    self.frames[nextFrame].grid()
-                    self.frames[p].grid_remove()
-
-                self.completion.val+=1
-                self.removed[p] = True
-
-                self.completion.lbl['text']=f'{self.completion.val}/{self.Ni}'
+        self.completion.lbl['text']=f'{np.sum(self.done)}/{self.Ni}'
 
         if np.all(self.done):
             self.destroy()
         else:
             self.after(100,self.PoolInfo)
+
+    def CenterWhenActive(self):
+        if self.state() != "normal":
+            return
+
+        if not self.centered:
+            # self.update_idletasks()
+            CentreGUI(self)
+            self.centered=True
+
 
 ### Auxiliary classes ###
 
@@ -627,6 +671,16 @@ class Frame(ttk.Frame):
             pady=(0,15)
         )
         self.NextRow()
+
+    def CheckDataType(self,data):
+        if isinstance(data.val,float):
+            data.var = tk.DoubleVar(value=data.val)
+        elif isinstance(data.val,int):
+            data.var = tk.IntVar(value=data.val)
+        elif isinstance(data.val,str):
+            data.var = tk.StringVar(value=data.val)
+        else:
+            data.var = tk.BooleanVar(value=data.val)
 
     # Default widgets
     def Label(
@@ -856,15 +910,53 @@ class Frame(ttk.Frame):
         )
         data.frame.ComboBox(data,colSpan)
 
-    def CheckDataType(self,data):
-        if isinstance(data.val,float):
-            data.var = tk.DoubleVar(value=data.val)
-        elif isinstance(data.val,int):
-            data.var = tk.IntVar(value=data.val)
-        elif isinstance(data.val,str):
-            data.var = tk.StringVar(value=data.val)
-        else:
-            data.var = tk.BooleanVar(value=data.val)
+    def ScrollFrame(self,*args,**kwargs):
+        canvas = tk.Canvas(self,highlightthickness=0)
+        scrollbar = ttk.Scrollbar(
+            self,
+            orient='vertical',
+            command=canvas.yview
+        )
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.grid(row=0,column=1,sticky="ns")
+        canvas.grid(row=0,column=0,sticky="nsew")
+        self.NextRow()
+
+        self.columnconfigure(0,weight=1)
+        self.rowconfigure(0,weight=1)
+
+        frame = Frame(canvas,*args,**kwargs)
+
+        window = canvas.create_window(
+            (0,0),
+            window=frame,
+            anchor='nw'
+        )
+
+        frame.bind(
+            "<Configure>",
+            lambda e:self.FrameConfiguration(canvas)
+        )
+        canvas.bind(
+            "<Configure>",
+            lambda e:self.CanvasConfiguration(e,canvas,window)
+        )
+
+        canvas.bind_all("<MouseWheel>",lambda e:self.ScrollMotion(e,canvas))
+
+        return frame
+
+    # CallBacks
+    def FrameConfiguration(self,canvas):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    def CanvasConfiguration(self,event,canvas,window):
+        canvas.itemconfig(window,width=event.width)
+
+    def ScrollMotion(self,event,canvas):
+        canvas.yview_scroll(int(-event.delta/120),"units")
+
 
 class Parameter():
     def __init__(
@@ -1351,3 +1443,113 @@ def TimeFormatter(seconds):
         dicObjects['regSelected']['obj']['var'].set(codeReg)
 """
 #endregion
+
+#region Old implementation to show an arbitrary number of progress bars where only the bars associated to completed process would be hidden if there were still hidden bars of uncompleted processes which would take their place
+"""
+class ProgressGUI(tk.Tk):
+    def __init__(
+        self,Ni,Nt,
+        namep,namee,named
+    ):
+        #region Window
+        super().__init__()
+        self.resizable(False,False)
+        self.title("Simulation Progress")
+        self.iconify() # Start minimized
+        #endregion
+
+        #region Parameters
+        shmp = shared_memory.SharedMemory(name=namep); self.shmp = shmp
+        shme = shared_memory.SharedMemory(name=namee); self.shme = shme
+        shmd = shared_memory.SharedMemory(name=named); self.shmd = shmd
+
+        self.progress = np.ndarray((Ni,),dtype=np.int64,buffer=shmp.buf)
+        self.elapsed = np.ndarray((Ni,),dtype=np.float64,buffer=shme.buf)
+        self.done = np.ndarray((Ni,),dtype=np.int8,buffer=shmd.buf)
+
+        self.Ni = Ni
+        self.Nt = Nt
+        # self.d = [False]*Ni
+        #endregion
+
+        #region Frames
+        pad = 20; pad = (pad,pad)
+        mainFrame = Frame(
+            self,
+            nCol=1,
+            pad=pad,
+            normalFontStyle=('JetBrains Mono',11)
+        )
+        pad = 5; pad = (pad,pad)
+
+        self.frames = []; self.bars = []; self.status = []
+        for i in range(Ni):
+            progressBarFrame = Frame(mainFrame,nCol=3,pad=pad)
+
+            label = f"p{'0' if i+1<10 else ''}{i+1}" # Process
+            setattr(self,label,Parameter(text=label+':'))
+            progressBarFrame.Label(getattr(self,label),width=4)
+
+            progressBarFrame.ProgressBar(getattr(self,label),Nt)
+
+            status = f"s{'0' if i+1<10 else ''}{i+1}"
+            setattr(self,status,Parameter(text=''))
+            progressBarFrame.Label(
+                getattr(self,status),
+                width=60,
+                pad=((0,0),(0,0)),
+                anchor='c'
+            )
+
+            self.frames.append(progressBarFrame)
+            self.bars.append(getattr(self,label).wid)
+            self.status.append(getattr(self,status).lbl)
+
+        progressBarFrame = Frame(mainFrame,sticky='e')
+        self.completion = Parameter(text=f'0/{Ni}',val=0)
+        progressBarFrame.Label(self.completion)
+
+        shown = 10; self.shown = shown
+        if Ni>shown:
+            for i in range(Ni-shown):
+                self.frames[shown+i].grid_remove()
+        self.removed = [False]*Ni
+        #endregion
+
+        CentreGUI(self)
+        self.after(100,self.PoolInfo)
+
+    def PoolInfo(self):
+        for p in range(self.Ni):
+            nt = int(self.progress[p])
+            el = float(self.elapsed[p])
+
+            if el != 0:
+                self.bars[p]['value'] = nt
+                ips = max(1,nt)/max(el,1e-10) # Iterations per second
+                self.status[p]['text'] = (
+                    f'{nt}/{self.Nt} ['
+                    f'{TimeFormatter(nt/ips)}<'
+                    f'{TimeFormatter((self.Nt-nt)/ips)} '
+                    # f'[{nt/ips:.2f}<{(self.Nt-nt)/ips:.2f}, '
+                    f'{ips:.2f}it/s]'
+                )
+
+            if self.done[p] and not self.removed[p]:
+                nextFrame = self.shown+self.completion.val
+                if nextFrame<self.Ni:
+                    self.frames[nextFrame].grid()
+                    self.frames[p].grid_remove()
+
+                self.completion.val+=1
+                self.removed[p] = True
+
+                self.completion.lbl['text']=f'{self.completion.val}/{self.Ni}'
+
+        if np.all(self.done):
+            self.destroy()
+        else:
+            self.after(100,self.PoolInfo)
+
+"""
+#endregion It was replaced by a much more simple approach with a scrollable frame
