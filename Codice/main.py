@@ -51,7 +51,11 @@ def main():
 
 
         ### Kinetic simulation ###
-        clsKS = libKT.KineticSimulation(clsPrm,clsReg)
+        if clsPrm.parametricStudy:
+            clsKS = libKT.ParametricStudy(clsPrm,clsReg)
+        else:
+            clsKS = libKT.KineticSimulation(clsPrm,clsReg)
+
         clsKS.MonteCarloSimulation()
 
         clsKS.SizeDistrFittingsFig()
