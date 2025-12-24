@@ -118,12 +118,32 @@ class ParametersGUI(tk.Tk):
         self.screenshots = Parameter('Ns',int(1)) # Number of screenshots [not considering the initial state]
         self.smoothingFactor = Parameter('Sf',int(1))
 
+        self.parametricStudy = Parameter('Parametric study',False)
+
+        self.studiedPrmList = [
+            self.attractivity.text,
+            self.convincibility.text,
+            self.zetaFraction.text
+        ]
+        self.studiedParameter = Parameter(
+            'Studied parameter',
+            'study',
+            list=self.studiedPrmList
+        )
+        self.studiedPrmCodeList = {
+            r:i for i,r in enumerate(self.studiedPrmList)
+        }
+
+        self.startValuePrmStudy = Parameter('Start',float(1))
+        self.endValuePrmStudy = Parameter('End',float(1))
+        self.numberPrmStudy = Parameter('Nv',int(1))
+
         self.simFlag = Parameter(var=tk.BooleanVar(value=False))
         #endregion
 
-        #region Parameter Frames
+        #region Parameter frames
         pad = 20; pad = (pad,pad)
-        mainFrame = Frame(self,pad=pad)
+        mainFrame = Frame(self,pad=pad,sticky='nsew')
         pad = 15; pad = (1.25*pad,pad)
 
         popPrmFrame = Frame(
@@ -131,6 +151,42 @@ class ParametersGUI(tk.Tk):
             pad=pad,
             title='Population parameters'
         )
+        timePrmFrame = Frame(
+            mainFrame,
+            pad=pad,
+            title='Time parameters'#,labelWidth=3
+        )
+        simPrmFrame = Frame(
+            mainFrame,
+            pad=pad,
+            title='Simulation parameters'
+        )
+        ppcPrmFrame = Frame(
+            mainFrame,
+            pad=pad,
+            title='Postprocessing parameters'
+        )
+        pspPrmFrame = Frame(
+            mainFrame,
+            pad=pad,
+            title='Parametric study parameters',
+            colSpan=mainFrame.nCol,
+            nCol=5,
+            removed=True
+        ); self.pspPrmFrame = pspPrmFrame
+        buttonFrame = Frame(
+            mainFrame,
+            pad=(pad[0],(1.5*pad[1],0)),
+            colSpan=mainFrame.nCol
+        )
+        parametricStudyFrame = Frame(
+            mainFrame,
+            colSpan=mainFrame.nCol,
+            sticky='sw'
+        )
+        #endregion
+
+        #region Population parameters
         popPrmFrame.LabelSlider(
             self.attractivity,(0,1),0.01,
             extremes=(False,False)
@@ -149,37 +205,25 @@ class ParametersGUI(tk.Tk):
 
         popPrmFrame.LabelComboBox(self.region)
         self.region.var.trace_add("write",self.SetPopulation)
+        #endregion
 
-
-        timePrmFrame = Frame(
-            mainFrame,
-            pad=pad,
-            title='Time parameters'#,labelWidth=3
-        )
+        #region Time parameters
         timePrmFrame.LabelEntry(self.timestep,colSpan=timePrmFrame.nCol)
         timePrmFrame.LabelEntry(self.timesteps,colSpan=timePrmFrame.nCol)
         timePrmFrame.LabelEntry(self.iterations,colSpan=timePrmFrame.nCol)
         timePrmFrame.CheckBox(self.progressBar)
+        #endregion
 
-
-        simPrmFrame = Frame(
-            mainFrame,
-            pad=pad,
-            title='Simulation parameters'
-        )
+        #region Simulation parameters
         simPrmFrame.CheckBox(self.extraction)
         simPrmFrame.CheckBox(self.analysis)
         simPrmFrame.CheckBox(self.edgeWeights)
 
         simPrmFrame.LabelComboBox(self.interactingLaw)
         self.interactingLaw.var.trace_add("write",self.InteractingLawCallBack)
+        #endregion
 
-
-        ppcPrmFrame = Frame(
-            mainFrame,
-            pad=pad,
-            title='Postprocessing parameters'
-        )
+        #region Postprocessing parameters
         ppcPrmFrame.CheckBox(self.PdfPopUp)
         ppcPrmFrame.CheckBox(self.LaTeXConversion)
         ppcPrmFrame.LabelSlider(
@@ -206,7 +250,29 @@ class ParametersGUI(tk.Tk):
         )
         #endregion
 
-        #region Case studies
+        #region Parametric study frame
+        pspPrmFrame.LabelComboBox(
+            self.studiedParameter,
+            colSpan=1,
+            cbWdith=1,
+            # pad=((5,0),(0,0))
+        )
+        self.studiedParameter.var.trace_add(
+            'write',self.SetStudiedParameterState
+        )
+        width = 5
+        pspPrmFrame.Label(Parameter('with'),pad=pspPrmFrame.pad)
+        pspPrmFrame.LabelEntry(self.startValuePrmStudy,entryWidth=width)
+        pspPrmFrame.LabelEntry(self.endValuePrmStudy,entryWidth=width)
+        pspPrmFrame.LabelEntry(self.numberPrmStudy,entryWidth=width)
+
+        parametricStudyFrame.CheckBox(self.parametricStudy)
+        self.parametricStudy.var.trace_add(
+            'write',self.ShowParametricStudyFrame
+        )
+        #endregion
+
+        #region Case study list
         self.caseStudiesDict = {
             'Default':{
                 # self.population:self.regPopList['Sardegna'],
@@ -216,17 +282,22 @@ class ParametersGUI(tk.Tk):
                 self.region:self.regNameList[19],
                 self.zetaFraction:1e-1,
                 self.timestep:1e-2,
-                self.timesteps:int(1e6),
-                self.iterations:30,
-                self.progressBar:True,
+                self.timesteps:int(1e5),
+                self.iterations:3,
+                self.progressBar:False,
                 self.extraction:False,
                 self.analysis:False,
                 self.edgeWeights:False,
-                self.interactingLaw:self.intLawList[4],
+                self.interactingLaw:self.intLawList[3],
                 self.PdfPopUp:False,
                 self.LaTeXConversion:False,
                 self.screenshots:int(100),
                 self.smoothingFactor:int(10),
+                self.studiedParameter:self.studiedPrmList[1],
+                self.parametricStudy:False,
+                self.startValuePrmStudy:.1,
+                self.endValuePrmStudy:1,
+                self.numberPrmStudy:3
             },
             'λ(rsk/α)/(1+rsk/α)':{
                 # self.population:self.regPopList['Sardegna'],
@@ -247,6 +318,11 @@ class ParametersGUI(tk.Tk):
                 self.LaTeXConversion:False,
                 # self.screenshots:int(100),
                 # self.smoothingFactor:int(10),
+                self.studiedParameter:self.studiedPrmList[0],
+                self.parametricStudy:False,
+                self.startValuePrmStudy:1,
+                self.endValuePrmStudy:1,
+                self.numberPrmStudy:1
             },
             '(1-ζ)efl_k/α+ζefs_k/':{
                 # self.population:self.regPopList['Sardegna'],
@@ -267,6 +343,11 @@ class ParametersGUI(tk.Tk):
                 self.LaTeXConversion:False,
                 # self.screenshots:int(100),
                 # self.smoothingFactor:int(10),
+                self.studiedParameter:self.studiedPrmList[0],
+                self.parametricStudy:False,
+                self.startValuePrmStudy:1,
+                self.endValuePrmStudy:1,
+                self.numberPrmStudy:1
             },
             'λ(rsk^α)/(1+rsk^α)':{
                 # self.population:self.population.var.get(),
@@ -287,6 +368,11 @@ class ParametersGUI(tk.Tk):
                 self.LaTeXConversion:False,
                 # self.screenshots:int(100),
                 # self.smoothingFactor:int(10),
+                self.studiedParameter:self.studiedPrmList[0],
+                self.parametricStudy:False,
+                self.startValuePrmStudy:1,
+                self.endValuePrmStudy:1,
+                self.numberPrmStudy:1
             },
             'λ[rsk/(1+rsk)]^α':{
                 # self.population:self.population.var.get(),
@@ -307,6 +393,11 @@ class ParametersGUI(tk.Tk):
                 self.LaTeXConversion:False,
                 # self.screenshots:int(100),
                 # self.smoothingFactor:int(10),
+                self.studiedParameter:self.studiedPrmList[0],
+                self.parametricStudy:False,
+                self.startValuePrmStudy:1,
+                self.endValuePrmStudy:1,
+                self.numberPrmStudy:1
             },
         }
         self.caseStudy = Parameter(
@@ -316,13 +407,7 @@ class ParametersGUI(tk.Tk):
         )
         #endregion
 
-        #region Button frame
-        buttonFrame = Frame(
-            mainFrame,
-            pad=pad,
-            colSpan=mainFrame.nCol
-        )
-
+        #region Buttons and case studies
         buttonFrame.LabelComboBox(
             self.caseStudy,
             colSpan=buttonFrame.nCol,
@@ -382,13 +467,17 @@ class ParametersGUI(tk.Tk):
     def InteractingLawCallBack(self,*args):
         if self.intLawCodeList[self.interactingLaw.var.get()] in (2,4,6):
             self.zetaFraction.frame.grid()
+            self.studiedParameter.wid['values'] = self.studiedPrmList
         else:
             self.zetaFraction.frame.grid_remove()
+            self.studiedParameter.wid['values'] = self.studiedPrmList[:-1]
 
         if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2,5,6):
             self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
             self.DisableCallBack(self.attractivity)
+
+        self.ResizeWindow()
 
     def SetSliderUpperLimit(self,slider,ref):
         try:
@@ -396,6 +485,90 @@ class ParametersGUI(tk.Tk):
         except Exception:
             return
         slider.wid["to"] = val
+
+    def ShowParametricStudyFrame(self,*args):
+        frame = self.pspPrmFrame
+
+        if self.parametricStudy.var.get(): frame.grid()
+        else: frame.grid_remove()
+        self.SetStudiedParameterState()
+
+        self.ResizeWindow()
+
+    def SetStudiedParameterState(self,*args):
+        state = 'normal'
+        self.attractivity.wid['state'] = state
+        self.attractivity.wid['sliderrelief'] = 'raised'
+        self.convincibility.wid['state'] = state
+        self.zetaFraction.wid['state'] = state
+
+        checked = self.parametricStudy.var.get()
+        state = 'disabled' if checked else 'normal'
+        value = self.studiedPrmCodeList[self.studiedParameter.var.get()]
+
+        if checked:
+            match value:
+                case 0: 
+                    self.attractivity.wid['state'] = state
+                    self.attractivity.wid['sliderrelief'] = 'flat'
+                case 1:
+                    self.convincibility.wid['state'] = state
+                case 2: 
+                    self.zetaFraction.wid['state'] = state
+
+    def SetCaseStudy(self,*args):
+        caseStudy = self.caseStudy.var.get()
+        for prm,val in self.caseStudiesDict[caseStudy].items():
+            prm.var.set(val)
+
+        self.InteractingLawCallBack()
+        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2):
+            self.SetConvincibility()
+        self.ShowParametricStudyFrame()
+        self.SetStudiedParameterState()
+
+    # Functions
+    def GatherParameters(self):
+        parameters = {}
+        for attribute,value in self.__dict__.items():
+            if isinstance(value,Parameter):
+                parameters[attribute] = value.var.get()
+                # if value.var is not None:
+                # setattr(self,name,value.var.get())
+                # value.val = value.var.get()
+        
+        parameters = Parameters(**parameters)
+
+        parameters.region = self.regCodeList[
+            parameters.region
+        ]
+        parameters.interactingLaw = self.intLawCodeList[
+            parameters.interactingLaw
+        ]
+        parameters.studiedParameter = self.studiedPrmCodeList[
+            parameters.studiedParameter
+        ]
+
+        return parameters
+
+    def ResizeWindow(self,center=True):
+        self.update_idletasks()
+
+        ww = self.winfo_reqwidth()
+        wh = self.winfo_reqheight()
+
+        if center:
+            sw = self.winfo_screenwidth()
+            sh = self.winfo_screenheight()
+
+            x = max(0,(sw-ww)//2)
+            y = max(0,(sh-wh)//2)
+
+            # self.after(100,lambda: self.geometry(f"{ww}x{wh}+{x}+{y}"))
+            self.geometry(f"{ww}x{wh}+{x}+{y}")
+        else:
+            # self.after(100,lambda: self.geometry(f"{ww}x{wh}"))
+            self.geometry(f"{ww}x{wh}")
 
     def EnableCallBack(self,prm,clb):
         if prm.cbid is None:
@@ -406,34 +579,11 @@ class ParametersGUI(tk.Tk):
             prm.var.trace_remove("write",prm.cbid)
             prm.cbid = None
 
-    def SetCaseStudy(self,*args):
-        caseStudy = self.caseStudy.var.get()
-        for prm,val in self.caseStudiesDict[caseStudy].items():
-            prm.var.set(val)
-
-        self.InteractingLawCallBack()
-        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2):
-            self.SetConvincibility()
-
-    # Functions
-    def GatherParameters(self):
-        parameters = {}
-        for attribute, value in self.__dict__.items():
-            if isinstance(value,Parameter):
-                parameters[attribute] = value.var.get()
-                # if value.var is not None:
-                # setattr(self,name,value.var.get())
-                # value.val = value.var.get()
-        
-        parameters['region'] = self.regCodeList[self.region.var.get()]
-        parameters['interactingLaw'] = self.intLawCodeList[self.interactingLaw.var.get()]
-
-        return Parameters(**parameters)
-
 class ProgressGUI(tk.Tk):
     def __init__(
         self,Ni,Nt,
-        namep,namee,named
+        namep,namee,named,
+        sid=None,Nv=None
     ):
         #region Window
         super().__init__()
@@ -516,7 +666,9 @@ class ProgressGUI(tk.Tk):
             # sticky='se',
             pad=((0,0),(padcf,0))
         )
-        self.completion = Parameter(text=f'0/{Ni}')
+        self.completion = Parameter(
+            text=f'/{Ni}' if Nv is None else fr'/{Ni} {sid}/{Nv}'
+        )
         completionFrame.Label(self.completion)
 
         if Ni>shown:
@@ -550,7 +702,9 @@ class ProgressGUI(tk.Tk):
                     f'{ips:.2f}it/s]'
                 )
 
-        self.completion.lbl['text']=f'{np.sum(self.done)}/{self.Ni}'
+        self.completion.lbl['text']=(
+            f'{np.sum(self.done)}'+self.completion.text
+        )
 
         if np.all(self.done):
             self.destroy()
@@ -578,9 +732,10 @@ class Frame(ttk.Frame):
         sticky='n',
         pos=None,
         pad=((0,0),(0,0)),
-        labelWidth = None,
-        normalFontStyle = None,
-        titleFontStyle = None
+        labelWidth=None,
+        normalFontStyle=None,
+        titleFontStyle=None,
+        removed=False
     ):
         super().__init__(parent,borderwidth=0)
 
@@ -592,6 +747,7 @@ class Frame(ttk.Frame):
 
         self.pCol = [0,0]
         self.pRow = [0,0]
+        self.pad = (self.pCol,self.pRow)
 
         self.labelWidth = labelWidth
         self.entryWidth = 13
@@ -631,6 +787,7 @@ class Frame(ttk.Frame):
             pady=pad[1],
             sticky=sticky
         )
+        if removed: self.grid_remove()
 
     # Functions
     def NextRow(self):
@@ -668,7 +825,7 @@ class Frame(ttk.Frame):
             row=self.cRow,
             column=self.cCol,
             columnspan=self.nCol,
-            pady=(0,15)
+            pady=(0,12.5)
         )
         self.NextRow()
 
@@ -714,13 +871,16 @@ class Frame(ttk.Frame):
         )
         self.NextColumn(colSpan)
 
-    def Entry(self,data):
+    def Entry(self,data,width=None):
         self.CheckDataType(data)
+
+        if width is None: width = self.entryWidth
+
         data.wid = ttk.Entry(
             master=self,
             textvariable=data.var,
             font=self.normalFontStyle,
-            width=self.entryWidth,
+            width=width,
         )
         data.wid.grid(
             row=self.cRow,
@@ -765,15 +925,23 @@ class Frame(ttk.Frame):
         )
         self.NextColumn()
 
-    def ComboBox(self,data,colSpan=1,state='readonly'):
+    def ComboBox(
+        self,
+        data,
+        colSpan=1,
+        state='readonly',
+        width=None
+    ):
         self.CheckDataType(data)
+
+        if width is None: width = self.comboBoxWidth
         data.wid = ttk.Combobox(
             master=self,
             values=data.list,
             textvariable=data.var,
             state=state,
             font=self.normalFontStyle,
-            width=self.comboBoxWidth
+            width=width
         )
         data.wid.grid(
             row=self.cRow,
@@ -846,20 +1014,24 @@ class Frame(ttk.Frame):
         self,data,
         colSpan=1,
         pos=None,
-        labelWidth=None
+        lblWidth=None,
+        pad=None,
+        entryWidth=None,
     ):
-        if labelWidth is None: labelWidth=self.labelWidth 
+        if lblWidth is None: lblWidth = self.labelWidth 
+        if pad is None: pad = (self.pCol,self.pRow)
         
         data.frame = Frame(
             self,colSpan=colSpan,
             pos=pos,
-            pad=(self.pCol,self.pRow),
-            labelWidth=labelWidth
+            pad=pad,
+            labelWidth=lblWidth
         )
 
         data.text += ':'
-        data.frame.Label(data,labelWidth)
-        data.frame.Entry(data)
+        data.frame.Label(data,lblWidth)
+        data.text = data.text[:-1]
+        data.frame.Entry(data,entryWidth)
 
     def LabelSlider(
         self,data,bounds,res,
@@ -880,6 +1052,7 @@ class Frame(ttk.Frame):
             data,
             width=labelWidth
         )
+        data.text = data.text[:-1]
         data.frame.Slider(
             data,
             bounds,
@@ -892,8 +1065,12 @@ class Frame(ttk.Frame):
         data,
         colSpan=2,
         pos=None,
-        pad=((0,0),(10,0))
+        # pad=((0,0),(10,0)),
+        pad=None,
+        cbWdith=None
     ):
+        if pad is None: pad = (self.pCol,self.pRow)
+
         data.frame = Frame(
             self,
             pos=pos,
@@ -908,7 +1085,8 @@ class Frame(ttk.Frame):
             pad=((0,0),(0,0)),
             anchor='s'
         )
-        data.frame.ComboBox(data,colSpan)
+        data.text = data.text[:-1]
+        data.frame.ComboBox(data,colSpan,width=cbWdith)
 
     def ScrollFrame(self,*args,**kwargs):
         canvas = tk.Canvas(self,highlightthickness=0)
@@ -986,22 +1164,22 @@ class Parameters():
 
 def CentreGUI(window):
     # Get screen width and height
-    screenWidth = window.winfo_screenwidth()
-    screenHeight = window.winfo_screenheight()
+    sw = window.winfo_screenwidth()
+    sh = window.winfo_screenheight()
 
     # Update window size
     window.update_idletasks()
 
     # Measure window size
-    windowWidth = window.winfo_width()
-    windowHeight = window.winfo_height()
+    ww = window.winfo_width()
+    wh = window.winfo_height()
 
     # Calculate new centred coordinates
-    x = (screenWidth // 2) - (windowWidth // 2)
-    y = (screenHeight // 2) - (windowHeight // 2)
+    x = max(0,(sw-ww)//2)
+    y = max(0,(sh-wh)//2)
 
     # Set geometry
-    window.geometry(f"{windowWidth}x{windowHeight}+{x}+{y}")
+    window.geometry(f"{ww}x{wh}+{x}+{y}")
 
 def TimeFormatter(seconds):
     m, s = divmod(seconds,60)

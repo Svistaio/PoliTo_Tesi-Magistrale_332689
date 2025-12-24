@@ -22,6 +22,132 @@ importlib.reload(libF)
 
 ### Main class ###
 
+class ParametricStudy():
+    def __init__(self,clsPrm,clsReg):
+        sp = clsPrm.studiedParameter
+
+        sV = clsPrm.startValuePrmStudy; self.sV = sV
+        eV = clsPrm.endValuePrmStudy; self.eV = eV
+        Nv = clsPrm.numberPrmStudy; self.Nv = Nv
+
+        self.KS = [None]*Nv
+        for s,val in enumerate(np.linspace(sV,eV,Nv)):
+            match sp:
+                case 0:
+                    clsPrm.attractivity = val
+                case 1:
+                    clsPrm.convincibility = val
+                case 2:
+                    clsPrm.zetaFraction = val
+
+            self.KS[s] = KineticSimulation(clsPrm,clsReg)
+            self.KS[s].sid = s+1
+
+        self.fw = 24
+        self.fh = 8
+        self.figData = libF.FigData(clsPrm,'KS')
+
+    # Simulation
+    def MonteCarloSimulation(self):
+        for sim in self.KS:
+            sim.MonteCarloSimulation()
+
+    # Figures
+    def SizeDistrFittingsFig(self):
+        figData = self.figData
+        fw = self.fw
+        fh = self.fh
+
+        nCol = 3 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.SizeDistrFittingsFig(
+                ax=ax[s,:],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('SizeDistributionFittings')
+
+    def AverageSizeFig(self):
+        figData = self.figData
+        fw = self.fw/3
+        fh = self.fh
+
+        nCol = 1 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.AverageSizeFig(
+                ax=ax[s],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('AverageSize')
+
+    def SizeVsDegreeFig(self):
+        figData = self.figData
+        fw = self.fw*2/3
+        fh = self.fh
+
+        nCol = 2 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.SizeVsDegreeFig(
+                ax=ax[s,:],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('SizeVsDegree')
+
+    def SizeDistrEvolutionFig(self):
+        figData = self.figData
+        fw = self.fw*2/3
+        fh = self.fh
+
+        nCol = 2 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.SizeDistrEvolutionFig(
+                ax=ax[s,:],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('SizeDistributionEvolution')
+
+    def SizeEvolutionsFig(self):
+        figData = self.figData
+        fw = self.fw*2/3
+        fh = self.fh
+
+        nCol = 2 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.SizeEvolutionsFig(
+                ax=ax[s,:],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('SizeEvolutions')
+
+    def ShowFig(self):
+        from matplotlib.pyplot import show
+        show()
+
+
 class KineticSimulation():
     def __init__(self,clsPrm,clsReg):
         self.il = int(clsPrm.interactingLaw)
@@ -84,7 +210,13 @@ class KineticSimulation():
         self.clr = ('#0072B2','#D55E00')
         # self.clr = ('blue','red')
 
-        self.figData = libF.FigData(clsPrm,'KS')
+        if clsPrm.parametricStudy:
+            self.figData = None
+            self.Nv = clsPrm.numberPrmStudy
+        else:
+            self.figData = libF.FigData(clsPrm,'KS')
+            self.Nv = None
+        self.sid = None
 
     # Simulation
     def MonteCarloSimulation(self):
@@ -97,9 +229,11 @@ class KineticSimulation():
         Ns = self.Ns
         ns = self.ns
 
-        D = self.D
+        sid = self.sid
+        Nv = self.Nv
 
         Mdt = self.Mdt
+        D = self.D
         l = self.l
         a = self.a
         s = self.s
@@ -126,7 +260,8 @@ class KineticSimulation():
                 Ni,Nt,
                 shmp.name,
                 shme.name,
-                shmd.name
+                shmd.name,
+                sid,Nv
             )
 
             ctx = mp.get_context("spawn")
@@ -233,7 +368,13 @@ class KineticSimulation():
         self.siAvr = np.argsort(self.itAvrVrtState,axis=0)
 
     # Figures
-    def SizeDistrFittingsFig(self):
+    def SizeDistrFittingsFig(
+        self,
+        ax=None,
+        idx=1,
+        figData=None,
+        saveFig=False
+    ):
         Ni = self.Ni
         ta = self.ta
 
@@ -247,16 +388,19 @@ class KineticSimulation():
         lbl = self.lbl
         clr = self.clr
 
-        figData = self.figData
-        fig, ax = figData.SetFigs(1,3,size=(23,6))
+        if figData is None:
+            figData = self.figData
+            fig, ax = figData.SetFigs(1,3,size=(23,6))
+            saveFig = True
 
         sMax = cs.max(); sMin = cs.min()
+        p = (.5,1.07); dp = (.6,.05)
 
         for t in typ: # t[ype]
             ### Lognormal fit ###
             libF.CreateHistogramPlot(
                 cs[:,:,t],30,
-                figData.fig1,
+                getattr(figData,f'fig{idx}'),
                 limits=(sMin,sMax),
                 xScale='log',
                 Ni=Ni,
@@ -264,13 +408,13 @@ class KineticSimulation():
                 label=f"{lbl[t]} histogram",
                 color=clr[t],
                 alpha=(0.35,0.45) if Ni>1 else 0.35,
-                idx=t+1,
+                idx=t+idx,
                 ax=ax[0]
             ) # Histogram plot
 
             libF.CreateLognormalFitPlot(
                 cs[:,:,t],
-                figData.fig1,
+                getattr(figData,f'fig{idx}'),
                 limits=(sMin,sMax),
                 xScale='log',
                 Ni=Ni,
@@ -281,14 +425,14 @@ class KineticSimulation():
                 ),
                 color=(clr[t],clr[t]),
                 alpha=(1,0.15) if Ni>1 else 1,
-                idx=t+1,
+                idx=t+idx,
                 ax=ax[0]
             ) # Fit plot
 
             ### Power law fit log-log ###
-            b = libF.CreateParetoFitPlot(
+            bl = libF.CreateParetoFitPlot(
                 cs[:,:,t],
-                figData.fig2,
+                getattr(figData,f'fig{idx+1}'),
                 upperbound=sMax,
                 yScale='log',
                 Ni=Ni,
@@ -299,14 +443,14 @@ class KineticSimulation():
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=t+1,
+                idx=t+idx,
                 ax=ax[1]
             )
 
             ### Power law fit log-lin ###
-            b = libF.CreateParetoFitPlot(
+            bl = libF.CreateParetoFitPlot(
                 cs[:,:,t],
-                figData.fig3,
+                getattr(figData,f'fig{idx+2}'),
                 upperbound=sMax,
                 yScale='lin',
                 Ni=Ni,
@@ -317,12 +461,12 @@ class KineticSimulation():
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=t+1,
+                idx=t+idx,
                 ax=ax[2]
             )
 
-            fig.text(
-                .5,.975-t*.05,
+            Text(
+                ax[1],(p[0],p[1]+(1/2-t)*dp[1]),
                 fr'{lbl[t]}:$\quad$'+
                 DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
                 DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
@@ -331,56 +475,72 @@ class KineticSimulation():
                     csSum[:,t],Ni,ta,r's_{{\Sigma}}',
                     formatVal='.2e',formatErr='.2e'
                 )+
-                DataString(b,Ni,ta,r'\beta',space=False),
-                ha='center',color=clr[t]
+                DataString(bl,Ni,ta,r'\beta',space=False),
+                ha='center',
+                color=clr[t]
             )
 
-        fig.text(.1,.975,fr'$Nc={self.Nc}$',ha='center')
-        fig.text(.1,.925,fr'$R={self.R}$',ha='center')
+        if idx == 1:
+            p = (0,p[1])
+            TextBlock(
+                ax[0],[
+                    [fr'$Nc={self.Nc}$'],
+                    [fr'$R={self.R}$']
+                ],
+                p=p,dp=(0,dp[1])
+            )
 
-        p = .95; i = 0; d = 0.035
-        fig.text(p-i*d,.975,fr'$Ns={self.Ns}$',ha='center')
-        fig.text(p-i*d,.925,fr'$sf={self.sf}$',ha='center')
+            p = (.85,p[1]); dp = (.425,dp[1])
+            TextBlock(
+                ax[2],[[ '',
+                    fr'$\lambda={self.l}$',
+                    fr'$\sigma={self.s}$',
+                    fr'$Ni={Ni}$',
+                    fr'$Ns={self.Ns}$',
+                ],[
+                    fr'$ζ={self.z}$',
+                    '','','',''
+                ],[ '',
+                    fr'$\alpha={self.a}$',
+                    fr'$il={self.il}$',
+                    fr'$dt={self.dt}$',
+                    fr'$sf={self.sf}$',
+                ]],
+                p=p,dp=dp,
+                offset=0 if self.il in (2,4,6) else 1
+            )
 
-        i += 1
-        fig.text(p-i*d,.975,fr'$Ni={Ni}$',ha='center')
-        fig.text(p-i*d,.925,fr'$dt={self.dt}$',ha='center')
-
-        i += 1
-        fig.text(p-i*d,.975,fr'$\sigma={self.s}$',ha='center')
-        fig.text(p-i*d,.925,fr'$il={self.il}$',ha='center')
-
-        i += 1
-        fig.text(p-i*d,.975,fr'$\lambda={self.l}$',ha='center')
-        fig.text(p-i*d,.925,fr'$\alpha={self.a}$',ha='center')
-
-        i += 1
-        if self.il in (2,4,6):
-            fig.text(p-i*d,.95,fr'$ζ={self.z}$',ha='center')
+        Text(ax[2],(1.1,.5),fr'$\alpha={self.a}$')
 
         # Style
         libF.SetFigStyle(
             r'$cs$',r'$P(cs)$',
             yNotation='sci',xScale='log', # ,xNotation="sci"
-            ax=ax[0],data=figData.fig1
+            ax=ax[0],data=getattr(figData,f'fig{idx}')
         )
 
         libF.SetFigStyle(
             r'$cs$',r'$P(cs)$',
             xScale='log',yScale='log',
-            ax=ax[1],data=figData.fig2
+            ax=ax[1],data=getattr(figData,f'fig{idx+1}')
         )
 
         libF.SetFigStyle(
             r'$cs$',r'$P(cs)$',
             xScale='log',yScale='lin',
-            ax=ax[2],data=figData.fig3
+            ax=ax[2],data=getattr(figData,f'fig{idx+2}')
         )
 
         # CentreFig()
-        figData.SaveFig('SizeDistributionFittings')
+        if saveFig: figData.SaveFig('SizeDistributionFittings')
 
-    def AverageSizeFig(self):
+    def AverageSizeFig(
+        self,
+        ax=None,
+        idx=1,
+        figData=None,
+        saveFig=False
+    ):
         Ni = self.Ni
         ta = self.ta
 
@@ -390,30 +550,43 @@ class KineticSimulation():
         lbl = self.lbl
         clr = self.clr
 
-        figData = self.figData
-        fig = figData.SetFigs()
+        if figData is None:
+            figData = self.figData
+            fig = figData.SetFigs()
+            saveFig = True
 
         for t in self.typ:
             libF.CreateFunctionPlot(
                 times,
                 ca[:,:,t],
-                figData.fig,
+                figData.fig if figData is None
+                else getattr(figData,f'fig{idx}'),
                 Ni=Ni,
                 ta=ta,
                 label=rf"{lbl[t]} city size average $\langle s\rangle$",
                 color=clr[t],
                 alpha=(1,0.15) if Ni>1 else 1,
-                idx=t+1
+                idx=t+idx,
+                ax=ax
             )
 
         # CentreFig()
         libF.SetFigStyle(
             r"$t$",r"$\langle cs\rangle$",
-            data=figData.fig
+            data=figData.fig if figData is None 
+            else getattr(figData,f'fig{idx}'),
+            ax=ax
         )
-        figData.SaveFig('AverageSize')
 
-    def SizeVsDegreeFig(self):
+        if saveFig: figData.SaveFig('AverageSize')
+
+    def SizeVsDegreeFig(
+        self,
+        ax=None,
+        idx=1,
+        figData=None,
+        saveFig=False
+    ):
         di = self.di
         cs = self.itAvrVrtState
 
@@ -424,46 +597,55 @@ class KineticSimulation():
         si = self.siAvr
         li2Name = self.li2Name
 
-        figData = self.figData
-        fig, ax = figData.SetFigs(1,2,size=(15,6))
+        if figData is None:
+            figData = self.figData
+            fig, ax = figData.SetFigs(1,2,size=(15,6))
+            saveFig = True
 
         for i,scale in enumerate(['lin','log']):
             for t in typ:
                 libF.CreateScatterPlot(
                     di,cs[:,t],
-                    getattr(figData,f'fig{i+1}'),
+                    getattr(figData,f'fig{i+idx}'),
                     label=lbl[t],
                     color=clr[t],
-                    idx=t+1,
+                    idx=t+idx,
                     ax=ax[i]
                 )
 
             libF.SetFigStyle(
                 r'$k$',r'$cs(k)$',
                 yScale='log',xScale=scale,
-                data=getattr(figData,f'fig{i+1}'),
+                data=getattr(figData,f'fig{i+idx}'),
                 ax=ax[i]
             )
 
         for t in typ:
-            for i in range(-1,-6,-1):
-                fig.text(
-                    .4,.5-.2*t+i*.03,
+            TextBlock(
+                ax[0],[[
                     DataString(
                         cs[si[i,t],t],
                         head=li2Name[si[i,t]],
                         formatVal='.2e',
                         space=False
-                    ),
-                    ha="center",
-                    # fontsize=10,
-                    color=clr[t]
-                )
+                    )
+                ] for i in range(-1,-6,-1)],
+                p=(.8,.35-t*.225),
+                dp=(0,.15),
+                ha='center',
+                color=clr[t]
+            )
 
         # CentreFig()
-        figData.SaveFig('SizeVsDegree')
+        if saveFig: figData.SaveFig('SizeVsDegree')
 
-    def SizeDistrEvolutionFig(self):
+    def SizeDistrEvolutionFig(
+        self,
+        ax=None,
+        idx=1,
+        figData=None,
+        saveFig=False
+    ):
         screenshots = self.itAvrScreenshots
 
         ns = self.ns
@@ -472,8 +654,10 @@ class KineticSimulation():
         dt = self.dt
         typ = self.typ
 
-        figData = self.figData
-        fig, ax = figData.SetFigs(1,2,size=(15,6))
+        if figData is None:
+            figData = self.figData
+            fig, ax = figData.SetFigs(1,2,size=(15,6))
+            saveFig = True
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
 
         samples = 6
@@ -487,13 +671,13 @@ class KineticSimulation():
             for j,s in enumerate(np.linspace(0,Ns,samples,dtype=int)):
                 libF.CreateHistogramPlot(
                     screenshots[:,s,t],21,
-                    getattr(figData,f'fig{t+1}'),
+                    getattr(figData,f'fig{t+idx}'),
                     limits=(sMin,sMax),
                     xScale='log',
                     label=f"t = {int(ns[s]*dt)}",
                     color=colours[j][:-1],
                     alpha=0.4,
-                    idx=j+1,
+                    idx=j+idx,
                     ax=ax[t],
                     norm=False
                 ) # Histogram plot
@@ -504,13 +688,19 @@ class KineticSimulation():
                 xScale='log',
                 yScale='log',
                 ax=ax[t],
-                data=getattr(figData,f'fig{t+1}')
+                data=getattr(figData,f'fig{t+idx}')
             ) # Style
 
         # CentreFig()
-        figData.SaveFig('SizeDistributionEvolution')
+        if saveFig: figData.SaveFig('SizeDistributionEvolution')
 
-    def SizeEvolutionsFig(self):
+    def SizeEvolutionsFig(
+        self,
+        ax=None,
+        idx=1,
+        figData=None,
+        saveFig=False
+    ):
         # Nc = self.Nc
         typ = self.typ
 
@@ -520,8 +710,10 @@ class KineticSimulation():
         di = self.di
         sf = self.sf
 
-        figData = self.figData
-        fig, ax = figData.SetFigs(1,2,size=(15,6))
+        if figData is None:
+            figData = self.figData
+            fig, ax = figData.SetFigs(1,2,size=(15,6))
+            saveFig = True
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
 
         dk, _ = np.unique(di,return_counts=True); Nk = dk.size
@@ -536,8 +728,8 @@ class KineticSimulation():
         # colours = [clrmap(i/(Nc-1)) for i in range(Nc)]
 
         labels = ['']*Nk
-        idx = np.linspace(0,Nk-1,6,dtype=np.int64)
-        for i in idx: labels[i] = f'k={dk[i]}'
+        classes = np.linspace(0,Nk-1,6,dtype=np.int64)
+        for i in classes: labels[i] = f'k={dk[i]}'
 
         for t in typ: # t[ype]
             # norm = LogNorm(
@@ -549,24 +741,25 @@ class KineticSimulation():
             for k in range(Nk):
                 libF.CreateFunctionPlot(
                     times,screenshotsk[k,:,t],
-                    getattr(figData,f'fig{t+1}'),
+                    getattr(figData,f'fig{t+idx}'),
                     color=colours[k,:],
                     alpha=0.8,
                     linewidth=1,
                     label=labels[k],
-                    idx=k+1,
+                    idx=k+idx,
                     ax=ax[t]
                 ) # Histogram plot
 
             libF.SetFigStyle(
                 r"$t$",r"$s$",
                 # yNotation="sci", # ,xNotation="sci"
-                yScale='log',ax=ax[t],
-                data=getattr(figData,f'fig{t+1}')
+                yScale='log',
+                data=getattr(figData,f'fig{t+idx}'),
+                ax=ax[t]
             ) # Style
 
         # CentreFig()
-        figData.SaveFig('SizeEvolutions')
+        if saveFig: figData.SaveFig('SizeEvolutions')
 
     def ShowFig(self):
         from matplotlib.pyplot import show
@@ -824,6 +1017,49 @@ def DataString(
         return fr'${head}={value:{formatVal}}{space}$'
     else:
         return fr'${head}={value:{formatVal}}\pm{error:{formatErr}}{space}$'
+
+def Text(
+    target,
+    pos,
+    string,
+    ha='center',
+    color=None
+):
+    if hasattr(target,"transAxes"):
+        target.text(
+            pos[0],
+            pos[1],
+            string,
+            color=color,
+            ha=ha,
+            transform=target.transAxes
+        )
+    else:
+        target.text(
+            pos[0],
+            pos[1],
+            string,
+            color=color,
+            ha=ha
+        )
+
+def TextBlock(
+    ax,
+    list,
+    p=(0,0),
+    dp=(0,0),
+    offset=0,
+    **kwargs
+):
+    nR = len(list); nC = len(list[0])-offset
+    for r,y in enumerate(np.linspace(p[1]-dp[1]/2,p[1]+dp[1]/2,nR)):
+        for c,x in enumerate(
+            np.linspace(p[0]-dp[0]/2,p[0]+dp[0]/2,nC),
+            start=offset
+        ):
+            Text(ax,(x,y),list[r][c],**kwargs)
+
+    # An alternative is to do what linspace does manually with «x0+(i-(n-1)/2)*dx» where dx is actually the space between strings rather than the block length
 
 
 ### Discarded code ###
