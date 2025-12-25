@@ -187,12 +187,14 @@ class KineticSimulation():
 
         self.EvaluateSimulationData()
         WriteSimulationData(
-            self.lbl,
-            self.siVrt,
             self.vrtState,
+            self.snapshots,
+            self.siVrtState,
             self.typ,
+            self.lbl,
             self.li2Name,
-            Ni
+            Ni,
+            self.sid
         )
 
     def EvaluateSimulationData(self):
@@ -221,8 +223,8 @@ class KineticSimulation():
             return sv
 
         self.vrtState = np.array([data[p][0] for p in range(Ni)])
-        screenshots = np.array([data[p][1] for p in range(Ni)])
-        self.avrState = Convolve(np.mean(screenshots,axis=1))
+        self.snapshots = np.array([data[p][1] for p in range(Ni)])
+        self.avrState = Convolve(np.mean(self.snapshots,axis=1))
 
         self.nodeAvrVrtState = np.mean(self.vrtState,axis=1)
         self.nodeMinVrtState = np.min(self.vrtState,axis=1)
@@ -233,16 +235,16 @@ class KineticSimulation():
             self.ta = stats.t.ppf(0.975,df=Ni-1)
 
             self.itAvrVrtState = np.mean(self.vrtState,axis=0)
-            self.itAvrScreenshots = np.mean(screenshots,axis=0)
+            self.itAvrSnapshots = np.mean(self.snapshots,axis=0)
         else:
             self.ta = None
 
             self.itAvrVrtState = self.vrtState[0,:,:]
-            self.itAvrScreenshots = screenshots[0,:,:,:]
+            self.itAvrSnapshots = self.snapshots[0,:,:,:]
 
-        self.itAvrConvScreenshots = Convolve(self.itAvrScreenshots)
-        self.siVrt = np.argsort(self.vrtState,axis=1)
-        self.siAvr = np.argsort(self.itAvrVrtState,axis=0)
+        self.itAvrConvSnapshots = Convolve(self.itAvrSnapshots)
+        self.siVrtState = np.argsort(self.vrtState,axis=1)
+        self.siAvrState = np.argsort(self.itAvrVrtState,axis=0)
 
     # Figures
     def SizeDistrFittingsFig(
@@ -473,7 +475,7 @@ class KineticSimulation():
         lbl = self.lbl
         clr = self.clr
 
-        si = self.siAvr
+        si = self.siAvrState
         li2Name = self.li2Name
 
         if figData is None:
@@ -525,7 +527,7 @@ class KineticSimulation():
         figData=None,
         saveFig=False
     ):
-        screenshots = self.itAvrScreenshots
+        screenshots = self.itAvrSnapshots
 
         ns = self.ns
         Ns = self.Ns
@@ -584,7 +586,7 @@ class KineticSimulation():
         typ = self.typ
 
         times = self.times
-        screenshots = self.itAvrConvScreenshots
+        screenshots = self.itAvrConvSnapshots
 
         di = self.di
         sf = self.sf
@@ -1060,12 +1062,14 @@ def TextBlock(
     **kwargs
 ):
     nR = len(list); nC = len(list[0])-offset
-    for r,y in enumerate(np.linspace(p[1]-dp[1]/2,p[1]+dp[1]/2,nR)):
+    for r,y in enumerate(np.linspace(p[1]+dp[1]/2,p[1]-dp[1]/2,nR)):
         for c,x in enumerate(
             np.linspace(p[0]-dp[0]/2,p[0]+dp[0]/2,nC),
             start=offset
         ):
             Text(ax,(x,y),list[r][c],**kwargs)
+            # x moves from left to right
+            # y moves from top to bottom
 
     # An alternative is to do what linspace does manually with «x0+(i-(n-1)/2)*dx» where dx is actually the space between strings rather than the block length
 
