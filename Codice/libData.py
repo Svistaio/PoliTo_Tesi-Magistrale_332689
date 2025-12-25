@@ -31,7 +31,6 @@ def ExtractAdjacencyMatrices():
         "!Limiti1991_g/Com1991_g/Com1991_g_WGS84.shp"
     )
 
-
     # Conversion of «elencom91.xls» from the old format «.xls» to a more manageable «.csv»
     csvFile = xls2csv(matrixZipPath,'elencom91.xls')
 
@@ -50,9 +49,10 @@ def LoadAdjacencyMatrices(code):
     zipFile = projectFolder/'Dati'/'DatiPendolarismo1991.zip'
 
     el = {
-        'A':'.txt','W':'.txt',
+        'A':'.txt',
+        'W':'.txt',
         'li2Name':'.json',
-        'li2Coord':'.json',
+        'li2Coord':'.txt',
         'Name2li':'.json',
         'Nc':'.json'
     }
@@ -63,11 +63,11 @@ def LoadAdjacencyMatrices(code):
             path = f'{code}/{data}{el[data]}'
             with z.open(path,'r') as f:
                 match data:
-                    case 'A' | 'W':
+                    case 'A' | 'W' | 'li2Coord':
                         parameters[data] = np.loadtxt(
                             tiow(f,encoding='utf-8'),
                             delimiter=",",dtype=int
-                        ) # Decodes binary stream as UTF-8 text
+                        )
 
                     case 'li2Name':
                         parameters[data] = {
@@ -77,19 +77,15 @@ def LoadAdjacencyMatrices(code):
                     case 'Nc' | 'Name2li':
                         parameters[data] = json.load(f)
 
-                    case 'li2Coord':
-                        tmp = json.load(f)
-                        parameters[data] = np.array(
-                            [tmp[str(i)] for i in range(len(tmp))],
-                            dtype=np.float64
-                        )
-
     return libP.Parameters(**parameters)
 
 
 ### Auxiliary functions ###
 
-def xls2csv(zipFile,xlsFile):
+def xls2csv(
+    zipFile,
+    xlsFile
+):
     with ZF(zipFile) as z:
         b = z.read(xlsFile)  # Extract raw bytes from «elencom91.xls»
 
@@ -109,7 +105,10 @@ def xls2csv(zipFile,xlsFile):
 
     return streamCsv
 
-def ReadMunRegCodes(matrixFile,coordFile):
+def ReadMunRegCodes(
+    matrixFile,
+    coordFile
+):
     # These two dictionary are necessary to link muicipalities and regions via their codes defined in «file», which will be useful later on to extract the actual data for the adjacency matrices
     dicMun = {} # Dictionary to link municipality codes with region codes
     dicReg = {
@@ -132,39 +131,65 @@ def ReadMunRegCodes(matrixFile,coordFile):
             nameMun = row[4]      # Municipality name
 
             dicMun[codeMun] = codeReg
-
-            li = dicReg[codeReg]['Nc'] # Local index
-            dicReg[codeReg]['li2Name'][li] = nameMun
-            dicReg[codeReg]['li2Coord'][li] = [gdf[codeMun].x,gdf[codeMun].y]
-            dicReg[codeReg]['Name2li'][nameMun] = li
-            dicReg[codeReg]['Code2li'][codeMun] = li
-
-            gi = dicReg[21]['Nc']      # Global index
-            dicReg[21]['li2Name'][gi] = nameMun
-            dicReg[21]['Name2li'][nameMun] = gi
-            dicReg[21]['Code2li'][codeMun] = gi
-
-            dicReg[codeReg]['Nc'] += 1 # Update local number of cities
-            dicReg[21]['Nc'] +=1       # Upadte global number of cities
-
             # In reality «codeMun» it's more like «Province code + Municipality code»
+
+            UpdateDictionary(
+                dicReg,
+                codeReg,
+                nameMun,
+                codeMun,
+                gdf
+            )
+
+            UpdateDictionary(
+                dicReg,
+                21,
+                nameMun,
+                codeMun,
+                gdf
+            )
 
         except ValueError:
             continue # Ignore it otherwise
 
     return dicMun, dicReg
 
+def UpdateDictionary(
+    dicReg,
+    codeReg,
+    nameMun,
+    codeMun,
+    gdf
+):
+    lgi = dicReg[codeReg]['Nc'] # Local/Global index
+    dicReg[codeReg]['li2Name'][lgi] = nameMun
+    dicReg[codeReg]['li2Coord'][lgi] = [gdf[codeMun].x,gdf[codeMun].y]
+    dicReg[codeReg]['Name2li'][nameMun] = lgi
+    dicReg[codeReg]['Code2li'][codeMun] = lgi
+
+    dicReg[codeReg]['Nc'] = lgi+1 # Update local/global number of cities
+    # Local (codeReg=!=21) index
+    # Global (codeReg==21) index
+
 def BuildAdjacencyMatrices(
     dicMun,dicReg,
     zipFile,txtFile
 ):
+
     for r in dicReg:
-        for M in ['A','W']:
-            dicReg[r][M] = np.zeros(
-                (dicReg[r]['Nc'],dicReg[r]['Nc']),dtype=int
-            )
-            # 'A' == [Unitary] Adjacency matrix
-            # 'W' == Weighted adjacency matrix
+        Nc = dicReg[r]['Nc']
+
+        for (M,numTyp) in [
+            ('A',np.uint8), # 'A' == [Unitary] Adjacency matrix
+            ('W',np.int64)  # 'W' == Weighted adjacency matrix
+        ]:
+            dicReg[r][M] = np.zeros((Nc,Nc),dtype=numTyp)
+
+        li2Coord = np.empty((Nc,2),np.float64)
+        for i in range(Nc):
+            li2Coord[i,0] = dicReg[r]['li2Coord'][i][0]
+            li2Coord[i,1] = dicReg[r]['li2Coord'][i][1]
+        dicReg[r]['li2Coord'] = li2Coord
 
     with ZF(zipFile) as z, z.open(txtFile) as f:
         for line in tiow(f,encoding="utf-8"):
@@ -179,13 +204,17 @@ def BuildAdjacencyMatrices(
 
                     if oReg == dReg: # and commuters!=0
                         UpdateMatrices(
-                            dicReg,commuters,
-                            oReg,dReg,oMun,dMun
+                            dicReg,
+                            commuters,
+                            oReg,dReg,
+                            oMun,dMun
                         )
 
                     UpdateMatrices(
-                        dicReg,commuters,
-                        21,21,oMun,dMun
+                        dicReg,
+                        commuters,
+                        21,21,
+                        oMun,dMun
                     )
                 except Exception:
                     continue
@@ -208,7 +237,10 @@ def UpdateMatrices(
     dicReg[dReg]['W'][dI,oI] += commuters
     # The sum in «matricesReg[oReg]['W'][oI,dI] += commuters» is necessary as there are repeating origin-destination links in the dataset
 
-def WriteAdjacencyMatrices(zipPath,dicReg):
+def WriteAdjacencyMatrices(
+    zipPath,
+    dicReg
+):
     with ZF(
         zipPath,'w',
         compression=zf.ZIP_DEFLATED, # Enable compression
@@ -216,9 +248,10 @@ def WriteAdjacencyMatrices(zipPath,dicReg):
         # https://docs.python.org/3/library/zipfile.html#zipfile-objects
     ) as z:
         el = {
-            'A':'.txt','W':'.txt',
+            'A':'.txt',
+            'W':'.txt',
             'li2Name':'.json',
-            'li2Coord':'.json',
+            'li2Coord':'.txt',
             'Name2li':'.json',
             'Nc':'.json'
         }
@@ -227,59 +260,76 @@ def WriteAdjacencyMatrices(zipPath,dicReg):
             folder = f'{'0' if r+1<10 else ''}{r+1}'
 
             for data in el:
-                buf = sio()
                 path = f'{folder}/{data}{el[data]}'
+                buf = sio()
 
                 match data:
-                    case 'A' | 'W':
+                    case 'A' | 'W' | 'li2Coord':
                         np.savetxt(
-                            buf,dicReg[r+1][data],
-                            fmt="%d",delimiter=","
-                        ) # Save the matrix in the zip as a «.txt» file
+                            buf,
+                            dicReg[r+1][data],
+                            fmt="%d",
+                            delimiter=","
+                        )
                         
-                    case 'Name2li' | 'li2Name' | 'li2Coord' | 'Nc':
+                    case 'Name2li' | 'li2Name':
                         json.dump(
                             dicReg[r+1][data],
-                            buf,indent=3
-                        ) # Save the dictionary in the zip as a «.json» file
+                            buf,
+                            indent=3
+                        )
 
-                    # case 'Nc':
-                    #     json.dump(dicReg[r+1][data],buf)
-                    #     # Save the number of cities in the zip as a «.json» file
+                    case 'Nc':
+                        json.dump(dicReg[r+1][data],buf)
 
-                value = buf.getvalue()
-                z.writestr(path,value)
+                z.writestr(path,buf.getvalue())
 
-def WriteSimulationData(lbl,si,cs,typ,li2Name,Ni):
+def WriteSimulationData(
+    vrtState,
+    snapshots,
+    siVrtState,
+    typ,
+    lbl,
+    li2Name,
+    Ni,
+    sid
+):
     lbl = [t.replace('.','') for t in lbl]
 
     zipFile = projectFolder/'Dati'/'SimulationData.zip'
 
+    mode = 'a' if sid is not None and sid != 1 else 'w'
     with ZF(
-        zipFile,'w',
+        zipFile,mode,
         compression=zf.ZIP_DEFLATED,
         compresslevel=9
     ) as z:
         for r in range(Ni):
             dicName2SortedPop = {
                 t:{
-                    li2Name[i]:cs[r,i,t] for i in si[r,::-1,t]
+                    li2Name[i]:vrtState[r,i,t] for i in siVrtState[r,::-1,t]
                 } for t in typ
             }
 
-            folder = f"{0 if r+1<10 else ''}{r+1}"
+            folder = (
+                f'{'' if sid is None else f's{sid}/'}'
+                f'{0 if r+1<10 else ""}{r+1}'
+            )
             for t in typ:
-                buf = sio()
-                path = f'{folder}/{lbl[t]}CitySizesFinal.json'
-                json.dump(list(cs[r,:,t]),buf)
-                value = buf.getvalue()
-                z.writestr(path,value)
+                buf = bio()
+                path = f'{folder}/{lbl[t]}CitySizesFinal.npy'
+                np.save(buf,vrtState[r,:,t])
+                z.writestr(path,buf.getvalue())
 
                 buf = sio()
                 path = f'{folder}/{lbl[t]}CitySizesSorted.json'
-                json.dump(dicName2SortedPop[t],buf)
-                value = buf.getvalue()
-                z.writestr(path,value)
+                json.dump(dicName2SortedPop[t],buf,indent=3)
+                z.writestr(path,buf.getvalue())
+
+                buf = bio()
+                path = f'{folder}/{lbl[t]}Snapshots.npy'
+                np.save(buf,snapshots[r,:,:,t])
+                z.writestr(path,buf.getvalue())
 
 def SetParameters(cls):
     parameters = libP.parameters
@@ -288,8 +338,10 @@ def SetParameters(cls):
 
 def LoadCaseStudies(cls):
     data = libP.caseStudies
+
     caseStudies = data['list']
     selectedCS = data['selected']
+
     listCS = list(caseStudies.keys())
     dictCS = {}
 
@@ -301,7 +353,7 @@ def LoadCaseStudies(cls):
             dictCS[name][prm] = val
 
         for (prmName,prmlist) in [
-            ('region','regList'),
+            ('region','regionList'),
             ('interactingLaw','intLawList'),
             ('studiedParameter','studiedPrmList')
         ]:
