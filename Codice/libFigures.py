@@ -1,4 +1,6 @@
 
+# Library to create figures
+
 # import os, sys
 from pathlib import Path
 import subprocess
@@ -11,6 +13,8 @@ from scipy import stats
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import savefig
 # import mplcursors
+
+from libData import projectFolder
 
 
 ### Main Functions and class ###
@@ -67,11 +71,18 @@ def SetFigStyle(
 class FigData():
     def __init__(self,clsPrm,folder):
         self.folder = folder
-        self.projectPath = Path(__file__).resolve().parent.parent
+        self.projectFolder = projectFolder
 
         self.regCode = str(clsPrm.region)
         self.PdfPopUp = clsPrm.PdfPopUp
         self.LaTeXConversion = clsPrm.LaTeXConversion
+
+        for ext in ('.pdf','.mat','.tex'):
+            if ext=='.pdf' or self.LaTeXConversion:
+                setattr(self,f'{ext[1:]}FolderPath',self.CreateFolders(ext))
+                # for p in folder.iterdir():
+                #     if p.is_file():
+                #         p.unlink()
 
     def SetFigs(self,nCol=1,nRow=1,size=None):
         nFig = nCol*nRow; self.nFig = nFig
@@ -86,7 +97,14 @@ class FigData():
             self.fig = self.fig1
             return plt.figure()
         else:
-            return plt.subplots(nCol,nRow,figsize=size)
+            return plt.subplots(
+                nCol,nRow,
+                figsize=size,
+                    gridspec_kw=dict(
+                    wspace=0.2,
+                    hspace=0.2
+                )
+            )
 
     def SaveFig(self,name):
         self.SaveFig2pdf(name)
@@ -102,50 +120,44 @@ class FigData():
 
     def SaveFig2pdf(self,name):
         format = '.pdf'
-        self.CreateFolders(format)
-        pdfPath = self.FigPath(name,format)
+        pdfFilePath = self.FigPath(name,format)
 
         savefig(
-            pdfPath,
+            pdfFilePath,
             dpi=300,
             bbox_inches='tight'
         )
 
         if self.PdfPopUp:
-            sumatraPath = self.projectPath/'.vscode'/'SumatraPDF.lnk'
-            cmd = f'"{str(sumatraPath)}" "{str(pdfPath)}"'
+            sumatraPath = self.projectFolder/'.vscode'/'SumatraPDF.lnk'
+            cmd = f'"{str(sumatraPath)}" "{str(pdfFilePath)}"'
             subprocess.Popen(cmd,shell=True)
 
     def SaveFig2mat(self,f):
         format = '.mat'
-        self.CreateFolders(format)
+        self.matFilePath = self.FigPath(self.names[f],format)
 
-        self.matPath = self.FigPath(self.names[f],format)
-        savemat(self.matPath,getattr(self,f'fig{f+1}'))
+        savemat(self.matFilePath,getattr(self,f'fig{f+1}'))
 
     def SaveFig2tex(self,f):
         format = '.tex'
-        self.CreateFolders(format)
+        self.texFilePath = self.FigPath(self.names[f],format)
 
-        self.texPath = self.FigPath(self.names[f],format)
         cmd = self.cmdTeX()
         subprocess.run(cmd,shell=True)
 
     def CreateFolders(self,format):
-        folderPath = self.projectPath/'Figure'/format/self.regCode/self.folder
+        folderPath = self.projectFolder/'Figure'/format/self.regCode/self.folder
         Path(folderPath).mkdir(parents=True,exist_ok=True)
         # Define the folder path and create all the missing ones if necessary
+        return folderPath
 
     def FigPath(self,figName,ext):
-        return (
-            self.projectPath/'Figure'/
-            ext/self.regCode/
-            self.folder/figName
-        ).with_suffix(ext)
+        return (getattr(self,f'{ext[1:]}FolderPath')/figName).with_suffix(ext)
 
     def cmdTeX(self):
-        m = self.matPath.as_posix()
-        t = self.texPath.as_posix()
+        m = self.matFilePath.as_posix()
+        t = self.texFilePath.as_posix()
 
         cmd = (
             r'matlab -batch "mat2tex('

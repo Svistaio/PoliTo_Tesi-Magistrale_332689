@@ -3,36 +3,30 @@ from multiprocessing import freeze_support
 
 
 def main():
-    import libGUI
-    import libExtractData as libED
-    import libAnalyseNetwork as libAN
-    import libMASKineticTheory as libKT
-
-    import importlib
-    importlib.reload(libGUI)
-    importlib.reload(libED)
-    importlib.reload(libAN)
-    importlib.reload(libKT)
+    import libGUIs
+    import libData as libD
+    import libNetworks as libN
+    import libKTMAS as libK
 
 
     ### Graphic User Interface ###
-    clsGUI = libGUI.ParametersGUI()
+    clsGUI = libGUIs.ParametersGUI()
     clsPrm = clsGUI.GatherParameters() # Parameters
 
 
     if clsPrm.simFlag:
 
         ### Data extraction ###
-        if clsPrm.extraction: libED.ExtractAdjacencyMatrices()
+        if clsPrm.extraction: libD.ExtractAdjacencyMatrices()
 
 
         ### Matrices extraction ###
-        clsReg = libED.ReadAdjacencyMatrices(clsPrm.region)
+        clsReg = libD.LoadAdjacencyMatrices(clsPrm.region)
 
 
         ### Network analysis ###
         if clsPrm.analysis:
-            clsNA = libAN.NetworkAnalysis(clsPrm,clsReg)
+            clsNA = libN.NetworkAnalysis(clsPrm,clsReg)
 
             clsNA.DegreeDistributionFig()
             clsNA.WeightDistributionFig()
@@ -52,9 +46,9 @@ def main():
 
         ### Kinetic simulation ###
         if clsPrm.parametricStudy:
-            clsKS = libKT.ParametricStudy(clsPrm,clsReg)
+            clsKS = libK.ParametricStudy(clsPrm,clsReg)
         else:
-            clsKS = libKT.KineticSimulation(clsPrm,clsReg)
+            clsKS = libK.KineticSimulation(clsPrm,clsReg)
 
         clsKS.MonteCarloSimulation()
 

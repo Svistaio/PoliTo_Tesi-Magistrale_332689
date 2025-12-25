@@ -1,4 +1,6 @@
 
+# Library to create Graphics Users Interfaces
+
 import tkinter as tk
 from tkinter import ttk
 
@@ -6,14 +8,18 @@ import numpy as np
 
 from multiprocessing import shared_memory
 
+import libParameters as libP
+import libData as libD
+
+
 ### Main class ###
 
 class ParametersGUI(tk.Tk):
     def __init__(self):
+        #region Window
         # Resets the default root before creating the GUI
         tk._default_root = None
 
-        #region Window
         super().__init__() # Main window
         self.title('City Size Model')
         self.resizable(False,False) # Disable resizing the window
@@ -23,122 +29,23 @@ class ParametersGUI(tk.Tk):
         #endregion
 
         #region Parameters
-        self.regPopList = { # Italian region sizes in 1991
-            'Piemonte':int(4302565),
-            "Valle d'Aosta":int(115938),
-            'Lombardia':int(8856074),
-            'Trentino-Alto Adige':int(890360),
-            'Veneto':int(4380797),
-            'Friuli-Venezia Giulia':int(1197666),
-            'Liguria':int(1676282),
-            'Emilia-Romagna':int(3909512),
-            'Toscana':int(3529946),
-            'Umbria':int(811831),
-            'Marche':int(1429205),
-            'Lazio':int(5140371),
-            'Abruzzo':int(1249054),
-            'Molise':int(330900),
-            'Campania':int(5630280),
-            'Puglia':int(4031885),
-            'Basilicata':int(610528),
-            'Calabria':int(2070203),
-            'Sicilia':int(4966386),
-            'Sardegna':int(1648248),
-            'Italia':int(56778031)
-        } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
-        self.population = Parameter('S',int(1))
+        libD.SetParameters(self)
 
-        self.attractivity = Parameter('λ',float(1))
-        self.convincibility = Parameter('α',float(1))
-        self.deviation = Parameter('σ',float(1))
-
-        self.regNameList = [
-            'Piemonte',
-            "Valle d'Aosta",
-            'Lombardia',
-            'Trentino-Alto Adige',
-            'Veneto',
-            'Friuli-Venezia Giulia',
-            'Liguria',
-            'Emilia-Romagna',
-            'Toscana',
-            'Umbria',
-            'Marche',
-            'Lazio',
-            'Abruzzo',
-            'Molise',
-            'Campania',
-            'Puglia',
-            'Basilicata',
-            'Calabria',
-            'Sicilia',
-            'Sardegna',
-            'Italia'
-        ]
-        self.region = Parameter(
-            'Region selected',
-            'region',
-            list=self.regNameList
+        self.regPopDict = libP.regPopDict
+        self.regionList = libP.ComboBoxList(
+            self.region,
+            libP.regionList
         )
-        self.regCodeList = {
-            r:i+1 for i,r in enumerate(self.regNameList)
-        }
-
-        self.zetaFraction = Parameter('ζ',float(1))
-
-        self.timestep = Parameter('Δt',float(1))
-        self.timesteps = Parameter('Nt',int(1))
-        self.iterations = Parameter('Ni',int(1))
-        self.progressBar = Parameter('Progress Bar',True)
-
-        self.extraction = Parameter('Extract data',False)
-        self.analysis = Parameter('Network analysis',False)
-        self.edgeWeights = Parameter('Edge weights',False)
-
-        self.intLawList = [
-            'λ(rs^α)/(1+rs^α)',         # 0
-            'λ(rsk/α)/(1+rsk/α)',       # 1
-            '(1-ζ)efl_k/α+ζefs_k/α',    # 2
-            'λ(rsk^α)/(1+rsk^α)',       # 3
-            '(1-ζ)efl_k^α+ζefs_k^α',    # 4
-            'λ[rsk/(1+rsk)]^α',         # 5
-            '(1-ζ)[efl_k]^α+ζ[efs_k]^α' # 6
-        ]
-        self.interactingLaw = Parameter(
-            'Interacting law',
-            'law',
-            list=self.intLawList
+        self.intLawList = libP.ComboBoxList(
+            self.interactingLaw,
+            libP.intLawList
         )
-        self.intLawCodeList = {
-            r:i for i,r in enumerate(self.intLawList)
-        }
-
-        self.PdfPopUp = Parameter('Open PDF',False)
-        self.LaTeXConversion = Parameter('LaTeX Conversion',False)
-        self.screenshots = Parameter('Ns',int(1)) # Number of screenshots [not considering the initial state]
-        self.smoothingFactor = Parameter('Sf',int(1))
-
-        self.parametricStudy = Parameter('Parametric study',False)
-
-        self.studiedPrmList = [
-            self.attractivity.text,
-            self.convincibility.text,
-            self.zetaFraction.text
-        ]
-        self.studiedParameter = Parameter(
-            'Studied parameter',
-            'study',
-            list=self.studiedPrmList
+        self.studiedPrmList = libP.ComboBoxList(
+            self.studiedParameter,
+            libP.prmStudyList
         )
-        self.studiedPrmCodeList = {
-            r:i for i,r in enumerate(self.studiedPrmList)
-        }
 
-        self.startValuePrmStudy = Parameter('Start',float(1))
-        self.endValuePrmStudy = Parameter('End',float(1))
-        self.numberPrmStudy = Parameter('Nv',int(1))
-
-        self.simFlag = Parameter(var=tk.BooleanVar(value=False))
+        self.simFlag = libP.Parameter(var=tk.BooleanVar(value=False))
         #endregion
 
         #region Parameter frames
@@ -188,11 +95,11 @@ class ParametersGUI(tk.Tk):
 
         #region Population parameters
         popPrmFrame.LabelSlider(
-            self.attractivity,(0,1),0.01,
+            self.attractivity,0.01,(0,1),
             extremes=(False,False)
         )
         popPrmFrame.LabelSlider(
-            self.deviation,(0,1),0.001,
+            self.deviation,0.001,(0,1),
             extremes=(True,False)
         )
         self.SetDeviationUpperLimit()
@@ -227,30 +134,28 @@ class ParametersGUI(tk.Tk):
         ppcPrmFrame.CheckBox(self.PdfPopUp)
         ppcPrmFrame.CheckBox(self.LaTeXConversion)
         ppcPrmFrame.LabelSlider(
-            self.screenshots,
+            self.snapshots,1,
             (1,self.timesteps.var.get()),
-            1,
             colSpan=ppcPrmFrame.nCol
-        )
+        ) # Number of screenshots [not considering the initial state]
         self.timesteps.var.trace_add(
             "write",lambda *args: self.SetSliderUpperLimit(
-                self.screenshots,self.timesteps
+                self.snapshots,self.timesteps
             )
         )
         ppcPrmFrame.LabelSlider(
-            self.smoothingFactor,
-            (1,self.screenshots.var.get()),
-            1,
+            self.smoothingFactor,1,
+            (1,self.snapshots.var.get()),
             colSpan=ppcPrmFrame.nCol
         )
-        self.screenshots.var.trace_add(
+        self.snapshots.var.trace_add(
             "write",lambda *args: self.SetSliderUpperLimit(
-                self.smoothingFactor,self.screenshots
+                self.smoothingFactor,self.snapshots
             )
         )
         #endregion
 
-        #region Parametric study frame
+        #region Parametric study parameters
         pspPrmFrame.LabelComboBox(
             self.studiedParameter,
             colSpan=1,
@@ -261,7 +166,7 @@ class ParametersGUI(tk.Tk):
             'write',self.SetStudiedParameterState
         )
         width = 5
-        pspPrmFrame.Label(Parameter('with'),pad=pspPrmFrame.pad)
+        pspPrmFrame.Label(libP.Parameter('with'),pad=pspPrmFrame.pad)
         pspPrmFrame.LabelEntry(self.startValuePrmStudy,entryWidth=width)
         pspPrmFrame.LabelEntry(self.endValuePrmStudy,entryWidth=width)
         pspPrmFrame.LabelEntry(self.numberPrmStudy,entryWidth=width)
@@ -272,142 +177,14 @@ class ParametersGUI(tk.Tk):
         )
         #endregion
 
-        #region Case study list
-        self.caseStudiesDict = {
-            'Default':{
-                # self.population:self.regPopList['Sardegna'],
-                self.attractivity:5e-2,
-                self.convincibility:5e-1,
-                self.deviation:5e-2,
-                self.region:self.regNameList[19],
-                self.zetaFraction:1e-1,
-                self.timestep:1e-2,
-                self.timesteps:int(1e5),
-                self.iterations:3,
-                self.progressBar:False,
-                self.extraction:False,
-                self.analysis:False,
-                self.edgeWeights:False,
-                self.interactingLaw:self.intLawList[3],
-                self.PdfPopUp:False,
-                self.LaTeXConversion:False,
-                self.screenshots:int(100),
-                self.smoothingFactor:int(10),
-                self.studiedParameter:self.studiedPrmList[1],
-                self.parametricStudy:False,
-                self.startValuePrmStudy:.1,
-                self.endValuePrmStudy:1,
-                self.numberPrmStudy:3
-            },
-            'λ(rsk/α)/(1+rsk/α)':{
-                # self.population:self.regPopList['Sardegna'],
-                self.attractivity:5e-2,
-                # self.convincibility:4,
-                self.deviation:5e-2,
-                self.region:self.regNameList[19],
-                # self.zetaFraction:1e-1,
-                self.timestep:1e-2,
-                self.timesteps:int(5e5),
-                self.iterations:15,
-                self.progressBar:True,
-                self.extraction:False,
-                self.analysis:False,
-                self.edgeWeights:False,
-                self.interactingLaw:self.intLawList[1],
-                self.PdfPopUp:False,
-                self.LaTeXConversion:False,
-                # self.screenshots:int(100),
-                # self.smoothingFactor:int(10),
-                self.studiedParameter:self.studiedPrmList[0],
-                self.parametricStudy:False,
-                self.startValuePrmStudy:1,
-                self.endValuePrmStudy:1,
-                self.numberPrmStudy:1
-            },
-            '(1-ζ)efl_k/α+ζefs_k/':{
-                # self.population:self.regPopList['Sardegna'],
-                self.attractivity:5e-2,
-                # self.convincibility:4,
-                self.deviation:5e-2,
-                self.region:self.regNameList[19],
-                # self.zetaFraction:1e-1,
-                self.timestep:1e-2,
-                self.timesteps:int(1e7),
-                self.iterations:15,
-                self.progressBar:True,
-                self.extraction:False,
-                self.analysis:False,
-                self.edgeWeights:False,
-                self.interactingLaw:self.intLawList[2],
-                self.PdfPopUp:False,
-                self.LaTeXConversion:False,
-                # self.screenshots:int(100),
-                # self.smoothingFactor:int(10),
-                self.studiedParameter:self.studiedPrmList[0],
-                self.parametricStudy:False,
-                self.startValuePrmStudy:1,
-                self.endValuePrmStudy:1,
-                self.numberPrmStudy:1
-            },
-            'λ(rsk^α)/(1+rsk^α)':{
-                # self.population:self.population.var.get(),
-                self.attractivity:5e-2,
-                self.convincibility:3e-1,
-                self.deviation:5e-2,
-                self.region:self.regNameList[19],
-                self.zetaFraction:1e-1,
-                self.timestep:1e-2,
-                self.timesteps:int(1e7),
-                self.iterations:15,
-                self.progressBar:True,
-                self.extraction:False,
-                self.analysis:False,
-                self.edgeWeights:False,
-                self.interactingLaw:self.intLawList[3],
-                self.PdfPopUp:False,
-                self.LaTeXConversion:False,
-                # self.screenshots:int(100),
-                # self.smoothingFactor:int(10),
-                self.studiedParameter:self.studiedPrmList[0],
-                self.parametricStudy:False,
-                self.startValuePrmStudy:1,
-                self.endValuePrmStudy:1,
-                self.numberPrmStudy:1
-            },
-            'λ[rsk/(1+rsk)]^α':{
-                # self.population:self.population.var.get(),
-                self.attractivity:5e-2,
-                self.convincibility:3e-1,
-                self.deviation:5e-2,
-                self.region:self.regNameList[19],
-                self.zetaFraction:1e-1,
-                self.timestep:1e-2,
-                self.timesteps:int(1e7),
-                self.iterations:15,
-                self.progressBar:True,
-                self.extraction:False,
-                self.analysis:False,
-                self.edgeWeights:False,
-                self.interactingLaw:self.intLawList[5],
-                self.PdfPopUp:False,
-                self.LaTeXConversion:False,
-                # self.screenshots:int(100),
-                # self.smoothingFactor:int(10),
-                self.studiedParameter:self.studiedPrmList[0],
-                self.parametricStudy:False,
-                self.startValuePrmStudy:1,
-                self.endValuePrmStudy:1,
-                self.numberPrmStudy:1
-            },
-        }
-        self.caseStudy = Parameter(
-            'Case studies',
-            list(self.caseStudiesDict.keys())[0],
-            list=list(self.caseStudiesDict.keys()),#[1:]
-        )
-        #endregion
-
         #region Buttons and case studies
+        self.dictCS, selectedCS, listCS = libD.LoadCaseStudies(self)
+        self.caseStudy = libP.Parameter(
+            'Case studies',
+            selectedCS,
+            list=listCS,
+        )
+
         buttonFrame.LabelComboBox(
             self.caseStudy,
             colSpan=buttonFrame.nCol,
@@ -415,22 +192,18 @@ class ParametersGUI(tk.Tk):
         )
         self.caseStudy.var.trace_add("write",self.SetCaseStudy)
 
-        buttonFrame.Button(
-            'Run',lambda: self.SetSimulationState(True)
-        )
-        buttonFrame.Button(
-            'Stop',lambda: self.SetSimulationState(False)
-        )
+        buttonFrame.Button('Run',lambda: self.SetSimulationState(True))
+        buttonFrame.Button('Stop',lambda: self.SetSimulationState(False))
         #endregion
 
-        # GUI call
+        #region GUI call
         self.SetCaseStudy()
 
-        self.update_idletasks()
         CentreGUI(self)
         self.deiconify()
 
         self.mainloop()
+        #endregion
 
     # Callbacks
     def SetDeviationUpperLimit(self,*args):
@@ -447,11 +220,11 @@ class ParametersGUI(tk.Tk):
 
     def SetPopulation(self,*args):
         nameReg = self.region.var.get()
-        popReg = self.regPopList[nameReg]
+        popReg = self.regPopDict[nameReg]
         self.population.var.set(popReg)
 
     def SetConvincibility(self,*args):
-        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2):
+        if self.intLawList.Code[self.interactingLaw.var.get()] in (1,2):
             l = self.attractivity.var.get()
             self.convincibility.var.set(np.round(l/.01-1,decimals=2))
         else:
@@ -465,14 +238,14 @@ class ParametersGUI(tk.Tk):
         self.destroy() # Close the window after any button is pressed
 
     def InteractingLawCallBack(self,*args):
-        if self.intLawCodeList[self.interactingLaw.var.get()] in (2,4,6):
+        if self.intLawList.Code[self.interactingLaw.var.get()] in (2,4,6):
             self.zetaFraction.frame.grid()
-            self.studiedParameter.wid['values'] = self.studiedPrmList
+            self.studiedParameter.wid['values'] = self.studiedPrmList.Name
         else:
             self.zetaFraction.frame.grid_remove()
-            self.studiedParameter.wid['values'] = self.studiedPrmList[:-1]
+            self.studiedParameter.wid['values'] = self.studiedPrmList.Name[:-1]
 
-        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2,5,6):
+        if self.intLawList.Code[self.interactingLaw.var.get()] in (1,2,5,6):
             self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
             self.DisableCallBack(self.attractivity)
@@ -504,7 +277,7 @@ class ParametersGUI(tk.Tk):
 
         checked = self.parametricStudy.var.get()
         state = 'disabled' if checked else 'normal'
-        value = self.studiedPrmCodeList[self.studiedParameter.var.get()]
+        value = self.studiedPrmList.Code[self.studiedParameter.var.get()]
 
         if checked:
             match value:
@@ -518,11 +291,11 @@ class ParametersGUI(tk.Tk):
 
     def SetCaseStudy(self,*args):
         caseStudy = self.caseStudy.var.get()
-        for prm,val in self.caseStudiesDict[caseStudy].items():
+        for prm,val in self.dictCS[caseStudy].items():
             prm.var.set(val)
 
         self.InteractingLawCallBack()
-        if self.intLawCodeList[self.interactingLaw.var.get()] in (1,2):
+        if self.intLawList.Code[self.interactingLaw.var.get()] in (1,2):
             self.SetConvincibility()
         self.ShowParametricStudyFrame()
         self.SetStudiedParameterState()
@@ -531,21 +304,21 @@ class ParametersGUI(tk.Tk):
     def GatherParameters(self):
         parameters = {}
         for attribute,value in self.__dict__.items():
-            if isinstance(value,Parameter):
+            if isinstance(value,libP.Parameter):
                 parameters[attribute] = value.var.get()
                 # if value.var is not None:
                 # setattr(self,name,value.var.get())
                 # value.val = value.var.get()
         
-        parameters = Parameters(**parameters)
+        parameters = libP.Parameters(**parameters)
 
-        parameters.region = self.regCodeList[
+        parameters.region = self.regionList.Code[
             parameters.region
         ]
-        parameters.interactingLaw = self.intLawCodeList[
+        parameters.interactingLaw = self.intLawList.Code[
             parameters.interactingLaw
         ]
-        parameters.studiedParameter = self.studiedPrmCodeList[
+        parameters.studiedParameter = self.studiedPrmList.Code[
             parameters.studiedParameter
         ]
 
@@ -579,7 +352,7 @@ class ParametersGUI(tk.Tk):
             prm.var.trace_remove("write",prm.cbid)
             prm.cbid = None
 
-class ProgressGUI(tk.Tk):
+class ProgressBarsGUI(tk.Tk):
     def __init__(
         self,Ni,Nt,
         namep,namee,named,
@@ -641,13 +414,13 @@ class ProgressGUI(tk.Tk):
             progressBarFrame = Frame(barsFrame,nCol=3,pad=pad)
 
             label = f"p{'0' if i+1<10 else ''}{i+1}" # Process
-            setattr(self,label,Parameter(text=label+':'))
+            setattr(self,label,libP.Parameter(text=label+':'))
             progressBarFrame.Label(getattr(self,label),width=4)
 
             progressBarFrame.ProgressBar(getattr(self,label),Nt)
 
             status = f"s{'0' if i+1<10 else ''}{i+1}"
-            setattr(self,status,Parameter(text=''))
+            setattr(self,status,libP.Parameter(text=''))
             progressBarFrame.Label(
                 getattr(self,status),
                 width=60,
@@ -666,7 +439,7 @@ class ProgressGUI(tk.Tk):
             # sticky='se',
             pad=((0,0),(padcf,0))
         )
-        self.completion = Parameter(
+        self.completion = libP.Parameter(
             text=f'/{Ni}' if Nv is None else fr'/{Ni} {sid}/{Nv}'
         )
         completionFrame.Label(self.completion)
@@ -681,10 +454,12 @@ class ProgressGUI(tk.Tk):
             self.geometry(f'{guiw}x{guih}')
         #endregion
 
+        #region GUI [after]call
         self.centered = False
         self.bind("<Map>",lambda e:self.CenterWhenActive())
 
         self.after(100,self.PoolInfo)
+        #endregion
 
     def PoolInfo(self):
         for p in range(self.Ni):
@@ -1034,7 +809,7 @@ class Frame(ttk.Frame):
         data.frame.Entry(data,entryWidth)
 
     def LabelSlider(
-        self,data,bounds,res,
+        self,data,res,bounds,
         extremes=(True,True),
         pos=None,
         labelWidth=None,
@@ -1134,33 +909,6 @@ class Frame(ttk.Frame):
 
     def ScrollMotion(self,event,canvas):
         canvas.yview_scroll(int(-event.delta/120),"units")
-
-
-class Parameter():
-    def __init__(
-        self,
-        text=None,
-        val=None,
-        lbl=None,
-        var=None,
-        wid=None,
-        frame=None,
-        list=None,
-        cbid=None # CallBack id
-    ):
-        self.text = text
-        self.val  = val
-        self.lbl  = lbl
-        self.var  = var
-        self.wid  = wid
-        self.frame = frame
-        self.list = list
-        self.cbid = cbid
-
-class Parameters():
-    def __init__(self,**kwargs):
-        for text,value in kwargs.items():
-            setattr(self,text,value)
 
 def CentreGUI(window):
     # Get screen width and height
@@ -1665,13 +1413,13 @@ class ProgressGUI(tk.Tk):
             progressBarFrame = Frame(mainFrame,nCol=3,pad=pad)
 
             label = f"p{'0' if i+1<10 else ''}{i+1}" # Process
-            setattr(self,label,Parameter(text=label+':'))
+            setattr(self,label,libP.Parameter(text=label+':'))
             progressBarFrame.Label(getattr(self,label),width=4)
 
             progressBarFrame.ProgressBar(getattr(self,label),Nt)
 
             status = f"s{'0' if i+1<10 else ''}{i+1}"
-            setattr(self,status,Parameter(text=''))
+            setattr(self,status,libP.Parameter(text=''))
             progressBarFrame.Label(
                 getattr(self,status),
                 width=60,
@@ -1684,7 +1432,7 @@ class ProgressGUI(tk.Tk):
             self.status.append(getattr(self,status).lbl)
 
         progressBarFrame = Frame(mainFrame,sticky='e')
-        self.completion = Parameter(text=f'0/{Ni}',val=0)
+        self.completion = libP.Parameter(text=f'0/{Ni}',val=0)
         progressBarFrame.Label(self.completion)
 
         shown = 10; self.shown = shown
