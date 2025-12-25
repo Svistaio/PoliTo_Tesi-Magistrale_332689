@@ -1,5 +1,9 @@
 
+# Library to handle [especially writing and reading] data
+
 from pathlib import Path
+mainFolder = Path(__file__).resolve().parent
+projectFolder = mainFolder.parent
 
 import zipfile as zf
 from zipfile import ZipFile as ZF
@@ -9,20 +13,19 @@ from io import BytesIO as bio
 from io import StringIO as sio
 
 import pandas as pd
-import csv, json
+import csv,json
 import geopandas as gpd
 
 import numpy as np
 
-from libGUI import Parameters
+import libParameters as libP
 
 
 ### Main functions ###
 
 def ExtractAdjacencyMatrices():
-    projectPath = Path(__file__).resolve().parent.parent
-    matrixZipPath = projectPath/'Dati'/'MatriciPendolarismo1991.zip'
-    coordZipPath = projectPath/'Dati'/'LimitiRegioni1991.zip'
+    matrixZipPath = projectFolder/'Dati'/'MatriciPendolarismo1991.zip'
+    coordZipPath = projectFolder/'Dati'/'LimitiRegioni1991.zip'
     shpPath = (
         f"zip://{coordZipPath}"
         "!Limiti1991_g/Com1991_g/Com1991_g_WGS84.shp"
@@ -36,15 +39,15 @@ def ExtractAdjacencyMatrices():
 
     BuildAdjacencyMatrices(
         dicMun,dicReg,
-        matrixZipPath,'Pen_91It.txt'
+        matrixZipPath,
+        'Pen_91It.txt'
     )
 
-    matrixZipPath = projectPath/'Dati'/'DatiPendolarismo1991.zip'
+    matrixZipPath = projectFolder/'Dati'/'DatiPendolarismo1991.zip'
     WriteAdjacencyMatrices(matrixZipPath,dicReg)
 
-def ReadAdjacencyMatrices(code):
-    projectPath = Path(__file__).resolve().parent.parent
-    zipFile = projectPath/'Dati'/'DatiPendolarismo1991.zip'
+def LoadAdjacencyMatrices(code):
+    zipFile = projectFolder/'Dati'/'DatiPendolarismo1991.zip'
 
     el = {
         'A':'.txt','W':'.txt',
@@ -81,7 +84,7 @@ def ReadAdjacencyMatrices(code):
                             dtype=np.float64
                         )
 
-    return Parameters(**parameters)
+    return libP.Parameters(**parameters)
 
 
 ### Auxiliary functions ###
@@ -192,7 +195,8 @@ def BuildAdjacencyMatrices(
 
 def UpdateMatrices(
     dicReg,commuters,
-    oReg,dReg,oMun,dMun
+    oReg,dReg,
+    oMun,dMun
 ):
     oI = dicReg[oReg]['Code2li'][oMun] # Local/Global origin index
     dI = dicReg[dReg]['Code2li'][dMun] # Local/Global destination index
@@ -249,8 +253,7 @@ def WriteAdjacencyMatrices(zipPath,dicReg):
 def WriteSimulationData(lbl,si,cs,typ,li2Name,Ni):
     lbl = [t.replace('.','') for t in lbl]
 
-    projectPath = Path(__file__).resolve().parent.parent
-    zipFile = projectPath/'Dati'/'SimulationData.zip'
+    zipFile = projectFolder/'Dati'/'SimulationData.zip'
 
     with ZF(
         zipFile,'w',
@@ -277,3 +280,33 @@ def WriteSimulationData(lbl,si,cs,typ,li2Name,Ni):
                 json.dump(dicName2SortedPop[t],buf)
                 value = buf.getvalue()
                 z.writestr(path,value)
+
+def SetParameters(cls):
+    parameters = libP.parameters
+    for name,kwargs in parameters.items():
+        setattr(cls,name,libP.Parameter(**kwargs))
+
+def LoadCaseStudies(cls):
+    data = libP.caseStudies
+    caseStudies = data['list']
+    selectedCS = data['selected']
+    listCS = list(caseStudies.keys())
+    dictCS = {}
+
+    for name,study in caseStudies.items():
+        dictCS[name] = {}
+
+        for key,val in study.items():
+            prm = getattr(cls,key)
+            dictCS[name][prm] = val
+
+        for (prmName,prmlist) in [
+            ('region','regList'),
+            ('interactingLaw','intLawList'),
+            ('studiedParameter','studiedPrmList')
+        ]:
+            prm = getattr(cls,prmName)
+            value = dictCS[name][prm]
+            dictCS[name][prm] = getattr(cls,prmlist).Name[value]
+
+    return dictCS, selectedCS, listCS

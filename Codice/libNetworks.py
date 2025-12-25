@@ -1,10 +1,10 @@
 
+# Library to analyse networks [also known as graphs]
+
 import numpy as np
 import networkx as nx
 
-import importlib
 import libFigures as libF
-importlib.reload(libF)
 
 
 ### Main class ###

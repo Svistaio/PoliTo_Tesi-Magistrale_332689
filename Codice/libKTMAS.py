@@ -1,4 +1,6 @@
 
+# Library to apply the Kinetic Theory for Multi-Agent Systems
+
 import numpy as np
 from scipy import stats
 from numba import njit
@@ -12,8 +14,8 @@ from multiprocessing import shared_memory
 from matplotlib.pyplot import get_cmap
 from matplotlib.colors import LogNorm
 
-from libGUI import ProgressGUI
-from libExtractData import WriteSimulationData
+from libGUIs import ProgressBarsGUI
+from libData import WriteSimulationData
 
 import importlib
 import libFigures as libF
@@ -21,132 +23,6 @@ importlib.reload(libF)
 
 
 ### Main class ###
-
-class ParametricStudy():
-    def __init__(self,clsPrm,clsReg):
-        sp = clsPrm.studiedParameter
-
-        sV = clsPrm.startValuePrmStudy; self.sV = sV
-        eV = clsPrm.endValuePrmStudy; self.eV = eV
-        Nv = clsPrm.numberPrmStudy; self.Nv = Nv
-
-        self.KS = [None]*Nv
-        for s,val in enumerate(np.linspace(sV,eV,Nv)):
-            match sp:
-                case 0:
-                    clsPrm.attractivity = val
-                case 1:
-                    clsPrm.convincibility = val
-                case 2:
-                    clsPrm.zetaFraction = val
-
-            self.KS[s] = KineticSimulation(clsPrm,clsReg)
-            self.KS[s].sid = s+1
-
-        self.fw = 24
-        self.fh = 8
-        self.figData = libF.FigData(clsPrm,'KS')
-
-    # Simulation
-    def MonteCarloSimulation(self):
-        for sim in self.KS:
-            sim.MonteCarloSimulation()
-
-    # Figures
-    def SizeDistrFittingsFig(self):
-        figData = self.figData
-        fw = self.fw
-        fh = self.fh
-
-        nCol = 3 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
-
-        for s,KS in enumerate(self.KS):
-            KS.SizeDistrFittingsFig(
-                ax=ax[s,:],
-                idx=nCol*s+1,
-                figData=figData
-            )
-
-        figData.SaveFig('SizeDistributionFittings')
-
-    def AverageSizeFig(self):
-        figData = self.figData
-        fw = self.fw/3
-        fh = self.fh
-
-        nCol = 1 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
-
-        for s,KS in enumerate(self.KS):
-            KS.AverageSizeFig(
-                ax=ax[s],
-                idx=nCol*s+1,
-                figData=figData
-            )
-
-        figData.SaveFig('AverageSize')
-
-    def SizeVsDegreeFig(self):
-        figData = self.figData
-        fw = self.fw*2/3
-        fh = self.fh
-
-        nCol = 2 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
-
-        for s,KS in enumerate(self.KS):
-            KS.SizeVsDegreeFig(
-                ax=ax[s,:],
-                idx=nCol*s+1,
-                figData=figData
-            )
-
-        figData.SaveFig('SizeVsDegree')
-
-    def SizeDistrEvolutionFig(self):
-        figData = self.figData
-        fw = self.fw*2/3
-        fh = self.fh
-
-        nCol = 2 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
-
-        for s,KS in enumerate(self.KS):
-            KS.SizeDistrEvolutionFig(
-                ax=ax[s,:],
-                idx=nCol*s+1,
-                figData=figData
-            )
-
-        figData.SaveFig('SizeDistributionEvolution')
-
-    def SizeEvolutionsFig(self):
-        figData = self.figData
-        fw = self.fw*2/3
-        fh = self.fh
-
-        nCol = 2 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
-
-        for s,KS in enumerate(self.KS):
-            KS.SizeEvolutionsFig(
-                ax=ax[s,:],
-                idx=nCol*s+1,
-                figData=figData
-            )
-
-        figData.SaveFig('SizeEvolutions')
-
-    def ShowFig(self):
-        from matplotlib.pyplot import show
-        show()
-
 
 class KineticSimulation():
     def __init__(self,clsPrm,clsReg):
@@ -165,7 +41,7 @@ class KineticSimulation():
         dt = float(clsPrm.timestep); self.dt = dt
         Nt = int(clsPrm.timesteps); self.Nt = Nt
 
-        Ns = int(clsPrm.screenshots); self.Ns = Ns
+        Ns = int(clsPrm.snapshots); self.Ns = Ns
         ns = np.array(
             [i*Nt/Ns for i in range(Ns+1)],
             dtype=np.int64
@@ -213,6 +89,7 @@ class KineticSimulation():
         if clsPrm.parametricStudy:
             self.figData = None
             self.Nv = clsPrm.numberPrmStudy
+            self.studiedPrmString = None
         else:
             self.figData = libF.FigData(clsPrm,'KS')
             self.Nv = None
@@ -256,7 +133,7 @@ class KineticSimulation():
             np.ndarray(elapsed.shape,elapsed.dtype,shme.buf)[:] = 0
             np.ndarray(done.shape,done.dtype,shmd.buf)[:] = 0
 
-            bar = ProgressGUI(
+            bar = ProgressBarsGUI(
                 Ni,Nt,
                 shmp.name,
                 shme.name,
@@ -490,7 +367,9 @@ class KineticSimulation():
                 p=p,dp=(0,dp[1])
             )
 
-            p = (.85,p[1]); dp = (.425,dp[1])
+            offset = 0 if self.il in (2,4,6) else 1
+            p = (.80+.05*offset,p[1])
+            dp = (.475-.07*offset,dp[1])
             TextBlock(
                 ax[2],[[ '',
                     fr'$\lambda={self.l}$',
@@ -507,10 +386,10 @@ class KineticSimulation():
                     fr'$sf={self.sf}$',
                 ]],
                 p=p,dp=dp,
-                offset=0 if self.il in (2,4,6) else 1
+                offset=offset
             )
 
-        Text(ax[2],(1.1,.5),fr'$\alpha={self.a}$')
+        if not saveFig: Text(ax[2],(1.1,.5),self.studiedPrmString)
 
         # Style
         libF.SetFigStyle(
@@ -559,7 +438,7 @@ class KineticSimulation():
             libF.CreateFunctionPlot(
                 times,
                 ca[:,:,t],
-                figData.fig if figData is None
+                figData.fig if saveFig
                 else getattr(figData,f'fig{idx}'),
                 Ni=Ni,
                 ta=ta,
@@ -573,7 +452,7 @@ class KineticSimulation():
         # CentreFig()
         libF.SetFigStyle(
             r"$t$",r"$\langle cs\rangle$",
-            data=figData.fig if figData is None 
+            data=figData.fig if saveFig
             else getattr(figData,f'fig{idx}'),
             ax=ax
         )
@@ -760,6 +639,135 @@ class KineticSimulation():
 
         # CentreFig()
         if saveFig: figData.SaveFig('SizeEvolutions')
+
+    def ShowFig(self):
+        from matplotlib.pyplot import show
+        show()
+
+class ParametricStudy():
+    def __init__(self,clsPrm,clsReg):
+        sp = clsPrm.studiedParameter
+
+        sV = clsPrm.startValuePrmStudy; self.sV = sV
+        eV = clsPrm.endValuePrmStudy; self.eV = eV
+        Nv = clsPrm.numberPrmStudy; self.Nv = Nv
+
+        self.KS = [None]*Nv
+        for s,val in enumerate(np.linspace(sV,eV,Nv)):
+            match sp:
+                case 0: 
+                    clsPrm.attractivity = val
+                    string = fr'$\lambda={val:.2f}$'
+                case 1:
+                    clsPrm.convincibility = val
+                    string = fr'$\alpha={val:.2f}$'
+                case 2:
+                    clsPrm.zetaFraction = val
+                    string = fr'$\zeta={val:.2f}$'
+
+            self.KS[s] = KineticSimulation(clsPrm,clsReg)
+            self.KS[s].sid = s+1
+            self.KS[s].studiedPrmString = string 
+
+        self.fw = 24
+        self.fh = 8
+        self.figData = libF.FigData(clsPrm,'KS')
+
+    # Simulation
+    def MonteCarloSimulation(self):
+        for sim in self.KS:
+            sim.MonteCarloSimulation()
+
+    # Figures
+    def SizeDistrFittingsFig(self):
+        figData = self.figData
+        fw = self.fw
+        fh = self.fh
+
+        nCol = 3 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.SizeDistrFittingsFig(
+                ax=ax[s,:],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('SizeDistributionFittings')
+
+    def AverageSizeFig(self):
+        figData = self.figData
+        fw = self.fw/3
+        fh = self.fh
+
+        nCol = 1 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.AverageSizeFig(
+                ax=ax[s],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('AverageSize')
+
+    def SizeVsDegreeFig(self):
+        figData = self.figData
+        fw = self.fw*2/3
+        fh = self.fh
+
+        nCol = 2 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.SizeVsDegreeFig(
+                ax=ax[s,:],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('SizeVsDegree')
+
+    def SizeDistrEvolutionFig(self):
+        figData = self.figData
+        fw = self.fw*2/3
+        fh = self.fh
+
+        nCol = 2 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.SizeDistrEvolutionFig(
+                ax=ax[s,:],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('SizeDistributionEvolution')
+
+    def SizeEvolutionsFig(self):
+        figData = self.figData
+        fw = self.fw*2/3
+        fh = self.fh
+
+        nCol = 2 # Figures for each row
+        nRow = self.Nv
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+
+        for s,KS in enumerate(self.KS):
+            KS.SizeEvolutionsFig(
+                ax=ax[s,:],
+                idx=nCol*s+1,
+                figData=figData
+            )
+
+        figData.SaveFig('SizeEvolutions')
 
     def ShowFig(self):
         from matplotlib.pyplot import show
