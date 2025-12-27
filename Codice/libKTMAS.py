@@ -1,28 +1,28 @@
 
 # Library to apply the Kinetic Theory for Multi-Agent Systems
 
-import numpy as np
-from scipy import stats
-from numba import njit
+from dataclasses import dataclass
 
-import time
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing as mp
 from multiprocessing import shared_memory
+import time
 # from tqdm import tqdm
+
+import numpy as np
+from scipy import stats
+from numba import njit
 
 from matplotlib.pyplot import get_cmap
 from matplotlib.colors import LogNorm
 
 from libGUIs import ProgressBarsGUI
 from libData import WriteSimulationData
-
-import importlib
+from libParameters import workersShM
 import libFigures as libF
-importlib.reload(libF)
 
 
-### Main class ###
+### Main classes ###
 
 class KineticSimulation():
     def __init__(self,clsPrm,clsReg):
@@ -31,6 +31,7 @@ class KineticSimulation():
         self.l = float(clsPrm.attractivity)
         self.a = float(clsPrm.convincibility)
         self.s = float(clsPrm.deviation)
+        self.f = clsPrm.fluctuations
         self.z = float(clsPrm.zetaFraction)
 
         self.Ni = int(clsPrm.iterations)
@@ -51,33 +52,26 @@ class KineticSimulation():
         ks = int(Ns/sf); self.ks = ks # Kernerl size
         self.times = ns[::ks]*dt
 
-        di = np.sum(
-            clsReg.A,axis=1,
-            dtype=np.int64,
-            keepdims=True
-        ); self.di = di.reshape((Nc,))
-        # Inverse degrees
-        invdi = np.array(1/di,dtype=np.float64)
-        self.D = di@invdi.T
+        self.di = np.sum(clsReg.A,axis=1,dtype=np.int32)
+        self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
+        # self.D = di@invdi.T
 
         self.R = int(clsPrm.region)
         self.P = int(clsPrm.population)
         self.p0 = float(self.P/self.Nc)
 
-        M = np.zeros((Nc,Nc,2),dtype=np.float64)
-
         # Exact [Weighted] Adjacency matrix
         if clsPrm.edgeWeights:
-            M[:,:,0] = clsReg.W/np.max(clsReg.W)
+            M = np.array(clsReg.W/np.max(clsReg.W),dtype=np.float64)
         else:
-            M[:,:,0] = clsReg.A
+            M = np.array(clsReg.A,dtype=np.float64)
         
         # Approximated adjacency matrix
-        Mn = np.sum(M[:,:,0])
-        wO = np.sum(M[:,:,0],axis=1,keepdims=True)
-        wI = np.sum(M[:,:,0],axis=0,keepdims=True)
-        M[:,:,1]  = wO@wI/Mn
-        # In this case wO=wI but it's better to define them in the most general way
+        Mn = np.sum(M[:,:])
+        self.wOdt = np.sum(M[:,:],axis=1)*dt/Mn
+        self.wI = np.sum(M[:,:],axis=0)
+        # M[:,:,1]  = wO@wI/Mn
+        # In this case wO=wI but it's better to define them rigorously
 
         self.Mdt = M*dt
         self.typ = np.array([0,1],dtype=np.int64)
@@ -101,89 +95,87 @@ class KineticSimulation():
         Nc = self.Nc
         p0 = self.p0
 
-        progressBar = self.progressBar
+        gui = self.progressBar
         Nt = self.Nt
         Ns = self.Ns
-        ns = self.ns
 
         sid = self.sid
         Nv = self.Nv
 
-        Mdt = self.Mdt
-        D = self.D
         l = self.l
         a = self.a
         s = self.s
+        f = self.f
         z = self.z
         il = self.il
         typ = self.typ.size
 
         process = range(Ni)
 
-        if progressBar: 
-            progress = np.zeros(Ni,dtype=np.int64)
-            elapsed = np.zeros(Ni,dtype=np.float64)
-            done = np.zeros(Ni,dtype=np.int8)
+        shmPrm = {}
+        shmHandles = {}
+        # clsShM = shmSpecs
 
-            shmp = shared_memory.SharedMemory(create=True,size=progress.nbytes)
-            shme = shared_memory.SharedMemory(create=True,size=elapsed.nbytes)
-            shmd = shared_memory.SharedMemory(create=True,size=done.nbytes)
+        for key in workersShM['parameters'].keys():
+            spec, shm = BuildShM(getattr(self,key))
+            shmPrm[key] = spec
+            shmHandles[key] = shm
 
-            np.ndarray(progress.shape,progress.dtype,shmp.buf)[:] = 0
-            np.ndarray(elapsed.shape,elapsed.dtype,shme.buf)[:] = 0
-            np.ndarray(done.shape,done.dtype,shmd.buf)[:] = 0
+        ctx = mp.get_context("spawn")
 
-            bar = ProgressBarsGUI(
-                Ni,Nt,
-                shmp.name,
-                shme.name,
-                shmd.name,
-                sid,Nv
-            )
+        if gui: 
+            for key,dtype in workersShM['gui'].items():
+                spec, shm = BuildShM(Ni=Ni,dtype=dtype)
+                shmPrm[key] = spec
+                shmHandles[key] = shm
 
-            ctx = mp.get_context("spawn")
-            with ProcessPoolExecutor(
-                max_workers=3,
-                mp_context=ctx
-            ) as executor:
-                futures = {}
-                for p in process:
-                    futures[p] = executor.submit(
-                        MonteCarloAlgorithm,
-                        p,Ni,Nc,Ns,ns,
-                        p0,D,Mdt,typ,
-                        l,a,s,z,il,
-                        gui=True,
-                        namep=shmp.name,
-                        namee=shme.name,
-                        named=shmd.name
-                    )
-                bar.mainloop()
+            bar = ProgressBarsGUI(Ni,Nt,sid,Nv,shmPrm,LoadShM)
 
+            try:
+                with ProcessPoolExecutor(
+                    max_workers=3,
+                    mp_context=ctx,
+                    initializer=InitializeMCSWorker,
+                    initargs=(shmPrm,True)
+                ) as executor:
+                    futures = {}
+                    for p in range(Ni):
+                        futures[p] = executor.submit(
+                            MonteCarloAlgorithm,
+                            p,Nc,Ns,p0,typ,
+                            l,a,s,f,z,il,gui
+                        )
+                    bar.mainloop()
 
-            shmp.close(); shmp.unlink()
-            shme.close(); shme.unlink()
-            shmd.close(); shmd.unlink()
+            finally:
+                data = [None]*Ni
+                for p, fut in futures.items():
+                    data[p] = fut.result()
+                self.data = data
+
+                for shm in shmHandles.values():
+                    shm.close(); shm.unlink()
 
         else:
-            ctx = mp.get_context("spawn")
-            with ProcessPoolExecutor(
-                max_workers=3,
-                mp_context=ctx
-            ) as executor:
-                futures = {}
-                for p in process:
-                    futures[p] = executor.submit(
-                        MonteCarloAlgorithm,
-                        p,Ni,Nc,Ns,ns,
-                        p0,D,Mdt,typ,
-                        l,a,s,z,il,
-                    )
-
-        data = [None]*Ni
-        for p, fut in futures.items():
-            data[p] = fut.result()
-        self.data = data
+            try:
+                with ProcessPoolExecutor(
+                    max_workers=3,
+                    mp_context=ctx,
+                    initializer=InitializeMCSWorker,
+                    initargs=(shmPrm,)
+                ) as executor:
+                    data = list(
+                        executor.map(
+                            MonteCarloAlgorithm,
+                            process,[Nc]*Ni,[Ns]*Ni,
+                            [p0]*Ni,[typ]*Ni,[l]*Ni,
+                            [a]*Ni,[s]*Ni,[f]*Ni,
+                            [z]*Ni,[il]*Ni,[gui]*Ni
+                        )
+                    ); self.data = data
+            finally:
+                for shm in shmHandles.values():
+                    shm.close(); shm.unlink()
 
         self.EvaluateSimulationData()
         WriteSimulationData(
@@ -219,7 +211,7 @@ class KineticSimulation():
                     )
                     sv[r,1:,t] = conv[::ks].copy()
             
-            # This functions applies the mean every ks unit of the Ns screenshots
+            # This functions applies the mean every ks unit of the Ns snapshots
             return sv
 
         self.vrtState = np.array([data[p][0] for p in range(Ni)])
@@ -383,7 +375,7 @@ class KineticSimulation():
                     '','','',''
                 ],[ '',
                     fr'$\alpha={self.a}$',
-                    fr'$il={self.il}$',
+                    fr'$il={self.il+1}$',
                     fr'$dt={self.dt}$',
                     fr'$sf={self.sf}$',
                 ]],
@@ -527,7 +519,7 @@ class KineticSimulation():
         figData=None,
         saveFig=False
     ):
-        screenshots = self.itAvrSnapshots
+        snapshots = self.itAvrSnapshots
 
         ns = self.ns
         Ns = self.Ns
@@ -545,13 +537,13 @@ class KineticSimulation():
         clrmap = get_cmap('inferno') # magma
         colours = [clrmap(i/(samples-1)) for i in range(samples)]
 
-        sMax = np.max(screenshots[:,-1,:])
-        sMin = np.min(screenshots[:,-1,:])
+        sMax = np.max(snapshots[:,-1,:])
+        sMin = np.min(snapshots[:,-1,:])
 
         for t in typ: # t[ype]
             for j,s in enumerate(np.linspace(0,Ns,samples,dtype=int)):
                 libF.CreateHistogramPlot(
-                    screenshots[:,s,t],21,
+                    snapshots[:,s,t],21,
                     getattr(figData,f'fig{t+idx}'),
                     limits=(sMin,sMax),
                     xScale='log',
@@ -586,7 +578,7 @@ class KineticSimulation():
         typ = self.typ
 
         times = self.times
-        screenshots = self.itAvrConvSnapshots
+        snapshots = self.itAvrConvSnapshots
 
         di = self.di
         sf = self.sf
@@ -598,10 +590,10 @@ class KineticSimulation():
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
 
         dk, _ = np.unique(di,return_counts=True); Nk = dk.size
-        screenshotsk = np.zeros((Nk,sf+1,2),dtype=np.float64)
+        snapshotsk = np.zeros((Nk,sf+1,2),dtype=np.float64)
         for i,k in enumerate(dk):
             bk = di == k
-            screenshotsk[i,:,:] = screenshots[bk,:,:].mean(axis=0)
+            snapshotsk[i,:,:] = snapshots[bk,:,:].mean(axis=0)
 
         clrmap = get_cmap('inferno') # magma
         norm = LogNorm(vmin=dk.min(),vmax=dk.max())
@@ -614,14 +606,14 @@ class KineticSimulation():
 
         for t in typ: # t[ype]
             # norm = LogNorm(
-            #     vmin=screenshotsk[:,-1,t].min(),
-            #     vmax=screenshotsk[:,-1,t].max()
+            #     vmin=snapshotsk[:,-1,t].min(),
+            #     vmax=snapshotsk[:,-1,t].max()
             # )
-            # colours = clrmap(norm(screenshotsk[:,-1,t]))
+            # colours = clrmap(norm(snapshotsk[:,-1,t]))
 
-            for k in range(Nk):
+            for k in np.linspace(Nk-1,0,Nk,dtype=np.int64):
                 libF.CreateFunctionPlot(
-                    times,screenshotsk[k,:,t],
+                    times,snapshotsk[k,:,t],
                     getattr(figData,f'fig{t+idx}'),
                     color=colours[k,:],
                     alpha=0.8,
@@ -778,145 +770,201 @@ class ParametricStudy():
 
 ### Auxiliary functions ###
 
-def MonteCarloAlgorithm(
-    p,Ni,Nc,Ns,ns,
-    p0,D,Mdt,typ,
-    l,a,s,z,il,
-    gui=False,
-    namep=None,
-    namee=None,
-    named=None
+@dataclass(frozen=True)
+class ShMSpec:
+    name: str
+    shape: tuple[int,...]
+    dtype: str
+
+def BuildShM(
+    array=None,
+    Ni=None,
+    dtype=None
 ):
+    if array is not None:
+        a = np.ascontiguousarray(array)
+    else:
+        a = np.zeros(Ni,dtype=dtype)
+
+    shm = shared_memory.SharedMemory(
+        create=True,
+        size=a.nbytes
+    )
+
+    view = np.ndarray(
+        a.shape,
+        dtype=a.dtype,
+        buffer=shm.buf
+    )
+    view[:] = a
+
+    spec = ShMSpec(
+        name=shm.name,
+        shape=a.shape,
+        dtype=a.dtype.str
+    )
+
+    return spec, shm
+
+def LoadShM(spec):
+    shm = shared_memory.SharedMemory(name=spec.name)
+    arr = np.ndarray(
+        spec.shape,
+        dtype=np.dtype(spec.dtype),
+        buffer=shm.buf
+    )
+    return shm, arr
+
+def InitializeMCSWorker(
+    shmPrm,
+    gui=False
+):
+    for key in workersShM['parameters'].keys():
+        shm, arr = LoadShM(shmPrm[key])
+        workersShM['handles'].append(shm)
+        workersShM['parameters'][key] = arr
+
+    if gui:
+        for key in workersShM['gui'].keys():
+            shm, arr = LoadShM(shmPrm[key])
+            workersShM['handles'].append(shm)
+            workersShM['gui'][key] = arr
+
+def MonteCarloAlgorithm(
+    p,Nc,Ns,p0,typ,
+    l,a,s,f,z,il,gui
+):
+    Mdt = workersShM['parameters']["Mdt"]
+    wOdt = workersShM['parameters']["wOdt"]
+    wI = workersShM['parameters']["wI"]
+    di = workersShM['parameters']["di"]
+    idi = workersShM['parameters']["idi"]
+    ns = workersShM['parameters']["ns"]
+
     # rng = np.random.default_rng() # Even though it's recommended by Numpy it is not efficiently implemented in Numba, hence it halves the iterations per second if used
 
     # Uniform initial state for all vertices
     vrtState = np.full((Nc,typ),p0,dtype=np.float64)
-    screenshots = np.full((Nc,Ns+1,typ),p0,dtype=np.float64)
+    snapshots = np.full((Nc,Ns+1,typ),p0,dtype=np.float64)
 
-    P = np.arange(Nc,dtype=np.int64)
+    P = np.arange(Nc,dtype=np.int32)
 
     nk = ns[1]
+    hNc = Nc//2 # Nc half
     nsid = 1
 
     if gui: # If ProgressGUI is required
-        # if namep is None or namee is None or named is None:
-        #     raise ValueError('GUI requires namep, namee and named for shared memory')
+        progress = workersShM['gui']['progress']
+        elapsed = workersShM['gui']['elapsed']
+        done = workersShM['gui']['done']
 
-        shmp = shared_memory.SharedMemory(name=namep)
-        shme = shared_memory.SharedMemory(name=namee)
-        shmd = shared_memory.SharedMemory(name=named)
-
-        try:
-            progress = np.ndarray((Ni,),dtype=np.int64,buffer=shmp.buf)
-            elapsed = np.ndarray((Ni,),dtype=np.float64,buffer=shme.buf)
-            done = np.ndarray((Ni,),dtype=np.int8,buffer=shmd.buf)
-
-            EvolveState(
-                vrtState,P,Nc,
-                nk,Mdt,D,il,
-                l,a,s,z#,rng
-            ) # Warm-up iteration to avoid polluting the initial time t0
-            screenshots[:,nsid,0] = vrtState[:,0]
-            screenshots[:,nsid,1] = vrtState[:,1]
-            nsid += 1
-
-            t0 = time.perf_counter()
-            for ns in range(Ns-1):
-                EvolveState(
-                    vrtState,P,Nc,
-                    nk,Mdt,D,il,
-                    l,a,s,z#,rng
-                )
-
-                progress[p] = (ns+2)*nk
-                elapsed[p] = time.perf_counter()-t0
-                # q.put((p,(ns+2)*nk,time.perf_counter()-t0))
-
-                screenshots[:,nsid,0] = vrtState[:,0]
-                screenshots[:,nsid,1] = vrtState[:,1]
-                nsid += 1
-
-            progress[p] = Ns*nk
-            elapsed[p] = time.perf_counter()-t0
-            done[p] = True
-            # q.put((p,'done',time.perf_counter()-t0))
-
-            return vrtState, screenshots
-
-        finally:
-            shmp.close()
-            shme.close()
-            shmd.close()
-
-    else:
         EvolveState(
-            vrtState,P,Nc,
-            nk,Mdt,D,il,
-            l,a,s,z#,rng
+            vrtState,P,
+            Nc,hNc,nk,
+            Mdt,wOdt,wI,
+            di,idi,il,
+            l,a,s,f,z#,rng
         ) # Warm-up iteration to avoid polluting the initial time t0
-        screenshots[:,nsid,0] = vrtState[:,0]
-        screenshots[:,nsid,1] = vrtState[:,1]
+        snapshots[:,nsid,0] = vrtState[:,0]
+        snapshots[:,nsid,1] = vrtState[:,1]
         nsid += 1
 
         t0 = time.perf_counter()
-        for ns in range(Ns-1):
+        for st in range(Ns-1): # step
             EvolveState(
-                vrtState,P,Nc,
-                nk,Mdt,D,il,
-                l,a,s,z#,rng
+                vrtState,P,
+                Nc,hNc,nk,
+                Mdt,wOdt,wI,
+                di,idi,il,
+                l,a,s,f,z#,rng
             )
-            screenshots[:,nsid,0] = vrtState[:,0]
-            screenshots[:,nsid,1] = vrtState[:,1]
+            snapshots[:,nsid,0] = vrtState[:,0]
+            snapshots[:,nsid,1] = vrtState[:,1]
             nsid += 1
 
-        return vrtState, screenshots
+            progress[p] = (st+2)*nk # ns[nsid]
+            elapsed[p] = time.perf_counter()-t0
+
+        progress[p] = Ns*nk # ns[-1]
+        elapsed[p] = time.perf_counter()-t0
+        done[p] = True
+
+        return vrtState, snapshots
+
+    else:
+        EvolveState(
+            vrtState,P,
+            Nc,hNc,nk,
+            Mdt,wOdt,wI,
+            di,idi,il,
+            l,a,s,f,z#,rng
+        ) # Warm-up iteration to avoid polluting the initial time t0
+        snapshots[:,nsid,0] = vrtState[:,0]
+        snapshots[:,nsid,1] = vrtState[:,1]
+        nsid += 1
+
+        t0 = time.perf_counter()
+        for _ in range(Ns-1):
+            EvolveState(
+                vrtState,P,
+                Nc,hNc,nk,
+                Mdt,wOdt,wI,
+                di,idi,il,
+                l,a,s,f,z#,rng
+            )
+            snapshots[:,nsid,0] = vrtState[:,0]
+            snapshots[:,nsid,1] = vrtState[:,1]
+            nsid += 1
+
+        return vrtState, snapshots
 
 @njit(cache=True)
 def EvolveState(
-    cs,P,Nc,nk,
-    Mdt,D,il,
-    l,a,s,z#,rng
+    cs,P,Nc,hNc,nk,
+    Mdt,wOdt,wI,
+    di,idi,il,
+    l,a,s,f,z#,rng
 ):
     for _ in range(nk):
         FYDInPlaceShuffle(P,Nc)
         # P = np.random.permutation(Nc)
         # pi = P[:hNc]; pr = P[hNc:]
 
-        hNc = Nc//2 # Nc half
         for i in range(hNc):
             ii = P[i]; ir = P[i+hNc]
 
             # t = 0
-            p = Mdt[ii,ir,0]
-            theta = np.random.random() < p
+            p = Mdt[ii,ir]
+            if p > 0:
+                theta = np.random.random() < p
 
-            if theta == 1:
-                si = cs[ii,0]; sr = cs[ir,0]
+                if theta == 1:
+                    si = cs[ii,0]; sr = cs[ir,0]
 
-                e = NonLinearEmigration(
-                    si,sr,D[ir,ii],
-                    il,l,a,z
-                )
-                ga = StochasticFluctuations(s,e)
+                    e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+                    ga = StochasticFluctuations(s,e) if f else 0
 
-                cs[ii,0] = si*(1-e+ga) 
-                cs[ir,0] = sr+si*e
+                    cs[ii,0] = si*(1-e+ga) 
+                    cs[ir,0] = sr+si*e
 
             # t = 1
-            p = Mdt[ii,ir,1]
+            p = wOdt[ii]*wI[ir] 
+            # Apparently it's more efficient to access two values from two separate vectors and to multiply them, than it is to access the same pre-computed value from a matrix; the same holds for the product «di[ir]*idi[ii]» inside «NonLinearEmigration()»
+            # However, in order for this property to be valid the matrix has to have an underlying more simple structure which in both cases is rank 1
+            # In other words this trick does not work with the adjacency matrix «Mdt[ii,ir]» which cannot be computed from simpler elements
             theta = np.random.random() < p
 
             if theta == 1:
                 si = cs[ii,1]; sr = cs[ir,1]
 
-                e = NonLinearEmigration(
-                    si,sr,D[ir,ii],
-                    il,l,a,z
-                )
-                ga = StochasticFluctuations(s,e)
+                e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+                ga = StochasticFluctuations(s,e) if f else 0
 
                 cs[ii,1] = si*(1-e+ga) 
                 cs[ir,1] = sr+si*e
+
+            # In the exact case it's reasonalbe to check whether p is actually positive before evaluating the Bernoulli distribution with «np.random.random()<p» since A can has zero components
+            # However its approximations Ap does not have zero components by definition (it's a complete network), hence that check becomes useless
 
             # p = 1 if p>1 else (0 if p<0 else p)
             # theta = np.random.binomial(1,p)
@@ -936,9 +984,8 @@ def FYDInPlaceShuffle(v,n):
 
 @njit(cache=True)
 def NonLinearEmigration(
-        si,  # Interacting city size
-        sr,  # Receiving city size
-        Dri, # Matrix of ratios dr/di
+        si,idii, # Interacting city size
+        sr,dir,  # Receiving city size
         il,l,a,z
     ):
     if si <= 0: return 0
@@ -948,13 +995,13 @@ def NonLinearEmigration(
         return l*(rs**a)/(1+rs**a)
 
     elif il == 1:
-        rsk = (sr/si)*Dri
+        rsk = (sr/si)*dir*idii
         return l*(rsk/a)/(1+rsk/a)
 
     elif il == 2:
         if sr <= 0: return 0
 
-        rsk = (sr/si)*Dri
+        rsk = (sr/si)*dir*idii
         efl = l*(rsk/a)/(1+rsk/a)
 
         irsk = 1/rsk
@@ -963,13 +1010,13 @@ def NonLinearEmigration(
         return (1-z)*efl+z*efs
 
     elif il == 3:
-        rsk = (sr/si)*Dri
+        rsk = (sr/si)*dir*idii
         return l*(rsk**a)/(1+rsk**a)
 
     elif il == 4:
         if sr <= 0: return 0
 
-        rsk = (sr/si)*Dri
+        rsk = (sr/si)*dir*idii
         efl = l*(rsk**a)/(1+rsk**a)
 
         irsk = 1/rsk
@@ -978,13 +1025,13 @@ def NonLinearEmigration(
         return (1-z)*efl+z*efs
 
     elif il == 5:
-        rsk = (sr/si)*Dri
+        rsk = (sr/si)*dir*idii
         return l*(rsk/(1+rsk))**a
 
     else:
         if sr <= 0: return 0
 
-        rsk = (sr/si)*Dri
+        rsk = (sr/si)*dir*idii
         efl = l*(rsk/(1+rsk))**a
 
         irsk = 1/rsk
@@ -997,7 +1044,7 @@ def NonLinearEmigration(
         # efl                     # Actual emigration rate for the lumping fraction
         # efs                     # Actual emigration rate for the separation fraction
 
-    # Numba does not support officially the match structure, hence, even if it appears to work, it's better to use an «if/elif/else» one the sake of performance and stability
+    # Numba does not officially support the match structure, hence, even if it appears to work, it's better to use an «if/elif/else» one the sake of performance and stability
 
 @njit(cache=True)
 def StochasticFluctuations(sigma,E):
