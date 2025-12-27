@@ -1,6 +1,11 @@
 
 # Library to more easily define/change parameters
 
+from dataclasses import dataclass
+from typing import Any
+
+import numpy as np
+
 
 ### Module attributes ###
 
@@ -56,6 +61,10 @@ parameters = {
     "edgeWeights": {
         "text": "Edge weights",
         "val": False
+    },
+    "fluctuations": {
+        "text": "Fluctuations",
+        "val": True
     },
     "interactingLaw": {
         "text": "Interacting law",
@@ -115,6 +124,7 @@ caseStudies = {
             "extraction": False,
             "analysis": False,
             "edgeWeights": False,
+            "fluctuations": True,
             "interactingLaw": 3,
             "PdfPopUp": False,
             "LaTeXConversion": False,
@@ -137,6 +147,7 @@ caseStudies = {
             "extraction": False,
             "analysis": False,
             "edgeWeights": False,
+            "fluctuations": True,
             "interactingLaw": 1,
             "PdfPopUp": False,
             "LaTeXConversion": False,
@@ -159,6 +170,7 @@ caseStudies = {
             "extraction": False,
             "analysis": False,
             "edgeWeights": False,
+            "fluctuations": True,
             "interactingLaw": 2,
             "PdfPopUp": False,
             "LaTeXConversion": False,
@@ -183,6 +195,7 @@ caseStudies = {
             "extraction": False,
             "analysis": False,
             "edgeWeights": False,
+            "fluctuations": True,
             "interactingLaw": 3,
             "PdfPopUp": False,
             "LaTeXConversion": False,
@@ -207,6 +220,7 @@ caseStudies = {
             "extraction": False,
             "analysis": False,
             "edgeWeights": False,
+            "fluctuations": True,
             "interactingLaw": 5,
             "PdfPopUp": False,
             "LaTeXConversion": False,
@@ -285,29 +299,36 @@ regPopDict = { # Italian region sizes in 1991
     'Italia':int(56778031)
 } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
 
+workersShM = {
+    'handles':[],
+    'parameters':{
+        'Mdt': None,
+        'wOdt': None,
+        'wI': None,
+        'di': None,
+        'idi': None,
+        'ns': None
+    },
+    'gui':{
+        'progress': np.int64,
+        'elapsed': np.float64,
+        'done': np.int8
+    }
+}
+
 
 ### Main classes ###
 
-class Parameter():
-    def __init__(
-        self,
-        text=None,
-        val=None,
-        var=None,
-        lbl=None,
-        wid=None,
-        frame=None,
-        list=None,
-        cbid=None # CallBack id
-    ):
-        self.text = text
-        self.val  = val
-        self.lbl  = lbl
-        self.var  = var
-        self.wid  = wid
-        self.frame = frame
-        self.list = list
-        self.cbid = cbid
+@dataclass(eq=False)
+class Parameter:
+    text: Any = None
+    val: Any = None
+    var: Any = None
+    lbl: Any = None
+    wid: Any = None
+    frame: Any = None
+    lst: Any = None
+    cbid: Any = None
 
 class Parameters():
     def __init__(self,**kwargs):
@@ -315,11 +336,11 @@ class Parameters():
             setattr(self,text,value)
 
 class ComboBoxList():
-    def __init__(self,attribute,list):
-        attribute.list = list
-        self.Name = list
-        self.Code = {
-            r:i+1 for i,r in enumerate(list)
+    def __init__(self,attribute,lst):
+        attribute.lst = lst
+        self.name = lst
+        self.code = {
+            r:i for i,r in enumerate(lst)
         }
 
 

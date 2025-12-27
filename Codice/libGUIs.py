@@ -6,8 +6,6 @@ from tkinter import ttk
 
 import numpy as np
 
-from multiprocessing import shared_memory
-
 import libParameters as libP
 import libData as libD
 
@@ -106,12 +104,12 @@ class ParametersGUI(tk.Tk):
         popPrmFrame.LabelEntry(self.convincibility)
 
         popPrmFrame.LabelEntry(self.population)
-        self.attractivity.var.trace_add("write",self.SetDeviationUpperLimit)
+        self.attractivity.var.trace_add('write',self.SetDeviationUpperLimit)
 
         popPrmFrame.LabelEntry(self.zetaFraction,colSpan=2)
 
         popPrmFrame.LabelComboBox(self.region)
-        self.region.var.trace_add("write",self.SetPopulation)
+        self.region.var.trace_add('write',self.SetPopulation)
         #endregion
 
         #region Time parameters
@@ -125,9 +123,11 @@ class ParametersGUI(tk.Tk):
         simPrmFrame.CheckBox(self.extraction)
         simPrmFrame.CheckBox(self.analysis)
         simPrmFrame.CheckBox(self.edgeWeights)
+        simPrmFrame.CheckBox(self.fluctuations)
+        self.fluctuations.var.trace_add('write',self.SetDevitaionState)
 
         simPrmFrame.LabelComboBox(self.interactingLaw)
-        self.interactingLaw.var.trace_add("write",self.InteractingLawCallBack)
+        self.interactingLaw.var.trace_add('write',self.InteractingLawCallBack)
         #endregion
 
         #region Postprocessing parameters
@@ -139,7 +139,7 @@ class ParametersGUI(tk.Tk):
             colSpan=ppcPrmFrame.nCol
         ) # Number of screenshots [not considering the initial state]
         self.timesteps.var.trace_add(
-            "write",lambda *args: self.SetSliderUpperLimit(
+            'write',lambda *args: self.SetSliderUpperLimit(
                 self.snapshots,self.timesteps
             )
         )
@@ -149,7 +149,7 @@ class ParametersGUI(tk.Tk):
             colSpan=ppcPrmFrame.nCol
         )
         self.snapshots.var.trace_add(
-            "write",lambda *args: self.SetSliderUpperLimit(
+            'write',lambda *args: self.SetSliderUpperLimit(
                 self.smoothingFactor,self.snapshots
             )
         )
@@ -182,7 +182,7 @@ class ParametersGUI(tk.Tk):
         self.caseStudy = libP.Parameter(
             'Case studies',
             selectedCS,
-            list=listCS,
+            lst=listCS,
         )
 
         buttonFrame.LabelComboBox(
@@ -190,7 +190,7 @@ class ParametersGUI(tk.Tk):
             colSpan=buttonFrame.nCol,
             pad=((0,0),(0,10))
         )
-        self.caseStudy.var.trace_add("write",self.SetCaseStudy)
+        self.caseStudy.var.trace_add('write',self.SetCaseStudy)
 
         buttonFrame.Button('Run',lambda: self.SetSimulationState(True))
         buttonFrame.Button('Stop',lambda: self.SetSimulationState(False))
@@ -206,6 +206,11 @@ class ParametersGUI(tk.Tk):
         #endregion
 
     # Callbacks
+    def SetDevitaionState(self,*args):
+        checked = self.fluctuations.var.get()
+        self.deviation.wid['state'] = 'normal' if checked else 'disabled'
+        self.deviation.wid['sliderrelief'] = 'raised' if checked else 'flat'
+
     def SetDeviationUpperLimit(self,*args):
         try:
             l = self.attractivity.var.get()
@@ -224,7 +229,7 @@ class ParametersGUI(tk.Tk):
         self.population.var.set(popReg)
 
     def SetConvincibility(self,*args):
-        if self.intLawList.Code[self.interactingLaw.var.get()] in (1,2):
+        if self.intLawList.code[self.interactingLaw.var.get()] in (1,2):
             l = self.attractivity.var.get()
             self.convincibility.var.set(np.round(l/.01-1,decimals=2))
         else:
@@ -238,14 +243,14 @@ class ParametersGUI(tk.Tk):
         self.destroy() # Close the window after any button is pressed
 
     def InteractingLawCallBack(self,*args):
-        if self.intLawList.Code[self.interactingLaw.var.get()] in (2,4,6):
+        if self.intLawList.code[self.interactingLaw.var.get()] in (2,4,6):
             self.zetaFraction.frame.grid()
-            self.studiedParameter.wid['values'] = self.studiedPrmList.Name
+            self.studiedParameter.wid['values'] = self.studiedPrmList.name
         else:
             self.zetaFraction.frame.grid_remove()
-            self.studiedParameter.wid['values'] = self.studiedPrmList.Name[:-1]
+            self.studiedParameter.wid['values'] = self.studiedPrmList.name[:-1]
 
-        if self.intLawList.Code[self.interactingLaw.var.get()] in (1,2,5,6):
+        if self.intLawList.code[self.interactingLaw.var.get()] in (1,2,5,6):
             self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
             self.DisableCallBack(self.attractivity)
@@ -277,7 +282,7 @@ class ParametersGUI(tk.Tk):
 
         checked = self.parametricStudy.var.get()
         state = 'disabled' if checked else 'normal'
-        value = self.studiedPrmList.Code[self.studiedParameter.var.get()]
+        value = self.studiedPrmList.code[self.studiedParameter.var.get()]
 
         if checked:
             match value:
@@ -295,7 +300,7 @@ class ParametersGUI(tk.Tk):
             prm.var.set(val)
 
         self.InteractingLawCallBack()
-        if self.intLawList.Code[self.interactingLaw.var.get()] in (1,2):
+        if self.intLawList.code[self.interactingLaw.var.get()] in (1,2):
             self.SetConvincibility()
         self.ShowParametricStudyFrame()
         self.SetStudiedParameterState()
@@ -312,13 +317,13 @@ class ParametersGUI(tk.Tk):
         
         parameters = libP.Parameters(**parameters)
 
-        parameters.region = self.regionList.Code[
+        parameters.region = self.regionList.code[
             parameters.region
-        ]
-        parameters.interactingLaw = self.intLawList.Code[
+        ]+1
+        parameters.interactingLaw = self.intLawList.code[
             parameters.interactingLaw
         ]
-        parameters.studiedParameter = self.studiedPrmList.Code[
+        parameters.studiedParameter = self.studiedPrmList.code[
             parameters.studiedParameter
         ]
 
@@ -345,18 +350,19 @@ class ParametersGUI(tk.Tk):
 
     def EnableCallBack(self,prm,clb):
         if prm.cbid is None:
-            prm.cbid = prm.var.trace_add("write",clb)
+            prm.cbid = prm.var.trace_add('write',clb)
 
     def DisableCallBack(self,prm):
         if prm.cbid is not None:
-            prm.var.trace_remove("write",prm.cbid)
+            prm.var.trace_remove('write',prm.cbid)
             prm.cbid = None
 
 class ProgressBarsGUI(tk.Tk):
     def __init__(
         self,Ni,Nt,
-        namep,namee,named,
-        sid=None,Nv=None
+        sid=None,Nv=None,
+        shmPrm=None,
+        LoadShM=None
     ):
         #region Window
         super().__init__()
@@ -370,13 +376,11 @@ class ProgressBarsGUI(tk.Tk):
         #endregion
 
         #region Parameters
-        shmp = shared_memory.SharedMemory(name=namep); self.shmp = shmp
-        shme = shared_memory.SharedMemory(name=namee); self.shme = shme
-        shmd = shared_memory.SharedMemory(name=named); self.shmd = shmd
-
-        self.progress = np.ndarray((Ni,),dtype=np.int64,buffer=shmp.buf)
-        self.elapsed = np.ndarray((Ni,),dtype=np.float64,buffer=shme.buf)
-        self.done = np.ndarray((Ni,),dtype=np.int8,buffer=shmd.buf)
+        self.shm = []
+        for key in libP.workersShM['gui'].keys():
+            shm, arr = LoadShM(shmPrm[key])
+            self.shm.append(shm)
+            setattr(self,key,arr)
 
         self.Ni = Ni
         self.Nt = Nt
@@ -468,7 +472,8 @@ class ProgressBarsGUI(tk.Tk):
 
             if el != 0:
                 self.bars[p]['value'] = nt
-                ips = max(1,nt)/max(el,1e-10) # Iterations per second
+                ips = max(1,nt)/el # Iterations per second
+
                 self.status[p]['text'] = (
                     f'{nt}/{self.Nt} ['
                     f'{TimeFormatter(nt/ips)}<'
@@ -712,7 +717,7 @@ class Frame(ttk.Frame):
         if width is None: width = self.comboBoxWidth
         data.wid = ttk.Combobox(
             master=self,
-            values=data.list,
+            values=data.lst,
             textvariable=data.var,
             state=state,
             font=self.normalFontStyle,
@@ -1058,7 +1063,7 @@ def TimeFormatter(seconds):
             rI=0,cI=1,px=(0,0),py=(0,0)
         )
 
-        dicObjects['attractivity']['obj']['var'].trace_add("write",DeviationUpperLimit)
+        dicObjects['attractivity']['obj']['var'].trace_add('write',DeviationUpperLimit)
 
         # Second row
         row += 1
@@ -1102,7 +1107,7 @@ def TimeFormatter(seconds):
             'var':intVar,
             'lab':stringVar
         }
-        dicObjects['regSelected']['obj']['lab'].trace_add("write",ChangePopulation)
+        dicObjects['regSelected']['obj']['lab'].trace_add('write',ChangePopulation)
         #endregion
 
         #region Time parameters

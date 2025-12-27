@@ -359,6 +359,6 @@ def LoadCaseStudies(cls):
         ]:
             prm = getattr(cls,prmName)
             value = dictCS[name][prm]
-            dictCS[name][prm] = getattr(cls,prmlist).Name[value]
+            dictCS[name][prm] = getattr(cls,prmlist).name[value]
 
     return dictCS, selectedCS, listCS
