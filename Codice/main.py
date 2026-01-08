@@ -17,11 +17,11 @@ def main():
     if clsPrm.simFlag:
 
         ### Data extraction ###
-        if clsPrm.extraction: libD.ExtractAdjacencyMatrices()
+        if clsPrm.extraction: libD.ExtractRegionData()
 
 
         ### Matrices extraction ###
-        clsReg = libD.LoadAdjacencyMatrices(clsPrm.region)
+        clsReg = libD.LoadRegionData(clsPrm.region)
 
 
         ### Network analysis ###
