@@ -4,6 +4,7 @@
 from dataclasses import dataclass
 from typing import Any
 
+from copy import deepcopy
 import numpy as np
 
 
@@ -118,7 +119,7 @@ caseStudies = {
             "region": 19,
             "zetaFraction": 0.1,
             "timestep": 0.01,
-            "timesteps": 100000,
+            "timesteps": int(1e5),
             "iterations": 3,
             "progressBar": False,
             "extraction": False,
@@ -141,7 +142,7 @@ caseStudies = {
             "deviation": 0.05,
             "region": 19,
             "timestep": 0.01,
-            "timesteps": 500000,
+            "timesteps": int(5e5),
             "iterations": 15,
             "progressBar": False,
             "extraction": False,
@@ -164,7 +165,7 @@ caseStudies = {
             "deviation": 0.05,
             "region": 19,
             "timestep": 0.01,
-            "timesteps": 10000000,
+            "timesteps": int(1e7),
             "iterations": 15,
             "progressBar": False,
             "extraction": False,
@@ -189,7 +190,7 @@ caseStudies = {
             "region": 19,
             "zetaFraction": 0.1,
             "timestep": 0.01,
-            "timesteps": 10000000,
+            "timesteps": int(1e7),
             "iterations": 15,
             "progressBar": False,
             "extraction": False,
@@ -214,7 +215,7 @@ caseStudies = {
             "region": 19,
             "zetaFraction": 0.1,
             "timestep": 0.01,
-            "timesteps": 10000000,
+            "timesteps": int(1e7),
             "iterations": 15,
             "progressBar": False,
             "extraction": False,
@@ -224,13 +225,13 @@ caseStudies = {
             "interactingLaw": 5,
             "PdfPopUp": False,
             "LaTeXConversion": False,
-            "studiedParameter": 0,
+            "studiedParameter": 1,
             "snapshots": 100,
             "smoothingFactor": 10,
             "parametricStudy": False,
-            "startValuePrmStudy": 1.0,
-            "endValuePrmStudy": 1.0,
-            "numberPrmStudy": 1
+            "startValuePrmStudy": 0.3,
+            "endValuePrmStudy": 1,
+            "numberPrmStudy": 3
         }
     }
 }
@@ -317,7 +318,7 @@ workersShM = {
 }
 
 
-### Main classes ###
+### Main classes and function ###
 
 @dataclass(eq=False)
 class Parameter:
@@ -342,6 +343,8 @@ class ComboBoxList():
         self.code = {
             r:i for i,r in enumerate(lst)
         }
+
+def CopyWorkerShMTemplate(): return deepcopy(workersShM)
 
 
 ### Discarded code ###

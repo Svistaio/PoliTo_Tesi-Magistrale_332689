@@ -100,7 +100,7 @@ class FigData():
             return plt.subplots(
                 nCol,nRow,
                 figsize=size,
-                    gridspec_kw=dict(
+                gridspec_kw=dict(
                     wspace=0.2,
                     hspace=0.2
                 )
@@ -518,14 +518,8 @@ def CreateLognormalFitPlot(
     xScale='lin',
     Ni=1,
     ta=None,
-    label=(
-        'Lognormal fit (ML)',
-        'Average value'
-    ), # Minimum likelihood
-    color=(
-        'blue',
-        'black'
-    ),
+    label='Lognormal fit (ML)', # Maximum likelihood
+    color='black',
     alpha=1,
     idx='',
     ax=None
@@ -554,26 +548,14 @@ def CreateLognormalFitPlot(
         shape, loc, scale = stats.lognorm.fit(v,floc=0)
         # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
         yF = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
-
-        vAvr = np.mean(v)
-        # xM = np.array([vAvr,vAvr])
-        # yM = np.array([0,stats.lognorm.pdf(vAvr,shape,loc=loc,scale=scale)])
     else:
         fitData = [None]*Ni
-        avrData = [None]*Ni
-        yM = 0
 
         for r in range(Ni):
             shape, loc, scale = stats.lognorm.fit(v[r,:],floc=0)
             fitData[r] = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
 
-            avrData[r] = np.mean(v[r,:])
-            yM += stats.lognorm.pdf(avrData[r],shape,loc=loc,scale=scale)/Ni
-
         yF = fitData
-
-        # xM = np.transpose(np.array([np.array(avrData)]*2))
-        # yM = np.array([0,yM])
 
     # Fit plot
     CreateFunctionPlot(
@@ -581,28 +563,71 @@ def CreateLognormalFitPlot(
         figData,
         Ni=Ni,
         ta=ta,
-        label=label[0],
+        label=label,
         # linewidth=1,
-        color=color[0],
+        color=color,
         alpha=alpha,
         idx=idx,
         ax=ax
     )
 
-    # Average value plot
-    # CreateFunctionPlot(
-    #     xM,yM,
-    #     figData,
-    #     Ni=Ni,
-    #     ta=ta,
-    #     yErr=False,
-    #     label=label[1],
-    #     # linewidth=1,
-    #     linestyle="--",
-    #     color=color[1],
-    #     idx=idx,
-    #     ax=ax
-    # )
+    """ Old implementation with the average drawn over the lognormal fit as a vertical line
+        # In the function arguments
+        label=(
+            'Lognormal fit (ML)',
+            'Average value'
+        ), # Minimum likelihood
+        color=(
+            'blue',
+            'black'
+        ),
+
+        # In the function body
+        if Ni == 1:
+            vAvr = np.mean(v)
+            xM = np.array([vAvr,vAvr])
+            yM = np.array([0,stats.lognorm.pdf(vAvr,shape,loc=loc,scale=scale)])
+        else:
+            avrData = [None]*Ni
+            yM = 0
+
+            for r in range(Ni):
+                avrData[r] = np.mean(v[r,:])
+                shape, loc, scale = stats.lognorm.fit(v[r,:],floc=0)
+                yM += stats.lognorm.pdf(avrData[r],shape,loc=loc,scale=scale)/Ni
+
+            xM = np.transpose(np.array([np.array(avrData)]*2))
+            yM = np.array([0,yM])
+
+        # Lognormal fit plot
+        CreateFunctionPlot(
+            xF,yF,
+            figData,
+            Ni=Ni,
+            ta=ta,
+            label=label[0],
+            # linewidth=1,
+            color=color[0],
+            alpha=alpha,
+            idx=idx,
+            ax=ax
+        )
+
+        # Average value plot
+        CreateFunctionPlot(
+            xM,yM,
+            figData,
+            Ni=Ni,
+            ta=ta,
+            yErr=False,
+            label=label[1],
+            # linewidth=1,
+            linestyle="--",
+            color=color[1],
+            idx=idx,
+            ax=ax
+        )
+    """
 
 def CreateParetoFitPlot(
     v,
