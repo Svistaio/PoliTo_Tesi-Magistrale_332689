@@ -16,9 +16,9 @@ from numba import njit
 from matplotlib.pyplot import get_cmap
 from matplotlib.colors import LogNorm
 
-from libGUIs import ProgressBarsGUI
 from libData import WriteSimulationData
-from libParameters import workersShM
+from libParameters import CopyWorkerShMTemplate
+workersShM = CopyWorkerShMTemplate()
 import libFigures as libF
 
 
@@ -59,6 +59,7 @@ class KineticSimulation():
         self.R = int(clsPrm.region)
         self.P = int(clsPrm.population)
         self.p0 = float(self.P/self.Nc)
+        self.realSizeDistr = clsReg.sizeDistr
 
         # Exact [Weighted] Adjacency matrix
         if clsPrm.edgeWeights:
@@ -76,8 +77,8 @@ class KineticSimulation():
         self.Mdt = M*dt
         self.typ = np.array([0,1],dtype=np.int64)
 
-        self.lbl = ('Ext.','Apx.')
-        self.clr = ('#0072B2','#D55E00')
+        self.lbl = ('Ext.','Apx.','Real')
+        self.clr = ('#0072B2','#D55E00','#000000')
         # self.clr = ('blue','red')
 
         if clsPrm.parametricStudy:
@@ -87,6 +88,8 @@ class KineticSimulation():
         else:
             self.figData = libF.FigData(clsPrm,'KS')
             self.Nv = None
+            self.fw = 8 # Figure width
+            self.fh = 6 # Figure height
         self.sid = None
 
     # Simulation
@@ -124,6 +127,9 @@ class KineticSimulation():
         ctx = mp.get_context("spawn")
 
         if gui: 
+            # Import of ProgressBarsGUI locally [and not at the top of the module] to avoid freezing the GUI when in a parametric study
+            from libGUIs import ProgressBarsGUI
+
             for key,dtype in workersShM['gui'].items():
                 spec, shm = BuildShM(Ni=Ni,dtype=dtype)
                 shmPrm[key] = spec
@@ -249,7 +255,9 @@ class KineticSimulation():
         Ni = self.Ni
         ta = self.ta
 
-        cs = self.vrtState
+        csSv = self.vrtState
+        csRv = self.realSizeDistr
+
         csAvr = self.nodeAvrVrtState
         csMin = self.nodeMinVrtState
         csMax = self.nodeMaxVrtState
@@ -261,68 +269,176 @@ class KineticSimulation():
 
         if figData is None:
             figData = self.figData
-            fig, ax = figData.SetFigs(1,3,size=(23,6))
+            Nf = 9 # Numbers of figures
+            fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
             saveFig = True
 
-        sMax = cs.max(); sMin = cs.min()
+        sMaxEA = csSv.max()
+        sMinEA = csSv.min()
+
+        sMaxER = max(csSv[:,:,0].max(),csRv.max())
+        sMinER = min(csSv[:,:,0].min(),csRv.min())
+
+        sMaxAR = max(csSv[:,:,1].max(),csRv.max())
+        sMinAR = min(csSv[:,:,1].min(),csRv.min())
+
         p = (.5,1.07); dp = (.6,.05)
 
         for t in typ: # t[ype]
             ### Lognormal fit ###
+
+            # Exact-Approximated plot
             libF.CreateHistogramPlot(
-                cs[:,:,t],30,
+                csSv[:,:,t],30,
                 getattr(figData,f'fig{idx}'),
-                limits=(sMin,sMax),
+                limits=(sMinEA,sMaxEA),
                 xScale='log',
                 Ni=Ni,
                 ta=ta,
-                label=f"{lbl[t]} histogram",
+                label=f'{lbl[t]} histogram',
                 color=clr[t],
                 alpha=(0.35,0.45) if Ni>1 else 0.35,
-                idx=t+idx,
+                idx=t+1,
                 ax=ax[0]
-            ) # Histogram plot
-
+            )
             libF.CreateLognormalFitPlot(
-                cs[:,:,t],
+                csSv[:,:,t],
                 getattr(figData,f'fig{idx}'),
-                limits=(sMin,sMax),
+                limits=(sMinEA,sMaxEA),
                 xScale='log',
                 Ni=Ni,
                 ta=ta,
-                label=(
-                    fr"{lbl[t]} mean value $\langle k\rangle$",
-                    f"{lbl[t]} lognormal fit (ML)"
-                ),
-                color=(clr[t],clr[t]),
+                label=f'{lbl[t]} lognormal fit (ML)',
+                # (
+                #     fr'{lbl[t]} mean value $\langle k\rangle$',
+                #     f'{lbl[t]} lognormal fit (ML)'
+                # ),
+                color=clr[t],#(clr[t],clr[t]),
                 alpha=(1,0.15) if Ni>1 else 1,
-                idx=t+idx,
+                idx=t+1,
                 ax=ax[0]
-            ) # Fit plot
+            )
+
+            # Exact-Real and Approximated-Real plots
+            libF.CreateHistogramPlot(
+                csSv[:,:,t],30,
+                getattr(figData,f'fig{idx+t+1}'),
+                limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
+                xScale='log',
+                Ni=Ni,
+                ta=ta,
+                label=f'{lbl[t]} histogram',
+                color=clr[t],
+                alpha=(0.35,0.45) if Ni>1 else 0.35,
+                idx=1,
+                ax=ax[0+t+1]
+            )
+            libF.CreateLognormalFitPlot(
+                csSv[:,:,t],
+                getattr(figData,f'fig{idx+t+1}'),
+                limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
+                xScale='log',
+                Ni=Ni,
+                ta=ta,
+                label=f'{lbl[t]} lognormal fit (ML)',
+                # (
+                #     fr'{lbl[t]} mean value $\langle k\rangle$',
+                #     f'{lbl[t]} lognormal fit (ML)'
+                # ),
+                color=clr[t],#(clr[t],clr[t]),
+                alpha=(1,0.15) if Ni>1 else 1,
+                idx=1,
+                ax=ax[0+t+1]
+            )
+
+            libF.CreateHistogramPlot(
+                csRv,30,
+                getattr(figData,f'fig{idx+t+1}'),
+                limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
+                xScale='log',
+                label=f'{lbl[2]} histogram',
+                color=clr[2],
+                alpha=0.35,
+                idx=2,
+                ax=ax[0+t+1]
+            )
+            libF.CreateLognormalFitPlot(
+                csRv,
+                getattr(figData,f'fig{idx+t+1}'),
+                limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
+                xScale='log',
+                label=f'{lbl[2]} lognormal fit (ML)',
+                # (
+                #     fr'{lbl[2]} mean value $\langle k\rangle$',
+                #     f'{lbl[2]} lognormal fit (ML)'
+                # ),
+                color=clr[2],
+                alpha=1,
+                idx=2,
+                ax=ax[0+t+1]
+            )
+
 
             ### Power law fit log-log ###
-            bl = libF.CreateParetoFitPlot(
-                cs[:,:,t],
-                getattr(figData,f'fig{idx+1}'),
-                upperbound=sMax,
+
+            # Exact-Approximated plot
+            libF.CreateParetoFitPlot(
+                csSv[:,:,t],
+                getattr(figData,f'fig{idx+3}'),
+                upperbound=sMaxEA,
                 yScale='log',
                 Ni=Ni,
                 ta=ta,
                 label=(
-                    f"{lbl[t]} empirical CCDF",
-                    fr"{lbl[t]} pareto fit"
+                    f'{lbl[t]} empirical CCDF',
+                    fr'{lbl[t]} pareto fit'
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=t+idx,
-                ax=ax[1]
+                idx=t+1,
+                ax=ax[3]
             )
 
+            # Exact-Real and Approximated-Real plots
+            libF.CreateParetoFitPlot(
+                csSv[:,:,t],
+                getattr(figData,f'fig{idx+3+t+1}'),
+                upperbound=sMaxER if t == 0 else sMaxAR,
+                yScale='log',
+                Ni=Ni,
+                ta=ta,
+                label=(
+                    f'{lbl[t]} empirical CCDF',
+                    fr'{lbl[t]} pareto fit'
+                ),
+                color=(clr[t],clr[t]),
+                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+                idx=t+1,
+                ax=ax[3+t+1]
+            )
+            libF.CreateParetoFitPlot(
+                csRv,
+                getattr(figData,f'fig{idx+3+t+1}'),
+                upperbound=sMaxER if t == 0 else sMaxAR,
+                yScale='log',
+                label=(
+                    f'{lbl[2]} empirical CCDF',
+                    fr'{lbl[2]} pareto fit'
+                ),
+                color=(clr[2],clr[2]),
+                alpha=(0.6,1),
+                idx=t+1,
+                ax=ax[3+t+1]
+            )
+
+
             ### Power law fit log-lin ###
-            bl = libF.CreateParetoFitPlot(
-                cs[:,:,t],
-                getattr(figData,f'fig{idx+2}'),
-                upperbound=sMax,
+
+            # Exact-Approximated plot
+            blS = libF.CreateParetoFitPlot(
+                csSv[:,:,t],
+                getattr(figData,f'fig{idx+6}'),
+                upperbound=sMaxEA,
                 yScale='lin',
                 Ni=Ni,
                 ta=ta,
@@ -332,12 +448,45 @@ class KineticSimulation():
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=t+idx,
-                ax=ax[2]
+                idx=t+1,
+                ax=ax[6]
             )
 
+            # Exact-Real and Approximated-Real plots
+            libF.CreateParetoFitPlot(
+                csSv[:,:,t],
+                getattr(figData,f'fig{idx+6+t+1}'),
+                upperbound=sMaxER if t == 0 else sMaxAR,
+                yScale='log',
+                Ni=Ni,
+                ta=ta,
+                label=(
+                    f'{lbl[t]} empirical CCDF',
+                    fr'{lbl[t]} pareto fit'
+                ),
+                color=(clr[t],clr[t]),
+                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+                idx=t+1,
+                ax=ax[6+t+1]
+            )
+            blR = libF.CreateParetoFitPlot(
+                csRv,
+                getattr(figData,f'fig{idx+6+t+1}'),
+                upperbound=sMaxER if t == 0 else sMaxAR,
+                yScale='log',
+                label=(
+                    f'{lbl[2]} empirical CCDF',
+                    fr'{lbl[2]} pareto fit'
+                ),
+                color=(clr[2],clr[2]),
+                alpha=(0.6,1),
+                idx=t+1,
+                ax=ax[6+t+1]
+            )
+
+
             Text(
-                ax[1],(p[0],p[1]+(1/2-t)*dp[1]),
+                ax[4],(p[0],p[1]+(1/2-t)*dp[1]),
                 fr'{lbl[t]}:$\quad$'+
                 DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
                 DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
@@ -346,26 +495,27 @@ class KineticSimulation():
                     csSum[:,t],Ni,ta,r's_{{\Sigma}}',
                     formatVal='.2e',formatErr='.2e'
                 )+
-                DataString(bl,Ni,ta,r'\beta',space=False),
+                DataString(blS,Ni,ta,r'\beta',space=False),
                 ha='center',
                 color=clr[t]
             )
 
         if idx == 1:
-            p = (0,p[1])
             TextBlock(
-                ax[0],[
-                    [fr'$Nc={self.Nc}$'],
-                    [fr'$R={self.R}$']
-                ],
-                p=p,dp=(0,dp[1])
+                ax[0],[[
+                    fr'$Nc={self.Nc}$',
+                    fr'$R={self.R}$',
+                    DataString(blR,head=r'\beta',space=False)
+                ]],
+                p=(.5,p[1]-dp[1]/2),
+                dp=(dp[0]/1.75,dp[1])
             )
 
             offset = 0 if self.il in (2,4,6) else 1
-            p = (.80+.05*offset,p[1])
+            p = (.5,p[1])
             dp = (.475-.07*offset,dp[1])
             TextBlock(
-                ax[2],[[ '',
+                ax[-1],[[ '',
                     fr'$\lambda={self.l}$',
                     fr'$\sigma={self.s}$',
                     fr'$Ni={Ni}$',
@@ -373,7 +523,8 @@ class KineticSimulation():
                 ],[
                     fr'$ζ={self.z}$',
                     '','','',''
-                ],[ '',
+                ],[ 
+                    '',
                     fr'$\alpha={self.a}$',
                     fr'$il={self.il+1}$',
                     fr'$dt={self.dt}$',
@@ -383,26 +534,27 @@ class KineticSimulation():
                 offset=offset
             )
 
-        if not saveFig: Text(ax[2],(1.1,.5),self.studiedPrmString)
+        if not saveFig: Text(ax[-1],(1.1,.5),self.studiedPrmString)
 
         # Style
-        libF.SetFigStyle(
-            r'$cs$',r'$P(cs)$',
-            yNotation='sci',xScale='log', # ,xNotation="sci"
-            ax=ax[0],data=getattr(figData,f'fig{idx}')
-        )
+        for i in range(3):
+            libF.SetFigStyle(
+                r'$cs$',r'$P(cs)$',
+                yNotation='sci',xScale='log', # ,xNotation="sci"
+                ax=ax[0+i],data=getattr(figData,f'fig{idx+i}')
+            )
 
-        libF.SetFigStyle(
-            r'$cs$',r'$P(cs)$',
-            xScale='log',yScale='log',
-            ax=ax[1],data=getattr(figData,f'fig{idx+1}')
-        )
+            libF.SetFigStyle(
+                r'$cs$',r'$P(cs)$',
+                xScale='log',yScale='log',
+                ax=ax[3+i],data=getattr(figData,f'fig{idx+3+i}')
+            )
 
-        libF.SetFigStyle(
-            r'$cs$',r'$P(cs)$',
-            xScale='log',yScale='lin',
-            ax=ax[2],data=getattr(figData,f'fig{idx+2}')
-        )
+            libF.SetFigStyle(
+                r'$cs$',r'$P(cs)$',
+                xScale='log',yScale='lin',
+                ax=ax[6+i],data=getattr(figData,f'fig{idx+6+i}')
+            )
 
         # CentreFig()
         if saveFig: figData.SaveFig('SizeDistributionFittings')
@@ -418,7 +570,8 @@ class KineticSimulation():
         ta = self.ta
 
         times = self.times
-        ca = self.avrState
+        csSa = self.avrState
+        csRa = np.ones_like(times)*self.realSizeDistr.mean()
         
         lbl = self.lbl
         clr = self.clr
@@ -431,7 +584,7 @@ class KineticSimulation():
         for t in self.typ:
             libF.CreateFunctionPlot(
                 times,
-                ca[:,:,t],
+                csSa[:,:,t],
                 figData.fig if saveFig
                 else getattr(figData,f'fig{idx}'),
                 Ni=Ni,
@@ -439,9 +592,23 @@ class KineticSimulation():
                 label=rf"{lbl[t]} city size average $\langle s\rangle$",
                 color=clr[t],
                 alpha=(1,0.15) if Ni>1 else 1,
-                idx=t+idx,
+                idx=t+1,
                 ax=ax
             )
+
+        libF.CreateFunctionPlot(
+            times,
+            csRa,
+            figData.fig if saveFig
+            else getattr(figData,f'fig{idx}'),
+            linestyle='--',
+            linewidth=0.75,
+            label=rf"{lbl[2]} city size average $\langle s\rangle$",
+            color=clr[2],
+            alpha=1,
+            idx=3,
+            ax=ax
+        )
 
         # CentreFig()
         libF.SetFigStyle(
@@ -461,7 +628,9 @@ class KineticSimulation():
         saveFig=False
     ):
         di = self.di
-        cs = self.itAvrVrtState
+
+        csSv = self.itAvrVrtState
+        csRv = self.realSizeDistr
 
         typ = self.typ
         lbl = self.lbl
@@ -472,32 +641,51 @@ class KineticSimulation():
 
         if figData is None:
             figData = self.figData
-            fig, ax = figData.SetFigs(1,2,size=(15,6))
+            Nf = 3 # Numbers of figures
+            fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
             saveFig = True
 
-        for i,scale in enumerate(['lin','log']):
-            for t in typ:
-                libF.CreateScatterPlot(
-                    di,cs[:,t],
-                    getattr(figData,f'fig{i+idx}'),
-                    label=lbl[t],
-                    color=clr[t],
-                    idx=t+idx,
-                    ax=ax[i]
-                )
+        for t in typ:
+            libF.CreateScatterPlot(
+                di,csSv[:,t],
+                getattr(figData,f'fig{idx}'),
+                label=lbl[t],
+                color=clr[t],
+                idx=t+1,
+                ax=ax[0]
+            )
 
+            libF.CreateScatterPlot(
+                di,csSv[:,t],
+                getattr(figData,f'fig{t+1+idx}'),
+                label=lbl[t],
+                color=clr[t],
+                idx=1,
+                ax=ax[t+1]
+            )
+
+            libF.CreateScatterPlot(
+                di,csRv,
+                getattr(figData,f'fig{t+1+idx}'),
+                label=lbl[2],
+                color=clr[2],
+                idx=2,
+                ax=ax[t+1]
+            )
+
+        for f in range(3):
             libF.SetFigStyle(
                 r'$k$',r'$cs(k)$',
-                yScale='log',xScale=scale,
-                data=getattr(figData,f'fig{i+idx}'),
-                ax=ax[i]
+                yScale='log',xScale='log',
+                data=getattr(figData,f'fig{f+idx}'),
+                ax=ax[f]
             )
 
         for t in typ:
             TextBlock(
                 ax[0],[[
                     DataString(
-                        cs[si[i,t],t],
+                        csSv[si[i,t],t],
                         head=li2Name[si[i,t]],
                         formatVal='.2e',
                         space=False
@@ -529,7 +717,8 @@ class KineticSimulation():
 
         if figData is None:
             figData = self.figData
-            fig, ax = figData.SetFigs(1,2,size=(15,6))
+            Nf = 2 # Numbers of figures
+            fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
             saveFig = True
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
 
@@ -585,7 +774,8 @@ class KineticSimulation():
 
         if figData is None:
             figData = self.figData
-            fig, ax = figData.SetFigs(1,2,size=(15,6))
+            Nf = 2 # Numbers of figures
+            fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
             saveFig = True
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
 
@@ -663,8 +853,8 @@ class ParametricStudy():
             self.KS[s].sid = s+1
             self.KS[s].studiedPrmString = string 
 
-        self.fw = 24
-        self.fh = 8
+        self.fw = 8
+        self.fh = 6
         self.figData = libF.FigData(clsPrm,'KS')
 
     # Simulation
@@ -678,9 +868,9 @@ class ParametricStudy():
         fw = self.fw
         fh = self.fh
 
-        nCol = 3 # Figures for each row
+        nCol = 9 # Figures for each row
         nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
         for s,KS in enumerate(self.KS):
             KS.SizeDistrFittingsFig(
@@ -693,12 +883,12 @@ class ParametricStudy():
 
     def AverageSizeFig(self):
         figData = self.figData
-        fw = self.fw/3
+        fw = self.fw
         fh = self.fh
 
         nCol = 1 # Figures for each row
         nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
         for s,KS in enumerate(self.KS):
             KS.AverageSizeFig(
@@ -711,12 +901,12 @@ class ParametricStudy():
 
     def SizeVsDegreeFig(self):
         figData = self.figData
-        fw = self.fw*2/3
+        fw = self.fw
         fh = self.fh
 
-        nCol = 2 # Figures for each row
+        nCol = 3 # Figures for each row
         nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
         for s,KS in enumerate(self.KS):
             KS.SizeVsDegreeFig(
@@ -729,12 +919,12 @@ class ParametricStudy():
 
     def SizeDistrEvolutionFig(self):
         figData = self.figData
-        fw = self.fw*2/3
+        fw = self.fw
         fh = self.fh
 
         nCol = 2 # Figures for each row
         nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
         for s,KS in enumerate(self.KS):
             KS.SizeDistrEvolutionFig(
@@ -747,12 +937,12 @@ class ParametricStudy():
 
     def SizeEvolutionsFig(self):
         figData = self.figData
-        fw = self.fw*2/3
+        fw = self.fw
         fh = self.fh
 
         nCol = 2 # Figures for each row
         nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw,fh*nRow))
+        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
         for s,KS in enumerate(self.KS):
             KS.SizeEvolutionsFig(
