@@ -377,7 +377,7 @@ class ProgressBarsGUI(tk.Tk):
 
         #region Parameters
         self.shm = []
-        for key in libP.workersShM['gui'].keys():
+        for key in libP.workersShMTemplate['gui'].keys():
             shm, arr = LoadShM(shmPrm[key])
             self.shm.append(shm)
             setattr(self,key,arr)
@@ -487,6 +487,7 @@ class ProgressBarsGUI(tk.Tk):
         )
 
         if np.all(self.done):
+            for shm in self.shm: shm.close()
             self.destroy()
         else:
             self.after(100,self.PoolInfo)

@@ -52,10 +52,6 @@ class KineticSimulation():
         ks = int(Ns/sf); self.ks = ks # Kernerl size
         self.times = ns[::ks]*dt
 
-        self.di = np.sum(clsReg.A,axis=1,dtype=np.int32)
-        self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
-        # self.D = di@invdi.T
-
         self.R = int(clsPrm.region)
         self.P = int(clsPrm.population)
         self.p0 = float(self.P/self.Nc)
@@ -64,9 +60,14 @@ class KineticSimulation():
         # Exact [Weighted] Adjacency matrix
         if clsPrm.edgeWeights:
             M = np.array(clsReg.W/np.max(clsReg.W),dtype=np.float64)
+            self.di = np.sum(M,axis=1,dtype=np.float64)
+            self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
         else:
-            M = np.array(clsReg.A,dtype=np.float64)
-        
+            M = clsReg.A
+            self.di = np.sum(M,axis=1,dtype=np.int32)
+            self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
+        # self.D = di@invdi.T
+
         # Approximated adjacency matrix
         Mn = np.sum(M[:,:])
         self.wOdt = np.sum(M[:,:],axis=1)*dt/Mn
@@ -117,7 +118,6 @@ class KineticSimulation():
 
         shmPrm = {}
         shmHandles = {}
-        # clsShM = shmSpecs
 
         for key in workersShM['parameters'].keys():
             spec, shm = BuildShM(getattr(self,key))
@@ -127,14 +127,13 @@ class KineticSimulation():
         ctx = mp.get_context("spawn")
 
         if gui: 
-            # Import of ProgressBarsGUI locally [and not at the top of the module] to avoid freezing the GUI when in a parametric study
-            from libGUIs import ProgressBarsGUI
-
             for key,dtype in workersShM['gui'].items():
                 spec, shm = BuildShM(Ni=Ni,dtype=dtype)
                 shmPrm[key] = spec
                 shmHandles[key] = shm
 
+            # Import of ProgressBarsGUI locally [and not at the top of the module] to avoid freezing the GUI when in a parametric study (Tk must live only in the parent thread but spawn under Windows imports it in each worker [if written at the top of the module] making it prone to errors)
+            from libGUIs import ProgressBarsGUI
             bar = ProgressBarsGUI(Ni,Nt,sid,Nv,shmPrm,LoadShM)
 
             try:
@@ -391,7 +390,7 @@ class KineticSimulation():
                 ta=ta,
                 label=(
                     f'{lbl[t]} empirical CCDF',
-                    fr'{lbl[t]} pareto fit'
+                    fr'{lbl[t]} Pareto fit'
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -409,7 +408,7 @@ class KineticSimulation():
                 ta=ta,
                 label=(
                     f'{lbl[t]} empirical CCDF',
-                    fr'{lbl[t]} pareto fit'
+                    fr'{lbl[t]} Pareto fit'
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -423,7 +422,7 @@ class KineticSimulation():
                 yScale='log',
                 label=(
                     f'{lbl[2]} empirical CCDF',
-                    fr'{lbl[2]} pareto fit'
+                    fr'{lbl[2]} Pareto fit'
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
@@ -444,7 +443,7 @@ class KineticSimulation():
                 ta=ta,
                 label=(
                     f"{lbl[t]} empirical CCDF",
-                    fr"{lbl[t]} pareto fit"
+                    fr"{lbl[t]} Pareto fit"
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -462,7 +461,7 @@ class KineticSimulation():
                 ta=ta,
                 label=(
                     f'{lbl[t]} empirical CCDF',
-                    fr'{lbl[t]} pareto fit'
+                    fr'{lbl[t]} Pareto fit'
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -476,7 +475,7 @@ class KineticSimulation():
                 yScale='log',
                 label=(
                     f'{lbl[2]} empirical CCDF',
-                    fr'{lbl[2]} pareto fit'
+                    fr'{lbl[2]} Pareto fit'
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),

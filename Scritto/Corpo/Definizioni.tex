@@ -7,11 +7,13 @@
         \fontsize{#1 pt}{\pgfmathresult pt}\selectfont%
     }
 
-    \newcommand\daRivedere{
-        {\color[HTML]{DC143C}§§§}
-    }
+    \newcommand\daRivedere{{\color[HTML]{DC143C}\{§\}}}
+    \newcommand\dubbio{{\color[HTML]{DC143C}\{?\}}}
 
     \newcommand\tref[2]{\hyperref[#1]{#2}}
+
+    % Comando per definire citazioni con note separate da un punto e virgola: [citazione1, nota1; citazione2, nota2; ecc.]
+    \DeclareMultiCiteCommand{\bracketcitesemi}[\mkbibbrackets]{\cite}{\addsemicolon\space}
 
     \crefrangeformat{equation}{(#3#1#4--#5#2#6)}
     \crefmultiformat{equation}{(#2#1#3}{, #2#1#3)}{, #2#1#3}{, #2#1#3)}
@@ -59,6 +61,16 @@
     
     \DeclareMathOperator\DstrBernoulli{Bernoulli}
     \DeclareMathOperator\DstrGamma{Gamma}
+
+    \theoremstyle{definition}
+    \newtheorem{dfn}{Definizione}
+    \newtheorem{dfnn}{Definizioni}
+
+    \theoremstyle{plain}
+    \newtheorem{ipo}{Ipotesi}
+    \newtheorem{thm}{Teorema}
+    \newtheorem{lmm}{Lemma}
+    \newtheorem{crl}{Corollario}
 %\endgroup
 
 %\begingroup Frontespizio

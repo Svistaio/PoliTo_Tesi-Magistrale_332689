@@ -110,7 +110,7 @@ parameters = {
 }
 
 caseStudies = {
-    "selected": "Default",
+    "selected": "(1-ζ)efl_k/α+ζefs_k/",
     "list": {
         "Default": {
             "attractivity": 0.05,
@@ -129,10 +129,10 @@ caseStudies = {
             "interactingLaw": 3,
             "PdfPopUp": False,
             "LaTeXConversion": False,
-            "studiedParameter": 1,
             "snapshots": 100,
             "smoothingFactor": 10,
             "parametricStudy": False,
+            "studiedParameter": 1,
             "startValuePrmStudy": 0.1,
             "endValuePrmStudy": 1.0,
             "numberPrmStudy": 3
@@ -141,6 +141,7 @@ caseStudies = {
             "attractivity": 0.05,
             "deviation": 0.05,
             "region": 19,
+            "zetaFraction": 0.1,
             "timestep": 0.01,
             "timesteps": int(5e5),
             "iterations": 15,
@@ -154,8 +155,8 @@ caseStudies = {
             "LaTeXConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
-            "studiedParameter": 0,
             "parametricStudy": False,
+            "studiedParameter": 0,
             "startValuePrmStudy": 1.0,
             "endValuePrmStudy": 1.0,
             "numberPrmStudy": 1
@@ -164,6 +165,7 @@ caseStudies = {
             "attractivity": 0.05,
             "deviation": 0.05,
             "region": 19,
+            "zetaFraction": 0.1,
             "timestep": 0.01,
             "timesteps": int(1e7),
             "iterations": 15,
@@ -175,13 +177,13 @@ caseStudies = {
             "interactingLaw": 2,
             "PdfPopUp": False,
             "LaTeXConversion": False,
-            "studiedParameter": 0,
             "snapshots": 100,
             "smoothingFactor": 10,
-            "parametricStudy": False,
-            "startValuePrmStudy": 1.0,
-            "endValuePrmStudy": 1.0,
-            "numberPrmStudy": 1
+            "parametricStudy": True,
+            "studiedParameter": 0,
+            "startValuePrmStudy": 0.01,
+            "endValuePrmStudy": 0.1,
+            "numberPrmStudy": 5
         },
         "λ(rsk^α)/(1+rsk^α)": {
             "attractivity": 0.05,
@@ -200,13 +202,13 @@ caseStudies = {
             "interactingLaw": 3,
             "PdfPopUp": False,
             "LaTeXConversion": False,
-            "studiedParameter": 0,
             "snapshots": 100,
             "smoothingFactor": 10,
-            "parametricStudy": False,
-            "startValuePrmStudy": 1.0,
-            "endValuePrmStudy": 1.0,
-            "numberPrmStudy": 1
+            "parametricStudy": True,
+            "studiedParameter": 1,
+            "startValuePrmStudy": 0.1,
+            "endValuePrmStudy": 0.5,
+            "numberPrmStudy": 5
         },
         "λ[rsk/(1+rsk)]^α": {
             "attractivity": 0.05,
@@ -225,10 +227,10 @@ caseStudies = {
             "interactingLaw": 5,
             "PdfPopUp": False,
             "LaTeXConversion": False,
-            "studiedParameter": 1,
             "snapshots": 100,
             "smoothingFactor": 10,
             "parametricStudy": False,
+            "studiedParameter": 1,
             "startValuePrmStudy": 0.3,
             "endValuePrmStudy": 1,
             "numberPrmStudy": 3
@@ -300,7 +302,7 @@ regPopDict = { # Italian region sizes in 1991
     'Italia':int(56778031)
 } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
 
-workersShM = {
+workersShMTemplate = {
     'handles':[],
     'parameters':{
         'Mdt': None,
@@ -344,7 +346,7 @@ class ComboBoxList():
             r:i for i,r in enumerate(lst)
         }
 
-def CopyWorkerShMTemplate(): return deepcopy(workersShM)
+def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
 
 
 ### Discarded code ###
