@@ -1,0 +1,733 @@
+
+% !TEX root = ../Testa/Principale.tex
+% LTeX: language=it
+
+\chapter[Teoria cinetica dei sistemi multiagente]{\texorpdfstring
+    {Teoria cinetica dei\newline sistemi multiagente}
+    {Teoria cinetica dei sistemi multiagente}%
+}\label{secTCSM}
+
+    \section{Descrizione cinetica classica}
+
+    \section{Descrizione cinetica retale}\label{secDescrizioneCinetica} %  d'interazioni mediante da un grafo
+        
+        \subsection{Impostazione}
+
+            La popolazione degli agenti evolve a causa delle interazioni con altri agenti connessi. Seguendo la teoria cinetica collisionale, l'ipotesi fondamentale ipotizzata è che solo le interazioni binarie siano rilevanti: le interazioni fra tre o piú agenti possono essere trascurate.
+
+            Dopodiché, sia \(X\in\mathcal I\) la posizione di un agente sul grafo \(\mathcal G=(\mathcal I,\mathcal E)\), ove \(\mathcal I\) è l'insieme dei vertici mentre \(\mathcal E\) dei lati di \(\mathcal G\). Si assume che il grafico sia statico, ovvero che le connessioni tra agenti non varia nel tempo.
+
+            Si consideri, allora, un generico agente rappresentativo, il cui stato microscopico è descritto dal processo stocastico \((X,S_t)_{t\geq0}\); la funzione \(S_t:\Omega\to\mathcal P\) è una variabile aleatoria da uno spazio astratto \(\Omega\) allo spazio delle popolazioni \(\mathcal P\) e indica la popolazione dell'agente al tempo \(t\geq0\). Tale variabile aleatoria evolve nel tempo per le interazioni binarie con altri agenti mediate dalle connessioni descritte da \(\mathcal E\), definendo cosí un processo stocastico \(\{S_t,t\in[0,+\infty)\}\).
+
+            Nel complesso di descrive statisticamente lo stato microscopico \(X,S_t\) dell'agente mediante una probabilità di misura \(f=f(x,s,t)\), discreta in \(x\in\mathcal I\) e continua in \(s\in\mathcal P\). Pertanto si può dare alla \(f\) la seguente forma
+            %
+            \begin{equation}
+                \label{eqDistribuzioneTotale}
+                f(x,s,t)=\frac1N\sum_{i\in\mathcal I}f_i(s,t)\otimes\delta(x-i),
+            \end{equation}
+            %
+            ove \(N\equiv\vert\mathcal I\vert\) è il numero totale d'agenti/vertici del grafo mentre \(\delta(\cdot)\) denota la delta di Dirac centrata all'origine; d'altra parte \[f_i=f_i(s,t):\mathcal P\times[0,+\infty)\rightarrow\mathbb R_+\] è la densità di probabilità della taglia \(S_t\) dell'agente \(X=i\).
+            
+            Logicamente si richiede
+            \begin{equation*}
+                %
+                % \label{eqUnitaryIntegrationfi}
+                \int_{\mathcal P}f_i(s,t)\de s=1,
+                \qquad\forall t\geq0,\;\forall i\in\mathcal I,
+            \end{equation*}
+            %
+            che implica coerentemente
+            %
+            \begin{equation*}
+                % \label{eqUnitaryIntegrationf}
+                \int_{\mathcal I}\int_{\mathcal P}
+                f(x,s,t)\de s\de x=1
+                \qquad\forall t\geq0
+            \end{equation*}
+
+        \subsection{Algoritmi d'interazione}
+
+            Un algoritmo d'interazione è una regola che descrive come gli agenti interagiscono a coppie e modificano di conseguenza il loro stato nel tempo; nel dettaglio, in un dato passo temporale \(\Delta t>0\) si assume che un agente \((X,S_t)\in\mathcal I\times\mathcal P\) cambi la sua popolazione a \(S_{t+\Delta t}\in\mathcal P\) a seguito di un interazione con un altro agente \((X^*,S^*_t)\in\mathcal I\times\mathcal P\) secondo il successivo schema
+            %
+            \begin{equation}
+                \label{eqSchemaInterazioneAgenteInteragente}
+                S_{t+\Delta t}=(1-\Theta)S_t+\Theta S'_t,
+            \end{equation}
+            %
+            ove \(\Theta\in{0,1}\) è una variabile aleatoria che tiene in considerazione qualora l'interazione tra i due agenti effettivamente si manifesti \((\Theta=1)\) o no \((\Theta=0)\); d'altro canto \(S'_t\in\mathcal P\) è la nuova popolazione ottenuta dall'agente \((X,V_t)\) in seguito a un'interazione avvenuta.
+
+            Con maggiore dettaglio si pone
+            %
+            \begin{equation}
+                \label{eqVariabileAleatoriaInterazione}
+                \Theta\sim\DstrBernoulli(A(X,X^*),\Delta t),
+            \end{equation}
+            %
+            il che significa che la probabilità che un'interazione avvenga è proporzionale al passo temporale d'interazione \(\Delta t\) mediante un nucleo d'interazione \(A(X,X^*)=1\), che contiene le informazioni sui lati del grafo, e quindi alle connessioni tra gli agenti, ponendo
+            %
+            \begin{equation*}
+                %\label{}
+                A(X,X^*)=
+                \left\{\begin{aligned}
+                    1&\quad\text{se }(X,X^*)\in\mathcal E,\\
+                    0&\quad\text{se }(X,X^*)\notin\mathcal E,
+                \end{aligned}\right.
+            \end{equation*}
+            %
+            dove la coppia ordinata \((X,X^*)\) denota il lato dal vertice \(X\) al vertice \(X^*\); per coerenza è necessario imporre \(\Delta t\leq1\) che impone un limite superiore al massimo passo temporale ammissibile, seppure tale condizione sia molto facile da verificare nella pratica.
+
+            La popolazione postinterazione è una variabile aleatoria \(S'_t:\Omega\to\mathcal P\) dipendente in generale dagli stati preinterazione \(V_t\), \(V^*_t\) degli agenti integranti:
+            %
+            \begin{equation}
+                \label{eqPopolazionePostInterazione}
+                V'_t(\omega)=\Psi(S_t(\omega),S^*_t(\omega),\omega),
+                \quad\omega\in\Omega,
+            \end{equation}
+            %
+            in cui \(\Psi:\mathcal P^2\times\Omega\to\mathcal P\) è funzione nota potenzialmente stocastica. 
+            
+        \subsection{Interazioni azione-reazione}
+            
+            Nel contesto delle città è chiaro che qualora una città-nodo interagisca con un'altra entrambe debbano variare il loro stato.
+            
+            Sia \(S\)
+            la città interagente e \(S^*\) quella subente, allora in un grafo diretto si può distinguere il senso d'interazione: quella \textit{in avanti} avviene sse \((S,S^*)\in\mathcal E\) mentre quella in indietro sse \((S^*,S)\in\mathcal E\); tuttavia questa distinzione è inutile in questo caso di grafo diretto con matrice d'adiacenza simmetrica.  Pertanto l'agente \((X^*,S^*_t)\) aggiorna la sua popolazione attraverso una regola analoga a quella dell'agente \((X,S_t)\):
+            %
+            \begin{equation}
+                \label{eqSchemaInterazioneAgenteSubente}
+                S^*_{t+\Delta t}=(1-\Theta)S^*_t+\Theta S^{*\prime}_t,
+            \end{equation}
+            %
+            ove si osserva che la \(\Theta\) è la stessa della \eqref{eqSchemaInterazioneAgenteInteragente} la cui legge dipende da \(A(X,X^*)\) ma non da \(A(X^*,X)\); tale dettaglio è da tenere in considerazione nel caso in cui la matrice di adiacenza non sia simmetrica, ma in questo caso di simmetria non è rilevante. L'opinione postinterazione
+            %
+            \begin{equation*}
+                %\label{}
+                S'_t(\omega)=\Psi_*(S^*_t(\omega),S_t(\omega),\omega),
+                \quad\omega\in\Omega,
+            \end{equation*}
+            %
+            è definita mediante una funzione \(\Psi_*:\mathcal P^2\times\Omega\to\mathcal P\) potenzialmente diversa da \(\Psi\). Questo tipo d'interazione, prendendo come riferimento \cite[§ 2.2.1]{Nurisso2024} sarà identificato come azione-reazione, e riassunto dall'algoritmo
+            %
+            \begin{equation*}
+                \label{eqAlgoritmoInterazioniAzioneReazione}
+                \refstepcounter{equation}
+                [AR]\left\{
+                \begin{aligned}
+                    S_{t+\Delta t}&=(1-\Theta)S_t+\Theta S'_t,\\
+                    S^*_{t+\Delta t}&=(1-\Theta)S^*_t+\Theta S^{*\prime}_t.
+                \end{aligned}
+                \right.
+                \notag
+            \end{equation*}
+            \newcommand\refAlgIntAR{\tref{eqAlgoritmoInterazioniAzioneReazione}{[AR]}}
+            %
+            Si conclude questa sezione osservando che gli agenti \((X,S_t)\), \((X^*,S^*_t)\) sono campionati casualmente e uniformemente a ogni passo temporale.
+
+
+    \section{Derivazione dell'equazioni cinetiche}
+
+        \subsection{Derivazione esatta}
+
+            Una descrizione cinetica dell'algoritmo \refAlgIntAR{} coincide con dell'equazioni d'evoluzione per le distribuzioni di probabiltà \(f_i\) delle opinioni degli agenti; per derivarle si procede mediante un metodo classico nella teoria dei sistemi multiagente \cite{Nurisso2024,IMS2013}.
+
+            Sia \(\Phi\equiv\Phi(x,s):\mathcal I\times\mathcal P\to\mathbb R\) un osservabile arbitrario (funzione \textit{test}), cioè una quantità che si può calcolare sapendo lo stato microscopico di un generico agente rappresentativo del sistema. Allora dalla prima equazione in \refAlgIntAR{}, valutando il valore atteso dell'osservabile postinterazione rispetto agl'indici e alla popolazione a tempo fissato, si ha \daRivedere
+            %
+            \begin{equation*}
+                %\label{}
+                \begin{aligned}
+                    \mathbb E[\Phi(X,S_{t+\Delta t})]=
+                    \mathbb E\left[\mathbb E\right.[
+                        &\Phi\left(X,(1-\Theta)S_t
+                        +\Theta\Psi(S_t,S_t^*,\omega)
+                        A(X,X_*)\Delta t\right)|X,X_*
+                    ]\left.\vphantom{\mathbb E}\right]\\
+                    =\mathbb E\left[
+                        \mathbb E\right.[
+                        &\Phi(X,S_t)(1-A(X,X_*)\Delta t)
+                        \\&+\Phi\left(
+                            X,\Psi(S_t,S_t^*,\omega)
+                        \right)A(X,X_*)\Delta t
+                    ]\left.\vphantom{\mathbb E}\right],
+                \end{aligned}
+            \end{equation*}
+            %
+            da cui, riordinando i termini e dividendo ambo i membri per \(\Delta t\), si deduce
+            %
+            \begin{equation*}
+                %\label{}
+                \frac{
+                    \mathbb E[\Phi(X,S_{t+\Delta t})
+                    -\mathbb E[\Phi(X,S_t)]]
+                }{\Delta t}=
+                \mathbb E\left[
+                    A(X,X_*)\left(
+                        \Phi(X,\Psi(S_t,S_t^*,\omega))-\Phi(X,S_t)
+                    \right)
+                \right],
+            \end{equation*}
+            %
+            laddove, prendendo il limite \(\Delta t\to0^+\), si ricava formalmente
+            %
+            \begin{equation}
+                \label{eqDinamicaValoreAtteso1}
+                \derS{\mathbb E[\Phi(X,S_t)]}t=
+                \mathbb E\left[
+                    A(X,X^*)\left(
+                        \Phi(X,\Psi(S_t,S_t^*,\omega))-\Phi(X,S_t)
+                    \right)
+                \right].
+            \end{equation}
+            %
+            Si può ricavare una simile equazione ripetendo i precedenti passaggi ma colla seconda equazione di \refAlgIntAR{}, da cui
+            %
+            \begin{equation}
+                \label{eqDinamicaValoreAtteso2}
+                \derS{\mathbb E[\Phi(X^*,S^*_t)]}t=
+                \mathbb E\left[
+                    A(X,X^*)\left(
+                        \Phi(X^*,\Psi_*(S^*_t,S_t,\omega))-\Phi(X^*,S^*_t)
+                    \right)
+                \right].
+            \end{equation}
+            %
+            Osservando che le coppie \((X,S_t)\) e \((X^*,S_t^*)\) fanno riferimento a un agente rappresentativo generico del sistema, vale \[\mathbb E[\Phi(X,S_t)]=\mathbb E[\Phi(X^*,S^*_t)]\] cosicché, sommando \cref{eqDinamicaValoreAtteso1,eqDinamicaValoreAtteso2}, si ha
+            %
+            \begin{equation*}
+                %\label{}
+                \begin{aligned}
+                    \derS{\mathbb E[\Phi(X,S_t)]}t=
+                    \frac12\mathbb E\bigl[
+                        A(X,X^*)\bigl(
+                            &\Phi(X,\Psi(S_t,S^*_t,\omega))
+                            +\Phi(X^*,\Psi_*(S^*_t,S_t,\omega))
+                            \\&
+                            -\Phi(X,S_t)-\Phi(X^*,S^*_t)
+                        \bigr)
+                    \bigr],
+                \end{aligned}
+            \end{equation*}
+            %
+            ed espandendo la definizione della media si arriva a
+            %
+            \begin{equation}
+                \label{eqDinamicaValoreAttesoEspanso}
+                % \derS{}t\int_{\mathcal I}\int_{\mathcal O}
+                % \Phi(x,s)f(x,s,t)\de v \de x=
+                % \int_{\mathcal I^2}\int_{\mathcal O^2}A(x,x_*)
+                % \frac{\langle \Phi(x,s')+\Phi(x_*,s'_*)
+                % -\Phi(x,s)-\Phi(x_*,s_*)\rangle}2
+                % f(x,s,t)f(x_*,s_*,t)\de s\de s_*\de x\de x_*
+                \derS{}t\int_{\mathcal I}\int_{\mathcal P}
+                \Phi f\de v \de x=
+                \int_{\mathcal I^2}\int_{\mathcal P^2}A(x,x_*)
+                \frac{\langle \Phi'+\Phi_*'-\Phi-\Phi_*\rangle}2
+                ff_*\de s\de s_*\de x\de x_*,
+            \end{equation}
+            %
+            ove [per brevità] si sono omessi gli argomenti dell'osservabile e della distribuzione \eqref{eqDistribuzioneTotale}:
+            %
+            \begin{equation*}
+                %\label{}
+                \newcommand\spazOr{\;\;\;}
+                f\equiv f(x,s,t),
+                \spazOr\Phi\equiv\Phi(x,s),
+                \spazOr\Phi_*\equiv\Phi(x_*,s_*)
+                \spazOr\Phi'\equiv\Phi(x,s')
+                \spazOr\text{e}\spazOr
+                \Phi_*'\equiv\Phi(x_*,s_*'),
+            \end{equation*}
+            %
+            si è inoltre imposto
+            %
+            \begin{equation}
+                \label{eqStatiPostInterazioni}
+                s'=\Psi(s,s_*,\omega)\quad s'_*=\Psi_*(s_*,s,\omega),
+            \end{equation}
+            %
+            mentre \(\langle\cdot\rangle\) indica il valore atteso rispetto alla potenziale stocasticità delle funzioni \(\Psi\) e \(\Psi_*\).
+
+            Si noti che la \eqref{eqDinamicaValoreAttesoEspanso} è valida per ogni funzione \textit{test} \(\Phi\) per cui è un'equazione debole per la distribuzione \(f\). (commento su Fokker-Planck \daRivedere)
+
+            Si osservi anche che la \eqref{eqDinamicaValoreAttesoEspanso} è scritta sotto l'ipotesi della propagazione del caos: ogni due potenziali agenti interagenti sono tra di loro campionati indipendentemente. Questa assunzione è classicamente usata, per es. nella teorica cinetica di Boltzmann, per ottenere un'equazione chiusa per la distribuzione \(f\) di una particella, siccome permette di fattorizzare la distribuzione di probabilità congiunta \(g(x,x_*,s,s_*,t)\) degli agenti interagenti nel prodotto \(f(x,s,t)f(x_*,s_*,t)\).
+
+            Dalla \eqref{eqDinamicaValoreAttesoEspanso} con una scelta adeguata della funzione \textit{test} \(\Psi\), è possibile recuperare un sistema di equazioni debole per le \(f_i\). Sia \(\Psi(x,s)=\phi_i(x)\varphi(s)\), dove \(\phi_i:\mathcal I\to\mathbb R\) è tale che \(\phi_i(i)=1\) mentre \(\phi_i(x)=0\) per ogni \(x\in\mathcal I\setminus\{i\}\) e \(\varphi:\mathcal O\to\mathbb R\) è arbitrario. Allora usando la \eqref{eqDistribuzioneTotale} dentro la \eqref{eqDinamicaValoreAttesoEspanso} si ricava
+            %
+            \begin{equation}
+                \label{eqBoltzmannConGrafo}
+                \begin{aligned}
+                    \derS{}t\int_{\mathcal P}\varphi f_i\de s=&
+                    \frac1{2N}\sum_{j\in\mathcal I}A(i,j)
+                    \int_{\mathcal P^2}%\int_{\mathcal P}
+                    \langle\varphi'-\varphi\rangle
+                    f_if^*_j\de s\de s_*\\&
+                    +\frac1{2N}\sum_{j\in\mathcal I}A(j,i)
+                    \int_{\mathcal P^2}%\int_{\mathcal P}
+                    \langle\varphi'_*-\varphi_*\rangle
+                    f_jf^*_i\de s\de s_*,%\\&
+                    \quad\forall i\in\mathcal I,
+                \end{aligned}
+            \end{equation}
+            %
+            ove gli argomenti di tutte le funzioni sono stati sottintesi, vale a dire
+            \[
+                \newcommand\spazOr{\;\;\;}
+                f_i\equiv f_i(s,t)\spazOr\forall i\in\mathcal I,
+                \spazOr\varphi\equiv\varphi(s),
+                \spazOr\varphi_*\equiv\varphi(s_*)
+                \spazOr\text{e}\spazOr
+                \varphi'\equiv\varphi(s').
+            \]
+            Tal'equazione si può anche derivare, sempre sotto l'ipotesi della propagazione del caos, dalla gerarchia tipo BBGKY (v. se aggiungere il riferimento \daRivedere). In aggiunta si può convertire in forma matriciale introducendo la distribuzione vettoriale \(\mathbf f\equiv\bigl(f_i(s,t)\bigr)_{i\in\mathcal I}\) e la matrice \(\mathbf M\equiv\bigl( A(i,j)\bigr)_{i,j\in\mathcal I}\in\mathbb R^{N\times N}\): 
+            %
+            \begin{equation}
+                \label{eqBoltzmannConGrafoVettoriale}
+                \begin{aligned}
+                    \derS{}t\int_{\mathcal P}\varphi\mathbf f\de s=&
+                    \frac1{2N}\int_{\mathcal P^2}
+                    \langle\varphi'-\varphi\rangle
+                    \mathbf f\odot\mathbf M\mathbf f_*\de s\de s_*\\&
+                    +\frac1{2N}\int_{\mathcal P^2}
+                    \langle\varphi'_*-\varphi_*\rangle
+                    \mathbf M^\top\mathbf f\odot\mathbf f_*\de s\de s_*,
+                \end{aligned}
+            \end{equation}
+            %
+            ove \(\odot\) indica il prodotto di Hadamard e \(\mathbf M^\top\) al trasposta di \(\mathbf M\). Si noti che \(\mathbf M\) altro non è che la matrice d'adiacenza di \(\mathcal G\).
+            
+
+        \subsection{Interazioni tra città}
+        
+            Si può ora approfondire il tipo d'interazioni ipotizzate tra città su grafi.
+
+            Innanzitutto, è chiaro che l'interazione d'interesse sia di tipo «azione-reazione» descritta da \refAlgIntAR{}: infatti, se una città interagisce con un'altra, scambiando popolazione, entrambi variano il proprio stato ma non è detto che la seconda interagisca a sua volta colla prima.
+
+            Tuttavia, se una città può interagire con un'altra, allora è sempre possibile l'opposto; dunque il grafo in questione è diretto ma con struttura indiretta, ovvero la sua matrice d'adiacenza è simmetrica; a livello matematico, ciò implica che la matrice d'adiacenza \(\mathbf M\) è simmetrica.
+
+            Gli stati postinterazione \eqref{eqStatiPostInterazioni} prendono come riferimento leggi d'interazioni lineari
+            %
+            \begin{equation}
+                \label{eqStatiPostInterazioniLineari}
+                \left\{\begin{alignedat}{2}
+                    S_t'&=pS_t&&+qS_t^*,\\
+                    S_t^{*\prime}&=p_*S_t&&+q_*S_t^*,
+                \end{alignedat}\right.
+            \end{equation}
+            %
+            le quali, specializzate, presentano invece la seguente forma:
+            %
+            \begin{equation}
+                \label{eqSchemaInterazioneCittà}
+                \left\{\begin{aligned}
+                    s'&=s\bigl(1-E(s,s_*)+\gamma\bigr)\\
+                    s_*'&=s_*+sI(s,s_*)
+                \end{aligned}\right.
+            \end{equation}
+            %
+            ove \(s\) e \(s_*\) sono le città interagente e subente rispettivamente, \(E(s,s_*)\) e \(I(s,s_*)\) sono rispettivamente i tassi di emigrazione e immigrazione, mentre \(\gamma\) rappresenta fluttuazioni stocastiche da definire; rispetto alle leggi d'interazioni lineari \eqref{eqStatiPostInterazioniLineari} le \eqref{eqSchemaInterazioneCittà} soddisfano
+            %
+            \begin{equation}
+                \label{eqLegameLineareInterazioneCittà}
+                % \begin{aligned}
+                %     p(s,s_*)&\equiv s[1-E(s,s_*)+\gamma]\\
+                %     p_*(s,s_*)&\equiv s_*
+                % \end{aligned}
+                % \begin{aligned}
+                %     \quad&\text{e}\quad\\
+                %     \quad&\text{e}\quad
+                % \end{aligned}
+                % \begin{aligned}
+                %     q(s,s_*)&\equiv 0,\\
+                %     q_*(s,s_*)&\equiv sI(s,s_*),
+                % \end{aligned}
+                \begin{alignedat}{3}
+                    p(s,s_*)&\equiv s[1-E(s,s_*)+\gamma]
+                    \quad&&\text{e}\quad
+                    p_*(s,s_*)&&\equiv s_*\\
+                    q(s,s_*)&\equiv 0,
+                    \quad&&\text{e}\quad
+                    q_*(s,s_*)&&\equiv sI(s,s_*),
+                \end{alignedat}
+            \end{equation}
+            %
+            rispettivamente per la prima e seconda legge. Ovviamente questo scambio deve conservare [in media] la popolazione totale da cui 
+            %
+            \begin{equation}
+                \label{eqLeggeImmigrazione}
+                \begin{aligned}
+                    s+s_*&=\langle s+s_*\rangle=
+                    \langle s'+s_*'\rangle\\&=
+                    s-sE(s,s_*)+s_*+sI(s,s_*)
+                \end{aligned}
+                \;\;\implies\;\;
+                E(s,s_*)=I(s,s_*),
+            \end{equation}
+            %
+            ciò ha senso perché l'emigrazione e l'immigrazione sono fenomeni relativi (invertendo \(s\) ed \(s_*\) sarebbe l'opposto). La scelta di \(E(s,s_*)\) dipende da come si vuole modellizzare il fenomeno dell'immigrazione, e in questo manuscritto si è modificata la \cite[(2.2), § 2, p. 223]{Gualandi2019} mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019}: 
+            %
+            \begin{equation}
+                \label{eqLeggeEmigrazione}
+                E(s,s_*)\equiv\lambda\frac{(s_*/s)^\alpha}{1+(s_*/s)^\alpha},
+            \end{equation}
+            %
+            che in essenza è una funzione di Hill di ordine \(\alpha\), in cui v'è un tasso di emigrazione maggiore verso città con popolazione relativa, data dal rapporto \(s_*/s\), maggiore; gli unici due parametri presenti, invece, presentano il seguente significato:
+
+            \begin{itemize}[label=\(\diamond\)]
+                \item \(\lambda\in(0,1)\) rappresenta l'attrattività dei poli, ossia la frazione che le città piú popolose riescono al massimo ad attrarre in un'interazione;
+                \item \(\alpha\in\mathbb R^+\) indica la rapidità d'emigrazione e influenza quanto rapidamente il rapporto \(s_*/s\) raggiunge la massima attrattività \(\lambda\).
+            \end{itemize}
+
+            In poche parole la \eqref{eqLeggeEmigrazione} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
+
+            In questo caso si hanno quindi interazioni non simmetriche, poiché dalla \eqref{eqLegameLineareInterazioneCittà} \(p\neq q\) e \(q\neq p\), e non lineari, a causa della \eqref{eqLeggeEmigrazione}.
+            
+            % Mediante la conservazione di popolazione ho rifatto molto velocemente i conti della formula prima del Teorema 5.1 a p. 16 di [1], confermando che d⟨s⟩/dt=0, come ci si aspetta da questo tipo d'interazione.
+
+            Non manca che caratterizzare il tipo di perturbazione \(\gamma\) per avere uno stato postinterazione fisicamente sensato; difatti, è chiaro che rigorosamente \(\mathcal P\equiv\mathbb N\) ma è piú agevole supporre \(\mathcal P\equiv\mathbb R^+\) per poi approssimare per eccesso o difetto il numero intero effettivo; pertanto, dalla \eqref{eqSchemaInterazioneCittà}, si ha
+            %
+            \begin{equation}
+                \label{eqVincoloPositivitàFluttuazioni}
+                s'>0\;\;\implies\;\;\gamma>E(s,s_*)-1
+            \end{equation}
+            %
+            mentre \(s_*'\) è per definizione sempre positivo. La scelta di \(>\) anziché \(\geq\) nella \eqref{eqVincoloPositivitàFluttuazioni} è ben fondata: di fatto si sta supponendo che le fluttuazioni non possono annullare la popolazione di una città; difatti qualora \(\gamma=E(s,s_*)-1\) si avrebbe \(s'=0\) dalla \eqref{eqSchemaInterazioneCittà}, situazione che si vuole evitare\footnotemark{} dato che nella \eqref{eqLeggeEmigrazione} compare il rapporto tra popolazioni delle città interagenti.
+
+            \footnotetext{Ciò non significa che il modello non possa modellare lo spopolamento di una città, poiché la sua taglia può arbitrariamente avvicinarsi a zero [ma mai esserne uguale], raggiungendolo solo \textit{a posteriori} dopo l'approssimazione dai numeri reali a quelli interi.}
+
+            Perdipiú, le fluttuazioni rappresentano a grandi linee quei fenomeni complessivi di nascita e di morte che vengono considerati ma non direttamente modellati; pertanto \(\gamma\) deve soddisfare le seguenti due caratteristiche:
+
+            \begin{enumerate}[label=F\arabic*]
+                \item\label{ipFluttuazioniPositivitàNegatività} possono assumere sia valori positivi che negativi, ma non minori del vincolo imposto da \eqref{eqVincoloPositivitàFluttuazioni};
+                \item\label{ipFluttuazioniMediaNulla} la media è scelta arbitrariamente posta allo zero, ossia \(\langle\gamma\rangle=0\);
+                \item\label{ipFluttuazioniProbabilitàDecrescente} seppure non vi siano limiti superiori per l'entità della fluttuazione, è chiaro che piú grande questa è meno è probabile.
+            \end{enumerate}
+            
+            Con queste si possono allora analizzare alcune distribuzioni continue:
+
+            \begin{itemize}[label=\(\diamond\)]
+                \item la distribuzione normale non soddisfa la \ref{ipFluttuazioniPositivitàNegatività} poiché può assumere valori reali arbitrari con probabilità non nulla;
+                \item la distribuzione uniforme è adeguata solo per intervalli finiti e diventa degenere quando un suo estremo diverge, per cui non soddisfa né \ref{ipFluttuazioniMediaNulla} né \ref{ipFluttuazioniProbabilitàDecrescente}, mentre \ref{ipFluttuazioniPositivitàNegatività} si;
+                \item la distribuzione esponenziale è quella piú promettente perché riflette sia \ref{ipFluttuazioniMediaNulla} (dopo un'opportuna traslazione dei valori campionati) che \ref{ipFluttuazioniProbabilitàDecrescente}, ma sfortunatamente non \ref{ipFluttuazioniPositivitàNegatività} perché il valore estremo \(\gamma=E(s,s_*)-1\) ha probabilità non nulla [anzi massima] d'essere campionato;
+                \item l'unica distribuzione che soddisfa tutt'e tre le caratteristiche ricercate è proprio la distribuzione gamma.
+            \end{itemize}
+
+            Si consideri allora una distribuzione gamma avente la seguente funzione di densità di probabilità:
+            %
+            \begin{equation}
+                \label{eqDistribuzioneGamma}
+                f(x)=\frac1{\theta\Gamma(\alpha)}x^{\alpha-1}
+                \exp\left(-\frac x\theta\right),
+            \end{equation}
+            %
+            ove \(\alpha\) e \(\theta\) sono i parametri rispettivamente di forma e di scala, mentre \(\Gamma(\alpha):\mathbb R^+\to\mathbb R^+\) è la funzione gamma:
+            %
+            \begin{equation}
+                \label{eqFunzioneGamma}
+                \Gamma(\alpha)\equiv\int_0^{+\infty}y^{\alpha+1}e^{-y}\de y.
+            \end{equation}
+            %
+            Si scelga \(\hat\gamma\sim\DstrGamma(\alpha,\theta)\), che soddisfa per definizione la \ref{ipFluttuazioniProbabilitàDecrescente}, e s'imponga
+            %
+            \begin{equation}
+                \label{eqMediaVarianzaFluttuazioni}
+                \langle\hat\gamma\rangle=1-E(s,s_*)=\alpha\theta
+                \quad\text{e}\quad
+                \langle\hat\gamma^2\rangle=\sigma^2=\alpha\theta^2,
+            \end{equation}
+            %
+            con \(\sigma\in\mathbb R^+\) equivalente alla deviazione \textit{standard} mentre \(\sigma^2\) alla varianza, da cui
+            %
+            \begin{equation}
+                \label{eqParametriDstrGamma}
+                \alpha=\frac{(1-E(s,s_*))^2}{\sigma^2}
+                \quad\text{e}\quad
+                \theta=\frac{\sigma^2}{1-E(s,s_*)}.
+            \end{equation}
+            %
+            Con tale scelta dei parametri è possibile soddisfare la \ref{ipFluttuazioniMediaNulla} semplicemente traslando i valori campionanti della \(\hat\gamma\) di \(-\langle\hat\gamma\rangle\), ossia si considera la distribuzione \(\gamma\sim\hat\gamma-\langle\hat\gamma\rangle\):
+            %
+            \begin{equation*}
+                %\label{}
+                \langle\gamma\rangle=
+                \langle\hat\gamma-\langle\hat\gamma\rangle\rangle=
+                \langle\hat\gamma\rangle-\langle\hat\gamma\rangle=0.
+            \end{equation*}
+            %
+            D'altra parte la \ref{ipFluttuazioniPositivitàNegatività} necessità di salvaguardarsi dai casi degeneri della distribuzione gamma: essa infatti se \(\alpha=1\) diventa un'esponenziale di parametro \(\theta\), mentre se \(\alpha<1\) diverge all'origine; per avere quindi una probabilità nulla di campionare l'origine [e quindi -\(\langle\hat\gamma\rangle\) dopo la traslazione] è necessario porre
+            %
+            \begin{equation*}
+                %\label{}
+                \alpha>1
+                \;\;\implies\;\;
+                \frac{(1-E(s,s_*))^2}{\sigma^2}>1,
+            \end{equation*}
+            %
+            ma nel caso peggiore \(1-E(s,s_*)=1-\lambda\) da cui
+            %
+            \begin{equation}
+                \label{eqVincoloTraParametri}
+                \frac{(1-\lambda)^2}{\sigma^2}>1
+                \;\;\implies\;\;
+                \sigma^2<(1-\lambda)^2
+                \;\;\implies\;\;
+                \sigma<\vert1-\lambda\vert=1-\lambda,
+            \end{equation}
+            %
+            siccome \(E(s,s_*)\in(0,\lambda)\;\;\forall s,s_*\in\mathcal P\) e \(\lambda\in(0,1)\). La \eqref{eqVincoloTraParametri} implica quindi che non è possibile avere una varianza arbitraria per poter soddisfare la \ref{ipFluttuazioniPositivitàNegatività}, ma che questa è limitata superiormente dall'attrattività dei poli: piú è grande \(\lambda\) piú piccola è la varianza, e viceversa.
+
+
+        \subsection{Derivazione approssimata}
+
+
+    \section{Nesso discreto-continuo}\label{secNessoDC}
+
+        È d'interesse esplorare il legame presente tra la \eqref{eqBoltzmannConGrafo} coll'equazione classica di Boltzmann \daRivedere{}.
+
+
+        \subsection{Ipotesi semplificative}
+
+            A questo scopo si possono fare tre principali ipotesi semplificative da applicare alla \eqref{eqBoltzmannConGrafo}:
+
+            \begin{enumerate}[
+                label=\arabic*\(^\circ\) IS,
+                topsep=7.5pt,
+                parsep=5pt,
+                itemsep=0pt,
+                leftmargin=1cm,
+                rightmargin=0pt,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            ]
+                \item\label{ipMatriceUnitaria} Si presuppone che il grafo sia completamente connesso e quindi che la matrice d'adiacenza sia unitaria \(A\equiv I\).
+                %
+                \item\label{ipAgentiIndistinguibili} Si assume che gli agenti siano indistinguibili:
+                %
+                \begin{equation}
+                    f_i(s,t)=f_j(s,t)=f(s,t)
+                    \quad\forall i,j\in\mathcal I,
+                \end{equation}
+                %
+                \item\label{ipInterazioniSimmetriche} S'ipotizza che le interazioni siano simmetriche:% \(\psi(s,s_*)=\psi_*(s_*,s).\)
+                %
+                \begin{equation}
+                    s'=\Psi(s,s_*)=\Psi_*(s_*,s),
+                    \;\;\text{ove }s_*=\Psi_*(s,s_*).
+                \end{equation}
+            \end{enumerate}
+
+
+        \newcommand\titoloSez{
+            Analisi della %
+            \texorpdfstring{%
+            % \tref{ipMatriceUnitaria}{\(1^\circ\)}
+            \ref{ipMatriceUnitaria}}{1° IS}%
+        }
+        \subsection{\titoloSez}
+
+            Con tal'ipotesi la \eqref{eqBoltzmannConGrafo} diventa
+            %
+            \begin{equation*}
+                % \begin{aligned}
+                %     \derS{}t\int_{\mathcal P}\varphi f_i\de s=
+                %     \frac1{2N}\left[\vphantom{\int_{\mathcal P^2}}\right.&
+                %     \smash{\sum_{j\in\mathcal I}}\int_{\mathcal P^2}
+                %     \langle\varphi'-\varphi\rangle f_if^*_j\de s\de s_*\\
+                %     +&\smash{\sum_{j\in\mathcal I}}\int_{\mathcal P^2}
+                %     \langle\varphi'_*-\varphi_*\rangle f_jf^*_i\de s\de s_*
+                %     \left.\vphantom{\int_{\mathcal P^2}}\right],
+                % \end{aligned}
+                %
+                \derS{}t\int_{\mathcal P}\varphi f_i\de s=
+                \frac1{2N}\left[\vphantom{\int_{\mathcal P^2}}\right.
+                \smash{\sum_{j\in\mathcal I}}\int_{\mathcal P^2}
+                \langle\varphi'-\varphi\rangle f_if^*_j\de s\de s_*
+                +\smash{\sum_{j\in\mathcal I}}\int_{\mathcal P^2}
+                \langle\varphi'_*-\varphi_*\rangle f_jf^*_i\de s\de s_*
+                \left.\vphantom{\int_{\mathcal P^2}}\right],
+            \end{equation*}
+            %
+            e valutando la distribuzione marginale della \eqref{eqDistribuzioneTotale} rispetto agl'indici
+            %
+            \begin{equation}
+                \label{eqDistribuzioneMarginaleIndici}
+                F(s,t)\equiv\int_{\mathcal I}f(x,s,t)\de x=
+                \frac1N\sum_{i\in\mathcal I}f_i(s,t)
+                \otimes\int_{\mathcal I}\delta(x-i)\de x=
+                \frac1N\sum_{i\in\mathcal I}f_i(s,t),
+            \end{equation}
+            %
+            che corrisponde a una media tra le distribuzione dei singoli agenti, si ricava
+            %
+            \begin{equation*}
+                % \label{}
+                % \begin{aligned}
+                %     \derS{}t\int_{\mathcal P}\varphi f_i\de s=
+                %     \frac1{2N}\left[\vphantom{\int_{\mathcal P^2}}\right.&
+                %     \int_{\mathcal P^2}
+                %     \langle\varphi'-\varphi\rangle f_iF^*\de s\de s_*\\
+                %     +&\int_{\mathcal P^2}
+                %     \langle\varphi'_*-\varphi_*\rangle F_jf^*_i\de s\de s_*
+                %     \left.\vphantom{\int_{\mathcal P^2}}\right],
+                % \end{aligned}
+                %
+                \derS{}t\int_{\mathcal P}\varphi f_i\de s=
+                \frac12\left[\vphantom{\int_{\mathcal P^2}}\right.
+                \int_{\mathcal P^2}
+                \langle\varphi'-\varphi\rangle f_iF^*\de s\de s_*
+                +\int_{\mathcal P^2}
+                \langle\varphi'_*-\varphi_*\rangle Ff^*_i\de s\de s_*
+                \left.\vphantom{\int_{\mathcal P^2}}\right];
+            \end{equation*}
+            %
+            mediando ora rispetto a tutti gli agenti, si ha
+            %
+            \begin{equation}
+                \label{eqBoltzmannConGrafoUnitario}
+                % \begin{aligned}
+                %     \derS{}t\int_{\mathcal P}\varphi F\de s&=
+                %     \frac1{2N}\left[\vphantom{\int_{\mathcal P^2}}\right.
+                %     \int_{\mathcal P^2}
+                %     \langle\varphi'-\varphi\rangle FF^*\de s\de s_*
+                %     +\int_{\mathcal P^2}
+                %     \langle\varphi'_*-\varphi_*\rangle FF^*\de s\de s_*
+                %     \left.\vphantom{\int_{\mathcal P^2}}\right]\\&=
+                %     \frac1{2N}\int_{\mathcal P^2}
+                %     \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle FF^*\de s\de s_*
+                % \end{aligned}
+                \derS{}t\int_{\mathcal P}\varphi F\de s=
+                \frac12\int_{\mathcal P^2}
+                \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                FF^*\de s\de s_*,
+            \end{equation}
+            %
+            la quale è formalmente analoga a quella classica di Boltzmann \daRivedere{}. Ciò significa che con tal'ipotesi semplificativa, nonostante gli agenti siano distinti, questi si possono vedere come indistinguibili purché si consideri la distribuzione media \eqref{eqDistribuzioneMarginaleIndici}.
+
+            Tale risultato è anche confermato a livello pratico nell'algoritmo \ref{algMonteCarlo} ove una matrice d'adiacenza unitaria porta ad avere un algoritmo del tutto analogo a quello classico; pertanto l'unica distribuzione che può calcolare \ref{algMonteCarlo} è proprio quella media \(F\).
+
+            \newcommand\ave[1]{\left\langle#1\right\rangle}
+            \newcommand\bM{\mathbf M}
+            \newcommand\cO{\mathcal O}
+            \begin{algorithm}[!t]
+                \caption{Algoritmo di Monte Carlo per equazioni di tipo su un grafo}
+                \label{algMonteCarlo}
+                \begin{algorithmic}[1]
+                    \Require adjacency matrix \(\bM\); initial state \(V_0\in\cO^N\); time step \(\Delta{t}>0\); final time \(T>0\)
+                    \State \(\tilde{V}\gets V_0\)
+                    \State \(t\gets 1\)
+                    \For{\(t<T\)}
+                    \State \(\ave{\varphi}(t)\gets\frac{1}{N}\sum_{i=1}^N\varphi(\tilde{V}(i))\)
+                    \State \(V\gets\tilde{V}\)
+                    \State \(P\gets \text{random permutation of } \left\{1,\,\dots,\,N\right\}\)
+                    \State \(p_1\gets (P(1),\,\dots,\,P(N/2))\)
+                    \State \(p_2\gets (P(N/2 + 1),\,\dots,\,P(N))\)
+                    \State \(i\gets 1\)
+                    \For{\(i<N/2\)}
+                    \State \(\Theta\sim\operatorname{Bernoulli}\!\left(B(p_1(i),p_2(i))\Delta{t}\right)\)
+                    \State \(\tilde{V}(p_1(i))\gets V(p_1(i))(1-\Theta)+\Psi(V(p_1(i)),V(p_2(i)))\Theta\)
+                    \State \(\tilde{V}(p_2(i))\gets V(p_2(i))(1-\Theta)+\Psi_\ast(V(p_2(i)),V(p_1(i)))\Theta\)
+                    \State \(i\gets i+1\)
+                    \EndFor
+                    \State \(t\gets t+\Delta t\)
+                    \EndFor
+                \end{algorithmic}
+            \end{algorithm}
+
+
+        \renewcommand\titoloSez{
+            Analisi della %
+            \texorpdfstring{%
+            % \tref{ipAgentiIndistinguibili}{\(2^\circ\)}
+            \ref{ipAgentiIndistinguibili}}{2° IS}%
+        }
+        \subsection{\titoloSez}
+
+            La previa discussione suggerisce di studiare anche il caso in cui gli agenti siano effettivamente indistinguibili; tuttavia, prima di affrontarlo assieme alla prima ipotesi risulta interessante analizzare tale ipotesi isolatamente. Pertanto la \eqref{eqBoltzmannConGrafo} diventa
+            %
+            \begin{equation*}
+                \begin{aligned}
+                    \derS{}t\int_{\mathcal P}\varphi f\de s&=
+                    \frac1{2N}\sum_{j\in\mathcal I}A(i,j)
+                    \int_{\mathcal P^2}
+                    \langle\varphi'-\varphi\rangle
+                    ff^*\de s\de s_*\\&
+                    +\frac1{2N}\sum_{j\in\mathcal I}A(j,i)
+                    \int_{\mathcal P^2}
+                    \langle\varphi'_*-\varphi_*\rangle
+                    ff^*\de s\de s_*,
+                \end{aligned}
+            \end{equation*}
+            %
+            che sommata su tutti gl'indici porta a
+            %
+            \begin{equation*}
+                \derS{}t\int_{\mathcal P}\varphi f\de s=
+                \frac1{2N^2}\sum_{i,j\in\mathcal I}A(i,j)
+                \int_{\mathcal P^2}
+                \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                ff^*\de s\de s_*,
+            \end{equation*}
+            %
+            e definendo \(L\equiv\sum_{i,j\in\mathcal I}A(i,j)\) si arriva a
+            %
+            \begin{equation}
+                \label{eqBoltzmannConAgentiIndistinguibili}
+                \derS{}t\int_{\mathcal P}\varphi f\de s=
+                \frac L{N^2}\left[\frac12
+                \smash{\sum_{i,j\in\mathcal I}}A(i,j)
+                \int_{\mathcal P^2}
+                \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                ff^*\de s\de s_*\right].
+            \end{equation}
+            %
+            In questo contesto il rapporto \(L/N^2\in[0,1]\) rappresenta topologicamente simile è la rete a una completamente connessa\footnotemark{}; d'altra parte l'equazione è analoga a quella classica di Boltzmann \daRivedere{}.
+            
+            Dunque l'indistinguibilità degli agenti ha una notevole conseguenza sulla \eqref{eqBoltzmannConGrafo}, riassumendo l'effetto complessivo del grafo al solo coefficiente \(L/N^2\) che quindi ne rappresenta gli ultimi bagliori prima di una sua totale scomparsa per la \ref{ipMatriceUnitaria}.
+
+            \footnotetext{Difatti \(L\) è interpretabile come il numero di lati presenti in un grafo diretto e che ha come limite superiore prorio \(N^2\), ossia il numero totale di coppie [e quindi lati] dati \(N\) nodi.}
+
+
+        \renewcommand\titoloSez{
+            Analisi della %
+            \texorpdfstring{%
+            \tref{ipMatriceUnitaria}{\(1^\circ\)}, %
+            \tref{ipAgentiIndistinguibili}{\(2^\circ\)} e %
+            % \tref{ipInterazioniSimmetriche}{\(3^\circ\)}%
+            \ref{ipInterazioniSimmetriche}}{1°, 2° e 3° IS}%
+        }
+        \subsection{\titoloSez}
+
+            Visto che vale \ref{ipMatriceUnitaria} si può partire dalla \eqref{eqBoltzmannConGrafoUnitario} nella quale la distribuzione media \eqref{eqDistribuzioneMarginaleIndici} diventa per \ref{ipAgentiIndistinguibili}                %
+            \begin{equation*}
+                    F(s,t)=\frac1N\sum_{i\in\mathcal I}f_i(s,t)
+                    \overset{\tref{ipAgentiIndistinguibili}{2^\circ}}=
+                    \frac1N\sum_{i\in\mathcal I}f(s,t)=f(s,t),
+            \end{equation*}
+            %
+            ossia la \(F\) coincide con quella di tutti gli agenti\footnotemark, essendo questi, appunto, indistinguibili.
+            \footnotetext{Si noti anche che la perdita della dipendenza della distribuzione media dal numero di nodi \(N\) è coerente colla situazione in cui \(N\to\infty\), condizione fondamentale analoga a casi classici come lo studio del gas nel quale \(N\gg1\) ben approssima il limite.}
+
+            In tal modo la \eqref{eqBoltzmannConGrafoUnitario} diventa
+            %
+            \begin{equation*}
+                \derS{}t\int_{\mathcal P}\varphi f\de s=
+                \frac12\int_{\mathcal P^2}
+                \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                ff^*\de s\de s_*,
+            \end{equation*}
+            %
+            che unita all \ref{ipInterazioniSimmetriche} porta all'equivalenza (mediante il cambio di variabili \(s_*=s\) e \(s=s_*\))
+            %
+            \begin{equation*}
+                \int_{\mathcal P^2}
+                \langle\varphi_*'-\varphi_*\rangle ff_*dsds_*
+                =\int_{\mathcal P^2}
+                \langle\varphi'-\varphi\rangle ff^*dsds_*,
+            \end{equation*}
+            %
+            e quindi a
+            %
+            \begin{equation*}
+                \derS{}t\int_{\mathcal P}\varphi fds=
+                \int_{\mathcal P^2}
+                \langle\varphi'-\varphi\rangle ff^*dsds_*,
+            \end{equation*}
+            %
+            che equivale alla formula classica di Boltzmann con interazioni simmetriche \daRivedere{} usata classicamente per modellizzare la distribuzione dell'energia cinetica tra una popolazione di particelle di un gas.

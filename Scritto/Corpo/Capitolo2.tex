@@ -1,0 +1,108 @@
+
+% !TEX root = ../Testa/Principale.tex
+% LTeX: language=it
+
+\chapter{Note di teoria dei grafi}\label{secTeoriaGrafi}
+
+    In questo capitolo sono prima introdotti alcuni oggetti di base della teoria dei grafi, quindi si discute la natura della rete d'interesse, infine si descriveranno molto brevemente i dati usati.
+
+    \section{Definizioni miscellanee}\label{secDefinizioniGrafi}
+
+        Innanzitutto s'inizia dando la definizione di rete:
+        %
+        \begin{dfn}[Grafo]
+            Un grafo è formato dalla coppia \(\mathcal G=(\mathcal I,\mathcal E)\), ove \(\mathcal I\) è l'insieme degl'indici dei nodi mentre \(\mathcal I\) è l'insieme dei lati, vale a dire di coppie d'indici \(\mathcal I\): due nodi \(i,j\in\mathcal I\) sono connessi sse \((i,j)\in\mathcal E\).
+        \end{dfn}
+        %
+        Dall'insieme \(\mathcal E\) si può poi specializzare il concetto di grafo:
+        %
+        \begin{dfn}[Grafo \textnormal{[in]}diretto]
+            Un grafo è indiretto sse dato \((i,j)\in\mathcal E\) allora \((j,i)\in\mathcal E\) e la direzione è trascurabile; altrimenti è detto diretto.
+        \end{dfn}
+        %
+        La trascurabilità della direzione sarà discussa poco dopo nella § \ref{secRetiECittà}, anche se è facilmente intuibile dall'esempio.
+        %
+        \begin{dfn}[Matrice d'adiacenza unitaria e pesata]
+            \label{defMatriceAdiacenzaUnitariaPesata}
+            Sia \(\vert\mathcal I\vert\) la cardinalità dell'insieme degl'indici, ossia il numero d'indici totali, si definiscono la matrice d'adiacenza unitaria \(A\in\mathbb R^{\vert I\vert\times\vert I\vert}\) e pesata \(W\in\mathbb R^{\vert I\vert\times\vert I\vert}\) come:
+            %
+            \begin{equation}
+                \label{eqMatriceAdiacenzaUnitariaPesata}
+                \newcommand\hspz{\hspace{0.5em}}
+                a_{i,j}\equiv
+                \left\{\begin{aligned}
+                    1&\hspz\text{ se }(i,j)\in\mathcal E\\
+                    0&\hspz\text{ altrimenti}
+                \end{aligned}\right.
+                \hspace{3em}
+                w_{i,j}\equiv
+                \left\{\begin{aligned}
+                    q_{i,j}&\hspz\text{ se }(i,j)\in\mathcal E\\
+                    0&\hspz\text{ altrimenti}
+                \end{aligned}\right.
+            \end{equation}
+            %
+            ove \(q_{i,j}\) è il peso\footnote{Per es. la matrice d'adiacenza unitaria può essere vista come pesata ponendo \(q_{i,j}\equiv1\).} associato al lato \((i,j)\). Si noti che per i grafi indiretti ambo le matrici risultano simmetriche.
+        \end{dfn}
+        %
+        \begin{dfn}[Grado e Forza \textnormal{[entrate/uscente]}]
+            \label{defGradoEntranteUscente}
+            Dato un indice \(i\in\mathcal I\), in un grafo indiretto non pesato si definisce grado la somma
+            %
+            \begin{equation}
+                \label{eqGradoForzaGrafoIndiretto}
+                k_i\equiv
+                \sum_{j=1}^{\vert\mathcal I\vert}a_{i,j}=
+                \sum_{j=1}^{\vert\mathcal I\vert}a_{j,i};
+            \end{equation}
+            %
+            d'altra parte in un grafo diretto non pesato la seconda equivalenza non è piú [necessariamente] valida, ragion per cui è necessario specializzare il grado in entrante e uscente 
+            %
+            \begin{equation}
+                \label{eqGradoForzaGrafoDiretto}
+                k^i_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{j,i}
+                \quad\text{e}\quad
+                k^o_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{i,j},
+            \end{equation}
+            %
+            rispettivamente. Se il grafo è invece pesato le definizioni sono le stesse di \cref{eqGradoForzaGrafoIndiretto,eqGradoForzaGrafoDiretto} ma con \(w_{i,j}/w_{j,i}\) in luogo di \(a_{i,j}/a_{j,i}\).
+        \end{dfn}
+        %
+        Infine in questa trattazione vale la seguente fondamentale ipotesi:
+        %
+        \begin{ipo}
+            Il grafo \(\mathcal G\) è assunto statico: in altre parole, \(\mathcal I\) e \(\mathcal E\) sono costanti nel tempo.
+        \end{ipo}
+        %
+        In altre parole si è solo interessati a prevedere come la popolazione si distribuisce rispetto a una topologia prestabilita \textit{a priori}; ovviamente si tratta di una forte semplificazione dato che nella realtà la topologia delle connessioni interurbane si è chiaramente coevoluta assieme allo sviluppo delle città stesse.
+    
+        % Scrivere tutte le definizioni necessarie (matrice d'adiacenza unitaria e pesata, forza di un nodo, grafo)
+
+    \section{Reti e città}\label{secRetiECittà}
+
+        Dopo aver studiato un po' di teoria sui grafi sorge successivamente il problema di come rappresentare mediante i grafi la moltitudine di collegamenti possibili tra le città
+        
+        Difatti vi sono molti modi di rappresentare le città mediante i grafi: i primi si pongono a livello \textit{intraurbano}, o considerando le strade come lati e le loro intersezioni come nodi \cite[§ 3.1.3.1 p. 17]{Barthelemy2011}, o rappresentando la rete di trasporto di tram, di bus e della metro \cite[§ 3.2.1 p. 22]{Barthelemy2011}; altri si pongono piú propriamente a livello \textit{interurbano} prendono singolarmente in considerazione varie reti dei trasporti (ferroviario \cite[§ 3.1.3.2 p. 17]{Barthelemy2011}, navale \cite[§ 3.1.4 p. 19]{Barthelemy2011}, aereo \cite[§ 3.1.2 p. 13]{Barthelemy2011}, ecc.).
+
+        Tuttavia, da quanto detto nella § \ref{secIntroduzione}, è chiaro che per predire la distribuzione della popolazione tra città valgono le seguenti osservazioni:
+
+        \begin{enumerate}[
+            label=\arabic*.,
+            topsep=0.5em,
+            parsep=0em,
+            itemsep=0.25em,
+            leftmargin=2em,
+            rightmargin=1.5em,
+            % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %itemindent=!,
+            %labelindent=3em,
+            %labelwidth=!,
+            %labelsep=!,
+        ]
+            \item tutte le rappresentazioni intraurbane vanno scartate perché sono troppo fini, oltre a considerare movimenti limitatamente a una sola città;
+            \item d'altra parte tutte quelle interurbane vanno considerate contemporaneamente e non singolarmente siccome ogn'individuo può scegliere diversi trasporti per muoversi.
+        \end{enumerate}
+
+        Ecco perché la corretta rete considerata è quella legata ai movimenti pendolari \bracketcitesemi[§ 3.1.3.3 p. 18]{Barthelemy2011}[]{DeMontis2007} tra città che mostrano olisticamente tutt'i possibili collegamenti tra le città a prescindere del trasporto scelto; inoltre essa mostra collegamenti realistici associati a movimenti quotidiani anziché straordinari (vacanze, visite mediche, ecc.).
+
+    \section{Cenni sui dati}\label{secCenniSuiDati}
