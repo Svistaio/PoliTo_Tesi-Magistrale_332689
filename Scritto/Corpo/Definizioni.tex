@@ -20,6 +20,51 @@
     \crefrangemultiformat{equation}{(#3#1#4--#5#2#6}{, #3#1#4--#5#2#6)}{, #3#1#4--#5#2#6}{, #3#1#4--#5#2#6)}
 %\endgroup
 
+%\begingroup TikZ
+    \newcommand\didascalia[2]{%
+        \captionsetup{aboveskip=-.2cm,width=#2}
+        \addcontentsline{lof}{figure}{\protect\numberline{\thefigure}#1}%
+        \caption*{\figurename~\thefigure: #1}
+    }
+    
+    \newcommand\sottoDidascalia[1]{%
+        \refstepcounter{subfigure}%
+        (\thesubfigure) #1%
+    }
+    
+    \newcommand\dimTesto[1]{%
+        \pgfmathparse{#1*1.2}%
+        \fontsize{#1 pt}{\pgfmathresult pt}\selectfont%
+    }
+    
+    \makeatletter
+    \newcommand\includetikzgroupplotfigure
+        {\@ifstar{\includetikzgroupplotfigure@star}
+        {\includetikzgroupplotfigure@nostar}}
+    
+    \newcommand{\includetikzgroupplotfigure@nostar}[6]{%
+        \begin{figure}[#1]%
+            \centering%
+            \refstepcounter{figure}%
+            \resizebox{#2}{!}{#3}%
+            \didascalia{#4}{#5}%
+            \label{#6}%
+        \end{figure}%
+    }
+    
+    \newcommand\includetikzgroupplotfigure@star[7]{%
+        \begin{figure*}[#1]%
+            \vspace{#2}%
+            \centering%
+            \refstepcounter{figure}%
+            \resizebox{#3}{!}{#4}%
+            \didascalia{#5}{#6}%
+            \label{#7}%
+        \end{figure*}%
+    }
+    \makeatother
+%\endgroup
+
 %\begingroup Liste
     \setlist[enumerate]{
         topsep=0.5em,

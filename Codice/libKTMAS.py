@@ -57,16 +57,17 @@ class KineticSimulation():
         self.p0 = float(self.P/self.Nc)
         self.realSizeDistr = clsReg.sizeDistr
 
-        # Exact [Weighted] Adjacency matrix
         if clsPrm.edgeWeights:
-            M = np.array(clsReg.W/np.max(clsReg.W),dtype=np.float64)
-            self.di = np.sum(M,axis=1,dtype=np.float64)
-            self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
+            self.di = np.sum(clsReg.W/np.max(clsReg.W),axis=1,dtype=np.float64)
         else:
-            M = clsReg.A
-            self.di = np.sum(M,axis=1,dtype=np.int32)
-            self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
+            self.di = np.sum(clsReg.A,axis=1,dtype=np.int32)
+        self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
         # self.D = di@invdi.T
+
+        # Exact unitary adjacency matrix
+        M = clsReg.A
+        self.dk = np.sum(M,axis=1,dtype=np.int32)
+        self.Mdt = M*dt
 
         # Approximated adjacency matrix
         Mn = np.sum(M[:,:])
@@ -75,9 +76,7 @@ class KineticSimulation():
         # M[:,:,1]  = wO@wI/Mn
         # In this case wO=wI but it's better to define them rigorously
 
-        self.Mdt = M*dt
         self.typ = np.array([0,1],dtype=np.int64)
-
         self.lbl = ('Ext.','Apx.','Real')
         self.clr = ('#0072B2','#D55E00','#000000')
         # self.clr = ('blue','red')
@@ -626,7 +625,7 @@ class KineticSimulation():
         figData=None,
         saveFig=False
     ):
-        di = self.di
+        ki = self.dk
 
         csSv = self.itAvrVrtState
         csRv = self.realSizeDistr
@@ -646,7 +645,7 @@ class KineticSimulation():
 
         for t in typ:
             libF.CreateScatterPlot(
-                di,csSv[:,t],
+                ki,csSv[:,t],
                 getattr(figData,f'fig{idx}'),
                 label=lbl[t],
                 color=clr[t],
@@ -655,7 +654,7 @@ class KineticSimulation():
             )
 
             libF.CreateScatterPlot(
-                di,csSv[:,t],
+                ki,csSv[:,t],
                 getattr(figData,f'fig{t+1+idx}'),
                 label=lbl[t],
                 color=clr[t],
@@ -664,7 +663,7 @@ class KineticSimulation():
             )
 
             libF.CreateScatterPlot(
-                di,csRv,
+                ki,csRv,
                 getattr(figData,f'fig{t+1+idx}'),
                 label=lbl[2],
                 color=clr[2],
@@ -768,7 +767,7 @@ class KineticSimulation():
         times = self.times
         snapshots = self.itAvrConvSnapshots
 
-        di = self.di
+        ki = self.dk
         sf = self.sf
 
         if figData is None:
@@ -778,10 +777,10 @@ class KineticSimulation():
             saveFig = True
         ax[0].set_title('Exact'); ax[1].set_title('Approximated')
 
-        dk, _ = np.unique(di,return_counts=True); Nk = dk.size
+        dk, _ = np.unique(ki,return_counts=True); Nk = dk.size
         snapshotsk = np.zeros((Nk,sf+1,2),dtype=np.float64)
         for i,k in enumerate(dk):
-            bk = di == k
+            bk = ki == k
             snapshotsk[i,:,:] = snapshots[bk,:,:].mean(axis=0)
 
         clrmap = get_cmap('inferno') # magma

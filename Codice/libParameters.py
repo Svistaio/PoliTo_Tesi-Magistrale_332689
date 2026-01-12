@@ -110,7 +110,7 @@ parameters = {
 }
 
 caseStudies = {
-    "selected": "(1-ζ)efl_k/α+ζefs_k/",
+    "selected": "λ(rsk^α)/(1+rsk^α)",
     "list": {
         "Default": {
             "attractivity": 0.05,
@@ -131,11 +131,11 @@ caseStudies = {
             "LaTeXConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
-            "parametricStudy": False,
             "studiedParameter": 1,
             "startValuePrmStudy": 0.1,
             "endValuePrmStudy": 1.0,
-            "numberPrmStudy": 3
+            "numberPrmStudy": 3,
+            "parametricStudy": False
         },
         "λ(rsk/α)/(1+rsk/α)": {
             "attractivity": 0.05,
@@ -155,13 +155,13 @@ caseStudies = {
             "LaTeXConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
-            "parametricStudy": False,
             "studiedParameter": 0,
             "startValuePrmStudy": 1.0,
             "endValuePrmStudy": 1.0,
-            "numberPrmStudy": 1
+            "numberPrmStudy": 1,
+            "parametricStudy": False
         },
-        "(1-ζ)efl_k/α+ζefs_k/": {
+        "(1-ζ)efl_k/α+ζefs_k": {
             "attractivity": 0.05,
             "deviation": 0.05,
             "region": 19,
@@ -179,17 +179,17 @@ caseStudies = {
             "LaTeXConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
-            "parametricStudy": True,
             "studiedParameter": 0,
             "startValuePrmStudy": 0.01,
             "endValuePrmStudy": 0.1,
-            "numberPrmStudy": 5
+            "numberPrmStudy": 5,
+            "parametricStudy": True
         },
         "λ(rsk^α)/(1+rsk^α)": {
             "attractivity": 0.05,
             "convincibility": 0.3,
             "deviation": 0.05,
-            "region": 19,
+            "region": 20,
             "zetaFraction": 0.1,
             "timestep": 0.01,
             "timesteps": int(1e7),
@@ -204,11 +204,11 @@ caseStudies = {
             "LaTeXConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
-            "parametricStudy": True,
             "studiedParameter": 1,
             "startValuePrmStudy": 0.1,
             "endValuePrmStudy": 0.5,
-            "numberPrmStudy": 5
+            "numberPrmStudy": 5,
+            "parametricStudy": True
         },
         "λ[rsk/(1+rsk)]^α": {
             "attractivity": 0.05,
@@ -229,11 +229,11 @@ caseStudies = {
             "LaTeXConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
-            "parametricStudy": False,
             "studiedParameter": 1,
             "startValuePrmStudy": 0.3,
             "endValuePrmStudy": 1,
-            "numberPrmStudy": 3
+            "numberPrmStudy": 3,
+            "parametricStudy": False
         }
     }
 }

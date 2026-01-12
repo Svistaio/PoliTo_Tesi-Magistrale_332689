@@ -11,12 +11,14 @@
         Innanzitutto s'inizia dando la definizione di rete:
         %
         \begin{dfn}[Grafo]
+            \label{defGrafo}
             Un grafo è formato dalla coppia \(\mathcal G=(\mathcal I,\mathcal E)\), ove \(\mathcal I\) è l'insieme degl'indici dei nodi mentre \(\mathcal I\) è l'insieme dei lati, vale a dire di coppie d'indici \(\mathcal I\): due nodi \(i,j\in\mathcal I\) sono connessi sse \((i,j)\in\mathcal E\).
         \end{dfn}
         %
         Dall'insieme \(\mathcal E\) si può poi specializzare il concetto di grafo:
         %
         \begin{dfn}[Grafo \textnormal{[in]}diretto]
+            \label{defGrafoInDiretto}
             Un grafo è indiretto sse dato \((i,j)\in\mathcal E\) allora \((j,i)\in\mathcal E\) e la direzione è trascurabile; altrimenti è detto diretto.
         \end{dfn}
         %
@@ -103,6 +105,38 @@
             \item d'altra parte tutte quelle interurbane vanno considerate contemporaneamente e non singolarmente siccome ogn'individuo può scegliere diversi trasporti per muoversi.
         \end{enumerate}
 
-        Ecco perché la corretta rete considerata è quella legata ai movimenti pendolari \bracketcitesemi[§ 3.1.3.3 p. 18]{Barthelemy2011}[]{DeMontis2007} tra città che mostrano olisticamente tutt'i possibili collegamenti tra le città a prescindere del trasporto scelto; inoltre essa mostra collegamenti realistici associati a movimenti quotidiani anziché straordinari (vacanze, visite mediche, ecc.).
+        Ecco perché la corretta rete da considerare è quella legata ai movimenti pendolari \bracketcitesemi[§ 3.1.3.3 p. 18]{Barthelemy2011}[]{DeMontis2007} tra città che mostrano olisticamente tutt'i possibili collegamenti tra le città a prescindere del trasporto scelto; inoltre essa mostra collegamenti realistici associati a movimenti quotidiani anziché straordinari (vacanze, visite mediche, ecc.).
+
+        Una volta fissata la rappresentazione è necessario comprendere il tipo di grafo con cui si ha a che fare. Eppure la risposta è molto semplice e immediata dopo una semplice osservazione: un ente, ovvero una città, può interagire con un secondo senza che questo interagisca a sua volta col primo; si è dunque di fronte a un grafo diretto ma simmetrico (\ref{defGrafoInDiretto}) perché il contesto richiede di considerare la direzione d'interazione.
+
+        Come nota finale si osserva che questo tipo di grafo è spaziale \cite{Barthelemy2011,DeMontis2007}, ovvero i suoi nodi occupano un punto nello spazio euclideo; oltre a ciò tale osservazione è puramente formale, ma servirà successivamente quando si definiranno le leggi d'interazione. Perdipiú, contrariamente a quanto si possa pensare di primo inizialmente, tale grafo non è a invarianza di scala \cite{Barabasi1999} proprio a causa della sua natura spaziale \cite{Broido2019,Barthelemy2011}; ciò non esclude l'esistenza di nodi piú centrali di altri, ma solo che il massimo grado di un nodo è limitato superiormente dalla natura spaziale del grafo.
 
     \section{Cenni sui dati}\label{secCenniSuiDati}
+
+        La matrice di pendolarismo costruita è quella fornita dall'ISTAT del 1999 \cite{ISTATPendolarismo1999} seguendo l'esempio di \cite{DeMontis2007}. I dati sono di fatto un \textit{file} di testo formato da una serie di righe di 29 numeri il cui significato è spiegato dalla Tab. \ref{tabStrutturaDatiPendolarismo}.
+
+        \begin{table}[htbp]
+            \centering
+            \begin{tabular}{cccc}
+                Dato& Col. iniziale& Lunghezza\\
+                \hline
+                Provincia di partenza& 1&  3\\
+                Comune di partenza&    4&  3\\
+                Sesso&                 7&  1\\
+                Mezzo di trasporto&    8&  1\\
+                Cond.professionale&    9&  1\\
+                Orario di uscita&     10&  1\\
+                Tempo di percorrenza& 11&  1\\
+                Provincia di arrivo&  12&  3\\
+                Comune di arrivo&     15&  3\\
+                Numero di persone&    18& 12
+            \end{tabular}
+            \captionsetup{width=.75\textwidth}
+            \caption{Formattazione di una sola riga nei dati ISTAT\protect\footnotemark.}
+            \label{tabStrutturaDatiPendolarismo}
+        \end{table}
+        \footnotetext{si v. il \textit{file} «trapen91.txt» per maggiori informazioni.}
+
+        I comuni considerati sono tutt'i quell'italiani (8100) nel 1999, quindi è necessario estrapolare da essi le matrici di pendolarismo delle singole regioni e parallelamente quella complessiva dell'Italia. 
+
+        Sono stati anche riprodotti i risultati di \cite{DeMontis2007}, ma l'unico importante da mostrare è quello relativo alla correlazione positiva tra la forza e il grado del nodo nella Fig. \daRivedere{}, mentre tutti gli altri sono elencati per completezza nella Fig. \daRivedere{}.
