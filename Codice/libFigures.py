@@ -545,14 +545,14 @@ def CreateLognormalFitPlot(
         )
 
     if Ni == 1:
-        shape, loc, scale = stats.lognorm.fit(v,floc=0)
+        shape, loc, scale = stats.lognorm.fit(v[v>0],floc=0)
         # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
         yF = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
     else:
         fitData = [None]*Ni
 
         for r in range(Ni):
-            shape, loc, scale = stats.lognorm.fit(v[r,:],floc=0)
+            shape, loc, scale = stats.lognorm.fit(v[r,:][v[r,:]>0],floc=0)
             fitData[r] = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
 
         yF = fitData
