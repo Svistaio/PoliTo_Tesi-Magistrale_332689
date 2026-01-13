@@ -35,23 +35,29 @@
 \usetikzlibrary{
     positioning,
     shapes.geometric,
+    plotmarks,
+    arrows.meta
 }
-
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{
+    patchplots,
+    groupplots
+}
+\usepackage{grffile}
+    
 \usepackage{
     amsmath,
     amsfonts,
-    amsthm,
-    amssymb
+    amsthm
+    % amssymb
 }
 
-\usepackage{graphicx}
-\usepackage{subfig}
-
 \usepackage{
+    graphicx,
+    subfig,
     caption,
-    subcaption
-}
-\usepackage{
+    subcaption,
     float,
     stfloats
 }

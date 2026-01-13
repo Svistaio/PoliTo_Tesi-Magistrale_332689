@@ -54,7 +54,7 @@ def LoadRegionData(code):
 
     with ZF(regDataZipPath) as z:
         for data,ext in el.items():
-            path = f'{code}/{data}{ext}'
+            path = f'{code:02d}/{data}{ext}'
             with z.open(path,'r') as f:
                 match data:
                     case 'A' | 'W' | 'li2Coord' | 'sizeDistr':

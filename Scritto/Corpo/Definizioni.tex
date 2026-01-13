@@ -22,19 +22,15 @@
 
 %\begingroup TikZ
     \newcommand\didascalia[2]{%
-        \captionsetup{aboveskip=-.2cm,width=#2}
-        \addcontentsline{lof}{figure}{\protect\numberline{\thefigure}#1}%
-        \caption*{\figurename~\thefigure: #1}
+        \captionsetup{width=#2} % aboveskip=-.2cm,
+        % \addcontentsline{lof}{figure}{\protect\numberline{\thefigure}#1}%
+        % \caption*{\figurename~\thefigure: #1}
+        \captionof{figure}{#1}
     }
     
     \newcommand\sottoDidascalia[1]{%
         \refstepcounter{subfigure}%
         (\thesubfigure) #1%
-    }
-    
-    \newcommand\dimTesto[1]{%
-        \pgfmathparse{#1*1.2}%
-        \fontsize{#1 pt}{\pgfmathresult pt}\selectfont%
     }
     
     \makeatletter
@@ -52,15 +48,29 @@
         \end{figure}%
     }
     
-    \newcommand\includetikzgroupplotfigure@star[7]{%
-        \begin{figure*}[#1]%
-            \vspace{#2}%
-            \centering%
-            \refstepcounter{figure}%
-            \resizebox{#3}{!}{#4}%
-            \didascalia{#5}{#6}%
-            \label{#7}%
-        \end{figure*}%
+    \newcommand\includetikzgroupplotfigure@star[6]{%
+        \newgeometry{
+            left=1cm,
+            right=1cm,
+            top=1cm,
+            bottom=1cm
+        }
+        \begin{center}
+            \vspace{#1}%
+            % \refstepcounter{figure}%
+            \resizebox{#2}{!}{#3}%
+            \didascalia{#4}{#5}%
+            \label{#6}%
+        \end{center}
+        % \begin{figure*}[#1]%
+        %     \vspace{#2}%
+        %     \centering%
+        %     % \refstepcounter{figure}%
+        %     \resizebox{#3}{!}{#4}%
+        %     \didascalia{#5}{#6}%
+        %     \label{#7}%
+        % \end{figure*}%
+        \restoregeometry
     }
     \makeatother
 %\endgroup
