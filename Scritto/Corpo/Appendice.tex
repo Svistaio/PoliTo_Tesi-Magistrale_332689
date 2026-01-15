@@ -1,0 +1,18 @@
+
+% !TEX root = ../Testa/Principale.tex
+% LTeX: language=it
+
+\appendix
+
+\chapter*{Appendice}
+\addcontentsline{toc}{chapter}{Appendice}
+
+    \setcounter{section}{0}
+    \renewcommand\thesection{\Alph{section}}
+    \renewcommand\thesubsection{\thesection.\arabic{subsection}}
+
+    % \setcounter{equation}{0}
+    \numberwithin{equation}{section}
+    \renewcommand\theequation{\thesection.\arabic{equation}}
+
+    \section{Codice}\label{apnCodice}

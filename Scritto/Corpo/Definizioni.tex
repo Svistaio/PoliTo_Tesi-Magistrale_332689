@@ -23,9 +23,7 @@
 %\begingroup TikZ
     \newcommand\didascalia[2]{%
         \captionsetup{width=#2} % aboveskip=-.2cm,
-        % \addcontentsline{lof}{figure}{\protect\numberline{\thefigure}#1}%
-        % \caption*{\figurename~\thefigure: #1}
-        \captionof{figure}{#1}
+        \caption{#1}%
     }
     
     \newcommand\sottoDidascalia[1]{%
@@ -33,46 +31,53 @@
         (\thesubfigure) #1%
     }
     
-    \makeatletter
-    \newcommand\includetikzgroupplotfigure
-        {\@ifstar{\includetikzgroupplotfigure@star}
-        {\includetikzgroupplotfigure@nostar}}
-    
-    \newcommand{\includetikzgroupplotfigure@nostar}[6]{%
+    \newcommand\tikzfigure[6]{%
         \begin{figure}[#1]%
             \centering%
-            \refstepcounter{figure}%
-            \resizebox{#2}{!}{#3}%
-            \didascalia{#4}{#5}%
+            \IfSubStr{#1}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
+                \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
+                \stepcounter{figposcount}%
+                \zsaveposx{figpos-\thefigposcount}%
+                \makebox[0pt][l]{%
+                    % Muove indietro il cursore del testo fino al lato sinistro del foglio
+                    \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+                    % Muove avanti il cursore del testo fino al centro del foglio
+                    \hspace*{0.5\paperwidth}%
+                    % Centra la figura TikZ riseptto a questo punto
+                    \makebox[0pt][c]{%
+                        \begin{minipage}{#2}%
+                            \centering
+                            \resizebox{\linewidth}{!}{#3}%
+                            \didascalia{#4}{#5}%
+                        \end{minipage}%
+                    }%
+                }%
+            }{% Altrimenti centra la figura rispetto al corpo del testo
+                \makebox[\textwidth][c]{%
+                    \begin{minipage}{#2}%
+                        \centering
+                        \resizebox{\linewidth}{!}{#3}%
+                        \didascalia{#4}{#5}%
+                    \end{minipage}%
+                }%
+            }% Cosa che non richiede l'uso del pacchetto «zref»
             \label{#6}%
         \end{figure}%
     }
-    
-    \newcommand\includetikzgroupplotfigure@star[6]{%
-        \newgeometry{
-            left=1cm,
-            right=1cm,
-            top=1cm,
-            bottom=1cm
-        }
-        \begin{center}
-            \vspace{#1}%
-            % \refstepcounter{figure}%
-            \resizebox{#2}{!}{#3}%
-            \didascalia{#4}{#5}%
-            \label{#6}%
-        \end{center}
-        % \begin{figure*}[#1]%
-        %     \vspace{#2}%
-        %     \centering%
-        %     % \refstepcounter{figure}%
-        %     \resizebox{#3}{!}{#4}%
-        %     \didascalia{#5}{#6}%
-        %     \label{#7}%
-        % \end{figure*}%
-        \restoregeometry
+
+    \newcommand\RidefinisciLimitiTikZ[2]{
+        % Salva le coordinate della cima e del fondo della figura corrente (cosí da mantenere i titoli e le didascalie)
+        \coordinate (Cima) at (current bounding box.north);
+        \coordinate (Fondo) at (current bounding box.south);
+
+        \pgfresetboundingbox % Resetta la scatola dei limiti
+
+        \useasboundingbox % Definisce la nuova scatola come un rettangolo
+            (#1.west |- Cima)   % con ascissa sinistra data da «Col1 c1r1.west», 
+            rectangle           % ascissa destra data da «Col2 c1r1.east»
+            (#2.east |- Fondo); % ordinate date dalla cima e fondo originali
+            % L'operatore «|-» in «(A |- B)» prende come ascissa quella del punto A mentre come coordinata quella del punto B
     }
-    \makeatother
 %\endgroup
 
 %\begingroup Liste

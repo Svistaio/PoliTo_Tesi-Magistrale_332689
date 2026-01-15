@@ -93,7 +93,7 @@ class ParametersGUI(tk.Tk):
 
         #region Population parameters
         popPrmFrame.LabelSlider(
-            self.attractivity,0.01,(0,1),
+            self.attractivity,0.001,(0,1),
             extremes=(False,False)
         )
         popPrmFrame.LabelSlider(
