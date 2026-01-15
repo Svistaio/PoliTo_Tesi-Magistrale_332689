@@ -1157,6 +1157,53 @@ def EvolveState(
             # p = 1 if p>1 else (0 if p<0 else p)
             # theta = np.random.binomial(1,p)
 
+    """
+    for _ in range(nP): # nk/100
+        FYDInPlaceShuffle(P,Nc)
+        # P = np.random.permutation(Nc)
+        # pi = P[:hNc]; pr = P[hNc:]
+
+        for _ in range(itd): # 100
+            for i in range(hNc):
+                ii = P[i]; ir = P[i+hNc]
+
+                # t = 0
+                p = Mdt[ii,ir]
+                if p > 0:
+                    theta = np.random.random() < p
+
+                    if theta == 1:
+                        si = cs[ii,0]; sr = cs[ir,0]
+
+                        e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+                        ga = StochasticFluctuations(s,e) if f else 0
+
+                        cs[ii,0] = si*(1-e+ga) 
+                        cs[ir,0] = sr+si*e
+
+                # t = 1
+                p = wOdt[ii]*wI[ir] 
+                # Apparently it's more efficient to access two values from two separate vectors and to multiply them, than it is to access the same pre-computed value from a matrix; the same holds for the product «di[ir]*idi[ii]» inside «NonLinearEmigration()»
+                # However, in order for this property to be valid the matrix has to have an underlying more simple structure which in both cases is rank 1
+                # In other words this trick does not work with the adjacency matrix «Mdt[ii,ir]» which cannot be computed from simpler elements
+                theta = np.random.random() < p
+
+                if theta == 1:
+                    si = cs[ii,1]; sr = cs[ir,1]
+
+                    e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+                    ga = StochasticFluctuations(s,e) if f else 0
+
+                    cs[ii,1] = si*(1-e+ga) 
+                    cs[ir,1] = sr+si*e
+
+                # In the exact case it's reasonalbe to check whether p is actually positive before evaluating the Bernoulli distribution with «np.random.random()<p» since A can has zero components
+                # However its approximations Ap does not have zero components by definition (it's a complete network), hence that check becomes useless
+
+                # p = 1 if p>1 else (0 if p<0 else p)
+                # theta = np.random.binomial(1,p)
+    """
+
 @njit(cache=True)
 def FYDInPlaceShuffle(v,n):
     for i in range(n-1,0,-1):
