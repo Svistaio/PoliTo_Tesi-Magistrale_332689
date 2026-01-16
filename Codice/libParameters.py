@@ -7,8 +7,22 @@ from typing import Any
 from copy import deepcopy
 import numpy as np
 
+from pathlib import Path
+
 
 ### Module attributes ###
+
+mainFolder     = Path(__file__).resolve().parent
+projectFolder  = mainFolder.parent
+dataFolder     = projectFolder/'Dati'
+
+matrixZipPath  = dataFolder/'MatriciPendolarismo1991.zip'
+sizeZipPath    = dataFolder/'CensimentoRegioni1991.zip'
+coordZipPath   = dataFolder/'LimitiRegioni1991.zip'
+shpFilePath    = f"zip://{coordZipPath}!Limiti1991_g/Com1991_g/Com1991_g_WGS84.shp"
+
+regDataZipPath = dataFolder/'DatiRegioni1991.zip'
+simDataZipFile = dataFolder/'DatiSimulazione.zip'
 
 parameters = {
     "population": {

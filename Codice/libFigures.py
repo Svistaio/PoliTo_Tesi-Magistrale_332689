@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import savefig
 # import mplcursors
 
-from libData import projectFolder
+from libParameters import projectFolder
 
 
 ### Main Functions and class ###
@@ -863,6 +863,68 @@ def CreateConfidenceIntervalPlot(
                     'e':'x','xe':xerr95,
                     'l':'','c':clr,'a':alpha,
                 }
+
+def DataString(
+    data,
+    Ni=1,
+    ta=None,
+    head='',
+    formatVal='.2f',
+    formatErr='.2f',
+    space=True
+):
+    (value,error) = EvaluateConfidenceInterval(data,ta,Ni)
+    
+    space = r'\qquad' if space else ''
+    if error is None:
+        return fr'${head}={value:{formatVal}}{space}$'
+    else:
+        return fr'${head}={value:{formatVal}}\pm{error:{formatErr}}{space}$'
+
+def Text(
+    target,
+    pos,
+    string,
+    ha='center',
+    color=None
+):
+    if hasattr(target,"transAxes"):
+        target.text(
+            pos[0],
+            pos[1],
+            string,
+            color=color,
+            ha=ha,
+            transform=target.transAxes
+        )
+    else:
+        target.text(
+            pos[0],
+            pos[1],
+            string,
+            color=color,
+            ha=ha
+        )
+
+def TextBlock(
+    ax,
+    list,
+    p=(0,0),
+    dp=(0,0),
+    offset=0,
+    **kwargs
+):
+    nR = len(list); nC = len(list[0])-offset
+    for r,y in enumerate(np.linspace(p[1]+dp[1]/2,p[1]-dp[1]/2,nR)):
+        for c,x in enumerate(
+            np.linspace(p[0]-dp[0]/2,p[0]+dp[0]/2,nC),
+            start=offset
+        ):
+            Text(ax,(x,y),list[r][c],**kwargs)
+            # x moves from left to right
+            # y moves from top to bottom
+
+    # An alternative is to do what linspace does manually with «x0+(i-(n-1)/2)*dx» where dx is actually the space between strings rather than the block length
 
 
 ### Discarded code ###

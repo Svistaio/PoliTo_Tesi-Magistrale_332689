@@ -16,8 +16,18 @@
     \DeclareMultiCiteCommand{\bracketcitesemi}[\mkbibbrackets]{\cite}{\addsemicolon\space}
 
     \crefrangeformat{equation}{(#3#1#4--#5#2#6)}
-    \crefmultiformat{equation}{(#2#1#3}{, #2#1#3)}{, #2#1#3}{, #2#1#3)}
-    \crefrangemultiformat{equation}{(#3#1#4--#5#2#6}{, #3#1#4--#5#2#6)}{, #3#1#4--#5#2#6}{, #3#1#4--#5#2#6)}
+    \crefmultiformat{equation}{(#2#1#3}{,~#2#1#3)}{,~#2#1#3}{,~#2#1#3)}
+    \crefrangemultiformat{equation}{(#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}
+
+    \crefname{figure}{Fig.}{Figg.}
+    \crefrangeformat{figure}{Figg.~#3#1#4--#5#2#6}
+    \crefmultiformat{figure}{Figg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{figure}{Figg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{table}{Tab.}{Tabb.}
+    \crefrangeformat{table}{Tabb.~#3#1#4--#5#2#6}
+    \crefmultiformat{table}{Tabb.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{table}{Tabb.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
 %\endgroup
 
 %\begingroup TikZ
@@ -26,9 +36,9 @@
         \caption{#1}%
     }
     
-    \newcommand\sottoDidascalia[1]{%
+    \newcommand\sottoDidascalia[2][ ]{%
         \refstepcounter{subfigure}%
-        (\thesubfigure) #1%
+        (\thesubfigure)#1#2%
     }
     
     \newcommand\tikzfigure[6]{%
@@ -47,8 +57,12 @@
                     \makebox[0pt][c]{%
                         \begin{minipage}{#2}%
                             \centering
+                            \addtocounter{figure}{1}%
+                            \setcounter{subfigure}{0}%
                             \resizebox{\linewidth}{!}{#3}%
+                            \addtocounter{figure}{-1}%
                             \didascalia{#4}{#5}%
+                            \label{#6}%
                         \end{minipage}%
                     }%
                 }%
@@ -56,16 +70,19 @@
                 \makebox[\textwidth][c]{%
                     \begin{minipage}{#2}%
                         \centering
+                        \addtocounter{figure}{1}%
+                        \setcounter{subfigure}{0}%
                         \resizebox{\linewidth}{!}{#3}%
+                        \addtocounter{figure}{-1}%
                         \didascalia{#4}{#5}%
+                        \label{#6}%
                     \end{minipage}%
                 }%
             }% Cosa che non richiede l'uso del pacchetto «zref»
-            \label{#6}%
         \end{figure}%
     }
 
-    \newcommand\RidefinisciLimitiTikZ[2]{
+    \newcommand\redefineTikZbounds[2]{
         % Salva le coordinate della cima e del fondo della figura corrente (cosí da mantenere i titoli e le didascalie)
         \coordinate (Cima) at (current bounding box.north);
         \coordinate (Fondo) at (current bounding box.south);
@@ -128,7 +145,7 @@
 
     \theoremstyle{plain}
     \newtheorem{ipo}{Ipotesi}
-    \newtheorem{thm}{Teorema}
+    \newtheorem{teo}{Teorema}
     \newtheorem{lmm}{Lemma}
     \newtheorem{crl}{Corollario}
 %\endgroup
@@ -155,7 +172,7 @@
                 \centering\huge\bfseries%
                 Modellizzazione della distribuzione della popolazione tra città su reti spaziali mediante la teoria cinetica dei sistemi multiagente
             }\\[1.5cm]
-            \includegraphics[width=0.25\textwidth]{../../Figure/Scelte/logo_PoliTO_2021.jpg}
+            \includegraphics[width=0.25\textwidth]{../../Figure/Scelte/Altro/LogoPoliTO.jpg}
             %
             \vfill
             %

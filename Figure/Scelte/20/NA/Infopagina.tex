@@ -1,0 +1,155 @@
+
+% !TEX root = ../../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\begin{tikzpicture}%[trim axis left,trim axis right]
+    %\begingroup Comandi
+        \definecolor{colore}{rgb}{0.50196,0.50196,0.50196}%
+    
+        \newcommand\titleSize{12} % Dimensione del titolo
+        \newcommand\captionSize{12} % Dimensione dell'etichette
+        \newcommand\labelSize{12} % Dimensione dell'etichette
+        \newcommand\tickSize{12} % Dimensioni delle tacche
+        \newcommand\legendSize{11} % Dimensione della legenda
+
+        \pgfmathsetmacro\widthPlot{10}
+        \pgfmathsetmacro\heightPlot{.6*\widthPlot}
+        \pgfmathsetmacro\halfHeightPlot{\heightPlot/2}
+        \pgfmathsetmacro\lineWidth{.5pt}
+        \pgfmathsetmacro\lineMidWidth{.75pt}
+        \pgfmathsetmacro\lineThickWidth{1.2pt}
+        
+        \pgfmathsetmacro\xPlotSep{2}
+        \pgfmathsetmacro\yPlotSep{6}
+        \pgfmathsetmacro\yPlotSepPartial{.8*\yPlotSep}
+        \pgfmathsetmacro\xLegendSep{.25cm}
+    %\endgroup
+
+    %\begingroup Impostazioni pgfplots - Prima colonna
+        \pgfplotsset{
+            /pgfplots/group/plotGroup/.style={
+                group name=Col1,
+                group size=1 by 5,
+                vertical sep=\yPlotSep em,
+                % x descriptions at=edge bottom,
+                % y descriptions at=edge left,
+            },
+            plotColumn/.style={
+                width=\widthPlot cm,% 10.45in
+                height=\heightPlot cm,% height=6.328in,
+                scale only axis, % Fondamentale per avere coerenza tra i due grafici,altrimenti non scalano correttamente
+                % xmin=0,xmax=60,
+                % xlabel={},
+                xlabel style={
+                    font=\color{white!15!black}\dimTesto{\labelSize},
+                    % at={(ticklabel cs:1.0)},
+                    % anchor=east,
+                    % yshift=-.3cm,
+                },
+                % xtick distance=5,
+                % ymin=0,
+                % ylabel={},
+                ylabel style={
+                    font=\color{white!15!black}\dimTesto{\labelSize},
+                    % at={(ticklabel cs:1.0)},
+                    % anchor=east,
+                    % yshift=.3cm,
+                },
+                xticklabel style={font=\dimTesto{\tickSize}},
+                yticklabel style={font=\dimTesto{\tickSize}},
+                % axis background/.style={fill=white},
+                axis x line*=bottom,
+                axis y line*=left,
+                xmajorgrids,
+                ymajorgrids,
+                grid style={dashed}
+            },
+            plotLegend/.style={
+                legend cell align=left,
+                align=left,
+                legend pos=north east,
+                % at={(0,.5)},
+                % anchor=west,
+                xshift=\xLegendSep,
+                draw=white!15!black,
+                font=\dimTesto{\legendSize},
+                % fill=none,
+                % draw=none,
+            },
+        }
+    %\endgroup
+
+    \begin{groupplot}[group style=plotGroup,plotColumn]
+        \input{../../Figure/Scelte/20/NA/DD.tex}
+        \input{../../Figure/Scelte/20/NA/AA.tex}
+        \input{../../Figure/Scelte/20/NA/WD.tex}
+        \input{../../Figure/Scelte/20/NA/WCC1.tex}
+        \input{../../Figure/Scelte/20/NA/WCC2.tex}
+    \end{groupplot}
+
+    %\begingroup Impostazioni pgfplots - Seconda colonna
+        \pgfplotsset{
+            /pgfplots/group/plotGroup/.append style={
+                group name=Col2,
+                y descriptions at=edge right,
+            },
+            plotColumn/.append style={
+                xmax=50,
+                % xlabel={},
+                axis y line*=right,
+                y tick scale label style={
+                    xshift=.4cm,
+                    at={(1,1)},
+                    anchor=south west,
+                },
+                % ytick distance=0.01,
+            },
+            % plotLegend/.append style={
+            %     at={(1,.5)},
+            %     anchor=east,
+            %     xshift=-2*\xLegendSep, % Le traslazioni vengono sommate; quindi se prima si aveva \xLegendSep ora si ha «\xLegendSep-2*\xLegendSepcm=-\xLegendSep», come desiderato
+            % },
+        }
+    %\endgroup
+
+    \begin{groupplot}[group style=plotGroup,plotColumn,clip=false]
+        \input{../../Figure/Scelte/20/NA/ACC.tex}
+        \input{../../Figure/Scelte/20/NA/BC.tex}
+        \input{../../Figure/Scelte/20/NA/SD.tex}
+        \input{../../Figure/Scelte/20/NA/WA1.tex}
+        \input{../../Figure/Scelte/20/NA/WA2.tex}
+    \end{groupplot}
+
+    %\begingroup Didascalie
+        \tikzset{SubCaption/.style={
+            text width=\widthPlot cm,
+            anchor=north,
+            align=center,
+            yshift=-3em
+        }}
+        \node[SubCaption] at (Col1 c1r1.south)
+            {\dimTesto{\captionSize}\sottoDidascalia{Distribuzione di probabilità dei gradi.\label{figDeMontisPk}}};
+        \node[SubCaption] at (Col2 c1r1.south)
+            {\dimTesto{\captionSize}\sottoDidascalia{Coefficiente d'aggregrazione \(C(k)\).\label{figDeMontisCk}}};
+
+        \node[SubCaption] at (Col1 c1r2.south)
+            {\dimTesto{\captionSize}\sottoDidascalia{Assortatività \(k_{nn}(k)\).\label{figDeMontisKnnk}}};
+        \node[SubCaption] at (Col2 c1r2.south)
+            {\dimTesto{\captionSize}\sottoDidascalia{Centralità per intermediazione \(g(i)\).\label{figDeMontisGi}}};
+    
+        \node[SubCaption] at (Col1 c1r3.south)
+            {\dimTesto{\captionSize}\sottoDidascalia{Distribuzione di probabilità dei pesi.\label{figDeMontisWk}}};
+        \node[SubCaption] at (Col2 c1r3.south)
+            {\dimTesto{\captionSize}\sottoDidascalia{Distribuzione di probabilità delle forze.\label{figDeMontisSk}}};
+
+        
+        \pgfmathparse{1.5*\widthPlot}\node[SubCaption,text width=\pgfmathresult cm] at (Col1 c1r5.south)
+            {\dimTesto{\captionSize}\sottoDidascalia{Coefficiente [relativo] d'aggregazione pesato \(C^w(k)\).\label{figDeMontisCwk}}};
+        \node[SubCaption] at (Col2 c1r5.south)
+            {\dimTesto{\captionSize}\sottoDidascalia{Assortatività [relativa] pesata \(k_{nn}^w(k)\).\label{figDeMontisKnnwk}}};
+    
+        % https://tex.stackexchange.com/questions/632045/get-subcaption-for-every-plot-using-groupplot-pgf-tikz-after-2020-update
+    %\endgroup
+
+    \redefineTikZbounds{Col1 c1r1}{Col2 c1r1}
+\end{tikzpicture}%

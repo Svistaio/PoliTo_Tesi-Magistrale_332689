@@ -47,6 +47,11 @@
             ove \(q_{i,j}\) è il peso\footnote{Per es. la matrice d'adiacenza unitaria può essere vista come pesata ponendo \(q_{i,j}\equiv1\).} associato al lato \((i,j)\). Si noti che per i grafi indiretti ambo le matrici risultano simmetriche.
         \end{dfn}
         %
+        \tikzfigure{H}{.8\linewidth}
+            {\input{../../Figure/Scelte/Altro/EsempioGrafo[In]Diretto.tex}}
+            {Esempio di un grafo indiretto, della sua equivalente forma diretta [simmetrica] e della loro [identica] matrice d'adiacenza.}
+            {1.2\linewidth}{figStrenghtVsDegree20}
+        %
         \begin{dfn}[Grado e Forza \textnormal{[entrate/uscente]}]
             \label{defGradoEntranteUscente}
             Dato un indice \(i\in\mathcal I\), in un grafo indiretto non pesato si definisce grado la somma
@@ -117,35 +122,136 @@
 
         \begin{table}[htbp]
             \centering
-            \begin{tabular}{cccc}
-                Dato& Col. iniziale& Lunghezza\\
-                \hline
-                Provincia di partenza& 1&  3\\
-                Comune di partenza&    4&  3\\
-                Sesso&                 7&  1\\
-                Mezzo di trasporto&    8&  1\\
-                Cond.professionale&    9&  1\\
-                Orario di uscita&     10&  1\\
-                Tempo di percorrenza& 11&  1\\
-                Provincia di arrivo&  12&  3\\
-                Comune di arrivo&     15&  3\\
-                Numero di persone&    18& 12
-            \end{tabular}
+            \begin{NiceTabular}{ccc}
+                % \CodeBefore
+                %     \chessboardcolors{red!15}{blue!15}
+                % \Body
+                    \hline
+                    Dato & Col. iniziale & Lunghezza \\
+                    \hline
+                    Provincia di partenza & 1 & 3 \\
+                    Comune di partenza & 4 & 3 \\
+                    Sesso & 7 & 1 \\
+                    Mezzo di trasporto & 8 & 1 \\
+                    Cond.professionale & 9 & 1 \\
+                    Orario di uscita & 10 & 1 \\
+                    Tempo di percorrenza & 11 & 1 \\
+                    Provincia di arrivo & 12 & 3 \\
+                    Comune di arrivo & 15 & 3 \\
+                    Numero di persone & 18 & 12 \\
+                    \hline
+                \CodeAfter
+                    \tikz \foreach \r in {4,...,8} \draw (\r.5-|1) -- (\r.5-|4);
+            \end{NiceTabular}
             \captionsetup{width=.75\textwidth}
-            \caption{Formattazione di una sola riga nei dati ISTAT\protect\footnotemark.}
+            \caption{Formattazione di una sola riga nei dati ISTAT\protect\footnotemark; le linee barrate corrispondono a dati trascurati.}
             \label{tabStrutturaDatiPendolarismo}
         \end{table}
-        \footnotetext{si v. il \textit{file} «trapen91.txt» per maggiori informazioni.}
+        \footnotetext{si v. il documento \texttt{trapen91.txt} per maggiori informazioni.}
 
         I comuni considerati sono tutt'i quell'italiani (8100) nel 1999, quindi è necessario estrapolare da essi le matrici di pendolarismo delle singole regioni e parallelamente quella complessiva dell'Italia. 
 
-        Sono stati anche riprodotti i risultati di \cite{DeMontis2007}, ma l'unico importante da mostrare è quello relativo alla correlazione positiva tra la forza e il grado del nodo nella Fig. \ref{figStrenghtVsDegree20}, mentre tutti gli altri sono elencati per completezza nella Fig. \daRivedere{}.
+        Si notano tuttavia due principali difetti dei dati contenuti nel documento \texttt{Pen\_91It.txt}:
 
-        \tikzfigure{H}{0.65\linewidth}
+        \begin{enumerate}[
+            label=\arabic*.,
+            topsep=0.5em,
+            parsep=0em,
+            itemsep=0.25em,
+            leftmargin=2em,
+            rightmargin=1.5em,
+            % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %itemindent=!,
+            %labelindent=3em,
+            %labelwidth=!,
+            %labelsep=!,
+        ]
+            \item in alcune linee come comune di destinazione è segnato il codice «022008» che però non è elencato nel documento \texttt{elencom91.xls} che riassume tutti gli 8100 comuni italiani nel 1991;
+            \item in molte linee come comune di destinazione sono segnati dei codici incompleti contenenti solo l'ultima metà (codice comune) ma non la prima (codice provincia), e questi sono in totale 8: «215», «229», «241», «216», «203», «224», «236», «246».
+        \end{enumerate}
+
+        In entrambi i casi i dati relativi [a quelli che sono potenzialmente refusi] sono stati trascurati nella corrente tesi; il primo errore è già di per sé molto raro, mentre il secondo è eccessivamente ambiguo da risolvere come si può notare dalla linea successiva relativa al codice «215»:
+        %
+        \begin{center}
+            \texttt{00200714212215\_\_\_\_\_\_\_\_\_\_\_\_\_\_1},
+        \end{center}
+        %
+        ove \_ indica uno spazio, per la quale, tralasciando il fatto che vi sono in totale 6 città italiane collo stesso codice comunale, se ci si limita alla regione del Piemonte (vale a dire la stessa del comune di partenza «002007») esistono in realtà ben due città condividenti lo stesso codice: «001215» e «004215», eppure entrambe non hanno lo stesso codice provinciale («002») del comune di partenza. Da questo piccolo estratto, quindi, non si può nemmeno ipotizzare che il codice provinciale sia lo stesso tra il comune di partenza e d'arrivo; è allora chiaro che sia impossibile scegliere la prima metà per completare il codice del comune di destinazione\footnotemark{}.
+
+        \footnotetext{Si potrebbe scegliere, tra tutt'i comuni collo stesso codice comunale, quello che minimizza la distanza geografica (ossia euleriana) siccome le coordinate dei punti rappresentativi di ogni comune sono disponibili nell'ISTAT; in ogni caso, come si vedrà nella § \ref{secSimulazioni}, sono correzioni del tutto innecessarie.}
+
+        \tikzfigure{H}{0.5\linewidth}
             {\input{../../Figure/Scelte/20/NA/SVsD.tex}}
-            {Forza in funzione del grado per la Sardegna.}
-            {\linewidth}{figStrenghtVsDegree20}
+            {Forza contro grado \(s(k)\) per la Sardegna.}
+            {1.5\linewidth}{figForzaVsGrado20}
+
+        Infine nelle \cref{figForzaVsGrado20,figDeMontisRiproduzione} sono stati anche riprodotti i risultati di \cite{DeMontis2007} colle seguenti osservazioni:
+
+        \begin{enumerate}[
+            label=\arabic*.,
+            topsep=0.5em,
+            parsep=0em,
+            itemsep=0.25em,
+            leftmargin=2em,
+            rightmargin=1.5em,
+            % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %itemindent=!,
+            %labelindent=3em,
+            %labelwidth=!,
+            %labelsep=!,
+        ]
+            \item il coefficiente d'aggregazione medio \(\langle C(k)\rangle=0.453\) è quasi il doppio di quello riportato da \cite[p. 911]{DeMontis2007} (0.26);
+            \item la \cref{figDeMontisKnnk} rispetto alla \cite[Fig. 3b]{DeMontis2007} presenta sia una forma leggermente diversa, seppure la tendenza a mezza luna sia la stessa, che limiti superiori e inferiori piú estesi;
+            \item il coefficiente d'aggregazione pesato rapppresentato nella \cref{figDeMontisCwk} ha chiaramente una tendenza decrescente, anche se molto lenta, ragion per cui si può considerare comunque «circa costante» come afferma \cite{DeMontis2007};
+            \item i primi due pesi piú elevati, riportati nella \cref{tabConfrontoPesiDeMontis}, non corrispondono: ciò si può giustificare molto probabilmente come refuso da parte di \cite{DeMontis2007} poiché i collegamenti «Cagliari-Sassari» e «Sassari-Olbia» sono molto distanti geograficamente\footnote{Il primo equivale a percorrere l'intera lunghezza dell'isola ogni giorno.}, per cui è ragionevole che i flussi siano bassi.
+        \end{enumerate}
+
+        \begin{table}[htb]
+            \newcommand\dimTab{.5\linewidth}
+            \newcommand\sepCol{\hspace{0.5em}}
+            \newcommand\sepTab{\hspace{0em}}
+            % \newcommand\sepTab{\hfill}
+            %
+            \centering
+            \begin{subtable}{\dimTab}
+                \centering
+                \begin{tabular}{c@{\sepCol}c}
+                    \hline
+                    Connessione & Peso \\
+                    \hline
+                    Cagliari-Quartu & 14709 \\
+                    Cagliari-Selargius & 7995 \\
+                    Assemini-Selargius & 4418 \\
+                    Porto Torres-Sassari & 4149 \\
+                    Cagliari-Capoterra & 3865 \\
+                    \hline
+                \end{tabular}
+                \caption{Pesi maggiori correnti.}
+                \label{tabPesiCorrenti}
+            \end{subtable}%
+            \sepTab
+            \begin{subtable}{\dimTab}
+                \centering
+                \begin{tabular}{c@{\sepCol}c}
+                    \hline
+                    Connessione & Peso \\
+                    \hline
+                    Cagliari-Sassari & 13953 \\
+                    Sassari-Olbia & 7246 \\
+                    Cagliari-Assemini & 4226 \\
+                    Porto Torres-Sassari & 3993 \\
+                    Cagliari-Capoterra & 3731 \\
+                    \hline
+                \end{tabular}
+                \caption{Pesi maggiori di \cite{DeMontis2007}}
+                \label{tabPesiDeMontis}
+            \end{subtable}
+            \caption{Confronto con \cite{DeMontis2007} dei pesi maggiori.}
+            \label{tabConfrontoPesiDeMontis}
+        \end{table}
+       
+        Come si vedrà tra qualche capitolo, ma soprattutto perché sono davvero lievi, queste discrepanze sono irrilevanti per quanto concerne questo elaborato. Inoltre, l'unico risultato importante recuperato è la correlazione positiva tra la forza e il grado già mostrato nella \cref{figForzaVsGrado20}.
 
         \tikzfigure{p}{1.2\linewidth}
             {\input{../../Figure/Scelte/20/NA/Infopagina.tex}}
-            {Prova}{\linewidth}{figProva}
+            {Riproduzione dei principali grafici di \cite{DeMontis2007} [a cui si rimanda per maggiori dettagli sui vari coefficienti] relativi alla topologia della rete del pendolarismo sarda.}{\linewidth}{figDeMontisRiproduzione}

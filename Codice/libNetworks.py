@@ -11,12 +11,15 @@ import libFigures as libF
 
 class NetworkAnalysis():
     def __init__(self,clsPrm,clsReg):
+        self.li2Name = clsReg.li2Name
+        self.name2li = clsReg.name2li
+        self.Nc = clsReg.Nc
+
         A = clsReg.A; self.A = A
         W = clsReg.W; self.W = W
-        n = clsReg.Nc; self.n = n
 
         # Degrees
-        di = np.sum(A,axis=0); self.di = di # Vectors of degrees
+        di = np.sum(A,axis=0); self.di = di # Degree vector
         self.dk, self.Nk = np.unique(di,return_counts=True)
         # Unique degrees and corresponding frequencies
         # Pk = counts/N
@@ -34,23 +37,32 @@ class NetworkAnalysis():
         self.figData = libF.FigData(clsPrm,'NA')
 
     def DegreeDistributionFig(self):
+        li2Name = self.li2Name
         di = self.di
 
         figData = self.figData
         fig = figData.SetFigs()
 
+
         kAvr = np.mean(di)
-        fig.text(
-            0.8,0.25,
-            fr"$N$={di.size}"f"\n"
-            fr"$E$={int(np.sum(di)/2)}"f"\n"
-            fr"$k_{{min}}$={np.min(di)}"f"\n"
-            fr"$k_{{max}}$={np.max(di)}"f"\n"
-            r"$\langle k\rangle $="f"{kAvr}",
-            ha="center",
-            # fontsize=10,
-            color="black"
+        libF.TextBlock(
+            fig,[
+                [libF.DataString(di.size,head='N',space=False,formatVal='')],
+                [libF.DataString(int(np.sum(di)/2),head='E',space=False,formatVal='')],
+                [libF.DataString(np.min(di),head=r'k_{{min}}',space=False,formatVal='')],
+                [libF.DataString(np.max(di),head=r'k_{{max}}',space=False,formatVal='')],
+                [libF.DataString(kAvr,head=r'\langle k\rangle',space=False)]
+            ],(0.8,0.4),
+            (0,0.15)
         )
+
+
+        kis = np.argsort(di) # Vector for the sorted degrees
+        kit = [['City','k']] # Table for the sorted degrees
+        for i in range(10):
+            li = kis[-i-1]
+            kit.append([li2Name[li],di[li]])
+        libF.TextBlock(fig,kit,(1.175,0.5),(0.2,0.4))
 
 
         # Histogram plot
@@ -100,13 +112,18 @@ class NetworkAnalysis():
         # libF.CentreFig()
         libF.SetFigStyle(
             r"$k$",r"$P(k)$",
-            [0,300],[0,0.03],
+            # [0,300],[0,0.03],
             data=figData.fig
         )
         figData.SaveFig('DegreeDistribution')
 
     def WeightDistributionFig(self):
+        W = self.W
         wi = self.wi
+        Nc = self.Nc
+
+        li2Name = self.li2Name
+        name2li = self.name2li
 
         figData = self.figData
         fig = figData.SetFigs()
@@ -125,16 +142,40 @@ class NetworkAnalysis():
         slope = libF.CreateLogRegressionPlot(binw,binPw,figData.fig)
 
         kAvr = np.mean(wi)
-        fig.text(
-            0.75,0.5,
-            r"$w_{min}$="f"{np.min(wi)}\n"
-            r"$w_{max}$="f"{np.max(wi)}\n"
-            r"$\langle w\rangle $="f"{kAvr:.3f}\n"
-            r"$\alpha$="f"{slope:.3f}",
-            ha="center",
-            # fontsize=10,
-            color="black"
+        libF.TextBlock(
+            fig,[
+                [libF.DataString(np.min(wi),head=r'w_{min}',space=False,formatVal='')],
+                [libF.DataString(np.max(wi),head=r'w_{max}',space=False,formatVal='')],
+                [libF.DataString(kAvr,head=r'\langle w\rangle',space=False,formatVal='.3f')],
+                [libF.DataString(slope,head=r'\alpha',space=False,formatVal='.3f')]
+            ],(0.75,0.5),
+            (0,0.1)
         )
+
+
+        iWu,jWu = np.triu_indices_from(W,k=1)
+        values = W[iWu,jWu]
+        ls = np.argsort(values)[-5:][::-1] # Vector or sorted links
+
+        Wt = [['Connection [extracted]', 'w']]
+        for l in ls:
+            lir = iWu[l]; lic = jWu[l]
+            Wt.append([f'{li2Name[lir]}-{li2Name[lic]}',W[lir,lic]])
+        libF.TextBlock(fig,Wt,(1.3,0.65),(0.3,0.2))
+
+
+        Wt = [['Connection [reference]','w']]
+        for link in [
+            ['CAGLIARI','SASSARI'],
+            ['SASSARI','OLBIA'],
+            ['CAGLIARI','ASSEMINI'],
+            ['PORTO TORRES','SASSARI'],
+            ['CAGLIARI','CAPOTERRA']
+        ]:
+            lir = name2li[link[0]]
+            lic = name2li[link[1]]
+            Wt.append([f'{li2Name[lir]}-{li2Name[lic]}',W[lir,lic]])
+        libF.TextBlock(fig,Wt,(1.3,0.35),(0.3,0.2))
 
 
         # Style
@@ -147,6 +188,7 @@ class NetworkAnalysis():
         figData.SaveFig('WeightDistribution')
 
     def StrengthDistributionFig(self):
+        li2Name = self.li2Name
         si = self.si
 
         figData = self.figData
@@ -166,17 +208,25 @@ class NetworkAnalysis():
         v = binPs>0; v[:6] = 0
         slope = libF.CreateLogRegressionPlot(bins[v],binPs[v],figData.fig)
 
+
         kAvr = np.mean(si)
-        fig.text(
-            0.75,0.5,
-            fr"$s_{{min}}$={np.min(si)}"f"\n"
-            fr"$s_{{max}}$={np.max(si)}"f"\n"
-            fr"$\langle s\rangle $={kAvr:.3f}"f"\n"
-            fr"$\alpha$={slope:.3f}",
-            ha="center",
-            # fontsize=10,
-            color="black"
+        libF.TextBlock(
+            fig,[
+                [libF.DataString(np.min(si),head=r's_{min}',space=False,formatVal='')],
+                [libF.DataString(np.max(si),head=r's_{max}',space=False,formatVal='')],
+                [libF.DataString(kAvr,head=r'\langle s\rangle',space=False,formatVal='.3f')],
+                [libF.DataString(slope,head=r'\alpha',space=False,formatVal='.3f')]
+            ],(0.75,0.5),
+            (0,0.1)
         )
+
+        
+        sis = np.argsort(si) # Vector for the sorted strengths
+        sit = [['City','s']] # Table for the sorted strengths
+        for i in range(10):
+            li = sis[-i-1]
+            sit.append([li2Name[li],si[li]])
+        libF.TextBlock(fig,sit,(1.175,0.5),(0.2,0.4))
 
 
         # Style
@@ -200,14 +250,13 @@ class NetworkAnalysis():
         bcd = np.array([bc[i] for i in range(len(di))])
 
         aAvr = np.mean(list(bc.values()))
-        fig.text(
-            0.75,0.25,
-            r"$g_{min}$="+f"{np.min(list(bc.values())):.3f}"+"\n"+\
-            r"$g_{max}$="+f"{np.max(list(bc.values())):.0e}"+"\n"+\
-            r"$\langle g\rangle $="+f"{aAvr:.3f}",
-            ha="center",
-            # fontsize=10,
-            color="black"
+        libF.TextBlock(
+            fig,[
+                [libF.DataString(np.min(list(bc.values())),head=r'g_{min}',space=False,formatVal='.3f')],
+                [libF.DataString(np.max(list(bc.values())),head=r'g_{max}',space=False,formatVal='.0f')],
+                [libF.DataString(aAvr,head=r'\langle g\rangle',space=False,formatVal='.3f')]
+            ],(0.75,0.25),
+            (0,0.075)
         )
 
         libF.CreateScatterPlot(
@@ -250,15 +299,14 @@ class NetworkAnalysis():
         slope = libF.CreateLogRegressionPlot(dk,sk,figData.fig)
 
         sAvr = np.mean(si)
-        fig.text(
-            0.75,0.25,
-            r"$s_{min}$="f"{np.min(si)}\n"
-            r"$s_{max}$="f"{np.max(si)}\n"
-            r"$\langle s\rangle $="f"{sAvr:.3f}\n"
-            r"$\alpha$="f"{slope:.3f}",
-            ha="center",
-            # fontsize=10,
-            color="black"
+        libF.TextBlock(
+            fig,[
+                [libF.DataString(np.min(si),head=r's_{min}',space=False,formatVal='')],
+                [libF.DataString(np.max(si),head=r's_{max}',space=False,formatVal='')],
+                [libF.DataString(sAvr,head=r'\langle s\rangle',space=False,formatVal='.3f')],
+                [libF.DataString(slope,head=r'\alpha',space=False,formatVal='.3f')]
+            ],(0.75,0.25),
+            (0,0.1)
         )
 
 
@@ -272,6 +320,7 @@ class NetworkAnalysis():
         figData.SaveFig('StrengthVsDegree')
 
     def AClusteringCoefficientFig(self):
+        Nc = self.Nc
         A = self.A
         di = self.di
         dk = self.dk
@@ -281,14 +330,14 @@ class NetworkAnalysis():
         fig = figData.SetFigs()
         
         G = nx.from_numpy_array(A)
-        Cd = nx.clustering(G)
+        C = nx.clustering(G)
+        Cd = np.array([C[i] for i in range(Nc)])
+
 
         Ck = np.zeros_like(dk,dtype=float)
         for i,ki in enumerate(dk):
-            v = np.nonzero(di == ki)[0]
-            for n in v:
-                Ck[i] += Cd[n]
-            Ck[i] /= Nk[i]
+            v = di == ki
+            Ck[i] = np.sum(Cd[v])/Nk[i]
         self.Ck = Ck
 
         #region
@@ -318,15 +367,15 @@ class NetworkAnalysis():
             #     Ck[i] = np.sum(Cd[v])/Nk
         #endregion
 
-        CAvr = nx.average_clustering(G)
-        fig.text(
-            0.75,0.75,
-            fr"$C_{{min}}$={np.min(list(Cd.values())):.3f}"f"\n"
-            fr"$C_{{max}}$={np.max(list(Cd.values())):.3f}"f"\n"
-            fr"$\langle C\rangle $={CAvr:.3f}",
-            ha='center',
-            # fontsize=10,
-            color="black"
+        # CAvr = nx.average_clustering(G)
+        CAvr = Ck.mean()
+        libF.TextBlock(
+            fig,[
+                [libF.DataString(np.min(Cd),head=r'C_{min}',space=False,formatVal='.3f')],
+                [libF.DataString(np.max(Cd),head=r'C_{max}',space=False,formatVal='.3f')],
+                [libF.DataString(CAvr,head=r'\langle C\rangle',space=False,formatVal='.3f')]
+            ],(0.75,0.75),
+            (0,0.075)
         )
 
         libF.CreateScatterPlot(dk,Ck,figData.fig,label='')
@@ -335,7 +384,7 @@ class NetworkAnalysis():
         # libF.CentreFig()
         libF.SetFigStyle(
             r"$k$",r"$C(k)$",
-            [0,300],[0,0.8],
+            # [0,300],[0,0.8],
             data=figData.fig
         )
         figData.SaveFig('AClusteringCoefficient')
@@ -360,11 +409,11 @@ class NetworkAnalysis():
         for i, ki in enumerate(di):
             if ki>1: # Consider only nodes with more than 2 neighbours
                 vi = A[i,:]
-                indeces = np.nonzero(vi)[0]
+                indices = np.nonzero(vi)[0]
 
                 Ei = 0
-                for n in indeces:
-                    for m in indeces:
+                for n in indices:
+                    for m in indices:
                         Ei += (W[i,n]+W[i,m])*A[n,m]
                 Ei /= 2 # Divided by 2 since each edge is counted twice
 
@@ -375,7 +424,7 @@ class NetworkAnalysis():
 
         Ckw = np.zeros_like(dk,dtype=float)
         for i, ki in enumerate(dk):
-            v = (di == ki)
+            v = di == ki
             Ckw[i] = np.sum(Cd[v])/Nk[i]
 
         libF.CreateScatterPlot(dk,Ckw,figData.fig1,label='',ax=ax[0])
@@ -417,14 +466,13 @@ class NetworkAnalysis():
         ak = nx.average_degree_connectivity(G)
 
         aAvr = np.mean(list(ad.values()))
-        fig.text(
-            0.75,0.75,
-            r"$k_{nn}^{min}$="+f"{np.min(list(ad.values())):.3f}"+"\n"+\
-            r"$k_{nn}^{max}$="+f"{np.max(list(ad.values())):.3f}"+"\n"+\
-            r"$\langle k_{nn}\rangle $="+f"{aAvr:.3f}",
-            ha="center",
-            # fontsize=10,
-            color="black"
+        libF.TextBlock(
+            fig,[
+                [libF.DataString(np.min(list(ad.values())),head=r'k_{nn}^{min}',space=False,formatVal='.3f')],
+                [libF.DataString(np.max(list(ad.values())),head=r'k_{nn}^{max}',space=False,formatVal='.3f')],
+                [libF.DataString(aAvr,head=r'\langle k_{nn}\rangle ',space=False,formatVal='.3f')]
+            ],(0.75,0.75),
+            (0,0.075)
         )
 
         knn = np.array([ak[ki] for ki in dk])
@@ -436,7 +484,7 @@ class NetworkAnalysis():
         # libF.CentreFig()
         libF.SetFigStyle(
             r"$k$",r"$k_{nn}(k)$",
-            [0,300],[40,95],
+            # [0,300],[40,95],
             data=figData.fig
         )
         figData.SaveFig('AAssortativity')
