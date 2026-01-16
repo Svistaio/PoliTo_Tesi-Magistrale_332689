@@ -483,27 +483,27 @@ class KineticSimulation():
             )
 
 
-            Text(
+            libF.Text(
                 ax[4],(p[0],p[1]+(1/2-t)*dp[1]),
                 fr'{lbl[t]}:$\quad$'+
-                DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
-                DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
-                DataString(csAvr[:,t],Ni,ta,r'\langle s\rangle')+
-                DataString(
+                libF.DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
+                libF.DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
+                libF.DataString(csAvr[:,t],Ni,ta,r'\langle s\rangle')+
+                libF.DataString(
                     csSum[:,t],Ni,ta,r's_{{\Sigma}}',
                     formatVal='.2e',formatErr='.2e'
                 )+
-                DataString(blS,Ni,ta,r'\beta',space=False),
+                libF.DataString(blS,Ni,ta,r'\beta',space=False),
                 ha='center',
                 color=clr[t]
             )
 
         if idx == 1:
-            TextBlock(
+            libF.TextBlock(
                 ax[0],[[
                     fr'$Nc={self.Nc}$',
                     fr'$R={self.R}$',
-                    DataString(blR,head=r'\beta',space=False)
+                    libF.DataString(blR,head=r'\beta',space=False)
                 ]],
                 p=(.5,p[1]-dp[1]/2),
                 dp=(dp[0]/1.75,dp[1])
@@ -512,7 +512,7 @@ class KineticSimulation():
             offset = 0 if self.il in (2,4,6) else 1
             p = (.5,p[1])
             dp = (.475-.07*offset,dp[1])
-            TextBlock(
+            libF.TextBlock(
                 ax[-1],[[ '',
                     fr'$\lambda={self.l}$',
                     fr'$\sigma={self.s}$',
@@ -532,7 +532,7 @@ class KineticSimulation():
                 offset=offset
             )
 
-        if not saveFig: Text(ax[-1],(1.1,.5),self.studiedPrmString)
+        if not saveFig: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
 
         # Style
         for i in range(3):
@@ -680,9 +680,9 @@ class KineticSimulation():
             )
 
         for t in typ:
-            TextBlock(
+            libF.TextBlock(
                 ax[0],[[
-                    DataString(
+                    libF.DataString(
                         csSv[si[i,t],t],
                         head=li2Name[si[i,t]],
                         formatVal='.2e',
@@ -1292,68 +1292,6 @@ def StochasticFluctuations(sigma,E):
     ga = np.random.gamma(alpha,theta) # Initial sampling
 
     return ga+E-1 # Final left translation
-
-def DataString(
-    data,
-    Ni=1,
-    ta=None,
-    head='',
-    formatVal='.2f',
-    formatErr='.2f',
-    space=True
-):
-    (value,error) = libF.EvaluateConfidenceInterval(data,ta,Ni)
-    
-    space = r'\qquad' if space else ''
-    if error is None:
-        return fr'${head}={value:{formatVal}}{space}$'
-    else:
-        return fr'${head}={value:{formatVal}}\pm{error:{formatErr}}{space}$'
-
-def Text(
-    target,
-    pos,
-    string,
-    ha='center',
-    color=None
-):
-    if hasattr(target,"transAxes"):
-        target.text(
-            pos[0],
-            pos[1],
-            string,
-            color=color,
-            ha=ha,
-            transform=target.transAxes
-        )
-    else:
-        target.text(
-            pos[0],
-            pos[1],
-            string,
-            color=color,
-            ha=ha
-        )
-
-def TextBlock(
-    ax,
-    list,
-    p=(0,0),
-    dp=(0,0),
-    offset=0,
-    **kwargs
-):
-    nR = len(list); nC = len(list[0])-offset
-    for r,y in enumerate(np.linspace(p[1]+dp[1]/2,p[1]-dp[1]/2,nR)):
-        for c,x in enumerate(
-            np.linspace(p[0]-dp[0]/2,p[0]+dp[0]/2,nC),
-            start=offset
-        ):
-            Text(ax,(x,y),list[r][c],**kwargs)
-            # x moves from left to right
-            # y moves from top to bottom
-
-    # An alternative is to do what linspace does manually with «x0+(i-(n-1)/2)*dx» where dx is actually the space between strings rather than the block length
 
 
 ### Discarded code ###

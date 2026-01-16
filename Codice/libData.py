@@ -1,19 +1,6 @@
 
 # Library to handle [especially writing and reading] data
 
-from pathlib import Path
-mainFolder    = Path(__file__).resolve().parent
-projectFolder = mainFolder.parent
-dataFolder    = projectFolder/'Dati'
-
-matrixZipPath = dataFolder/'MatriciPendolarismo1991.zip'
-sizeZipPath   = dataFolder/'CensimentoRegioni1991.zip'
-coordZipPath  = dataFolder/'LimitiRegioni1991.zip'
-shpFilePath   = f"zip://{coordZipPath}!Limiti1991_g/Com1991_g/Com1991_g_WGS84.shp"
-
-regDataZipPath = dataFolder/'DatiRegioni1991.zip'
-simDataZipFile = dataFolder/'DatiSimulazione.zip'
-
 import zipfile as zf
 from zipfile import ZipFile as ZF
 
@@ -33,12 +20,12 @@ import libParameters as libP
 ### Main functions ###
 
 def ExtractRegionData():
-    dicMun,dicReg = ReadMunRegCodes()
+    dictMun,dictReg = ReadMunRegCodes()
 
-    BuildAdjacencyMatrices(dicMun,dicReg)
-    BuildSizeDistributions(dicReg)
+    BuildAdjacencyMatrices(dictMun,dictReg)
+    BuildSizeDistributions(dictReg)
 
-    WriteRegionData(dicReg)
+    WriteRegionData(dictReg)
 
 def LoadRegionData(code):
     el = {
@@ -52,7 +39,7 @@ def LoadRegionData(code):
     }
     parameters = {}
 
-    with ZF(regDataZipPath) as z:
+    with ZF(libP.regDataZipPath) as z:
         for data,ext in el.items():
             path = f'{code:02d}/{data}{ext}'
             with z.open(path,'r') as f:
@@ -104,21 +91,21 @@ def xls2csv(
 
 def ReadMunRegCodes(): # Read Municipality-Region Codes
     # Conversion of «fileName» from the old format «.xls» to a more manageable «.csv»
-    matrixCSV = xls2csv('elencom91.xls',matrixZipPath)
+    matrixCSV = xls2csv('elencom91.xls',libP.matrixZipPath)
 
     # These two dictionary are necessary to link muicipalities and regions via their codes defined in «file», which will be useful later on to extract the actual data for the adjacency matrices
-    dicMun = {} # Dictionary to link municipality codes with region codes
-    dicReg = {
+    dictMun = {} # Dictionary to link municipality codes with region codes
+    dictReg = {
         i+1:{
             'li2Name':{},  # Dictionary to link local indices with the municipality name
             'li2Coord':{}, # Dictionary to link local indices with the municipality representative point
             'name2li':{},  # Dictionary to link local indices with the municipality name
-            'Code2li':{},  # Dictionary to link municipality codes with local indices
+            'code2li':{},  # Dictionary to link municipality codes with local indices
             'Nc':0  # Number of cities in a region
         } for i in range(21)
     } # The index 21 is arbitrarily associated to Italy viewed as the 21th region, hence its local index is actually the global one
 
-    gdf = gpd.read_file(shpFilePath).set_index('PRO_COM_T').geometry.representative_point()
+    gdf = gpd.read_file(libP.shpFilePath).set_index('PRO_COM_T').geometry.representative_point()
     reader = csv.reader(matrixCSV)
     next(reader)  # Skip header line containing metadata labels
     for row in reader:
@@ -127,11 +114,11 @@ def ReadMunRegCodes(): # Read Municipality-Region Codes
             codeMun = row[3]      # Municipality code
             nameMun = row[4]      # Municipality name
 
-            dicMun[codeMun] = codeReg
+            dictMun[codeMun] = codeReg
             # In reality «codeMun» it's more like «(Province code)+(Municipality code)»
 
             UpdateDictionary(
-                dicReg,
+                dictReg,
                 codeReg,
                 nameMun,
                 codeMun,
@@ -139,7 +126,7 @@ def ReadMunRegCodes(): # Read Municipality-Region Codes
             )
 
             UpdateDictionary(
-                dicReg,
+                dictReg,
                 21,
                 nameMun,
                 codeMun,
@@ -149,46 +136,46 @@ def ReadMunRegCodes(): # Read Municipality-Region Codes
         except ValueError:
             continue # Ignore it otherwise
 
-    return dicMun, dicReg
+    return dictMun, dictReg
 
 def UpdateDictionary(
-    dicReg,
+    dictReg,
     codeReg,
     nameMun,
     codeMun,
     gdf
 ):
-    lgi = dicReg[codeReg]['Nc'] # Local/Global index
-    dicReg[codeReg]['li2Name'][lgi] = nameMun
-    dicReg[codeReg]['li2Coord'][lgi] = [gdf[codeMun].x,gdf[codeMun].y]
-    dicReg[codeReg]['name2li'][nameMun] = lgi
-    dicReg[codeReg]['Code2li'][codeMun] = lgi
+    lgi = dictReg[codeReg]['Nc'] # Local/Global index
+    dictReg[codeReg]['li2Name'][lgi] = nameMun
+    dictReg[codeReg]['li2Coord'][lgi] = [gdf[codeMun].x,gdf[codeMun].y]
+    dictReg[codeReg]['name2li'][nameMun] = lgi
+    dictReg[codeReg]['code2li'][codeMun] = lgi
 
-    dicReg[codeReg]['Nc'] = lgi+1 # Update local/global number of cities
+    dictReg[codeReg]['Nc'] = lgi+1 # Update local/global number of cities
     # Local (codeReg=!=21) index
     # Global (codeReg==21) index
 
 def BuildAdjacencyMatrices(
-    dicMun,
-    dicReg
+    dictMun,
+    dictReg
 ):
 
-    for r in dicReg:
-        Nc = dicReg[r]['Nc']
+    for r in dictReg:
+        Nc = dictReg[r]['Nc']
 
         for (M,numTyp) in [
             ('A',np.uint8), # 'A' == [Unitary] Adjacency matrix
             ('W',np.int64)  # 'W' == Weighted adjacency matrix
         ]:
-            dicReg[r][M] = np.zeros((Nc,Nc),dtype=numTyp)
+            dictReg[r][M] = np.zeros((Nc,Nc),dtype=numTyp)
 
         li2Coord = np.empty((Nc,2),np.float64)
         for i in range(Nc):
-            li2Coord[i,0] = dicReg[r]['li2Coord'][i][0]
-            li2Coord[i,1] = dicReg[r]['li2Coord'][i][1]
-        dicReg[r]['li2Coord'] = li2Coord
+            li2Coord[i,0] = dictReg[r]['li2Coord'][i][0]
+            li2Coord[i,1] = dictReg[r]['li2Coord'][i][1]
+        dictReg[r]['li2Coord'] = li2Coord
 
-    with ZF(matrixZipPath) as z, z.open('Pen_91It.txt') as f:
+    with ZF(libP.matrixZipPath) as z, z.open('Pen_91It.txt') as f:
         for line in tiow(f,encoding="utf-8"):
             oMun = line[:6]         # Origin municipality
             dMun = line[11:17]      # Destination municipality
@@ -196,19 +183,19 @@ def BuildAdjacencyMatrices(
 
             if oMun != dMun and ' ' not in dMun: # and ' ' not in oMun
                 try:
-                    oReg = dicMun[oMun] # Origin region
-                    dReg = dicMun[dMun] # Destination region
+                    oReg = dictMun[oMun] # Origin region
+                    dReg = dictMun[dMun] # Destination region
 
                     if oReg == dReg: # and commuters!=0
                         UpdateMatrices(
-                            dicReg,
+                            dictReg,
                             commuters,
                             oReg,dReg,
                             oMun,dMun
                         )
 
                     UpdateMatrices(
-                        dicReg,
+                        dictReg,
                         commuters,
                         21,21,
                         oMun,dMun
@@ -216,35 +203,50 @@ def BuildAdjacencyMatrices(
                 except Exception:
                     continue
 
-    # The if statement excludes municipalities whose codes are only partially written due to, I presume, typos from ISTAT
-    # Instead, the try statement catches the few cases where the code does not match any municipality (so far only one: «022008»)
+            # else:
+            #     if oMun != dMun:
+            #         prova = f'{oMun[:3]}{dMun[:3]}'
+            #         try:
+            #             dictMun[prova]
+            #         except KeyError:
+            #             print(line)
+ 
+    # There are in total two majors typos in the data:
+    #    1. There is a municipality of code «'022008'» which isn't listed in «elencom91.xls», raising always a KeyError
+    #    2. Some lines in «Pen_91It.txt» contain a dMun which is incomplete, lacking in particular the first three numbers for the province code; these are in total:
+    #          '215   ','229   ','241   ','216   ','203   ','224   ','236   ','246   '
+    #       Moreover, nothing can be done about it, not even assuming that dReg shares the same province code of oMun, as some of these are ambiguous, even in the same region
+    #       For instance, the very first one '215   ' appears in the line «'00200714212215              1\n'»; leaving aside the fact that there are in total 6 cities with the same municipality code accross the italian peninsula, even just considering the Piedmont region, i.e. the same one of «oMun='002007'» («ASIGLIANO VERCELLESE»), there exists actually two cities with such a code: «'001215'» («RIVA PRESSO CHIERI») and «'004215'» («SAVIGLIAN»O), and both do not have the same province code («'002'») of oMun. In plain words it's impossible which one has to be chosen
+
+    # Therefore the if statement excludes municipalities whose codes are only partially written due to, I presume, typos from ISTAT
+    # while, the try statement catches the few cases where the code does not match any municipality (only one: «022008»)
 
 def UpdateMatrices(
-    dicReg,commuters,
+    dictReg,commuters,
     oReg,dReg,
     oMun,dMun
 ):
-    oI = dicReg[oReg]['Code2li'][oMun] # Local/Global origin index
-    dI = dicReg[dReg]['Code2li'][dMun] # Local/Global destination index
+    oI = dictReg[oReg]['code2li'][oMun] # Local/Global origin index
+    dI = dictReg[dReg]['code2li'][dMun] # Local/Global destination index
     # The index is considered global iff «oReg=dReg=21»
     
-    dicReg[oReg]['A'][oI,dI] = 1
-    dicReg[dReg]['A'][dI,oI] = 1
-    dicReg[oReg]['W'][oI,dI] += commuters
-    dicReg[dReg]['W'][dI,oI] += commuters
+    dictReg[oReg]['A'][oI,dI] = 1
+    dictReg[dReg]['A'][dI,oI] = 1
+    dictReg[oReg]['W'][oI,dI] += commuters
+    dictReg[dReg]['W'][dI,oI] += commuters
     # The sum in «matricesReg[oReg]['W'][oI,dI] += commuters» is necessary as there are repeating origin-destination links in the dataset
 
 def BuildSizeDistributions(
-    dicReg
+    dictReg
 ):
     sizeDistribution = {}
 
-    with ZF(sizeZipPath) as z:
-        Nc = dicReg[21]['Nc']
+    with ZF(libP.sizeZipPath) as z:
+        Nc = dictReg[21]['Nc']
         sizeDistribution[21] = np.zeros((Nc,),dtype=np.int64)
 
         for r in range(1,21):
-            Nc = dicReg[r]['Nc']
+            Nc = dictReg[r]['Nc']
             sizeDistribution[r] = np.zeros((Nc,),dtype=np.int64)
 
             # Conversion of the relative «.xls» file into a more manageable «.csv» one
@@ -258,23 +260,23 @@ def BuildSizeDistributions(
                     codeMun = f'{int(row[2]):006d}' # Municipality code
                     secPop  = int(row[5]) # Section population
 
-                    li = dicReg[r]['Code2li'][codeMun]
+                    li = dictReg[r]['code2li'][codeMun]
                     sizeDistribution[r][li] += secPop
 
-                    gi = dicReg[21]['Code2li'][codeMun]
+                    gi = dictReg[21]['code2li'][codeMun]
                     sizeDistribution[21][gi] += secPop
                 except ValueError:
                     continue # Ignore it otherwise
 
-            dicReg[r]['sizeDistr'] = sizeDistribution[r]
+            dictReg[r]['sizeDistr'] = sizeDistribution[r]
 
-        dicReg[21]['sizeDistr'] = sizeDistribution[21]
+        dictReg[21]['sizeDistr'] = sizeDistribution[21]
 
 def WriteRegionData(
-    dicReg
+    dictReg
 ):
     with ZF(
-        regDataZipPath,'w',
+        libP.regDataZipPath,'w',
         compression=zf.ZIP_DEFLATED, # Enable compression
         compresslevel=9              # Max compression for «ZIP_DEFLATED»
         # https://docs.python.org/3/library/zipfile.html#zipfile-objects
@@ -300,14 +302,14 @@ def WriteRegionData(
                     case '.txt':
                         np.savetxt(
                             buf,
-                            dicReg[r+1][data],
+                            dictReg[r+1][data],
                             fmt="%d",
                             delimiter=","
                         )
                         
                     case '.json':
                         json.dump(
-                            dicReg[r+1][data],
+                            dictReg[r+1][data],
                             buf,
                             indent=3 if data != 'Nc' else 0
                         )
@@ -328,7 +330,7 @@ def WriteSimulationData(
 
     mode = 'a' if sid is not None and sid != 1 else 'w'
     with ZF(
-        simDataZipFile,mode,
+        libP.simDataZipFile,mode,
         compression=zf.ZIP_DEFLATED,
         compresslevel=9
     ) as z:

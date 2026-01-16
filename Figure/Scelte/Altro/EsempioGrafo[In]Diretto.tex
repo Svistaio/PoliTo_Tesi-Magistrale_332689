@@ -1,0 +1,71 @@
+
+% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\begin{tikzpicture}[
+    node distance=5em,
+    main node/.style={
+        circle,
+        draw,
+        thick,
+        fill=white,
+        inner sep=0pt,
+        minimum size=1.25em
+    }, % Ponendo la separazione interna nulla la dimensione del cerchio sarà data dalla chiave «minimum size», oltre che dalla dimensione del testo stesso
+    edge/.style={thick}
+]
+    \pgfmathsetmacro\radius{1.5}
+    \newcommand\hSepPlot{9em}
+    \newcommand\hSepLabel{1.5em}
+
+    % Grafo Indiretto a forma di triangolo equilatero
+    \node[main node] (A) at (90:\radius) {1};
+    \node[main node] (B) at (330:\radius) {2};
+    \node[main node] (C) at (210:\radius) {3};
+    % Coordinate polari: (angolo:raggio)
+
+    \draw[edge] (A) -- (B);
+    \draw[edge] (B) -- (C);
+    \draw[edge] (C) -- (A);
+
+    \node[left=\hSepLabel of A] {\sottoDidascalia[]{}};
+    % \node[below=\hSepLabel of 1] {\textbf{Grafo Indiretto}};
+    
+    % Grado diretto a forma di triangolo equilatero
+    \begin{scope}[xshift=\hSepPlot]
+        \node[main node] (A) at (90:\radius) {1};
+        \node[main node] (B) at (330:\radius) {2};
+        \node[main node] (C) at (210:\radius) {3};
+
+        \draw[edge, -{Stealth}] (A) edge[bend left=15] (B);
+        \draw[edge, -{Stealth}] (B) edge[bend left=15] (A);
+
+        \draw[edge, -{Stealth}] (B) edge[bend left=15] (C);
+        \draw[edge, -{Stealth}] (C) edge[bend left=15] (B);
+
+        \draw[edge, -{Stealth}] (C) edge[bend left=15] (A);
+        \draw[edge, -{Stealth}] (A) edge[bend left=15] (C);
+
+        \node[left=\hSepLabel of A] {\sottoDidascalia[]{}};
+        % \node[below=\hSepLabel of A] {\textbf{Grafo Diretto Simmetrico}};
+    \end{scope}
+
+    % Matrice d'adiacenza
+    \pgfmathparse{1.9*\hSepPlot}
+    \begin{scope}[xshift=\pgfmathresult]
+        \node (M) {
+            \(
+            A = 
+            \begin{bmatrix}
+                0 & 1 & 1 \\
+                1 & 0 & 1 \\
+                1 & 1 & 0 
+            \end{bmatrix}
+            \)
+        };
+
+        \node at (90:\radius) {\sottoDidascalia[]{}};
+        % \pgfmathparse{\radius/sqrt(3)}
+        % \node[above=\pgfmathresult em of M] {\sottoDidascalia[]{}};
+    \end{scope}
+\end{tikzpicture}
