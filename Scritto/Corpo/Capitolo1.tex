@@ -4,14 +4,89 @@
 
 \chapter{Introduzione}\label{secIntroduzione}
 
-    Lo studio della distribuzione della popolazione tra le città è stato un fenomeno già studiato [sporadicamente] in passato. Il primo fu Auerbach \cite{Auerbach1913} che all'inizio del 19-esimo secolo notò una caratteristica poi formalizzata successivamente da Zipf \cite{Zipf2016} quasi cinquantanni dopo: nella sua teoria ha introdotto la legge che oggi prende il suo nome.\daRivedere{}
+    Lo studio della distribuzione della popolazione tra le città è stato un fenomeno già analizzato [sporadicamente] in passato. Il primo fu Auerbach \cite{Auerbach1913} che all'inizio del 19-esimo secolo notò una caratteristica poi formalizzata successivamente da Zipf\footnotemark{} \cite{Zipf2016} quasi cinquantanni dopo, seppure inizialmente in un contesto linguistico; difatti la legge di Zipf è una legge empirica di forma
+    \footnotetext{In realtà, come Zipf stesso ammette \cite[p. 546]{Zipf2016}, non fu il primo a scoprire tale legge; in ogni caso la popolarizzò a tal punto che oggi è conosciuta col suo nome.}
+    %
+    \begin{equation}
+        \label{eqLeggeZipf}
+        f\propto\frac1 r\quad\text{ove}
+        \left\{
+        \begin{split}
+            &f\text{ è la frequenza della parola,}\\
+            &r\text{ è il suo rango nella classifica;}
+        \end{split}
+        \right.
+        % https://en.wikipedia.org/wiki/Zipf%27s_law#cite_note-7
+        % https://archive.org/details/in.ernet.dli.2015.90211/page/n393/mode/1up
+    \end{equation}
+    %
+    per dare un esempio concreto, se la 10 parola piú frequente compare 2000 volte allora esiste una costante \(C\) tale che \(2000\approx C/10\). La stessa legge descritta in \eqref{eqLeggeZipf} si può ritrovare in molt'altri contesti, tra i quali figura la distribuzione della popolazione tra le città se si in luogo di \(f\) la popolazione \(t\) \cite[Fig. 9-2, p. 375]{Zipf2016} (\(t\) sta per \textit{taglia}); tuttavia ciò è vero solo qualora \(t\gg1\), ossia nella coda della distribuzione, contrariamente al contesto linguistico originale di Zipf ove \eqref{eqLeggeZipf} vale sempre.
+  
+    Piú in generale la legge [empirica] di Zipf può essere descritta da una distribuzione di Pareto: sia \(T\) la variabile aleatoria legata alla taglia delle città e sia \(f_T(t)\) la sua funzione di densità di probabilità\footnotemark{}, per la quale \(f_T(t)\de t\) indica il numero di città con \(t\in(t,t+dt)\), allora si dice che \(T\) segue una distribuzione di Pareto se soddisfa
+    \footnotetext{Affinché \(f_T(t)\) esista bisogna rigorosamente anche supporre che sia assolutamente continua ma in questa introduzione non è necessario entrare nei dettagli, per i quali si rimanda alla § \ref{secTCSM}.}
+    %
+    \begin{equation}
+        \label{eqDistribuzionePareto}
+        R(t)\approx\frac1{t^p}
+        \quad\text{se }t\gg1,
+        \quad\quad\text{ove }
+        R(t)=\int_{t}^{+\infty}f_T(\tau)\de\tau,
+        % https://en.wikipedia.org/wiki/Pareto_distribution#Relation_to_Zipf's_law
+    \end{equation}
+    %
+    che altro non è che la funzione di ripartizione complementare di \(T\), la quale rappresenta matematicamente il numero di città con popolazione maggiore o uguale a \(t\); si indica con \(R(t)\) perché è analoga al rango nella \eqref{eqLeggeZipf} una volta che s'impone l'indice di Pareto \(p\) unitario.
 
-    Aggiungere le formule sul rango\daRivedere{}.
+    Piú recentemente \cite{Eeckhout2004,Gualandi2019HBLD} si è scoperto che al di fuori della coda la \(f_T(t)\) è ben fittata dalla distribuzione lognormale con funzione di distribuzione di probabilità
+    %
+    \begin{equation}
+        \label{eqDistribuzioneLognormale}
+        f_X(x)=\frac1{x\sigma\sqrt{2\pi}}\exp\left( -\frac{(\log x-\mu)^2}{2\sigma^2}\right)
+        \quad\text{ove }X\sim\DstrLognormale(\mu,\sigma).
+    \end{equation}
+    %
+    Come suggerisce il nome, la peculiarità di tale distribuzione è che vale \(\log X\sim\mathcal N(\mu,\sigma)\) (\cref{figEsempioFunzioneLognormale}) in cui \(\mathcal N(\mu,\sigma)\) indica la distribuzione gaussiana.
 
-    D'altra parte, nella letteratura piú recente, perlomeno quella a conoscenza dell'autore, la maggior parte degli articoli su tale argomento o considerano le città come luoghi ove vivono gli agenti, creando cosí un modello di equazioni di Boltzmann elevate e accoppiate \daRivedere{}, o non considerano una naturale struttura da grafo \daRivedere{} oltre ad astrarre eccessivamente le città e i loro dintorni \daRivedere{}.
+    \tikzfigure{H}{.75\linewidth}
+        {\input{../../Figure/Scelte/Altro/EsempioFunzioneLognormale.tex}}
+        {Funzione \(\DstrLognormale(0,1)\).}
+        {\linewidth}{figEsempioFunzioneLognormale}
+
+    Perdipiú da Gualandi \etal{} \cite{Gualandi2019HBLD,Gualandi2019SDC} ci si è poi resi conto che per fittare l'intera distribuzione è sufficiente considerare una lognormale bimodale, vale a dire una combinazione convessa della \eqref{eqDistribuzioneLognormale}
+    %
+    \begin{equation}
+        \label{eqDistribuzioneLognormaleBimodale}
+        f_T(t)=zf^1_T(t)+(1-z)f^2_T(t),
+    \end{equation}
+    %
+    ove \(z\in[0,1]\) è un parametro da fittare tanto quanto le medie e le varianze associate a \(f^1_T(t)\) e \(f^2_T(t)\) per un totale di 5 parametri.
+
+    Pertanto l'obbiettivo di questa tesi è il seguente: si vuole simulare attraverso la Teoria Cinetica dei Sistemi MultiAgente (TCSMA) le interazioni tra città su un grafo spaziale, tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate (principalmente corpo lognormale e coda di Pareto); una volta raggiunto questo scopo si potrà poi meditare sulle implicazioni della legge d'interazione riguardo al fenomeno dell'emigrazione, che è alla base delle interazioni tra città.
+
+    Si sottolinea che qui le città verranno invece considerate come agenti, caratterizzati dalla loro popolazione, che interagiscono attraverso la struttura sottostante di un grafo [spaziale]; tale descrizione, salvo il grafo, non è affatto dissimile a quella classica delle molecole di un gas caratterizzate dalla loro velocità e posizione.
    
-    In questo elaborato le città verranno invece considerate come agenti, caratterizzati dalla loro popolazione, che interagiscono su mediante la struttura di un grafo spaziale; tale descrizione, salvo il grafo, non è affatto dissimile a quella classica delle molecole di un gas caratterizzate dalla loro velocità e posizione.
-
-    La suddivisione è come segue: nel secondo capitolo si affronteranno brevemente e [superficialmente] alcuni concetti della teoria dei grafi, soprattutto quelli pertinenti alla topologia interurbana; nel terzo la teoria cinetica dei sistemi multiagente è approfondita prima da un punto di vista classico, poi mediata dai grafi sia esattamente che approssimatamente; infine nel quarto si illustreranno i principali risultati mentre nel quinto si conclude con delle note finali e potenziali sviluppi futuri.
+    Difatti, in letteratura, perlomeno quella a conoscenza dell'autore, non esistono articoli che trattano contemporaneamente le teorie cinetiche, la distribuzione della città e i grafi, nonostante la rappresentazione di queste su un grafo sia del tutto naturale; piú nel dettaglio gli articoli in letteratura
     
-    Per il lettore interessato sarà anche presente un'appendice ove il codice in Python è spiegato a grandi linee.
+    \begin{itemize}[
+        label=\(\diamond\),
+        topsep=0.5em,
+        parsep=0em,
+        itemsep=0.25em,
+        leftmargin=2em,
+        rightmargin=1.5em,
+        % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+        %itemindent=!,
+        labelindent=30pt,
+        %labelwidth=!,
+        %labelsep=!,
+    ]
+        \item o applicano la TCSMA alle città senza considerare una naturale topologia sottostante \cite{Gualandi2019SDC}\footnotemark{} o, in senso opposto, considera la struttura da grafo senza applicare la TCSMA\cite{Berliant2018};
+        \footnotetext{In particolare \cite{Gualandi2019SDC}, nonostante sia un articolo molto interessante e che giunge a conclusioni altrettanto importanti, astrae eccessivamente le interazioni tra città oltre a non definire con sufficiente chiarezza che cosa s'intende per \textit{dintorni}.}
+        \item altri vedono i nodi piú come luoghi ove vivono e interagiscono gli agenti, creando cosí un modello descritto da un sistema di equazioni di Boltzmann elevate e accoppiate\cite{Loy2021};
+        \item infine l'articolo che piú si avvicina all'obbiettivo di questa tesi, applica tuttavia la sua teoria nel contesto delle reti sociali\cite{Nurisso2024}.
+    \end{itemize}
+
+    Questa lacuna è probabilmente attribuile al fatto che gli sviluppi della teoria dei grafi applicata alla TCSMA sono stati piuttosto recenti e principalmente concentrati sulla prospettiva nodo-luogo anziché nodo-agente. Dunque l'aspetto piú innovativo di questo lavoro è mostrare che la prospettiva nodo-agente è altrettanto valida quanto quella piú comune e recente del nodo-luogo; per il resto questa tesi dev'essere considerata come un'esplorazione formale applicativa con pochi approfondimenti analitici.
+
+    Lo scritto sarà cosí suddiviso: nel secondo capitolo si affronteranno brevemente e [superficialmente] alcuni concetti della teoria dei grafi, soprattutto quelli pertinenti alla topologia interurbana; quindi nel terzo la TCSMA è approfondita prima da un punto di vista classico, e poi mediata dai grafi sia esattamente che approssimatamente; infine negli ultimi due si illustreranno i principali risultati concludendo con delle note finali e potenziali sviluppi futuri.
+    
+    Per il lettore interessato sarà anche presente un'appendice ove il codice di Python dell'implementazione è spiegato a grandi linee.

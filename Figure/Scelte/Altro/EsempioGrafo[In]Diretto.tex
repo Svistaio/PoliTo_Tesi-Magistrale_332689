@@ -2,7 +2,7 @@
 % !TEX root = ../../../Esperimenti/.tex/MEF.tex
 % LTeX: language=it
 
-\begin{tikzpicture}[
+\begin{tikzpicture}[%
     node distance=5em,
     main node/.style={
         circle,
@@ -53,19 +53,22 @@
     % Matrice d'adiacenza
     \pgfmathparse{1.9*\hSepPlot}
     \begin{scope}[xshift=\pgfmathresult]
-        \node (M) {
+        \node[
+            inner sep=0pt,
+            outer sep=0pt
+        ] (M) {
             \(
-            A = 
-            \begin{bmatrix}
-                0 & 1 & 1 \\
-                1 & 0 & 1 \\
-                1 & 1 & 0 
-            \end{bmatrix}
-            \)
-        };
+                A = 
+                \begin{bmatrix}
+                    0 & 1 & 1 \\
+                    1 & 0 & 1 \\
+                    1 & 1 & 0 
+                \end{bmatrix}%
+            \)%
+        };%
 
         \node at (90:\radius) {\sottoDidascalia[]{}};
         % \pgfmathparse{\radius/sqrt(3)}
         % \node[above=\pgfmathresult em of M] {\sottoDidascalia[]{}};
-    \end{scope}
-\end{tikzpicture}
+    \end{scope}%
+\end{tikzpicture}%

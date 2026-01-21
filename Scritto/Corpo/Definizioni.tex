@@ -11,6 +11,10 @@
     \newcommand\dubbio{{\color[HTML]{DC143C}\{?\}}}
 
     \newcommand\tref[2]{\hyperref[#1]{#2}}
+%\endgroup
+
+%\begingroup Citazioni
+    \newcommand\etal{\textit{et al.}}
 
     % Comando per definire citazioni con note separate da un punto e virgola: [citazione1, nota1; citazione2, nota2; ecc.]
     \DeclareMultiCiteCommand{\bracketcitesemi}[\mkbibbrackets]{\cite}{\addsemicolon\space}
@@ -18,12 +22,12 @@
     \crefrangeformat{equation}{(#3#1#4--#5#2#6)}
     \crefmultiformat{equation}{(#2#1#3}{,~#2#1#3)}{,~#2#1#3}{,~#2#1#3)}
     \crefrangemultiformat{equation}{(#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}
-
+    
     \crefname{figure}{Fig.}{Figg.}
     \crefrangeformat{figure}{Figg.~#3#1#4--#5#2#6}
     \crefmultiformat{figure}{Figg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
     \crefrangemultiformat{figure}{Figg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-
+    
     \crefname{table}{Tab.}{Tabb.}
     \crefrangeformat{table}{Tabb.~#3#1#4--#5#2#6}
     \crefmultiformat{table}{Tabb.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
@@ -136,6 +140,7 @@
     \newcommand\de[1][]{\mathrm{d}#1}
     \newcommand\derS[3][d]{\frac{\mathrm{#1}#2}{\mathrm{#1}#3}}
     
+    \DeclareMathOperator\DstrLognormale{Lognormale}
     \DeclareMathOperator\DstrBernoulli{Bernoulli}
     \DeclareMathOperator\DstrGamma{Gamma}
 
