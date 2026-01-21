@@ -318,8 +318,9 @@ class KineticSimulation():
             )
 
             # Exact-Real and Approximated-Real plots
+            bins = 60
             libF.CreateHistogramPlot(
-                csSv[:,:,t],30,
+                csSv[:,:,t],bins,
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
@@ -350,7 +351,7 @@ class KineticSimulation():
             )
 
             libF.CreateHistogramPlot(
-                csRv,30,
+                csRv,bins,
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',

@@ -1,0 +1,93 @@
+
+% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\begin{tikzpicture}%
+    % La lognormale è «f(x)=(1/(x*sigma*sqrt(2*pi)))*exp(-(ln(x)-mu)^2/(2*sigma^2))»
+
+    \newcommand\muPrm{0}    % Media della normale sottostante
+    \newcommand\sigmaPrm{1} % Deviazione standard della normale sottostante
+
+    % Definizione della funzione matematica pgf
+    \pgfmathdeclarefunction{lognormalpdf}{1}{%
+        \pgfmathparse{1/(#1*\sigmaPrm*sqrt(2*pi))*exp(-((ln(#1)-\muPrm)^2)/(2*\sigmaPrm*\sigmaPrm))}%
+    }
+
+    \newcommand\captionSize{12}
+    \newcommand\labelSize{10}
+    \newcommand\tickSize{10}
+
+    \pgfmathsetmacro\hsep{1cm}
+    % \pgfmathsetmacro\widthPlot{(\linewidth-\hsep)/2}
+    \pgfmathsetmacro\widthPlot{7cm}
+    \pgfmathsetmacro\heightPlot{.75*\widthPlot}
+
+    \begin{groupplot}[
+        group style={
+            group name=lgnrml,
+            group size=2 by 1,
+            horizontal sep=\hsep,
+            xlabels at=edge bottom,
+            ylabels at=edge left,
+            x descriptions at=edge bottom,
+            y descriptions at=edge left
+        },
+        width=\widthPlot,
+        height=\heightPlot,
+        axis x line*=bottom,
+        axis y line*=left,
+        xlabel={$x$},
+        ylabel={$f_X(x)$},
+        xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+        ylabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+        xticklabel style={font=\dimTesto{\tickSize}},
+        yticklabel style={font=\dimTesto{\tickSize}},
+        grid=major,
+        grid style={dashed},
+        every axis plot/.append style={
+            % ultra thick,
+            thick,
+            smooth
+        },
+        ymin=0,
+    ]
+        % Scala lineare
+        \nextgroupplot[
+            xmin=0,
+            xmax=10, %5
+            minor tick num=1,
+        ]
+        \addplot[
+            % color=blue,
+            domain=0.01:20,
+            samples=400
+        ] {lognormalpdf(x)};
+
+        % Scala semilogaritmica
+        \nextgroupplot[
+            xmode=log,
+            xmin=0.01,
+            xmax=20,
+            % log ticks with fixed point, % Mostra i numeri (0.1,1,10) invece di (10^-1,10^0,10^1)
+        ]
+        % Nota: il dominio è molto più ampio qui per mostrare le code
+        \addplot[
+            % color=red,
+            domain=0.005:25,
+            samples=500
+        ] {lognormalpdf(x)};
+    \end{groupplot}
+
+    \tikzset{SubCaption/.style={
+        text width=\widthPlot,
+        anchor=north,
+        align=center,
+        yshift=-2.5em
+    }}
+    \node[SubCaption] at (lgnrml c1r1.south)
+        {\dimTesto{\captionSize}\sottoDidascalia{Scala lineare.\label{figLognormaleScalaLineare}}};
+    \node[SubCaption] at (lgnrml c2r1.south)
+        {\dimTesto{\captionSize}\sottoDidascalia{Scala semilogaritmica.\label{figLognormaleScalaSemiLogaritmica}}};
+
+    \redefineTikZbounds{lgnrml c1r1}{lgnrml c2r1}
+\end{tikzpicture}%
