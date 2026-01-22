@@ -60,7 +60,7 @@
     %
     ove \(\xi\in[0,1]\) è un parametro da fittare tanto quanto le medie e le varianze associate a \(f^1_T(t)\) e \(f^2_T(t)\) per un totale di 5 parametri.
 
-    Pertanto l'obbiettivo di questa tesi è il seguente: si vuole simulare attraverso la Teoria Cinetica dei Sistemi MultiAgente (TCSMA) le interazioni tra città su un grafo spaziale, tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate (principalmente corpo lognormale e coda di Pareto); una volta raggiunto questo scopo si potrà poi meditare sulle implicazioni della legge d'interazione riguardo al fenomeno dell'emigrazione, che è alla base delle interazioni tra città.
+    Pertanto l'obbiettivo di questa tesi è il seguente: si vuole simulare attraverso la Teoria Cinetica dei Sistemi MultiAgente (\TCSMA) le interazioni tra città su un grafo spaziale, tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate (principalmente corpo lognormale e coda di Pareto); una volta raggiunto questo scopo si potrà poi meditare sulle implicazioni della legge d'interazione riguardo al fenomeno dell'emigrazione, che è alla base delle interazioni tra città.
 
     Si sottolinea che qui le città verranno invece considerate come agenti, caratterizzati dalla loro popolazione, che interagiscono attraverso la struttura sottostante di un grafo [spaziale]; tale descrizione, salvo il grafo, non è affatto dissimile a quella classica delle molecole di un gas caratterizzate dalla loro velocità e posizione.
    
@@ -79,14 +79,14 @@
         %labelwidth=!,
         %labelsep=!,
     ]
-        \item o applicano la TCSMA alle città senza considerare una naturale topologia sottostante \cite{Gualandi2019SDC}\footnotemark{} o, in senso opposto, considera la struttura da grafo senza applicare la TCSMA\cite{Berliant2018};
+        \item o applicano la \TCSMA{} alle città senza considerare una naturale topologia sottostante \cite{Gualandi2019SDC}\footnotemark{} o, in senso opposto, considera la struttura da grafo senza applicare la \TCSMA{}\cite{Berliant2018};
         \footnotetext{In particolare \cite{Gualandi2019SDC}, nonostante sia un articolo molto interessante e che giunge a conclusioni altrettanto importanti, astrae eccessivamente le interazioni tra città oltre a non definire con sufficiente chiarezza che cosa s'intende per \textit{dintorni}.}
         \item altri vedono i nodi piú come luoghi ove vivono e interagiscono gli agenti, creando cosí un modello descritto da un sistema di equazioni di Boltzmann elevate e accoppiate\cite{Loy2021};
         \item infine l'articolo che piú si avvicina all'obbiettivo di questa tesi, applica tuttavia la sua teoria nel contesto delle reti sociali\cite{Nurisso2024}.
     \end{itemize}
 
-    Questa lacuna è probabilmente attribuile al fatto che gli sviluppi della teoria dei grafi applicata alla TCSMA sono stati piuttosto recenti e principalmente concentrati sulla prospettiva nodo-luogo anziché nodo-agente. Dunque l'aspetto piú innovativo di questo lavoro è mostrare che la prospettiva nodo-agente è altrettanto valida quanto quella piú comune e recente del nodo-luogo; per il resto questa tesi dev'essere considerata come un'esplorazione formale applicativa con pochi approfondimenti analitici.
+    Questa lacuna è probabilmente attribuile al fatto che gli sviluppi della teoria dei grafi applicata alla \TCSMA{} sono stati piuttosto recenti e principalmente concentrati sulla prospettiva nodo-luogo anziché nodo-agente. Dunque l'aspetto piú innovativo di questo lavoro è mostrare che la prospettiva nodo-agente è altrettanto valida quanto quella piú comune e recente del nodo-luogo; per il resto questa tesi dev'essere considerata come un'esplorazione formale applicativa con pochi approfondimenti analitici.
 
-    Lo scritto sarà cosí suddiviso: nel secondo capitolo si affronteranno brevemente e [superficialmente] alcuni concetti della teoria dei grafi, soprattutto quelli pertinenti alla topologia interurbana; quindi nel terzo la TCSMA è approfondita prima da un punto di vista classico, e poi mediata dai grafi sia esattamente che approssimatamente; infine negli ultimi due si illustreranno i principali risultati concludendo con delle note finali e potenziali sviluppi futuri.
+    Lo scritto sarà cosí suddiviso: nel secondo capitolo si affronteranno brevemente e [superficialmente] alcuni concetti della teoria dei grafi, soprattutto quelli pertinenti alla topologia interurbana; quindi nel terzo la \TCSMA{} è approfondita prima da un punto di vista classico, e poi mediata dai grafi sia esattamente che approssimatamente; infine negli ultimi due si illustreranno i principali risultati concludendo con delle note finali e potenziali sviluppi futuri.
     
     Per il lettore interessato sarà anche presente un'appendice ove il codice di Python dell'implementazione è spiegato a grandi linee.

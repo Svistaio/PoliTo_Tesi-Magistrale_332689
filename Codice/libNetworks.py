@@ -66,7 +66,12 @@ class NetworkAnalysis():
 
 
         # Histogram plot
-        libF.CreateHistogramPlot(di,25,figData.fig)
+        def EstimateBinNumber(v):
+            # The option «'fd'» stands for «Freedman-Diaconis» and
+            # uses Numpy to calculate the optimal edges for the data
+            edges = np.histogram_bin_edges(v,bins='fd')
+            return len(edges) - 1
+        libF.CreateHistogramPlot(di,EstimateBinNumber(di),figData.fig)
 
         #region
             # Scatter plot
@@ -105,7 +110,7 @@ class NetworkAnalysis():
 
 
         # SciPy fitting (ML)
-        libF.CreateLognormalFitPlot(di,figData.fig)
+        libF.CreateLognormalFitPlot(di.reshape(1,-1),figData.fig)
 
 
         # Style

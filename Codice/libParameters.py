@@ -206,7 +206,7 @@ caseStudies = {
             "region": 19,
             "zetaFraction": 0.1,
             "timestep": 0.01,
-            "timesteps": int(1e6),
+            "timesteps": int(1e7),
             "iterations": 15,
             "progressBar": False,
             "extraction": False,
