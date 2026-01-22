@@ -267,7 +267,7 @@ class KineticSimulation():
 
         if figData is None:
             figData = self.figData
-            Nf = 9 # Numbers of figures
+            Nf = 12 # Numbers of figures
             fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
             saveFig = True
 
@@ -280,6 +280,23 @@ class KineticSimulation():
         sMaxAR = max(csSv[:,:,1].max(),csRv.max())
         sMinAR = min(csSv[:,:,1].min(),csRv.min())
 
+        nBins = [[None]*Ni,[None]*Ni,[None]]
+        for j,v in enumerate([csSv[:,:,0],csSv[:,:,1],csRv]):
+            def EstimateBinNumber(v,nBins,j,i):
+                vf = v.ravel()
+                vp = vf[vf > 0]
+                vl = np.log10(vp)
+                
+                edges = np.histogram_bin_edges(vl,bins='fd')
+                nBins[j][i] = len(edges) - 1
+                # «'fd'» stands for «Freedman-Diaconis» and uses Numpy to calculate the optimal edges for the data
+
+            if j != 2:
+                for i in range(Ni):
+                    EstimateBinNumber(v[i,:],nBins,j,i)
+            else:
+                EstimateBinNumber(v,nBins,j,0)
+
         p = (.5,1.07); dp = (.6,.05)
 
         for t in typ: # t[ype]
@@ -287,7 +304,8 @@ class KineticSimulation():
 
             # Exact-Approximated plot
             libF.CreateHistogramPlot(
-                csSv[:,:,t],30,
+                csSv[:,:,t],
+                np.max([np.max(nBins[i]) for i in range(2)]),
                 getattr(figData,f'fig{idx}'),
                 limits=(sMinEA,sMaxEA),
                 xScale='log',
@@ -299,7 +317,7 @@ class KineticSimulation():
                 idx=t+1,
                 ax=ax[0]
             )
-            libF.CreateLognormalFitPlot(
+            xiS = libF.CreateLognormalFitPlot(
                 csSv[:,:,t],
                 getattr(figData,f'fig{idx}'),
                 limits=(sMinEA,sMaxEA),
@@ -313,14 +331,15 @@ class KineticSimulation():
                 # ),
                 color=clr[t],#(clr[t],clr[t]),
                 alpha=(1,0.15) if Ni>1 else 1,
+                bimodal=True,
                 idx=t+1,
                 ax=ax[0]
             )
 
             # Exact-Real and Approximated-Real plots
-            bins = 60
             libF.CreateHistogramPlot(
-                csSv[:,:,t],bins,
+                csSv[:,:,t],
+                np.max([np.max(nBins[i]) for i in (0,2)]),
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
@@ -346,12 +365,14 @@ class KineticSimulation():
                 # ),
                 color=clr[t],#(clr[t],clr[t]),
                 alpha=(1,0.15) if Ni>1 else 1,
+                bimodal=True,
                 idx=1,
                 ax=ax[0+t+1]
             )
 
             libF.CreateHistogramPlot(
-                csRv,bins,
+                csRv,
+                np.max([np.max(nBins[i]) for i in (1,2)]),
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
@@ -361,7 +382,7 @@ class KineticSimulation():
                 idx=2,
                 ax=ax[0+t+1]
             )
-            libF.CreateLognormalFitPlot(
+            xiR = libF.CreateLognormalFitPlot(
                 csRv,
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
@@ -373,8 +394,46 @@ class KineticSimulation():
                 # ),
                 color=clr[2],
                 alpha=1,
+                bimodal=True,
                 idx=2,
                 ax=ax[0+t+1]
+            )
+
+
+            ### Power law vs bimodal lognormal fit log-log ###
+
+            if t: libF.CreateParetoFitPlot(
+                csRv,
+                getattr(figData,f'fig{idx+3}'),
+                yScale='log',
+                label=(
+                    f'{lbl[2]} empirical CCDF',
+                    f'{lbl[2]} Pareto fit (ML)',
+                    f'{lbl[2]} bimodal lognormal fit (ML)'
+                ),
+                color=(clr[2],clr[2]),
+                alpha=(0.6,1),
+                bimodal=True,
+                idx=1,
+                ax=ax[3]
+            )
+            libF.CreateParetoFitPlot(
+                csSv[:,:,t],
+                getattr(figData,f'fig{idx+3+t+1}'),
+                upperbound=sMaxEA,
+                yScale='log',
+                Ni=Ni,
+                ta=ta,
+                label=(
+                    f'{lbl[t]} empirical CCDF',
+                    f'{lbl[t]} Pareto fit (ML)',
+                    f'{lbl[t]} bimodal lognormal fit (ML)'
+                ),
+                color=(clr[t],clr[t]),
+                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+                bimodal=True,
+                idx=1,
+                ax=ax[3+t+1]
             )
 
 
@@ -383,67 +442,14 @@ class KineticSimulation():
             # Exact-Approximated plot
             libF.CreateParetoFitPlot(
                 csSv[:,:,t],
-                getattr(figData,f'fig{idx+3}'),
-                upperbound=sMaxEA,
-                yScale='log',
-                Ni=Ni,
-                ta=ta,
-                label=(
-                    f'{lbl[t]} empirical CCDF',
-                    fr'{lbl[t]} Pareto fit'
-                ),
-                color=(clr[t],clr[t]),
-                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=t+1,
-                ax=ax[3]
-            )
-
-            # Exact-Real and Approximated-Real plots
-            libF.CreateParetoFitPlot(
-                csSv[:,:,t],
-                getattr(figData,f'fig{idx+3+t+1}'),
-                upperbound=sMaxER if t == 0 else sMaxAR,
-                yScale='log',
-                Ni=Ni,
-                ta=ta,
-                label=(
-                    f'{lbl[t]} empirical CCDF',
-                    fr'{lbl[t]} Pareto fit'
-                ),
-                color=(clr[t],clr[t]),
-                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=t+1,
-                ax=ax[3+t+1]
-            )
-            libF.CreateParetoFitPlot(
-                csRv,
-                getattr(figData,f'fig{idx+3+t+1}'),
-                upperbound=sMaxER if t == 0 else sMaxAR,
-                yScale='log',
-                label=(
-                    f'{lbl[2]} empirical CCDF',
-                    fr'{lbl[2]} Pareto fit'
-                ),
-                color=(clr[2],clr[2]),
-                alpha=(0.6,1),
-                idx=t+1,
-                ax=ax[3+t+1]
-            )
-
-
-            ### Power law fit log-lin ###
-
-            # Exact-Approximated plot
-            blS = libF.CreateParetoFitPlot(
-                csSv[:,:,t],
                 getattr(figData,f'fig{idx+6}'),
                 upperbound=sMaxEA,
-                yScale='lin',
+                yScale='log',
                 Ni=Ni,
                 ta=ta,
                 label=(
-                    f"{lbl[t]} empirical CCDF",
-                    fr"{lbl[t]} Pareto fit"
+                    f'{lbl[t]} empirical CCDF',
+                    f'{lbl[t]} Pareto fit (ML)'
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -461,32 +467,86 @@ class KineticSimulation():
                 ta=ta,
                 label=(
                     f'{lbl[t]} empirical CCDF',
-                    fr'{lbl[t]} Pareto fit'
+                    f'{lbl[t]} Pareto fit (ML)'
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=t+1,
+                idx=1,
                 ax=ax[6+t+1]
             )
-            blR = libF.CreateParetoFitPlot(
+            libF.CreateParetoFitPlot(
                 csRv,
                 getattr(figData,f'fig{idx+6+t+1}'),
                 upperbound=sMaxER if t == 0 else sMaxAR,
                 yScale='log',
                 label=(
                     f'{lbl[2]} empirical CCDF',
-                    fr'{lbl[2]} Pareto fit'
+                    f'{lbl[2]} Pareto fit (ML)'
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
-                idx=t+1,
+                idx=2,
                 ax=ax[6+t+1]
             )
 
 
+            ### Power law fit log-lin ###
+
+            # Exact-Approximated plot
+            blS = libF.CreateParetoFitPlot(
+                csSv[:,:,t],
+                getattr(figData,f'fig{idx+9}'),
+                upperbound=sMaxEA,
+                yScale='lin',
+                Ni=Ni,
+                ta=ta,
+                label=(
+                    f'{lbl[t]} empirical CCDF',
+                    fr'{lbl[t]} Pareto fit (ML)'
+                ),
+                color=(clr[t],clr[t]),
+                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+                idx=t+1,
+                ax=ax[9]
+            )
+
+            # Exact-Real and Approximated-Real plots
+            libF.CreateParetoFitPlot(
+                csSv[:,:,t],
+                getattr(figData,f'fig{idx+9+t+1}'),
+                upperbound=sMaxER if t == 0 else sMaxAR,
+                yScale='log',
+                Ni=Ni,
+                ta=ta,
+                label=(
+                    f'{lbl[t]} empirical CCDF',
+                    fr'{lbl[t]} Pareto fit (ML)'
+                ),
+                color=(clr[t],clr[t]),
+                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+                idx=1,
+                ax=ax[9+t+1]
+            )
+            blR = libF.CreateParetoFitPlot(
+                csRv,
+                getattr(figData,f'fig{idx+9+t+1}'),
+                upperbound=sMaxER if t == 0 else sMaxAR,
+                yScale='log',
+                label=(
+                    f'{lbl[2]} empirical CCDF',
+                    fr'{lbl[2]} Pareto fit (ML)'
+                ),
+                color=(clr[2],clr[2]),
+                alpha=(0.6,1),
+                idx=2,
+                ax=ax[9+t+1]
+            )
+
+
             libF.Text(
-                ax[4],(p[0],p[1]+(1/2-t)*dp[1]),
+                ax[7],(p[0],p[1]+(1/2-t)*dp[1]),
                 fr'{lbl[t]}:$\quad$'+
+                libF.DataString(xiS,Ni,ta,r'\xi')+
                 libF.DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
                 libF.DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
                 libF.DataString(csAvr[:,t],Ni,ta,r'\langle s\rangle')+
@@ -501,13 +561,14 @@ class KineticSimulation():
 
         if idx == 1:
             libF.TextBlock(
-                ax[0],[[
+                ax[1],[[
                     fr'$Nc={self.Nc}$',
                     fr'$R={self.R}$',
-                    libF.DataString(blR,head=r'\beta',space=False)
+                    libF.DataString(blR,head=r'\beta',space=False),
+                    libF.DataString(xiR,head=r'\xi',space=False)
                 ]],
                 p=(.5,p[1]-dp[1]/2),
-                dp=(dp[0]/1.75,dp[1])
+                dp=(dp[0]/1.5,dp[1])
             )
 
             offset = 0 if self.il in (2,4,6) else 1
@@ -551,8 +612,14 @@ class KineticSimulation():
 
             libF.SetFigStyle(
                 r'$cs$',r'$P(cs)$',
-                xScale='log',yScale='lin',
+                xScale='log',yScale='log',
                 ax=ax[6+i],data=getattr(figData,f'fig{idx+6+i}')
+            )
+
+            libF.SetFigStyle(
+                r'$cs$',r'$P(cs)$',
+                xScale='log',yScale='lin',
+                ax=ax[9+i],data=getattr(figData,f'fig{idx+9+i}')
             )
 
         # CentreFig()
@@ -867,7 +934,7 @@ class ParametricStudy():
         fw = self.fw
         fh = self.fh
 
-        nCol = 9 # Figures for each row
+        nCol = 12 # Figures for each row
         nRow = self.Nv
         fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 

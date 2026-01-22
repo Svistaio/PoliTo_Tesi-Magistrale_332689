@@ -56,6 +56,8 @@ function mat2tex(matpath,texpath)
                 );
 
                 h.Color = s.plots.(field).c;
+                h.Marker = s.plots.(field).m;
+
                 if(s.plots.(field).l == "")
                     h.HandleVisibility = "off";
                 else

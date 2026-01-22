@@ -9,6 +9,7 @@ import numpy as np
 
 from scipy.io import savemat
 from scipy import stats
+from scipy.optimize import minimize
 
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import savefig
@@ -17,57 +18,9 @@ from matplotlib.pyplot import savefig
 from libParameters import projectFolder
 
 
-### Main Functions and class ###
+### Main class and functions ###
 
-# Style and data
-def SetTextStyle():
-    plt.rcParams["mathtext.fontset"] = "stix"
-    plt.rcParams["font.family"] = "serif"
-    plt.rcParams["font.serif"] = ["Times New Roman"]
-    plt.rcParams["font.size"] = 13
-SetTextStyle()
-
-def SetFigStyle(
-    xLabel=None,
-    yLabel=None,
-    xDom=None,
-    yDom=None,
-    xScale='lin',
-    yScale='lin',
-    xNotation='plain',
-    yNotation='plain',
-    ax=None,data=None
-):
-    if ax is None: ax = plt.gca()
-
-    if xLabel: ax.set_xlabel(xLabel)
-    if yLabel: ax.set_ylabel(yLabel)
-
-    if xDom: ax.set_xlim(xDom)
-    if yDom: ax.set_ylim(yDom)
-
-    ax.set_xscale('linear' if xScale == 'lin' else xScale)
-    ax.set_yscale('linear' if yScale == 'lin' else yScale)
-
-    if xScale == 'lin':
-        ax.ticklabel_format(style=xNotation,axis='x',scilimits=(0,0))
-    if yScale == 'lin':
-        ax.ticklabel_format(style=yNotation,axis='y',scilimits=(0,0))
-
-    ax.grid(True,linestyle=":",linewidth=1)
-    ax.set_axisbelow(True)
-
-    _, labels = ax.get_legend_handles_labels()
-    if any(labels):
-        ax.legend()
-        data['style']['legend'] = True
-    else:
-        data['style']['legend'] = False
-    # Create a legend iff there are labels connected to graphs
-
-    data['style']['scale'] = {'x':xScale,'y':yScale}
-    data['style']['labels'] = {'x':xLabel,'y':yLabel}
-
+# Figure data
 class FigData():
     def __init__(self,clsPrm,folder):
         self.folder = folder
@@ -165,25 +118,6 @@ class FigData():
         )
         return cmd
 
-def CentreFig():
-    fig = plt.gcf()
-    manager = plt.get_current_fig_manager()
-    manager.window.update_idletasks()
-
-    # Get screen size
-    screenW = manager.window.winfo_screenwidth()
-    screenH = manager.window.winfo_screenheight()
-
-    # Save figure size in pixels
-    figW, figH = fig.get_size_inches()*fig.dpi
-
-    # Centre coordinates
-    x = int((screenW-figW)/2)
-    y = int((screenH-figH)/2)
-
-    # Move the figure window
-    manager.window.geometry(f"+{x}+{y}")
-
 # Primary/Basic plots
 def CreateFunctionPlot(
     x,y,
@@ -194,6 +128,8 @@ def CreateFunctionPlot(
     label='',
     linestyle='-',
     linewidth=1,
+    marker='None',
+    hatch=None,
     color='black',
     alpha=1,
     idx='',
@@ -209,11 +145,14 @@ def CreateFunctionPlot(
             color=color,
             linestyle=linestyle,
             linewidth=linewidth,
+            marker=marker,
+            markevery=x.size//10-1,
+            mfc=color,
             alpha=alpha
         )
         figData['plots'][f'functionPlot{idx}'] = {
             't':'function','x':x,'y':y,
-            'l':label,'c':color
+            'l':label,'c':color,'m':marker
         }
 
     else:
@@ -244,12 +183,15 @@ def CreateFunctionPlot(
             color=color,
             linestyle=linestyle,
             linewidth=linewidth,
+            marker=marker,
+            markevery=x.size//10-1,
+            mfc=color,
             alpha=alpha[0],
             zorder=4
         )
         figData['plots'][f'functionPlot{idx}'] = {
             't':'function','x':x,'y':y,
-            'l':label,'c':color
+            'l':label,'c':color,'m':marker
         }
 
         CreateConfidenceIntervalPlot(
@@ -258,8 +200,9 @@ def CreateFunctionPlot(
             typ='functionfill',
             xerr95=xerr95,
             yerr95=yerr95,
+            color=color,
+            hatch=hatch,
             alpha=alpha[1],
-            clr=color,
             ax=ax,
             idx=idx
         )
@@ -324,7 +267,7 @@ def CreateScatterPlot(
                 figData,
                 typ='errorbar',
                 yerr95=np.array([err95Sct,err95Sct]),
-                clr=color,
+                color=color,
                 alpha=alpha[0],
                 ax=ax,
                 idx=idx
@@ -354,7 +297,7 @@ def CreateScatterPlot(
                 figData,
                 typ='errorbar',
                 xerr95=np.array([err95Sct,err95Sct]),
-                clr=color,
+                color=color,
                 alpha=alpha[1],
                 ax=ax,
                 idx=idx
@@ -380,8 +323,6 @@ def CreateHistogramPlot(
     idx='',
     ax=None
 ):
-    if ax is None: ax = plt.gca()
-
     def HistogramPlot(
         binEdges,
         binMidPoints,
@@ -413,6 +354,8 @@ def CreateHistogramPlot(
         #         f"{hgPlot[0][sel.index]:.3f}"
         #     )
         # )
+
+    if ax is None: ax = plt.gca()
 
     if limits is None:
         xMin = np.min(x); xMax=np.max(x)
@@ -467,7 +410,7 @@ def CreateHistogramPlot(
             figData,
             typ='errorbar',
             yerr95=binErr95,
-            clr=color,
+            color=color,
             ax=ax,
             idx=idx,
             alpha=alpha[1]
@@ -521,6 +464,8 @@ def CreateLognormalFitPlot(
     label='Lognormal fit (ML)', # Maximum likelihood
     color='black',
     alpha=1,
+    marker='None',
+    bimodal=False,
     idx='',
     ax=None
 ):
@@ -535,27 +480,33 @@ def CreateLognormalFitPlot(
         xF = np.linspace(
             vMin,
             vMax,
-            500
+            1000
         )
     else:
         xF = np.logspace(
             np.log10(vMin),
             np.log10(vMax),
-            500
+            1000
         )
 
-    if Ni == 1:
-        shape, loc, scale = stats.lognorm.fit(v[v>0],floc=0)
-        # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
-        yF = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
-    else:
-        fitData = [None]*Ni
+    yFData = [None]*Ni
+    xiData = [None]*Ni
 
-        for r in range(Ni):
-            shape, loc, scale = stats.lognorm.fit(v[r,:][v[r,:]>0],floc=0)
-            fitData[r] = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
+    for r in range(Ni):
+        if bimodal:
+            xi,scale1,shape1,scale2,shape2 = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
+            yFData[r] = (
+                xi*stats.lognorm.pdf(xF,s=shape1,scale=np.exp(scale1)) + 
+                (1-xi)*stats.lognorm.pdf(xF,s=shape2,scale=np.exp(scale2))
+            )
+            xiData[r] = xi
+        else:
+            shape,loc,scale = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
+            yFData[r] = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
+            xiData[r] = 1
 
-        yF = fitData
+    if Ni>1: yF = yFData; xi = xiData
+    else: yF = yFData[0]; xi = xiData[0]
 
     # Fit plot
     CreateFunctionPlot(
@@ -567,9 +518,12 @@ def CreateLognormalFitPlot(
         # linewidth=1,
         color=color,
         alpha=alpha,
+        marker=marker,
         idx=idx,
         ax=ax
     )
+
+    return xi
 
     """ Old implementation with the average drawn over the lognormal fit as a vertical line
         # In the function arguments
@@ -645,6 +599,7 @@ def CreateParetoFitPlot(
         'black'
     ),
     alpha=1,
+    bimodal=False,
     idx='',
     ax=None
 ):
@@ -663,66 +618,31 @@ def CreateParetoFitPlot(
             100
         )
 
-    if Ni == 1:
+    vTails  = [None]*Ni
+    b       = [None]*Ni
+    ccdfFit = [None]*Ni
+
+    for r in range(Ni):
         # Select the last quarter of city sizes
-        vQuarter = np.quantile(v,.75)
-        vTail = v[v >= vQuarter]
+        vQuarter = np.quantile(v[r,:] if Ni>1 else v,.75)
+        vTail = v[r,v[r,:] >= vQuarter] if Ni>1 else v[v>=vQuarter]
+        vTails[r] = np.sort(vTail) # Ascending values
 
-        # Empirical CCDF on the tail
-        vSort = np.sort(vTail) # Ascending values
-        n = vSort.size
-        ccdfEmp = (
-            n-np.arange(1,n+1,dtype=float)
-            +(0.5 if yScale == 'log' else 0)
-        )/n # P(X≥x)
-        """
-        Complementary Cumulative Distribution Function
-        Formally it should be
-        
-            1-np.arange(1,n+1,dtype=float)/Nc-(Nc-n)/Nc=
-            (n-np.arange(1,n+1,dtype=float))/Nc=
-            [(n-np.arange(1,n+1,dtype=float))/n][n/Nc]
-        
-        hence the correct variables are:
-        
-            xS = vSort
-            yS = (n-np.arange(1,n+1,dtype=float))/n*(n/Nc)
-            yF = ccdfFit*(n/Nc)
+        # Fitted CCDF from a Pareto function
+        b[r], loc, scale = stats.pareto.fit(vTail,floc=0,fscale=vQuarter) # b≈alpha
+        ccdfFit[r] = stats.pareto.sf(xF,b[r],loc=loc,scale=scale) # Survival function
 
-        without the constant translation 0.5, which is just necessary to avoid having a zero value at the tail end in a log-log plot.
+    # Empirical CCDF on the tail
+    n = vTails[0].size
+    ccdfEmp = (
+        n-np.arange(1,n+1,dtype=float)
+        +(0.5 if yScale == 'log' else 0)
+    )/n # P(X≥x)
+    yS = ccdfEmp
 
-        However, since the only relevant information is the Pareto index, the exact probability value can be omitted
-        """
+    """
+        The survival function is the Complementary Cumulative Distribution Function (CCDF)
 
-        b, loc, scale = stats.pareto.fit(vTail,floc=0,fscale=vQuarter) # b≈alpha
-        ccdfFit = stats.pareto.sf(xF,b,loc=loc,scale=scale) # Survival function
-
-        xS = vSort; yS = ccdfEmp; yF = ccdfFit
-
-    else:
-        vTails  = [None]*Ni
-        b       = [None]*Ni
-        ccdfFit = [None]*Ni
-
-        for r in range(Ni):
-            # Select the last quarter of city sizes
-            vQuarter = np.quantile(v[r,:],.75)
-            vTail = v[r,v[r,:] >= vQuarter]
-
-            # Empirical CCDF on the tail
-            vTails[r] = np.sort(vTail) # Ascending values
-
-            # Fitted CCDF from a Pareto function
-            b[r], loc, scale = stats.pareto.fit(vTail,floc=0,fscale=vQuarter) # b≈alpha
-            ccdfFit[r] = stats.pareto.sf(xF,b[r],loc=loc,scale=scale) # Survival function
-
-        n = vTails[0].size
-        ccdfEmp = (
-            n-np.arange(1,n+1,dtype=float)
-            +(0.5 if yScale == 'log' else 0)
-        )/n # P(X≥x)
-        """
-        Complementary Cumulative Distribution Function
         Formally it should be
         
             1-np.arange(1,n+1,dtype=float)/Nc-(Nc-n)/Nc=
@@ -738,8 +658,15 @@ def CreateParetoFitPlot(
         without the constant translation 0.5, which is just necessary to avoid having a zero value at the tail end in a log-log plot.
 
         However, since the only relevant information is the Pareto index, the exact probability value can be omitted
-        """
-        xS = vTails; yS = ccdfEmp; yF = ccdfFit
+    """
+
+    if Ni>1:
+        xS = vTails
+        yF = ccdfFit
+    else:
+        xS = vTails[0]
+        yF = ccdfFit[0]
+        b = b[0]
 
     CreateScatterPlot(
         xS,yS,
@@ -751,8 +678,8 @@ def CreateParetoFitPlot(
         label=label[0],
         color=color[0],
         alpha=alpha[0],
-        ax=ax,
-        idx=idx
+        idx=idx,
+        ax=ax
     )
 
     CreateFunctionPlot(
@@ -760,18 +687,116 @@ def CreateParetoFitPlot(
         figData,
         Ni=Ni,
         ta=ta,
-        # linewidth=1,
         label=label[1],
         color=color[1],
         alpha=alpha[1],
-        ax=ax,
-        idx=idx
+        marker='+' if bimodal else 'None',
+        hatch='|' if bimodal else 'None',
+        idx=idx,
+        ax=ax
     )
+
+    if bimodal:
+        xFl = np.log(xF)
+        yFData = [None]*Ni
+
+        for r in range(Ni):
+            xi,loc1,shape1,loc2,shape2 = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
+
+            ccdfFit1 = stats.norm.sf(xFl,loc=loc1,scale=shape1)
+            ccdfFit2 = stats.norm.sf(xFl,loc=loc2,scale=shape2)
+
+            yFData[r] = xi*ccdfFit1+(1-xi)*ccdfFit2
+            yFData[r] /= yFData[r][0] # Normalization
+            # It's necessary to effectively compare it with the Pareto fitting
+
+        yF = yFData if Ni>1 else yFData[0]
+
+        CreateFunctionPlot(
+            xF,yF,
+            figData,
+            Ni=Ni,
+            ta=ta,
+            label=label[2],
+            color=color[1],
+            alpha=alpha[1],
+            marker='x',
+            hatch='/',
+            idx=idx+1,
+            ax=ax
+        )
 
     return b
 
 
 ### Auxiliary functions ###
+
+def SetTextStyle():
+    plt.rcParams["mathtext.fontset"] = "stix"
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams["font.serif"] = ["Times New Roman"]
+    plt.rcParams["font.size"] = 13
+SetTextStyle()
+
+def SetFigStyle(
+    xLabel=None,
+    yLabel=None,
+    xDom=None,
+    yDom=None,
+    xScale='lin',
+    yScale='lin',
+    xNotation='plain',
+    yNotation='plain',
+    ax=None,data=None
+):
+    if ax is None: ax = plt.gca()
+
+    if xLabel: ax.set_xlabel(xLabel)
+    if yLabel: ax.set_ylabel(yLabel)
+
+    if xDom: ax.set_xlim(xDom)
+    if yDom: ax.set_ylim(yDom)
+
+    ax.set_xscale('linear' if xScale == 'lin' else xScale)
+    ax.set_yscale('linear' if yScale == 'lin' else yScale)
+
+    if xScale == 'lin':
+        ax.ticklabel_format(style=xNotation,axis='x',scilimits=(0,0))
+    if yScale == 'lin':
+        ax.ticklabel_format(style=yNotation,axis='y',scilimits=(0,0))
+
+    ax.grid(True,linestyle=":",linewidth=1)
+    ax.set_axisbelow(True)
+
+    _, labels = ax.get_legend_handles_labels()
+    if any(labels):
+        ax.legend()
+        data['style']['legend'] = True
+    else:
+        data['style']['legend'] = False
+    # Create a legend iff there are labels connected to graphs
+
+    data['style']['scale'] = {'x':xScale,'y':yScale}
+    data['style']['labels'] = {'x':xLabel,'y':yLabel}
+
+def CentreFig():
+    fig = plt.gcf()
+    manager = plt.get_current_fig_manager()
+    manager.window.update_idletasks()
+
+    # Get screen size
+    screenW = manager.window.winfo_screenwidth()
+    screenH = manager.window.winfo_screenheight()
+
+    # Save figure size in pixels
+    figW, figH = fig.get_size_inches()*fig.dpi
+
+    # Centre coordinates
+    x = int((screenW-figW)/2)
+    y = int((screenH-figH)/2)
+
+    # Move the figure window
+    manager.window.geometry(f"+{x}+{y}")
 
 def EvaluateConfidenceInterval(
     data,
@@ -795,11 +820,12 @@ def CreateConfidenceIntervalPlot(
     typ='errorbar',
     yerr95=None,
     xerr95=None,
-    clr='black',
+    color='black',
     fmt='none',
+    hatch=None,
+    alpha=0.5,
     ax=None,
-    idx='',
-    alpha=0.5
+    idx=''
 ):
     if ax is None: ax = plt.gca()
 
@@ -809,16 +835,16 @@ def CreateConfidenceIntervalPlot(
                 x,y,
                 xerr=xerr95,
                 yerr=yerr95,
-                ecolor=clr,
+                ecolor=color,
                 fmt=fmt,
                 linestyle='none',
                 elinewidth=1.2,
                 capsize=8,
                 capthick=1.6,
                 markersize=0,
-                markerfacecolor=clr,
-                markerfacecoloralt=clr,
-                markeredgecolor=clr,
+                markerfacecolor=color,
+                markerfacecoloralt=color,
+                markeredgecolor=color,
                 markeredgewidth=0,
                 alpha=alpha,
                 zorder=1
@@ -827,42 +853,98 @@ def CreateConfidenceIntervalPlot(
                 figData['plots'][f'{typ}{idx}'] = {
                     't':typ,'x':x,'y':y,
                     'e':'y','ye':yerr95,
-                    'l':'','c':clr,'a':alpha,
+                    'l':'','c':color,'a':alpha,
                 }
             else:
                 figData['plots'][f'{typ}{idx}'] = {
                     't':typ,'x':x,'y':y,
                     'e':'x','xe':xerr95,
-                    'l':'','c':clr,'a':alpha,
+                    'l':'','c':color,'a':alpha,
                 }
 
         case 'functionfill':
             if xerr95 is None:
                 ax.fill_between(
                     x,y-yerr95[0],y+yerr95[1],
-                    facecolor=clr,
+                    facecolor=color,
                     alpha=alpha,
                     linewidth=0,
+                    hatch=hatch,
+                    edgecolor=color,
                     zorder=2
                 )
                 figData['plots'][f'{typ}{idx}'] = {
                     't':typ,'x':x,'y':y,
                     'e':'y','ye':yerr95,
-                    'l':'','c':clr,'a':alpha,
+                    'l':'','c':color,'a':alpha,
                 }
             else:
                 ax.fill_betweenx(
                     y,x-xerr95[0],x+xerr95[1],
-                    facecolor=clr,
+                    facecolor=color,
                     alpha=alpha,
                     linewidth=0,
+                    hatch=hatch,
+                    edgecolor=color,
                     zorder=2
                 )
                 figData['plots'][f'{typ}{idx}'] = {
                     't':typ,'x':x,'y':y,
                     'e':'x','xe':xerr95,
-                    'l':'','c':clr,'a':alpha,
+                    'l':'','c':color,'a':alpha,
                 }
+
+def FitLognormalData(v,bimodal):
+    if not bimodal:
+        shape,loc,scale = stats.lognorm.fit(v[v>0],floc=0)
+        # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
+        return shape,loc,scale
+    else:
+        vp = v[v>0]
+        vl = np.log(vp)
+
+        # The objective function to minimize is the negative log-likelihood
+        # This is equivalent to maximize the log-likelihood, just reversed
+        def NegativeLogLikelihood(params):
+            # xi is fraction between Gaussian
+            # mi and si are the mean and standard deviation of the ith Gaussian
+            xi,m1,s1,m2,s2 = params
+            
+            # Calculate Gaussian PDF for both components on log data
+            pdf1 = stats.norm.pdf(vl,loc=m1,scale=s1)
+            pdf2 = stats.norm.pdf(vl,loc=m2,scale=s2)
+            
+            # Mixture sum
+            mixture = xi*pdf1+(1-xi)*pdf2
+            
+            # Prevent log(0) errors
+            epsilon = 1e-10
+            return -np.sum(np.log(mixture + epsilon))
+
+        # Initial heuristic guesses
+        m0 = np.mean(vl)
+        s0 = np.std(vl)
+        prm0 = [
+            0.8, # The first gaussian is initially the most important one
+            m0,s0,
+            m0+0.5,s0
+        ] # Same standard deviation but translated average
+
+        bounds = ( # xi must be in [0,1]
+            (0,1),       # xi
+            (None,None), # m1
+            (1e-5,None), # s1
+            (None,None), # m2
+            (1e-5, None) # s2
+        ) # mi does not have a bound while si>0
+
+        # Optimization
+        minimization = minimize(NegativeLogLikelihood,prm0,bounds=bounds)
+        
+        # Extract results
+        xi,m1,s1,m2,s2 = minimization.x
+
+        return xi,m1,s1,m2,s2
 
 def DataString(
     data,
@@ -930,29 +1012,29 @@ def TextBlock(
 ### Discarded code ###
 
 #region From «FigData.SaveFig()» 
-    #region Different naming rule between the folders
-        # match folder:
-        #     case 'NA':
-        #         def ext(figName,ext): return (folderFig/figName).with_suffix(ext)
-        #     case 'KS':
-        #         def ext(figName,ext):
-        #             figName = regCode['prefix']+figName
-        #             return (folderFig/figName).with_suffix(ext)
-    #endregion
+    """ Different naming rule between the folders
+        match folder:
+            case 'NA':
+                def ext(figName,ext): return (folderFig/figName).with_suffix(ext)
+            case 'KS':
+                def ext(figName,ext):
+                    figName = regCode['prefix']+figName
+                    return (folderFig/figName).with_suffix(ext)
+    """
 
-    #region Open the pdf file (cross-platform)
-        # if sys.platform.startswith("win"):
-        #     os.startfile(pdfFigPath)
-        # elif sys.platform.startswith("darwin"):
-        #     subprocess.Popen(["open",str(pdfFigPath)])
-        # else:
-        #     subprocess.Popen(["xdg-open",str(pdfFigPath)])
-    #endregion
+    """ Open the pdf file (cross-platform)
+        if sys.platform.startswith("win"):
+            os.startfile(pdfFigPath)
+        elif sys.platform.startswith("darwin"):
+            subprocess.Popen(["open",str(pdfFigPath)])
+        else:
+            subprocess.Popen(["xdg-open",str(pdfFigPath)])
+    """
 
-    #region Other formats
-        # pngFigPath  = ext(".png")
-        # htmlFigPath = ext(".html")
-        # plt.savefig(pngFigPath,dpi=300,bbox_inches='tight')
-        # mpld3.save_html(fig,str(htmlFigPath))
-    #endregion
+    """ Other formats
+        pngFigPath  = ext(".png")
+        htmlFigPath = ext(".html")
+        plt.savefig(pngFigPath,dpi=300,bbox_inches='tight')
+        mpld3.save_html(fig,str(htmlFigPath))
+    """
 #endregion
