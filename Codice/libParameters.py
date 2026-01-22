@@ -206,7 +206,7 @@ caseStudies = {
             "region": 19,
             "zetaFraction": 0.1,
             "timestep": 0.01,
-            "timesteps": int(1e7),
+            "timesteps": int(1e6),
             "iterations": 15,
             "progressBar": False,
             "extraction": False,
@@ -222,7 +222,7 @@ caseStudies = {
             "startValuePrmStudy": 0.3,
             "endValuePrmStudy": 0.5,
             "numberPrmStudy": 5,
-            "parametricStudy": True
+            "parametricStudy": False
         },
         "λ[rsk/(1+rsk)]^α": {
             "attractivity": 0.05,
