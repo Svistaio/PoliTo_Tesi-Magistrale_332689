@@ -145,14 +145,15 @@
     \DeclareMathOperator\DstrGamma{Gamma}
 
     \theoremstyle{definition}
-    \newtheorem{dfn}{Definizione}
-    \newtheorem{dfnn}{Definizioni}
+    \newtheorem{dfn}{Definizione}[chapter]
+    \newtheorem{dfnn}{Definizioni}[chapter]
+    \newtheorem{ipo}{Ipotesi}[chapter]
 
     \theoremstyle{plain}
-    \newtheorem{ipo}{Ipotesi}
-    \newtheorem{teo}{Teorema}
-    \newtheorem{lmm}{Lemma}
-    \newtheorem{crl}{Corollario}
+    \newtheorem{prp}{Proposizione}[chapter]
+    \newtheorem{lmm}{Lemma}[chapter]
+    \newtheorem{teo}{Teorema}[chapter]
+    \newtheorem{crl}{Corollario}[chapter]
 %\endgroup
 
 %\begingroup Frontespizio
@@ -215,4 +216,9 @@
             \emph{Elisabetta} e \emph{Marco}
         \end{center}
     }
+%\endgroup
+
+%\begingroup Altro
+    \newcommand\TCSMA{TCSMA}
+    \newcommand\refAlgIntAR{\tref{eqAlgoritmoInterazioniAzioneReazione}{[AR]}}
 %\endgroup

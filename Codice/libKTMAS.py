@@ -254,7 +254,7 @@ class KineticSimulation():
         ta = self.ta
 
         csSv = self.vrtState
-        csRv = self.realSizeDistr
+        csRv = self.realSizeDistr.reshape(1,-1)
 
         csAvr = self.nodeAvrVrtState
         csMin = self.nodeMinVrtState
@@ -280,22 +280,21 @@ class KineticSimulation():
         sMaxAR = max(csSv[:,:,1].max(),csRv.max())
         sMinAR = min(csSv[:,:,1].min(),csRv.min())
 
-        nBins = [[None]*Ni,[None]*Ni,[None]]
-        for j,v in enumerate([csSv[:,:,0],csSv[:,:,1],csRv]):
-            def EstimateBinNumber(v,nBins,j,i):
+        nBins = np.zeros((3,),dtype=np.int32)
+        for i,v in enumerate([csSv[:,:,0],csSv[:,:,1],csRv]):
+            def EstimateBinNumber(v):
                 vf = v.ravel()
                 vp = vf[vf > 0]
                 vl = np.log10(vp)
                 
+                # The option «'fd'» stands for «Freedman-Diaconis» and
+                # uses Numpy to calculate the optimal edges for the data
                 edges = np.histogram_bin_edges(vl,bins='fd')
-                nBins[j][i] = len(edges) - 1
-                # «'fd'» stands for «Freedman-Diaconis» and uses Numpy to calculate the optimal edges for the data
+                return len(edges) - 1
 
-            if j != 2:
-                for i in range(Ni):
-                    EstimateBinNumber(v[i,:],nBins,j,i)
-            else:
-                EstimateBinNumber(v,nBins,j,0)
+            for j in range(v.shape[0]):
+                nBin = EstimateBinNumber(v[j,:])
+                if nBin > nBins[i]: nBins[i] = nBin
 
         p = (.5,1.07); dp = (.6,.05)
 
@@ -305,7 +304,7 @@ class KineticSimulation():
             # Exact-Approximated plot
             libF.CreateHistogramPlot(
                 csSv[:,:,t],
-                np.max([np.max(nBins[i]) for i in range(2)]),
+                np.max(nBins[:2]),
                 getattr(figData,f'fig{idx}'),
                 limits=(sMinEA,sMaxEA),
                 xScale='log',
@@ -339,7 +338,7 @@ class KineticSimulation():
             # Exact-Real and Approximated-Real plots
             libF.CreateHistogramPlot(
                 csSv[:,:,t],
-                np.max([np.max(nBins[i]) for i in (0,2)]),
+                np.max(nBins[[0,2]]),
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
@@ -372,7 +371,7 @@ class KineticSimulation():
 
             libF.CreateHistogramPlot(
                 csRv,
-                np.max([np.max(nBins[i]) for i in (1,2)]),
+                np.max(nBins[1:]),
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
@@ -597,29 +596,29 @@ class KineticSimulation():
         if not saveFig: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
 
         # Style
-        for i in range(3):
+        for j in range(3):
             libF.SetFigStyle(
                 r'$cs$',r'$P(cs)$',
                 yNotation='sci',xScale='log', # ,xNotation="sci"
-                ax=ax[0+i],data=getattr(figData,f'fig{idx+i}')
+                ax=ax[0+j],data=getattr(figData,f'fig{idx+j}')
             )
 
             libF.SetFigStyle(
                 r'$cs$',r'$P(cs)$',
                 xScale='log',yScale='log',
-                ax=ax[3+i],data=getattr(figData,f'fig{idx+3+i}')
+                ax=ax[3+j],data=getattr(figData,f'fig{idx+3+j}')
             )
 
             libF.SetFigStyle(
                 r'$cs$',r'$P(cs)$',
                 xScale='log',yScale='log',
-                ax=ax[6+i],data=getattr(figData,f'fig{idx+6+i}')
+                ax=ax[6+j],data=getattr(figData,f'fig{idx+6+j}')
             )
 
             libF.SetFigStyle(
                 r'$cs$',r'$P(cs)$',
                 xScale='log',yScale='lin',
-                ax=ax[9+i],data=getattr(figData,f'fig{idx+9+i}')
+                ax=ax[9+j],data=getattr(figData,f'fig{idx+9+j}')
             )
 
         # CentreFig()

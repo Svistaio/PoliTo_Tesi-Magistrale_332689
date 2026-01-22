@@ -37,8 +37,8 @@ class FigData():
                 #     if p.is_file():
                 #         p.unlink()
 
-    def SetFigs(self,nCol=1,nRow=1,size=None):
-        nFig = nCol*nRow; self.nFig = nFig
+    def SetFigs(self,nRow=1,nCol=1,size=None):
+        nFig = nRow*nCol; self.nFig = nFig
 
         if not isinstance(nFig,int) or nFig <= 0:
             raise ValueError('The number of figures must be a integer positive number')
@@ -51,7 +51,7 @@ class FigData():
             return plt.figure()
         else:
             return plt.subplots(
-                nCol,nRow,
+                nRow,nCol,
                 figsize=size,
                 gridspec_kw=dict(
                     wspace=0.2,
@@ -138,9 +138,8 @@ def CreateFunctionPlot(
     if ax is None: ax = plt.gca()
 
     if Ni == 1:
-        if y.ndim != 1: y = y.ravel()
         ax.plot(
-            x,y,
+            x,y if y.ndim == 1 else y.ravel(),
             label=label,
             color=color,
             linestyle=linestyle,
@@ -229,9 +228,8 @@ def CreateScatterPlot(
     if ax is None: ax=plt.gca()
 
     if Ni == 1:
-        if y.ndim != 1: y = y.ravel()
         sct = ax.scatter(
-            x,y,
+            x,y if y.ndim == 1 else y.ravel(),
             label=label,
             color=color,
             s=size,
@@ -380,9 +378,10 @@ def CreateHistogramPlot(
     # binMidPoints = (binEdges[:-1]+binEdges[1:])/2 # It only works in the linear case
 
     if Ni == 1:
-        if x.ndim != 1: x = x.ravel()
-
-        binAverages, _ = np.histogram(x,binEdges,density=norm)
+        binAverages, _ = np.histogram(
+            x if x.ndim == 1 else x.ravel(),
+            binEdges,density=norm
+        )
         HistogramPlot(binEdges,binMidPoints,binAverages,alpha)
 
         return binMidPoints, binAverages
@@ -494,14 +493,14 @@ def CreateLognormalFitPlot(
 
     for r in range(Ni):
         if bimodal:
-            xi,scale1,shape1,scale2,shape2 = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
+            xi,scale1,shape1,scale2,shape2 = FitLognormalData(v[r,:],bimodal)
             yFData[r] = (
                 xi*stats.lognorm.pdf(xF,s=shape1,scale=np.exp(scale1)) + 
                 (1-xi)*stats.lognorm.pdf(xF,s=shape2,scale=np.exp(scale2))
             )
             xiData[r] = xi
         else:
-            shape,loc,scale = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
+            shape,loc,scale = FitLognormalData(v[r,:],bimodal)
             yFData[r] = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
             xiData[r] = 1
 
@@ -624,8 +623,8 @@ def CreateParetoFitPlot(
 
     for r in range(Ni):
         # Select the last quarter of city sizes
-        vQuarter = np.quantile(v[r,:] if Ni>1 else v,.75)
-        vTail = v[r,v[r,:] >= vQuarter] if Ni>1 else v[v>=vQuarter]
+        vQuarter = np.quantile(v[r,:],.75)
+        vTail = v[r,v[r,:] >= vQuarter]
         vTails[r] = np.sort(vTail) # Ascending values
 
         # Fitted CCDF from a Pareto function

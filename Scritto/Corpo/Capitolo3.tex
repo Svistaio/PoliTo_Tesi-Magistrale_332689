@@ -7,7 +7,142 @@
     {Teoria cinetica dei sistemi multiagente}%
 }\label{secTCSM}
 
+    In questo capitolo è discussa la Teoria Cinetica dei Sistemi MultiAgente (\TCSMA) necessaria per ottenere i risultati nella § \ref{secSimulazioni}.
+   
+    In esso si deriva prima la celeberrima equazione di Boltzmann a partire da una descrizione stocastica delle particelle di un gas; quindi si passa a generalizzare tali risultati per mediare le interazioni tramite una struttura topologica sottostante gli agenti, sia in modo esatto che approssimato; successivamente si descrivono le equazioni cinetiche nel caso corrente; infine si conclude analizzando le ipotesi semplificative che portano dalla presente teoria a quella classica di Boltzmann.
+
     \section{Descrizione cinetica classica}
+
+        \subsection{Equazione di Boltzmann omogenea}
+            Prima di procedere è necessario definire il tipo di gas che si sta considerando.
+
+            \begin{ipo}
+                \label{ipGasPerfetto}
+                Si consideri un gas composto da particelle che soddisfaccia le successive importanti ipotesi:
+
+                \begin{enumerate}[
+                    label=G\arabic*,
+                    topsep=0.5em,
+                    parsep=0em,
+                    itemsep=0.25em,
+                    leftmargin=2.5em,
+                    rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    %labelindent=3em,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item\label{ipGasOmogeneo} è uniformemente distribuito nello spazio cosicché in ogni punto la distribuzione statistica delle velocità è la stessa;
+                    \item\label{ipGasRarefatto} è rarefatto, da cui si può assumere che solo interazioni binarie possono aver luogo;
+                    \item\label{ipGasParticelleIndistinguibili} è composto da particelle indistinguibili e aventi ugual massa;
+                    \item\label{ipGasCollisioniElastiche} le collisioni sono elastiche per cui, unito alla \ref{ipGasRarefatto}, porta alla conservazione dell'impulso e dell'energia:
+                    %
+                    \begin{align}
+                        v'+v_*'&=v+v_*,
+                        \label{eqConservazioneImpulso}\tag{CI}\\
+                        \vert v'\vert^2+\vert v_*'\vert^2&=
+                        \vert v\vert^2+\vert v_*\vert^2,
+                        \label{eqConservazioneEnergia}\tag{CE}
+                    \end{align}
+                    %
+                    ove \(v',v'_*\in\mathbb R^3\) sono le velocità poscollisionali che collidono colle velocità precollisionali \(v,v_*\in\mathbb R^3\), delle due particelle interagenti\footnotemark{}.
+                    \footnotetext{In questo contesto non è necessario distinguere quale delle due sia quella interagente e quale quella ricevente, contrariamente a quello delle città.}
+                \end{enumerate}
+            \end{ipo}
+            %
+            Dalla \ref{ipGasCollisioniElastiche} si possono in realtà caratterizzare pienamente le velocità poscollisionali.
+            %
+            \begin{prp}
+                Esistono due funzioni \(\hat v,\hat v_*\colon\mathbb R^3\to\mathbb R^3\) che soddisfanno \cref{eqConservazioneImpulso,eqConservazioneEnergia} e tali che
+                %
+                \begin{equation}
+                    \label{eqVelocitàPosCollisionali}
+                    \begin{aligned}
+                        v'&=\hat v(v,v_*)\equiv v+[(v_*-v)\cdot n]n,\\
+                        v'_*&=\hat v_*(v,v_*)\equiv v_*+[(v-v_*)\cdot n]n,
+                    \end{aligned}
+                \end{equation}
+                %
+                ove \(n\in\mathbb S^2\) è un qualunque vettore appartenente alla sfera unitaria di \(\mathbb R^3\).
+            \end{prp}
+            %
+            \begin{proof}
+                Assumendo l'\textit{ansatz}
+                %
+                \begin{equation}
+                    \label{eqAnsatzCollisioni}
+                    v'=v-\gamma n\quad\text{ e }\quad v'_*=v_*+\gamma n,
+                \end{equation}
+                %
+                in cui \(\gamma\in\mathbb R\) è un parametro da determinare, si può notare che la \eqref{eqConservazioneImpulso} è già verificata, mentre imponendo la \eqref{eqConservazioneEnergia} si ha
+                \[
+                    \begin{aligned}
+                        \vert v'\vert^2+\vert v_*'\vert^2
+                        &=\vert v-\gamma n\vert^2+\vert v_*+\gamma n\vert^2\\
+                        &=(v-\gamma n)\cdot(v-\gamma n)+(v_*+\gamma n)\cdot(v_*+\gamma n)\\
+                        &=\vert v\vert^2-2\gamma(v\cdot n)+\gamma^2+\vert v_*\vert^2+2\gamma(v_*\cdot n)+\gamma^2\\
+                        &=\vert v\vert^2+\vert v_*\vert^2-2\gamma[(v_*-v)\cdot n+2\gamma]\\
+                        &=\vert v\vert^2+\vert v_*\vert^2\ \ \implies\ \ \gamma[(v_*-v)\cdot n+\gamma]=0,
+                    \end{aligned}
+                \]
+                ma escludendo il caso banale di \(\gamma=0\) (nessuna interazione) si ha
+                \[
+                    \gamma=\hat\gamma(v,v_*)\equiv(v-v_*)\cdot n,
+                \]
+                per cui \(\gamma\) è in realtà una funzione delle velocità precollisionali; la \eqref{eqAnsatzCollisioni} diventa allora
+                %
+                \begin{equation}
+                    \label{eqVelocitàPoscollisionali}
+                    v'=v+[(v_*-v)\cdot n]n\quad\text{ e }\quad v'_*=v_*+[(v-v_*)\cdot n]n.
+                \end{equation}
+            \end{proof}
+
+            Si noti come la precedente dimostrazione lasci arbitrario \(n\in\mathbb S^2\), seppure da un punto di vista sia ragionevole porlo parallelo al vettore passante per i centri delle particelle collidenti.%; cosí è considerato da qui in poi.
+
+            Per poter dedurre l'equazione di Boltzmann omogenea è però necessaria una descrizione statistica del precedente gas: sia \(V_t,V_t^*\in\mathbb R^3\) le variabili aleatorie\footnotemark{} delle velocità precollisionali, di cui le \(v\) e \(v_*\) precedenti sono due realizzazioni, al tempo \(t\) e similmente per \(V'_t,V^{*\prime}_t\in\mathbb R^3\).
+            \footnotetext{Si noti come queste non dipendano dall'indice proprio per l'ipotesi \ref{ipGasParticelleIndistinguibili} d'indistinguibilità delle particelle.}
+
+            Le leggi d'interazione nella \eqref{eqVelocitàPosCollisionali} diventano
+            %
+            \begin{equation}
+                \label{eqVelocitàPosCollisionaliStatistiche}
+                \begin{aligned}
+                    V'&=\hat V(V,V_*)\equiv V+[(V_*-V)\cdot n]n,\\
+                    V'_*&=\hat V_*(V,V_*)\equiv V_*+[(V-V_*)\cdot n]n,
+                \end{aligned}
+            \end{equation}
+            %
+            in cui anche \(n\) risulta essere aleatoriamente distribuita; usualmente s'ipotizza \(n\sim\mathcal U(\mathbb S^2)\), vale a dire che non vi sono direzioni preferenziali essendo queste uniformemente distribuite sulla sfera unitaria.
+
+            Invece per modellare la dinamica basata su interazioni binarie si fissa un passo temporale \(\Delta t>0\), si campionano indipendentemente due agenti e si presuppone che questi interagiscano con una certa probabilità, ovvero
+            %
+            \[
+                \def\theequation{[AR]}
+                \refstepcounter{equation}
+                \label{eqAlgoritmoInterazioniAzioneReazione}
+                [AR]\left\{
+                \begin{aligned}
+                    V_{t+\Delta t}&=(1-\Theta)V_t+\Theta V'_t,\\
+                    V^*_{t+\Delta t}&=(1-\Theta)V^*_t+\Theta V^{*\prime}_t.
+                \end{aligned}
+                \right.
+                \notag
+            \]
+            %
+            ove 
+            \[
+                \Theta\sim\DstrBernoulli(B((V^*_t-V_t)\cdot n)\Delta t)
+            \] 
+            è una variabile aleatoria, indipendente da \(V_t\) e \(V^*_t\), che indica se l'interazione avviene o no; essa dipende dalla funzione \(B\colon\mathbb R\to\mathbb R_+\), detta nucleo di collisione, che permette d'avere una maggiore espressività sulle collisioni molecolari le quali possono influenzare  il tasso d'interazione tra le molecole. Per definizione di \(\Theta\) deve valere \(B((V^*_t-V_t)\cdot n)\Delta t\le1\) condizione soddisfacibile anche prendendo un passo temporale \(\Delta t\) adattivo.
+
+            Si noti come \(B\) dipenda da \((V_*-V)\cdot n\) cosa che permette d'interpretare \(n\) come la direzione lungo la quale le interazioni sono piú frequenti.
+
+
+
+        \subsection{Equazione di Boltzmann disomogenea}
+
+        \subsection{Equazione di tipo Boltzmann omogenea}
 
     \section{Descrizione cinetica retale}\label{secDescrizioneCinetica} %  d'interazioni mediante da un grafo
         
@@ -109,8 +244,8 @@
             è definita mediante una funzione \(\Psi_*:\mathcal P^2\times\Omega\to\mathcal P\) potenzialmente diversa da \(\Psi\). Questo tipo d'interazione, prendendo come riferimento \cite[§ 2.2.1]{Nurisso2024} sarà identificato come azione-reazione, e riassunto dall'algoritmo
             %
             \begin{equation*}
-                \label{eqAlgoritmoInterazioniAzioneReazione}
-                \refstepcounter{equation}
+                % \label{eqAlgoritmoInterazioniAzioneReazione}
+                % \refstepcounter{equation}
                 [AR]\left\{
                 \begin{aligned}
                     S_{t+\Delta t}&=(1-\Theta)S_t+\Theta S'_t,\\
@@ -119,10 +254,8 @@
                 \right.
                 \notag
             \end{equation*}
-            \newcommand\refAlgIntAR{\tref{eqAlgoritmoInterazioniAzioneReazione}{[AR]}}
             %
             Si conclude questa sezione osservando che gli agenti \((X,S_t)\), \((X^*,S^*_t)\) sono campionati casualmente e uniformemente a ogni passo temporale.
-
 
     \section{Derivazione dell'equazioni cinetiche}
 
@@ -294,7 +427,6 @@
             %
             ove \(\odot\) indica il prodotto di Hadamard e \(\mathbf M^\top\) al trasposta di \(\mathbf M\). Si noti che \(\mathbf M\) altro non è che la matrice d'adiacenza di \(\mathcal G\).
             
-
         \subsection{Interazioni tra città}
         
             Si può ora approfondire il tipo d'interazioni ipotizzate tra città su grafi.
@@ -474,27 +606,28 @@
             %
             siccome \(E(s,s_*)\in(0,\lambda)\;\;\forall s,s_*\in\mathcal P\) e \(\lambda\in(0,1)\). La \eqref{eqVincoloTraParametri} implica quindi che non è possibile avere una varianza arbitraria per poter soddisfare la \ref{ipFluttuazioniPositivitàNegatività}, ma che questa è limitata superiormente dall'attrattività dei poli: piú è grande \(\lambda\) piú piccola è la varianza, e viceversa.
 
-
         \subsection{Derivazione approssimata}
-
 
     \section{Nesso discreto-continuo}\label{secNessoDC}
 
         È d'interesse esplorare il legame presente tra la \eqref{eqBoltzmannConGrafo} coll'equazione classica di Boltzmann \daRivedere{}.
-
 
         \subsection{Ipotesi semplificative}
 
             A questo scopo si possono fare tre principali ipotesi semplificative da applicare alla \eqref{eqBoltzmannConGrafo}:
 
             \begin{enumerate}[
-                label=\arabic*\(^\circ\) IS,
-                topsep=7.5pt,
-                parsep=5pt,
-                itemsep=0pt,
-                leftmargin=1cm,
-                rightmargin=0pt,
+                label=IS\arabic*,
+                topsep=0.5em,
+                parsep=0em,
+                itemsep=0.25em,
+                leftmargin=2.5em,
+                rightmargin=1.5em,
                 % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                % labelindent=1em,
+                %labelwidth=!,
+                %labelsep=!,
             ]
                 \item\label{ipMatriceUnitaria} Si presuppone che il grafo sia completamente connesso e quindi che la matrice d'adiacenza sia unitaria \(A\equiv I\).
                 %
@@ -513,14 +646,7 @@
                 \end{equation}
             \end{enumerate}
 
-
-        \newcommand\titoloSez{
-            Analisi della %
-            \texorpdfstring{%
-            % \tref{ipMatriceUnitaria}{\(1^\circ\)}
-            \ref{ipMatriceUnitaria}}{1° IS}%
-        }
-        \subsection{\titoloSez}
+        \subsection{Analisi della \texorpdfstring{\ref{ipMatriceUnitaria}}{IS1}}
 
             Con tal'ipotesi la \eqref{eqBoltzmannConGrafo} diventa
             %
@@ -600,44 +726,9 @@
             %
             la quale è formalmente analoga a quella classica di Boltzmann \daRivedere{}. Ciò significa che con tal'ipotesi semplificativa, nonostante gli agenti siano distinti, questi si possono vedere come indistinguibili purché si consideri la distribuzione media \eqref{eqDistribuzioneMarginaleIndici}.
 
-            Tale risultato è anche confermato a livello pratico nell'algoritmo \ref{algMonteCarlo} ove una matrice d'adiacenza unitaria porta ad avere un algoritmo del tutto analogo a quello classico; pertanto l'unica distribuzione che può calcolare \ref{algMonteCarlo} è proprio quella media \(F\).
+            Tale risultato è anche confermato a livello pratico nell'algoritmo \ref{algMonteCarlo}, illustrato nel paragrafo a venire, ove una matrice d'adiacenza unitaria porta ad avere un algoritmo del tutto analogo a quello classico; pertanto l'unica distribuzione che può calcolare \ref{algMonteCarlo} è proprio quella media \(F\).
 
-            \newcommand\ave[1]{\left\langle#1\right\rangle}
-            \newcommand\bM{\mathbf M}
-            \newcommand\cO{\mathcal O}
-            \begin{algorithm}[!t]
-                \caption{Algoritmo di Monte Carlo per equazioni di tipo su un grafo}
-                \label{algMonteCarlo}
-                \begin{algorithmic}[1]
-                    \Require adjacency matrix \(\bM\); initial state \(V_0\in\cO^N\); time step \(\Delta{t}>0\); final time \(T>0\)
-                    \State \(\tilde{V}\gets V_0\)
-                    \State \(t\gets 1\)
-                    \For{\(t<T\)}
-                    \State \(\ave{\varphi}(t)\gets\frac{1}{N}\sum_{i=1}^N\varphi(\tilde{V}(i))\)
-                    \State \(V\gets\tilde{V}\)
-                    \State \(P\gets \text{random permutation of } \left\{1,\,\dots,\,N\right\}\)
-                    \State \(p_1\gets (P(1),\,\dots,\,P(N/2))\)
-                    \State \(p_2\gets (P(N/2 + 1),\,\dots,\,P(N))\)
-                    \State \(i\gets 1\)
-                    \For{\(i<N/2\)}
-                    \State \(\Theta\sim\operatorname{Bernoulli}\!\left(B(p_1(i),p_2(i))\Delta{t}\right)\)
-                    \State \(\tilde{V}(p_1(i))\gets V(p_1(i))(1-\Theta)+\Psi(V(p_1(i)),V(p_2(i)))\Theta\)
-                    \State \(\tilde{V}(p_2(i))\gets V(p_2(i))(1-\Theta)+\Psi_\ast(V(p_2(i)),V(p_1(i)))\Theta\)
-                    \State \(i\gets i+1\)
-                    \EndFor
-                    \State \(t\gets t+\Delta t\)
-                    \EndFor
-                \end{algorithmic}
-            \end{algorithm}
-
-
-        \renewcommand\titoloSez{
-            Analisi della %
-            \texorpdfstring{%
-            % \tref{ipAgentiIndistinguibili}{\(2^\circ\)}
-            \ref{ipAgentiIndistinguibili}}{2° IS}%
-        }
-        \subsection{\titoloSez}
+        \subsection{Analisi della \texorpdfstring{\ref{ipAgentiIndistinguibili}}{IS2}}
 
             La previa discussione suggerisce di studiare anche il caso in cui gli agenti siano effettivamente indistinguibili; tuttavia, prima di affrontarlo assieme alla prima ipotesi risulta interessante analizzare tale ipotesi isolatamente. Pertanto la \eqref{eqBoltzmannConGrafo} diventa
             %
@@ -683,16 +774,7 @@
 
             \footnotetext{Difatti \(L\) è interpretabile come il numero di lati presenti in un grafo diretto e che ha come limite superiore prorio \(N^2\), ossia il numero totale di coppie [e quindi lati] dati \(N\) nodi.}
 
-
-        \renewcommand\titoloSez{
-            Analisi della %
-            \texorpdfstring{%
-            \tref{ipMatriceUnitaria}{\(1^\circ\)}, %
-            \tref{ipAgentiIndistinguibili}{\(2^\circ\)} e %
-            % \tref{ipInterazioniSimmetriche}{\(3^\circ\)}%
-            \ref{ipInterazioniSimmetriche}}{1°, 2° e 3° IS}%
-        }
-        \subsection{\titoloSez}
+        \subsection{Analisi della \texorpdfstring{\ref{ipMatriceUnitaria}, \ref{ipAgentiIndistinguibili} e \ref{ipInterazioniSimmetriche}}{IS1, IS2 e IS3}}
 
             Visto che vale \ref{ipMatriceUnitaria} si può partire dalla \eqref{eqBoltzmannConGrafoUnitario} nella quale la distribuzione media \eqref{eqDistribuzioneMarginaleIndici} diventa per \ref{ipAgentiIndistinguibili}                %
             \begin{equation*}

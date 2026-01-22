@@ -3,3 +3,33 @@
 % LTeX: language=it
 
 \chapter{Simulazioni}\label{secSimulazioni}
+
+    \section{Metodo Monte Carlo}\label{secMetodoMonteCarlo}
+
+        \newcommand\ave[1]{\left\langle#1\right\rangle}
+        \newcommand\bM{\mathbf M}
+        \newcommand\cO{\mathcal O}
+        \begin{algorithm}[!t]
+            \caption{Algoritmo di Monte Carlo per equazioni di tipo su un grafo}
+            \label{algMonteCarlo}
+            \begin{algorithmic}[1]
+                \Require adjacency matrix \(\bM\); initial state \(V_0\in\cO^N\); time step \(\Delta{t}>0\); final time \(T>0\)
+                \State \(\tilde{V}\gets V_0\)
+                \State \(t\gets 1\)
+                \For{\(t<T\)}
+                \State \(\ave{\varphi}(t)\gets\frac{1}{N}\sum_{i=1}^N\varphi(\tilde{V}(i))\)
+                \State \(V\gets\tilde{V}\)
+                \State \(P\gets \text{random permutation of } \left\{1,\,\dots,\,N\right\}\)
+                \State \(p_1\gets (P(1),\,\dots,\,P(N/2))\)
+                \State \(p_2\gets (P(N/2 + 1),\,\dots,\,P(N))\)
+                \State \(i\gets 1\)
+                \For{\(i<N/2\)}
+                \State \(\Theta\sim\operatorname{Bernoulli}\!\left(B(p_1(i),p_2(i))\Delta{t}\right)\)
+                \State \(\tilde{V}(p_1(i))\gets V(p_1(i))(1-\Theta)+\Psi(V(p_1(i)),V(p_2(i)))\Theta\)
+                \State \(\tilde{V}(p_2(i))\gets V(p_2(i))(1-\Theta)+\Psi_\ast(V(p_2(i)),V(p_1(i)))\Theta\)
+                \State \(i\gets i+1\)
+                \EndFor
+                \State \(t\gets t+\Delta t\)
+                \EndFor
+            \end{algorithmic}
+        \end{algorithm}
