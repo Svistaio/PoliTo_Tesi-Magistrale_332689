@@ -9,12 +9,244 @@
 
     In questo capitolo è discussa la Teoria Cinetica dei Sistemi MultiAgente (\TCSMA) necessaria per ottenere i risultati nella § \ref{secSimulazioni}.
    
-    In esso si deriva prima la celeberrima equazione di Boltzmann a partire da una descrizione stocastica delle particelle di un gas; quindi si passa a generalizzare tali risultati per mediare le interazioni tramite una struttura topologica sottostante gli agenti, sia in modo esatto che approssimato; successivamente si descrivono le equazioni cinetiche nel caso corrente; infine si conclude analizzando le ipotesi semplificative che portano dalla presente teoria a quella classica di Boltzmann.
+    S'inizia prima dando delle nozioni generali di teoria della probabilità colle quali si deriva successivamente la celeberrima equazione di Boltzmann a partire da una descrizione stocastica delle particelle di un gas; quindi si passa a generalizzare tali risultati per mediare le interazioni tramite una struttura topologica sottostante gli agenti, sia in modo esatto che approssimato; successivamente si descrivono le equazioni cinetiche nel caso corrente; infine si conclude analizzando le ipotesi semplificative che portano dalla presente teoria a quella classica di Boltzmann.
+
+    \section{Definizioni preliminari}
+
+        Si annoverano ora molti concetti di teoria della probabilità avvisando, però, che per molti di essi è impossibile entrare eccessivamente nei dettagli senza spiegare un intero corso; in ogni caso si rimanda a \cite{Durrett2019PTE} per gl'interessati.
+
+        \begin{dfn}[Variabile aleatoria]
+            \label{defVariabileAleatoria}
+            Una variabile aleatoria (v.a.) \(X\) è una funzione misurabile \(X\colon\Omega\to\mathbb R\), il cui dominio è uno spazio astratto \(\Omega\) di eventi; quest'ultimo definisce a sua volta uno spazio di probabilità \((\Omega,\mathcal F,\mathbb P)\) composto da una \(\sigma\)-algebra \(\mathcal F\) e una misura \(\mathbb P\) di massa unitaria.
+        \end{dfn}
+
+        \begin{dfn}[Legge di X]
+            \label{defLeggeScalare}
+            Sia \(X\in\mathbb R\) una v.a. assolutamente continua, allora \(f\colon\mathbb R\times[0,+\infty)\to\mathbb R_+\) è detta legge per \(X\) sse
+            \[
+                \mathbb P(X\in A)=\int_Af_X(x,t)\de x
+                \quad\forall A\subseteq\mathbb R\text{ misurabile},
+            \]
+            e soddisfà la condizione di normalità
+            \[
+                \mathbb P(X\in\mathbb R)=\int_{\mathbb R}f_X(x,t)\de x=1
+                \quad\forall t\in[0,+\infty).
+            \]
+        \end{dfn}
+
+        \begin{oss}
+            Nella definizione precedente si assume che la v.a. \(X\) sia assolutamente continua, in tal modo \(f_X(x,t)\) è la sua derivata di Radon-Nikodym, ma la teoria sviluppata in questo paragrafo vale anche per misure piú astratte rispetto le quali \(f_X(x,t)dv\) va inteso come \(f_X(dv,t)\). Tuttavia, nel caso in cui \(f_X(x,t)\) sia non negativa e integrabile viene anche detta funzione di densità di probabilità.
+        \end{oss}
+
+        \begin{dfn}[Legge congiunta di \(\mathbf X\)]
+            \label{defLeggeCongiunta}
+            Siano \(n\in\mathbb N^+\) e \(\mathbf X=(X_1,X_2,\ldots,X_n)\in\mathbb R^n\) un vettore aleatorio assolutamente continuo, allora la legge congiunta di \(\mathbf X\) è una funzione \(f_Z\colon\mathbb R^n\times[0,+\infty)\to\mathbb R_+\) tale che
+            \[
+                \mathbb P(\mathbf X\in A)
+                =\int_Af_{\mathbf X}(\mathbf x,t)\de\mathbf x
+                =\int_Af_{\mathbf X}(\mathbf x,t)\de x_1\de x_2\cdots\de x_n
+                \quad\forall A\subseteq\mathbb R^n\text{ misurabile},
+            \]
+            e soddisfà la condizione di normalità
+            \[
+                \int_{\mathbb R}f_{\mathbf X}(\mathbf x,t)\de\mathbf x
+                =\int_{\mathbb R}f_{\mathbf X}(\mathbf x,t)\de x_1\de x_2\cdots\de x_n
+                =1\quad\forall t.
+            \]
+        \end{dfn}
+
+        \begin{dfn}[Legge marginale di \(\mathbf X\)]
+            \label{defLeggeMarginale}
+            Siano \(n\in\mathbb N^+\) e \[\mathbf X=(X_1,X_2,\ldots,X_n)\in\mathbb R^n\] un vettore aleatorio assolutamente continuo, allora la legge marginale di \(X_i\) è la funzione \(f_{X_i}\colon\mathbb R\times[0,+\infty)\to\mathbb R_+\) cosí definita
+            %
+            \begin{equation}
+                \label{eqLeggeMarginale}
+                f_{X_i}(x,t)=\int_{\mathbb R^{n-1}}
+                f_{\mathbf X}(\mathbf x,t)\de x_1\de x_2\cdots\de x_{i-1}\de x_{i+1}\cdots\de x_n
+                \quad\forall i\in\{1,2,\cdots,n\};
+            \end{equation}
+            %
+            essa è a tutti gli effetti la legge della v.a. \(X_i\) secondo la \cref{defLeggeScalare}.
+        \end{dfn}
+
+        \begin{oss}
+            Nelle definizioni precedenti il tempo dev'essere visto come un parametro che indicizza le varie leggi degli oggetti considerati; è presente per essere coerenti colla corrente trattazione, si in generale si può trascurare: \(f_X(x)\) e \(f_Z(x)\).
+        \end{oss}
+
+        \begin{prt}[Legge congiunta di variabili aleatorie indipendenti]
+            \label{prtLeggeCongiuntaIndipendente}
+            Siano \(n\in\mathbb N^+\) e \[\mathbf X=(X_1,X_2,\ldots,X_n)\in\mathbb R^n\] un vettore aleatorio assolutamente continuo, allora se tutte le variabili aleatorie che lo compongono sono tra loro indipendenti allora la legge congiunta di \(\mathbf X\) equivale alla produttoria di quelle marginali:
+            \[
+                X_i\independent X_j
+                \ \forall i\neq j\in\{1,2,\ldots,n\}
+                \ \ \implies\ \ 
+                f_{\mathbf X}=\prod_{i=1}^nf_{X_i}.
+            \]
+        \end{prt}
+
+        \begin{dfn}[Valore atteso]
+            \label{defValoreAtteso}
+            Sia \(X\in\mathbb R\) una v.a. assolutamente continua e data una funzione misurabile \(\varphi\colon\mathbb R\to\mathbb R\) arbitraria, allora il valore atteso della v.a. \(\varphi(X)\) è definito come
+            \[
+                \mathbb E[\varphi(X)]\equiv\int_{\mathbb R}\varphi(x)f(x,t)\de x,
+            \]
+            e un simile discorso vale anche per un vettore aleatorio ma con \(\varphi\colon\mathbb R^n\to\mathbb R\), preso \(n\in\mathbb N^+\):
+            \[
+                \mathbb E[\varphi(\mathbf X)]
+                \equiv\int_{\mathbb R^n}\varphi(\mathbf x)f_{\mathbf X}(\mathbf xx,t)\de\mathbf x
+                =\int_{\mathbb R^n}\varphi(\mathbf x)f_{\mathbf X}(\mathbf xx,t)\de x_1\de x_2\cdots\de x_n
+            \]
+        \end{dfn}
+
+        \begin{dfn}[Valore atteso condizionato]
+            Sia \(X\in\mathbb R\) una v.a. assolutamente continua a media finita \(\mathbb E[X]<\infty\) e sia \(\mathcal G\subseteq\mathcal F\) una sotto-\(\sigma\)-algebra, allora l'attesa di \(X\) condizionata a \(\mathcal G\) è una v.a. \(Y\) tale che
+
+            \begin{enumerate}[
+                label=AC\arabic*,
+                topsep=0.5em,
+                parsep=0em,
+                itemsep=0.25em,
+                leftmargin=3em,
+                rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=3em,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item\label{ipAttesaCondizionataGMisurabile} \(\sigma(Y)\in\mathcal G\), ossia \(Y\) è \(\mathcal G\)-misurabile e
+                \item\label{ipAttesaCondizionataUgualeMisura} per ogni \(A\in\mathcal G\) la misura di \(X\) e \(Y\) tramite \(\mathbb P\) è la stessa:
+                    \[
+                        \mathbb P(X\in A)=\int_AX\de\mathbb P=\int_AY\de\mathbb P=\mathbb P(Y\in A)
+                    \]
+            \end{enumerate}
+
+            L'insieme delle \(Y\) che soddisfanno le \ref{ipAttesaCondizionataGMisurabile} e \ref{ipAttesaCondizionataUgualeMisura} sono indicate col simbolo \(\mathbb E[X|\mathcal G]\) che ne è anche il suo rappresentante; in effetti una generica \(Y\) si può indicare anche direttamente come \(\mathbb E[X|\mathcal G]\).
+
+            Un'analoga definizione vale anche per i vettori aleatori e per i caso misti con \(X\) scalare e \(Y\) vettoriale.
+        \end{dfn}
+
+        \begin{oss}
+            Presa una v.a. \(Y\in\mathbb R\), nella precedente definizione \(\mathcal G\) può essere anche la \(\sigma\)-algebra definita da \(Y\):
+            \[
+                \sigma(Y)\equiv\sigma({Y^{-1}(B)\ |\ B\in\mathcal B(\mathbb R)}),
+            \]
+            ove \(\mathcal B(\mathbb R)\) è la \(\sigma\)-algebra di Borell relativa allo spazio dei numeri reali mentre \(\sigma(A)\) è la piú piccola \(\sigma\)-algebra che contiene \(A\subset\mathcal P(\Omega)\).
+
+            Un simile risultato vale anche per i vettori aleatori \(\mathbf Y\in\mathbb R^n\).
+        \end{oss}
+
+        \begin{prp}
+            \label{prpAttesaCondizionataInterpretazionePratica}
+            Dati
+
+            \begin{enumerate}[
+                label=\arabic*.,
+                topsep=0.5em,
+                parsep=0em,
+                itemsep=0.25em,
+                leftmargin=2em,
+                rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=3em,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item \(n,h,k\in\mathbb N_+\) tali che \(n=h+k\);
+                \item un vettore aleatorio \(\mathbf Z=(\mathbf X,\mathbf Y)\in\mathbb R^n\) assolutamente continuo costituito da \(\mathbf X\in\mathbb R^h\) e \(\mathbf Y\in\mathbb R^k\) con legge congiunta \(f_{\mathbf Z}(\mathbf x,\mathbf y)\) e marginali \(f_{\mathbf X}\) e \(f_{\mathbf Y}\);
+                \item una funzione \(\varphi\colon\mathbb R^n\to\mathbb R\) misurabile e tale che \(\mathbb E[\varphi(\mathbf Z)]=\mathbb E[(\mathbf X,\mathbf Y)]<\infty\);
+            \end{enumerate}
+
+            allora si può definire \(h\colon\mathbb R^k\to\mathbb R\) tramite la seguente equazione
+            %
+            \begin{equation}
+                \label{eqCondizionehVettoreAleatorio}
+                \int_{\mathbb R^h}h(\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x
+                =\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x
+                % =\mathbb E[\varphi(\mathbf X,\mathbf y)] % Non è corretto poiché la media necessita della legge delle v.a. al suo interno ma qui è presente solo quella relativa a Z
+                \quad\forall\mathbf y\in\mathbb R^k,
+            \end{equation}
+            %
+            che soddisfà \(h(\mathbf Y)\in\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y]\).
+        \end{prp}
+        
+        \begin{proof}
+            Per la \ref{ipAttesaCondizionataGMisurabile} è sufficiente esplicitare la forma di \(\sigma(h(\mathbf Y))\):
+            \[
+                \sigma(h(\mathbf Y))
+                \equiv\sigma({\mathbf Y^{-1}(h^{-1}(B))\ |\ B\in\mathcal B(\mathbb R)})
+                \subseteq\sigma({\mathbf Y^{-1}(B)\ |\ B\in\mathcal B(\mathbb R^h)}),
+            \]
+            a parole si considera la controimmagine tramite \(\mathbf Y\) dei borelliani filtrati da \(h\), ragion per cui la sigma algebra non potrà che essere contenuta in quella non filtrata.  
+            
+            Per la \ref{ipAttesaCondizionataUgualeMisura} si verifica la condizione \(\forall A\in\sigma(\mathbf Y)\) avvalendosi della caratterizzazione di \(h(\mathbf Y)\) tramite \eqref{eqCondizionehVettoreAleatorio}:
+            \[
+                \begin{aligned}
+                    \int_Ah(\mathbf Y)\de\mathbb P
+                    &=\int_Bh(\mathbf y)f_{\mathbf Y}(\mathbf y)\de\mathbf y
+                    \overset{\eqref{eqLeggeMarginale}}{=}
+                    \int_Bh(\mathbf y)\int_{\mathbb R^h}f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+                    \\&=\int_B\int_{\mathbb R^h}h(\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+                    \overset{\eqref{eqCondizionehVettoreAleatorio}}{=}
+                    \int_B\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+                    \\&=\int_{\mathbb R^n}\mathbb1_B(\mathbf y)\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+                    =\int_\Omega\mathbb1_B(\mathbf Y)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+                    \\&=\int_\Omega\mathbb1_C(\mathbf Z)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+                    =\int_\Omega\mathbb1_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+                    =\int_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P.
+                \end{aligned}
+            \] % P. 127 di «Probabilità II {29-09-2022}.pdf»
+            ove \(B\equiv\mathbf Y(A)\subseteq\mathbb R^k\) e \(C\equiv\mathbf Z(\mathbb R^h\times A)\subseteq\mathbb R^n\) dimodoché
+            \[
+                A=\mathbf Y^{-1}(B)=\mathbf Z^{-1}(C).
+            \]
+        \end{proof}
+
+        \begin{oss}
+            \label{ossAttesaCondizionataInterpretazionePratica}
+            La precedente dimostrazione svela un'interpretazione piú pratica dell'attesa condizionata rispetto alla sua definizione alquanto teorica.
+
+            Si consideri la \eqref{eqCondizionehVettoreAleatorio}, allora \(h(y)\) si può cosí riformulare:
+            %
+            \begin{equation}
+                \label{eqAttesaCondizionataEvento}
+                h(y)
+                =\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)
+                f_{\mathbf X|\mathbf Y=\mathbf y}(\mathbf x)\de\mathbf x
+                =\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y=\mathbf y]
+                \quad\forall\mathbf y\in\mathbb R^k,
+            \end{equation}
+            %
+            in cui
+            \[
+                f_{\mathbf X|\mathbf Y=y}
+                \equiv\left\{
+                    \begin{aligned}
+                        &f_{\mathbf Z}(\mathbf x,\mathbf y)/f_{\mathbf Y}(\mathbf y)&\text{se }f_{\mathbf Y}(y)\neq0\\
+                        &0&\text{se }f_{\mathbf Y}(y)=0
+                    \end{aligned}
+                \right.
+            \]
+            è la legge di \(\mathbf X\) condizionata dall'evento \(\mathbf Y=y\).
+
+            La \eqref{eqAttesaCondizionataEvento}, in pratica, si calcola svolgendo la media di \(\varphi(\mathbf X,\textbf Y)\) rispetto a \(\mathbf X\) dopo aver "fissato" l'evento \(\mathbf Y=\mathbf y\), vale a dire considerando la \(\mathbf Y\) come fosse un parametro uguale a \(\mathbf y\). 
+
+            Successivamente, se s'impone \(A=\Omega\) (sempre lecito essendo \(\mathcal G\) una \(\sigma-algebera\)) allora dalla \ref{ipAttesaCondizionataUgualeMisura} vale
+            %
+            \begin{equation}
+                \label{eqAttesaCondizionataInterpretazionePratica}
+                \mathbb E[\varphi(\mathbf X,\mathbf Y)]
+                =\mathbb E[\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y]],
+            \end{equation}
+            %
+            il che significa che l'attesa di \(\varphi(\mathbf X,\mathbf Y)\) si calcola mediando rispetto a \(\mathbf Y\) la v.a. \(\mathbb E[\mathbf X|\mathbf Y]\), ricavata dalla \eqref{eqAttesaCondizionataEvento} ma considerando \(\mathbf y\) arbitrario.
+        \end{oss}
 
     \section{Descrizione cinetica classica}
 
         \subsection{Equazione di Boltzmann omogenea}
-            Prima di procedere è necessario definire il tipo di gas che si sta considerando.
+            Innanzitutto è necessario caratterizzare alcune proprietà del gas da modellizzare.
 
             \begin{ipo}
                 \label{ipGasPerfetto}
@@ -34,33 +266,34 @@
                     %labelsep=!,
                 ]
                     \item\label{ipGasOmogeneo} è uniformemente distribuito nello spazio cosicché in ogni punto la distribuzione statistica delle velocità è la stessa;
-                    \item\label{ipGasRarefatto} è rarefatto, da cui si può assumere che solo interazioni binarie possono aver luogo;
+                    \item\label{ipGasRarefatto} è rarefatto, da cui segue che solo interazioni binarie possono aver luogo o, precisamente, sono piú probabili;
                     \item\label{ipGasParticelleIndistinguibili} è composto da particelle indistinguibili e aventi ugual massa;
-                    \item\label{ipGasCollisioniElastiche} le collisioni sono elastiche per cui, unito alla \ref{ipGasRarefatto}, porta alla conservazione dell'impulso e dell'energia:
+                    \item\label{ipGasCollisioniElastiche} le collisioni sono elastiche per cui si ha conservazione dell'impulso e dell'energia esprimibile, grazie alle \ref{ipGasRarefatto} e \ref{ipGasParticelleIndistinguibili}, binariamente come
                     %
                     \begin{align}
-                        v'+v_*'&=v+v_*,
+                        \mathbf\mathbf v'+\mathbf\mathbf v_*'
+                        &=\mathbf\mathbf v+\mathbf\mathbf v_*,
                         \label{eqConservazioneImpulso}\tag{CI}\\
-                        \vert v'\vert^2+\vert v_*'\vert^2&=
-                        \vert v\vert^2+\vert v_*\vert^2,
+                        \vert\mathbf\mathbf v'\vert^2+\vert \mathbf\mathbf v_*'\vert^2&=
+                        \vert\mathbf\mathbf v\vert^2+\vert \mathbf\mathbf v_*\vert^2,
                         \label{eqConservazioneEnergia}\tag{CE}
                     \end{align}
                     %
-                    ove \(v',v'_*\in\mathbb R^3\) sono le velocità poscollisionali che collidono colle velocità precollisionali \(v,v_*\in\mathbb R^3\), delle due particelle interagenti\footnotemark{}.
+                    ove \(\mathbf v',\mathbf v'_*\in\mathbb R^3\) sono le velocità poscollisionali che collidono colle velocità precollisionali \(\mathbf v,\mathbf v_*\in\mathbb R^3\), delle due particelle interagenti\footnotemark{}.
                     \footnotetext{In questo contesto non è necessario distinguere quale delle due sia quella interagente e quale quella ricevente, contrariamente a quello delle città.}
                 \end{enumerate}
             \end{ipo}
-            %
-            Dalla \ref{ipGasCollisioniElastiche} si possono in realtà caratterizzare pienamente le velocità poscollisionali.
-            %
-            \begin{prp}
-                Esistono due funzioni \(\hat v,\hat v_*\colon\mathbb R^3\to\mathbb R^3\) che soddisfanno \cref{eqConservazioneImpulso,eqConservazioneEnergia} e tali che
+
+            Dalla \ref{ipGasCollisioniElastiche} si possono in realtà esprimere le velocità poscollisionali a partire da quelle precollisionali, definendo quelle che sono le leggi d'interazione.
+
+            \begin{prp}[Leggi d'interazione]\label{prpVelocitàCollisionali}
+                Esistono due funzioni \(\psi,\psi_*\colon\mathbb R^3\to\mathbb R^3\) che soddisfanno \cref{eqConservazioneImpulso,eqConservazioneEnergia} e tali che
                 %
                 \begin{equation}
-                    \label{eqVelocitàPosCollisionali}
+                    \label{eqLeggiInterazioneGas}
                     \begin{aligned}
-                        v'&=\hat v(v,v_*)\equiv v+[(v_*-v)\cdot n]n,\\
-                        v'_*&=\hat v_*(v,v_*)\equiv v_*+[(v-v_*)\cdot n]n,
+                        \mathbf v'&=\psi(\mathbf v,\mathbf v_*)\equiv\mathbf v+[(\mathbf v_*-\mathbf v)\cdot n]n,\\
+                        \mathbf v'_*&=\psi_*(\mathbf v,\mathbf v_*)\equiv\mathbf v_*+[(\mathbf v-\mathbf v_*)\cdot n]n,
                     \end{aligned}
                 \end{equation}
                 %
@@ -72,73 +305,298 @@
                 %
                 \begin{equation}
                     \label{eqAnsatzCollisioni}
-                    v'=v-\gamma n\quad\text{ e }\quad v'_*=v_*+\gamma n,
+                    \mathbf v'=\mathbf v-\gamma n\quad\text{ e }\quad\mathbf v'_*=\mathbf v_*+\gamma n,
                 \end{equation}
                 %
                 in cui \(\gamma\in\mathbb R\) è un parametro da determinare, si può notare che la \eqref{eqConservazioneImpulso} è già verificata, mentre imponendo la \eqref{eqConservazioneEnergia} si ha
                 \[
                     \begin{aligned}
-                        \vert v'\vert^2+\vert v_*'\vert^2
-                        &=\vert v-\gamma n\vert^2+\vert v_*+\gamma n\vert^2\\
-                        &=(v-\gamma n)\cdot(v-\gamma n)+(v_*+\gamma n)\cdot(v_*+\gamma n)\\
-                        &=\vert v\vert^2-2\gamma(v\cdot n)+\gamma^2+\vert v_*\vert^2+2\gamma(v_*\cdot n)+\gamma^2\\
-                        &=\vert v\vert^2+\vert v_*\vert^2-2\gamma[(v_*-v)\cdot n+2\gamma]\\
-                        &=\vert v\vert^2+\vert v_*\vert^2\ \ \implies\ \ \gamma[(v_*-v)\cdot n+\gamma]=0,
+                        \vert\mathbf v'\vert^2+\vert\mathbf v_*'\vert^2
+                        &=\vert\mathbf v-\gamma n\vert^2+\vert\mathbf v_*+\gamma n\vert^2\\
+                        &=(\mathbf v-\gamma n)\cdot(\mathbf v-\gamma n)
+                        +(\mathbf v_*+\gamma n)\cdot(\mathbf v_*+\gamma n)\\
+                        &=\vert\mathbf v\vert^2-2\gamma(\mathbf v\cdot n)
+                        +\gamma^2+\vert\mathbf v_*\vert^2
+                        +2\gamma(\mathbf v_*\cdot n)+\gamma^2\\
+                        &=\vert\mathbf v\vert^2+\vert\mathbf v_*\vert^2
+                        -2\gamma[(\mathbf v_*-\mathbf v)\cdot n+2\gamma]\\
+                        &=\vert\mathbf v\vert^2+\vert\mathbf v_*\vert^2
+                        \ \ \implies\ \ 
+                        \gamma[(\mathbf v_*-\mathbf v)\cdot n+\gamma]=0,
                     \end{aligned}
                 \]
                 ma escludendo il caso banale di \(\gamma=0\) (nessuna interazione) si ha
                 \[
-                    \gamma=\hat\gamma(v,v_*)\equiv(v-v_*)\cdot n,
+                    \gamma=\Gamma(\mathbf v,\mathbf v_*)\equiv(\mathbf v-\mathbf v_*)\cdot n,
                 \]
                 per cui \(\gamma\) è in realtà una funzione delle velocità precollisionali; la \eqref{eqAnsatzCollisioni} diventa allora
                 %
                 \begin{equation}
                     \label{eqVelocitàPoscollisionali}
-                    v'=v+[(v_*-v)\cdot n]n\quad\text{ e }\quad v'_*=v_*+[(v-v_*)\cdot n]n.
+                    \mathbf v'=\mathbf v+[(\mathbf v_*-\mathbf v)\cdot n]n
+                    \quad\text{ e }\quad\mathbf v'_*
+                    =\mathbf v_*+[(\mathbf v-\mathbf v_*)\cdot n]n.
                 \end{equation}
             \end{proof}
+            %
+            Si noti come la precedente dimostrazione lasci arbitrario \(n\in\mathbb S^2\), seppure da un punto di vista fisico sia ragionevole porlo parallelo al vettore passante per i centri delle particelle collidenti.
 
-            Si noti come la precedente dimostrazione lasci arbitrario \(n\in\mathbb S^2\), seppure da un punto di vista sia ragionevole porlo parallelo al vettore passante per i centri delle particelle collidenti.%; cosí è considerato da qui in poi.
+            Si osservi come le leggi d'interazione nella \ref{eqLeggiInterazioneGas} sono bilineari e simmetriche secondo la seguente definzione:
 
-            Per poter dedurre l'equazione di Boltzmann omogenea è però necessaria una descrizione statistica del precedente gas: sia \(V_t,V_t^*\in\mathbb R^3\) le variabili aleatorie\footnotemark{} delle velocità precollisionali, di cui le \(v\) e \(v_*\) precedenti sono due realizzazioni, al tempo \(t\) e similmente per \(V'_t,V^{*\prime}_t\in\mathbb R^3\).
-            \footnotetext{Si noti come queste non dipendano dall'indice proprio per l'ipotesi \ref{ipGasParticelleIndistinguibili} d'indistinguibilità delle particelle.}
+            \begin{dfn}[Leggi d'interazione simmetriche]
+                \label{defLeggiInterazioneSimmetriche}
+                Due leggi d'interazione del tipo \eqref{eqLeggiInterazioneGas} si dicono simmetriche sse
+                \[
+                    \begin{aligned}
+                        \psi(\mathbf v,\mathbf v_*)&=\psi_*(\mathbf v_*,\mathbf v)\\
+                        \psi_*(\mathbf v,\mathbf v_*)&=\psi(\mathbf v_*,\mathbf v)
+                    \end{aligned}
+                    \ \ \implies\ \ 
+                    \begin{aligned}
+                        \mathbf v'&=\psi_*(\mathbf v_*,\mathbf v)\\
+                        \mathbf v'_*&=\psi(\mathbf v_*,\mathbf v)
+                    \end{aligned}
+                \]
+            \end{dfn}
 
-            Le leggi d'interazione nella \eqref{eqVelocitàPosCollisionali} diventano
+            Per proseguire è però necessaria una descrizione statistica del gas in esame: siano allora \(\mathbf V_t,\mathbf V_t^*\in\mathbb R^3\) le v.a. delle velocità precollisionali, di cui le \(\mathbf v\) e \(\mathbf v_*\) precedenti sono due realizzazioni, al tempo \(t\) e similmente per \(\mathbf V'_t,\mathbf V^{*\prime}_t\in\mathbb R^3\).
+
+            \begin{oss}
+                \label{ossLeggiIndistinguibili}
+                Le v.a. \(\mathbf V_t\) e \(\mathbf V^*_t\) non sono indicizzate (per es. \(\mathbf V^i_t\)) proprio per l'indistinguibilità delle particelle assunta dalla \ref{ipGasParticelleIndistinguibili}, dalla quale si deduce anche che le leggi di \(\mathbf V_t\) e \(\mathbf V^*_t\) sono identiche:
+                \[
+                    f_{\mathbf V_t}(\mathbf v,t)=f_{\mathbf V^*_t}(\mathbf v,t)=f(\mathbf v,t)\quad\forall \mathbf v\in\mathbb R^3.
+                \]
+            \end{oss}
+
+            Le leggi d'interazione nella \eqref{eqLeggiInterazioneGas} diventano
             %
             \begin{equation}
                 \label{eqVelocitàPosCollisionaliStatistiche}
                 \begin{aligned}
-                    V'&=\hat V(V,V_*)\equiv V+[(V_*-V)\cdot n]n,\\
-                    V'_*&=\hat V_*(V,V_*)\equiv V_*+[(V-V_*)\cdot n]n,
+                    \mathbf V'&=\psi(V,\mathbf V_*)\equiv\mathbf V+[(\mathbf V_*-\mathbf V)\cdot n]n,\\
+                    \mathbf V'_*&=\psi_*(\mathbf V,\mathbf V_*)\equiv \mathbf V_*+[(\mathbf V-\mathbf V_*)\cdot n]n,
                 \end{aligned}
             \end{equation}
             %
-            in cui anche \(n\) risulta essere aleatoriamente distribuita; usualmente s'ipotizza \(n\sim\mathcal U(\mathbb S^2)\), vale a dire che non vi sono direzioni preferenziali essendo queste uniformemente distribuite sulla sfera unitaria.
+            in cui anche \(n\) risulta aleatoriamente distribuito; usualmente s'ipotizza \(n\sim\mathcal U(\mathbb S^2)\), vale a dire che non vi sono direzioni preferenziali essendo queste uniformemente distribuite sulla sfera unitaria.
 
-            Invece per modellare la dinamica basata su interazioni binarie si fissa un passo temporale \(\Delta t>0\), si campionano indipendentemente due agenti e si presuppone che questi interagiscano con una certa probabilità, ovvero
+            Tuttavia l'interazione tra due particelle non è detto che avvenga, aspetto formulabile introducendo 
             %
-            \[
+            \begin{equation}
+                \label{eqBernoulliInterazione}
+                \Theta\sim\DstrBernoulli(B((\mathbf V^*_t-\mathbf V_t)\cdot n)\Delta t)
+            \end{equation}
+            %
+            che è una v.a. di Bernoulli, indipendente da \(\mathbf V_t\) e \(\mathbf V^*_t\), la cui probabilità è descritta da due termini:
+            
+            \begin{enumerate}[
+                label=\arabic*.,
+                topsep=0.5em,
+                parsep=0em,
+                itemsep=0.25em,
+                leftmargin=2em,
+                rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=3em,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item la funzione \(B\colon\mathbb R\to\mathbb R_+\), detta nucleo di collisione, che permette d'avere una maggiore espressività sulle collisioni molecolari le quali possono influenzare il tasso d'interazione tra le molecole\footnotemark{};
+                \footnotetext{Si noti come \(B\) dipenda da \((\mathbf V_*-\mathbf V)\cdot n\), termine ripreso dalla \cref{prpVelocitàCollisionali}, cosa che permette d'interpretare \(n\) come la direzione lungo la quale le interazioni sono piú frequenti.}
+                \item un passo temporale \(\Delta t>0\) per discretizzare il tempo.
+            \end{enumerate}
+            
+            \begin{oss}
+                \label{ossCondizioneTetaGas}
+                Per definizione di \(\Theta\), deve valere \(B((\mathbf V^*_t-\mathbf V_t)\cdot n)\Delta t\le1\) condizione soddisfacibile anche prendendo un passo temporale \(\Delta t\) adattivo; si vedrà tra poco, però, che, per quanto concerne il modello analitico, tale condizione sarà sempre verificata.
+            \end{oss}
+
+            Colle \cref{eqVelocitàPosCollisionaliStatistiche,eqBernoulliInterazione}, lo stato dei due agenti al tempo \(t+\Delta t\) successivo è dunque dato dal seguente algoritmo d'interazione:
+            %
+            \begin{equation*}
                 \def\theequation{[AR]}
                 \refstepcounter{equation}
                 \label{eqAlgoritmoInterazioniAzioneReazione}
                 [AR]\left\{
                 \begin{aligned}
-                    V_{t+\Delta t}&=(1-\Theta)V_t+\Theta V'_t,\\
-                    V^*_{t+\Delta t}&=(1-\Theta)V^*_t+\Theta V^{*\prime}_t.
+                    \mathbf V_{t+\Delta t}   & =(1-\Theta)\mathbf V_t+\Theta\mathbf V'_t,            \\
+                    \mathbf V^*_{t+\Delta t} & =(1-\Theta)\mathbf V^*_t+\Theta\mathbf V^{*\prime}_t,
                 \end{aligned}
                 \right.
                 \notag
-            \]
+            \end{equation*}
             %
-            ove 
+            dove l'acronimo \ref{eqAlgoritmoInterazioniAzioneReazione} sta per «Azione-Reazione» e descrive il fatto che ogni interazione (azione) necessariamente modifica entrambi gli stati degli agenti coinvolti (reazione); in alcuni contesti \cite{Nurisso2024} questa regola può essere alterata dimodoché solo il nodo interagente sia modificato portando alle interazioni «Azione-Azione».
+
+            L'idea successiva, al fine di ricavare un modello dell'evoluzione di \(f\), è di mediare le \ref{eqAlgoritmoInterazioniAzioneReazione} attraverso una funzione arbitraria \(\varphi\colon\mathbb R^3\to\mathbb R\), detta quantità osservabile, computabile dalle realizzazioni o di \(\mathbf V_{t+\Delta t}\) o di \(\mathbf V_{t+\Delta t}\); pertanto una volta applicato \(\varphi(\cdot)\) alle \ref{eqAlgoritmoInterazioniAzioneReazione},
+            %
+            \begin{equation*}
+                \begin{aligned}
+                    \varphi(\mathbf V_{t+\Delta t})&=\varphi((1-\Theta)\mathbf V_t+\Theta\mathbf V'_t),\\
+                    \varphi(\mathbf V^*_{t+\Delta t})&=\varphi((1-\Theta)\mathbf V^*_t+\Theta\mathbf V^{*\prime}_t),
+                \end{aligned}
+            \end{equation*}
+            %
+            e mediando \(\mathbb E[\cdot]\) si arriva a
+            %
+            \begin{equation*}
+                \begin{aligned}
+                    \mathbb E[\varphi(\mathbf V_{t+\Delta t})]&=\mathbb E[\varphi((1-\Theta)\mathbf V_t+\Theta\mathbf V'_t)],\\
+                    \mathbb E[\varphi(\mathbf V^*_{t+\Delta t})]&=\mathbb E[\varphi((1-\Theta)\mathbf V^*_t+\Theta\mathbf V^{*\prime}_t)];
+                \end{aligned}
+            \end{equation*}
+            %
+            per espandere la media, siccome \(\Theta\) dipende da \((\mathbf V_t,\mathbf V^*_t,n)\), bisogna avvalersi dell'attesa condizionata, e in particolare della \cref{ossAttesaCondizionataInterpretazionePratica}, che porta a
+            %
+            \begin{equation*}
+                \begin{aligned}
+                    \mathbb E[\varphi(\mathbf V_{t+\Delta t})]
+                    =&\mathbb E[\varphi((1-\Theta)\mathbf V_t+\Theta\mathbf V'_t)],
+                    \\=&\mathbb E[\mathbb E[\varphi((1-\Theta)\mathbf V_t+\Theta\mathbf V'_t)\ |\ \mathbf V_t,\mathbf V_t^*,n]],
+                    \\=&\mathbb E[\varphi(\mathbf V_t)(1-B((\mathbf V^*_t-\mathbf V_t)\cdot n)\Delta t)]
+                    \\&+\mathbb E[\varphi(\mathbf V'_t)B((\mathbf V^*_t-\mathbf V_t)\cdot n)]\Delta t,
+                \end{aligned}
+            \end{equation*}
+            %
+            e similmente per \(\mathbb E[\varphi(\mathbf V^*_{t+\Delta t})]\); riordinando i termini si ricava
+            %
+            \begin{equation*}
+                \begin{aligned}
+                    \frac{\mathbb E[\varphi(\mathbf V_{t+\Delta t})]-\mathbb E[\varphi(\mathbf V_t)]}{\Delta t}
+                    &=\mathbb E[B((\mathbf V^*_t-\mathbf V_t)\cdot n)(\varphi(\mathbf V'_t)-\varphi(\mathbf V_t))],\\
+                    \frac{\mathbb E[\varphi(\mathbf V^*_{t+\Delta t})]-\mathbb E[\varphi(\mathbf V^*_t)]}{\Delta t}
+                    &=\mathbb E[B((\mathbf V^*_t-\mathbf V_t)\cdot n)(\varphi(\mathbf V^{*\prime}_t)-\varphi(\mathbf V^*_t))],
+                \end{aligned}
+            \end{equation*}
+            %
+            e passando formalmente al tempo continuo col limite \(\Delta t\to0^+\)\footnotemark{} si ha
+            \footnotetext{Ciò permette di soddisfare la condizione descritta nel'\ref{ossCondizioneTetaGas} per qualunque valore di \(B((\mathbf V^*_t-\mathbf V_t)\cdot n)\).}
+            %
+            \begin{equation*}
+                \begin{aligned}
+                    \derS{\mathbb E[\varphi(\mathbf V_t)]}t
+                    &=\mathbb E[B((\mathbf V^*_t-\mathbf V_t)\cdot n)(\varphi(\mathbf V'_t)-\varphi(\mathbf V_t))],\\
+                    \derS{\mathbb E[\varphi(\mathbf V^*_t)]}t
+                    &=\mathbb E[B((\mathbf V^*_t-\mathbf V_t)\cdot n)(\varphi(\mathbf V^{*\prime}_t)-\varphi(\mathbf V^*_t))],
+                \end{aligned}
+            \end{equation*}
+            %
+            che, dopo aver espanso i valori attesi secondo le loro definizioni, diventano
+            %
+            \begin{equation}
+                \label{eqInterazioniOsservabiliContinue}
+                \newcommand\hsep{\hspace{-.4em}}
+                \begin{aligned}
+                    \derS{}t\int_{\mathbb R^3}\hsep
+                    \varphi(\mathbf v)f(\mathbf v,t)\de\mathbf v
+                    &=\int_{\mathbb R^6}\hsep\langle
+                        B(\mathbf v,\mathbf v_*,n)
+                        (\varphi(\mathbf v')-\varphi(\mathbf v))
+                    \rangle f_{\mathbf V}(\mathbf v,\mathbf v_*,t)
+                    \de\mathbf v\de\mathbf v_*,\\
+                    \derS{}t\int_{\mathbb R^3}\hsep
+                    \varphi(\mathbf v^*)f(\mathbf v_*,t)\de\mathbf v_*
+                    &=\int_{\mathbb R^6}\hsep\langle
+                        B(\mathbf v,\mathbf v_*,n)
+                        (\varphi(\mathbf v_*')-\varphi(\mathbf v_*))
+                    \rangle f_{\mathbf V}(\mathbf v,\mathbf v_*,t)
+                    \de\mathbf v\de\mathbf v_*,
+                \end{aligned}
+            \end{equation}
+            %
+            in cui
             \[
-                \Theta\sim\DstrBernoulli(B((V^*_t-V_t)\cdot n)\Delta t)
-            \] 
-            è una variabile aleatoria, indipendente da \(V_t\) e \(V^*_t\), che indica se l'interazione avviene o no; essa dipende dalla funzione \(B\colon\mathbb R\to\mathbb R_+\), detta nucleo di collisione, che permette d'avere una maggiore espressività sulle collisioni molecolari le quali possono influenzare  il tasso d'interazione tra le molecole. Per definizione di \(\Theta\) deve valere \(B((V^*_t-V_t)\cdot n)\Delta t\le1\) condizione soddisfacibile anche prendendo un passo temporale \(\Delta t\) adattivo.
+                \langle\cdot\rangle\equiv\frac1{4\pi}\int_{\mathbb S^2}\cdot\de n
+            \]
+            indica la media rispetto a \(n\), \(B(\mathbf v,\mathbf v_*,n)\) è una forma breve per \(B((\mathbf v-\mathbf v_*)\cdot n)\) e si è posto \(\mathbf V\equiv(\mathbf V_t,\mathbf V^*_t)\) la cui legge congiunta è \(f_{\mathbf V}(\mathbf v,\mathbf v_*,t)\). È infine necessario sommare le due equazioni in \eqref{eqInterazioniOsservabiliContinue}. S'inizi dal primo membro:
+            %
+            \begin{equation}
+                \label{eqSommaPrimoMembroIOC}
+                \derS{}t\int_{\mathbb R^3}\varphi(\mathbf v)f(\mathbf v,t)\de\mathbf v+
+                \derS{}t\int_{\mathbb R^3}\varphi(\mathbf v^*)f(\mathbf v_*,t)\de\mathbf v_*
+                =2\derS{}t\int_{\mathbb R^3}\varphi(\mathbf v)f(\mathbf v,t)\de\mathbf v,
+            \end{equation}
+            %
+            infatti dal'\cref{ossLeggiIndistinguibili} le due leggi sono di fatto identiche come lo è il dominio d'integrazione, quindi basta il cambio di variabile \(\mathbf v_*=\mathbf v\) nel secondo integrale per rendersi conto dell'equivalenza. Per il secondo membro sono necessarie due ulteriori fondamentali ipotesi:
 
-            Si noti come \(B\) dipenda da \((V_*-V)\cdot n\) cosa che permette d'interpretare \(n\) come la direzione lungo la quale le interazioni sono piú frequenti.
+            \begin{ipo}
+                Si assume che il nucleo di collisione sia una funzione pari:
+                %
+                \begin{equation}
+                    \label{eqParitàNucleoCollisioneGas}
+                    B((\mathbf v-\mathbf v_*)\cdot n)=B((\mathbf v_*-\mathbf v)\cdot n)
+                    \quad\forall\mathbf v,\mathbf v_*\in\mathbb R^3;
+                \end{equation}
+                %
+                una scelta tipica è il valore assoluto \(\vert\cdot\vert\): \(B((\mathbf v-\mathbf v_*)\cdot n)\equiv\vert(\mathbf v-\mathbf v_*)\cdot n\vert\).
+            \end{ipo}
 
+            \begin{ipo}[\textit{Caos} molecolare]
+                \label{ipCaosMolecolare}
+                Le particelle interagenti secondo le \ref{eqAlgoritmoInterazioniAzioneReazione} sono campionante indipendentemente. Tal'ipotesi è piú facile da giustificare matematicamente che fisicamente perché semplifica di molto conti; in ogni caso, la \ref{ipGasRarefatto} la corrobora poiché in un gas rarefatto è naturale che se due particelle interagiscono, prima che ricollidano, avranno perso ogni vicendevole dipendenza a causa delle innumerevoli altre interazioni colle altre particelle.
+            \end{ipo}
 
+            \begin{oss}
+                Dal'\cref{ipCaosMolecolare}, unitamente alla \cref{prtLeggeCongiuntaIndipendente}, si deduce che la legge congiunta del vettore aleatorio \(\mathbf V\equiv(\mathbf V_t,\mathbf V^*_t)\) è data dal prodotto
+                \[
+                    f_{\mathbf V}(\mathbf v,\mathbf v_*,t)
+                    =f_{\mathbf V_t}(\mathbf v,t)f_{\mathbf V^*_t}(\mathbf v_*,t)
+                    =f(\mathbf v,t)f(\mathbf v_*,t)
+                    \quad\forall \mathbf v,\mathbf v_*\in\mathbb R^3.
+                \]
+            \end{oss}
+
+            In tal modo il termine moltiplicato a \(\varphi(v_*)\) nel secondo membro della seconda equazione della \eqref{eqInterazioniOsservabiliContinue} può essere cosí riformulato:
+            %
+            \begin{equation}
+                \label{eqSommaSecondoMembroIOC}
+                \int_{\mathbb R^6}\langle(\varphi(\mathbf v))
+                B((\mathbf v-\mathbf v_*)\cdot n)\rangle
+                f(\mathbf v,t)f(\mathbf v_*,t)\de\mathbf v\de\mathbf v_*,
+            \end{equation}
+            %
+            seguendo la medesima logica della \eqref{eqSommaPrimoMembroIOC}. Applicando i due risultati illustrati nelle \cref{eqSommaPrimoMembroIOC,eqSommaSecondoMembroIOC} si perviene finalmente alla forma debole dell'equazione di Bolztmann omogenea assimmetrica:
+            %
+            \begin{equation}
+                \label{eqFormaDeboleBoltzmannOmogeneoAssimmetrico}
+                \derS{}t\int_{\mathbb R^3}\varphi f\de\mathbf v=
+                \frac1{4\pi}\int_{\mathbb R^6}\int_{\mathbb S^2}
+                    B(\mathbf v,\mathbf v_*,n)
+                    \left(\frac{\varphi'-\varphi'_*}2-\varphi\right)
+                ff_*\de n\de\mathbf v_*\de\mathbf v,
+            \end{equation}
+            %
+            ove, per brevità di notazione, si sono sottintese le dipendenze per tutte le funzioni, espresse, salvo per il nucleo di collisione, da apici \(\prime\) e asterischi \(*\). Tuttavia, qualora le leggi d'interazioni siano simmetriche secondo la \cref{defLeggiInterazioneSimmetriche}, come in questo caso data la \cref{prpVelocitàCollisionali}, sempre con un cambio di variabili e sfruttrando la parità del nucleo di collisione vale
+            %
+            \begin{equation*}
+                \int_{\mathbb R^6}\left(\left\langle
+                    B(\mathbf v,\mathbf v_*,n)\varphi'
+                \right\rangle\right) ff_*\de\mathbf v_*\de\mathbf v,
+                =\int_{\mathbb R^6}\left(\left\langle
+                    B(\mathbf v,\mathbf v_*,n)\varphi'_*
+                \right\rangle\right) ff_*\de\mathbf v_*\de\mathbf v,
+            \end{equation*}
+            %
+            da cui segue la forma debole dell'equazione di Bolztmann omogenea simmetrica:
+            %
+            \begin{equation}
+                \label{eqFormaDeboleBoltzmannOmogeneoSimmetrico}
+                \derS{}t\int_{\mathbb R^3}\varphi f\de\mathbf v=
+                \frac1{4\pi}\int_{\mathbb R^6}\int_{\mathbb S^2}
+                    B(\mathbf v,\mathbf v_*,n)
+                    \left(\varphi'-\varphi\right)
+                ff_*\de n\de\mathbf v_*\de\mathbf v.
+            \end{equation}
+            %
+            Si può anche ricavare la forma forte considerando la funzione invertendo le leggi d'interazione \eqref{eqLeggiInterazioneGas} \cite[§ 2.5, p. 15]{Loy2025EKTMAS}, ma il conto esula dagli scopi di questo elaborato; cionnonostante si riporta come riferimento la forma forte dell'equazione di Boltzmann omogenea simmetrica:
+            %
+            \begin{equation}
+                \label{eqFormaForteBoltzmannOmogeneoSimmetrico}
+                \derP ft=\frac1{4\pi}\int_{\mathbb R^3}\int_{\mathbb S^2}
+                B(\mathbf v,\mathbf v_*,n)\left(f'f'_*-ff_*\right)\de n\de\mathbf v_*.
+            \end{equation}
 
         \subsection{Equazione di Boltzmann disomogenea}
 
@@ -152,7 +610,7 @@
 
             Dopodiché, sia \(X\in\mathcal I\) la posizione di un agente sul grafo \(\mathcal G=(\mathcal I,\mathcal E)\), ove \(\mathcal I\) è l'insieme dei vertici mentre \(\mathcal E\) dei lati di \(\mathcal G\). Si assume che il grafico sia statico, ovvero che le connessioni tra agenti non varia nel tempo.
 
-            Si consideri, allora, un generico agente rappresentativo, il cui stato microscopico è descritto dal processo stocastico \((X,S_t)_{t\geq0}\); la funzione \(S_t:\Omega\to\mathcal P\) è una variabile aleatoria da uno spazio astratto \(\Omega\) allo spazio delle popolazioni \(\mathcal P\) e indica la popolazione dell'agente al tempo \(t\geq0\). Tale variabile aleatoria evolve nel tempo per le interazioni binarie con altri agenti mediate dalle connessioni descritte da \(\mathcal E\), definendo cosí un processo stocastico \(\{S_t,t\in[0,+\infty)\}\).
+            Si consideri, allora, un generico agente rappresentativo, il cui stato microscopico è descritto dal processo stocastico \((X,S_t)_{t\geq0}\); la funzione \(S_t:\Omega\to\mathcal P\) è una v.a. da uno spazio astratto \(\Omega\) allo spazio delle popolazioni \(\mathcal P\) e indica la popolazione dell'agente al tempo \(t\geq0\). Tale v.a. evolve nel tempo per le interazioni binarie con altri agenti mediate dalle connessioni descritte da \(\mathcal E\), definendo cosí un processo stocastico \(\{S_t,t\in[0,+\infty)\}\).
 
             Nel complesso di descrive statisticamente lo stato microscopico \(X,S_t\) dell'agente mediante una probabilità di misura \(f=f(x,s,t)\), discreta in \(x\in\mathcal I\) e continua in \(s\in\mathcal P\). Pertanto si può dare alla \(f\) la seguente forma
             %
@@ -189,7 +647,7 @@
                 S_{t+\Delta t}=(1-\Theta)S_t+\Theta S'_t,
             \end{equation}
             %
-            ove \(\Theta\in{0,1}\) è una variabile aleatoria che tiene in considerazione qualora l'interazione tra i due agenti effettivamente si manifesti \((\Theta=1)\) o no \((\Theta=0)\); d'altro canto \(S'_t\in\mathcal P\) è la nuova popolazione ottenuta dall'agente \((X,V_t)\) in seguito a un'interazione avvenuta.
+            ove \(\Theta\in{0,1}\) è una v.a. che tiene in considerazione qualora l'interazione tra i due agenti effettivamente si manifesti \((\Theta=1)\) o no \((\Theta=0)\); d'altro canto \(S'_t\in\mathcal P\) è la nuova popolazione ottenuta dall'agente \((X,V_t)\) in seguito a un'interazione avvenuta.
 
             Con maggiore dettaglio si pone
             %
@@ -211,7 +669,7 @@
             %
             dove la coppia ordinata \((X,X^*)\) denota il lato dal vertice \(X\) al vertice \(X^*\); per coerenza è necessario imporre \(\Delta t\leq1\) che impone un limite superiore al massimo passo temporale ammissibile, seppure tale condizione sia molto facile da verificare nella pratica.
 
-            La popolazione postinterazione è una variabile aleatoria \(S'_t:\Omega\to\mathcal P\) dipendente in generale dagli stati preinterazione \(V_t\), \(V^*_t\) degli agenti integranti:
+            La popolazione postinterazione è una v.a. \(S'_t:\Omega\to\mathcal P\) dipendente in generale dagli stati preinterazione \(V_t\), \(V^*_t\) degli agenti integranti:
             %
             \begin{equation}
                 \label{eqPopolazionePostInterazione}
@@ -435,7 +893,7 @@
 
             Tuttavia, se una città può interagire con un'altra, allora è sempre possibile l'opposto; dunque il grafo in questione è diretto ma con struttura indiretta, ovvero la sua matrice d'adiacenza è simmetrica; a livello matematico, ciò implica che la matrice d'adiacenza \(\mathbf M\) è simmetrica.
 
-            Gli stati postinterazione \eqref{eqStatiPostInterazioni} prendono come riferimento leggi d'interazioni lineari
+            Gli stati postinterazione \eqref{eqStatiPostInterazioni} prendono come riferimento leggi d'interazione lineari
             %
             \begin{equation}
                 \label{eqStatiPostInterazioniLineari}
@@ -455,7 +913,7 @@
                 \end{aligned}\right.
             \end{equation}
             %
-            ove \(s\) e \(s_*\) sono le città interagente e subente rispettivamente, \(E(s,s_*)\) e \(I(s,s_*)\) sono rispettivamente i tassi di emigrazione e immigrazione, mentre \(\gamma\) rappresenta fluttuazioni stocastiche da definire; rispetto alle leggi d'interazioni lineari \eqref{eqStatiPostInterazioniLineari} le \eqref{eqSchemaInterazioneCittà} soddisfano
+            ove \(s\) e \(s_*\) sono le città interagente e subente rispettivamente, \(E(s,s_*)\) e \(I(s,s_*)\) sono rispettivamente i tassi di emigrazione e immigrazione, mentre \(\gamma\) rappresenta fluttuazioni stocastiche da definire; rispetto alle leggi d'interazione lineari \eqref{eqStatiPostInterazioniLineari} le \eqref{eqSchemaInterazioneCittà} soddisfanno
             %
             \begin{equation}
                 \label{eqLegameLineareInterazioneCittà}
@@ -536,10 +994,10 @@
             Con queste si possono allora analizzare alcune distribuzioni continue:
 
             \begin{itemize}[label=\(\diamond\)]
-                \item la distribuzione normale non soddisfa la \ref{ipFluttuazioniPositivitàNegatività} poiché può assumere valori reali arbitrari con probabilità non nulla;
-                \item la distribuzione uniforme è adeguata solo per intervalli finiti e diventa degenere quando un suo estremo diverge, per cui non soddisfa né \ref{ipFluttuazioniMediaNulla} né \ref{ipFluttuazioniProbabilitàDecrescente}, mentre \ref{ipFluttuazioniPositivitàNegatività} si;
+                \item la distribuzione normale non soddisfà la \ref{ipFluttuazioniPositivitàNegatività} poiché può assumere valori reali arbitrari con probabilità non nulla;
+                \item la distribuzione uniforme è adeguata solo per intervalli finiti e diventa degenere quando un suo estremo diverge, per cui non soddisfà né \ref{ipFluttuazioniMediaNulla} né \ref{ipFluttuazioniProbabilitàDecrescente}, mentre \ref{ipFluttuazioniPositivitàNegatività} si;
                 \item la distribuzione esponenziale è quella piú promettente perché riflette sia \ref{ipFluttuazioniMediaNulla} (dopo un'opportuna traslazione dei valori campionati) che \ref{ipFluttuazioniProbabilitàDecrescente}, ma sfortunatamente non \ref{ipFluttuazioniPositivitàNegatività} perché il valore estremo \(\gamma=E(s,s_*)-1\) ha probabilità non nulla [anzi massima] d'essere campionato;
-                \item l'unica distribuzione che soddisfa tutt'e tre le caratteristiche ricercate è proprio la distribuzione gamma.
+                \item l'unica distribuzione che soddisfà tutt'e tre le caratteristiche ricercate è proprio la distribuzione gamma.
             \end{itemize}
 
             Si consideri allora una distribuzione gamma avente la seguente funzione di densità di probabilità:
@@ -557,7 +1015,7 @@
                 \Gamma(\alpha)\equiv\int_0^{+\infty}y^{\alpha+1}e^{-y}\de y.
             \end{equation}
             %
-            Si scelga \(\hat\gamma\sim\DstrGamma(\alpha,\theta)\), che soddisfa per definizione la \ref{ipFluttuazioniProbabilitàDecrescente}, e s'imponga
+            Si scelga \(\hat\gamma\sim\DstrGamma(\alpha,\theta)\), che soddisfà per definizione la \ref{ipFluttuazioniProbabilitàDecrescente}, e s'imponga
             %
             \begin{equation}
                 \label{eqMediaVarianzaFluttuazioni}

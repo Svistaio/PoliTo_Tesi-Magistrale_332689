@@ -32,6 +32,22 @@
     \crefrangeformat{table}{Tabb.~#3#1#4--#5#2#6}
     \crefmultiformat{table}{Tabb.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
     \crefrangemultiformat{table}{Tabb.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{prp}{Prop.}{Propp.}
+    \crefrangeformat{figure}{Propp.~#3#1#4--#5#2#6}
+    \crefmultiformat{figure}{Propp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{figure}{Propp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{dfn}{Def.}{Deff.}
+    \crefrangeformat{figure}{Deff.~#3#1#4--#5#2#6}
+    \crefmultiformat{figure}{Deff.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{figure}{Deff.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{oss}{Oss.}{Oss.ni}
+    \crefrangeformat{figure}{Oss.ni~#3#1#4--#5#2#6}
+    \crefmultiformat{figure}{Oss.ni~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{figure}{Oss.ni~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    % https://www.treccani.it/magazine/lingua_italiana/domande_e_risposte/grammatica/grammatica_123.html
 %\endgroup
 
 %\begingroup TikZ
@@ -139,15 +155,21 @@
 
     \newcommand\de[1][]{\mathrm{d}#1}
     \newcommand\derS[3][d]{\frac{\mathrm{#1}#2}{\mathrm{#1}#3}}
+    \newcommand\derP[2]{\frac{\partial#1}{\partial#2}}
     
     \DeclareMathOperator\DstrLognormale{Lognormale}
     \DeclareMathOperator\DstrBernoulli{Bernoulli}
     \DeclareMathOperator\DstrGamma{Gamma}
 
+    % \newcommand\independent{\perp\!\!\!\!\!\!\!\!\!\!\perp}
+    \newcommand\independent{\perp\hspace{-.5em}\perp}
+
     \theoremstyle{definition}
     \newtheorem{dfn}{Definizione}[chapter]
-    \newtheorem{dfnn}{Definizioni}[chapter]
+    % \newtheorem{dfnn}{Definizioni}[chapter]
     \newtheorem{ipo}{Ipotesi}[chapter]
+    \newtheorem{oss}{Osservazione}[chapter]
+    \newtheorem{prt}{Proprietà}[chapter]
 
     \theoremstyle{plain}
     \newtheorem{prp}{Proposizione}[chapter]
