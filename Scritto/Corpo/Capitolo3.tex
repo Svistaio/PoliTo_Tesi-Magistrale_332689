@@ -11,9 +11,9 @@
    
     S'inizia prima dando delle nozioni generali di teoria della probabilità colle quali si deriva successivamente la celeberrima equazione di Boltzmann a partire da una descrizione stocastica delle particelle di un gas; quindi si passa a generalizzare tali risultati per mediare le interazioni tramite una struttura topologica sottostante gli agenti, sia in modo esatto che approssimato; successivamente si descrivono le equazioni cinetiche nel caso corrente; infine si conclude analizzando le ipotesi semplificative che portano dalla presente teoria a quella classica di Boltzmann.
 
-    \section{Definizioni preliminari}
+    \section{Definizioni preliminari di probabilità}\label{secDefinizioniPreliminariProbabilitàTCSMA}
 
-        Si annoverano ora molti concetti di teoria della probabilità avvisando, però, che per molti di essi è impossibile entrare eccessivamente nei dettagli senza spiegare un intero corso; in ogni caso si rimanda a \cite{Durrett2019PTE} per gl'interessati.
+        Si annoverano ora alcuni concetti e risultati di teoria della probabilità avvisando, però, che per molti di essi è impossibile entrare eccessivamente nei dettagli senza spiegare un intero corso; in ogni caso si rimanda a \cite{Durrett2019PTE} per gl'interessati.
 
         \begin{dfn}[Variabile aleatoria]
             \label{defVariabileAleatoria}
@@ -243,9 +243,9 @@
             il che significa che l'attesa di \(\varphi(\mathbf X,\mathbf Y)\) si calcola mediando rispetto a \(\mathbf Y\) la v.a. \(\mathbb E[\mathbf X|\mathbf Y]\), ricavata dalla \eqref{eqAttesaCondizionataEvento} ma considerando \(\mathbf y\) arbitrario.
         \end{oss}
 
-    \section{Descrizione cinetica classica}
+    \section{Descrizione cinetica classica}\label{secDescrizioneClassica}
 
-        \subsection{Equazione di Boltzmann omogenea}
+        \subsection{Equazione di Boltzmann omogenea}\label{secBoltzmannOmogeno}
             Innanzitutto è necessario caratterizzare alcune proprietà del gas da modellizzare.
 
             \begin{ipo}
@@ -287,7 +287,7 @@
             Dalla \ref{ipGasCollisioniElastiche} si possono in realtà esprimere le velocità poscollisionali a partire da quelle precollisionali, definendo quelle che sono le leggi d'interazione.
 
             \begin{prp}[Leggi d'interazione]\label{prpVelocitàCollisionali}
-                Esistono due funzioni \(\psi,\psi_*\colon\mathbb R^3\to\mathbb R^3\) che soddisfanno \cref{eqConservazioneImpulso,eqConservazioneEnergia} e tali che
+                Esistono due funzioni \(\psi,\psi_*\colon\mathbb R^3\to\mathbb R^3\) lineari che soddisfanno \cref{eqConservazioneImpulso,eqConservazioneEnergia} e tali che
                 %
                 \begin{equation}
                     \label{eqLeggiInterazioneGas}
@@ -374,7 +374,7 @@
             \begin{equation}
                 \label{eqVelocitàPosCollisionaliStatistiche}
                 \begin{aligned}
-                    \mathbf V'&=\psi(V,\mathbf V_*)\equiv\mathbf V+[(\mathbf V_*-\mathbf V)\cdot n]n,\\
+                    \mathbf V'&=\psi(\mathbf V,\mathbf V_*)\equiv\mathbf V+[(\mathbf V_*-\mathbf V)\cdot n]n,\\
                     \mathbf V'_*&=\psi_*(\mathbf V,\mathbf V_*)\equiv \mathbf V_*+[(\mathbf V-\mathbf V_*)\cdot n]n,
                 \end{aligned}
             \end{equation}
@@ -384,7 +384,7 @@
             Tuttavia l'interazione tra due particelle non è detto che avvenga, aspetto formulabile introducendo 
             %
             \begin{equation}
-                \label{eqBernoulliInterazione}
+                \label{eqBernoulliInterazioneGas}
                 \Theta\sim\DstrBernoulli(B((\mathbf V^*_t-\mathbf V_t)\cdot n)\Delta t)
             \end{equation}
             %
@@ -415,22 +415,22 @@
 
             Colle \cref{eqVelocitàPosCollisionaliStatistiche,eqBernoulliInterazione}, lo stato dei due agenti al tempo \(t+\Delta t\) successivo è dunque dato dal seguente algoritmo d'interazione:
             %
-            \begin{equation*}
-                \def\theequation{[AR]}
-                \refstepcounter{equation}
-                \label{eqAlgoritmoInterazioniAzioneReazione}
-                [AR]\left\{
+            \begin{equation}
+                % \def\theequation{[AR]}
+                % \refstepcounter{equation}
+                \label{eqAlgoritmoInterazioniGas}
+                % [AR]\left\{
                 \begin{aligned}
-                    \mathbf V_{t+\Delta t}   & =(1-\Theta)\mathbf V_t+\Theta\mathbf V'_t,            \\
-                    \mathbf V^*_{t+\Delta t} & =(1-\Theta)\mathbf V^*_t+\Theta\mathbf V^{*\prime}_t,
+                    \mathbf V_{t+\Delta t}  &=(1-\Theta)\mathbf V_t+\Theta\mathbf V'_t,\\
+                    \mathbf V^*_{t+\Delta t}&=(1-\Theta)\mathbf V^*_t+\Theta\mathbf V^{*\prime}_t,
                 \end{aligned}
-                \right.
-                \notag
-            \end{equation*}
+                % \right.
+                % \notag
+            \end{equation}
             %
-            dove l'acronimo \ref{eqAlgoritmoInterazioniAzioneReazione} sta per «Azione-Reazione» e descrive il fatto che ogni interazione (azione) necessariamente modifica entrambi gli stati degli agenti coinvolti (reazione); in alcuni contesti \cite{Nurisso2024} questa regola può essere alterata dimodoché solo il nodo interagente sia modificato portando alle interazioni «Azione-Azione».
+            dove l'acronimo \ref{eqAlgoritmoInterazioniGas} sta per «Azione-Reazione» e descrive il fatto che ogni interazione (azione) necessariamente modifica entrambi gli stati degli agenti coinvolti (reazione); in alcuni contesti \cite{Nurisso2024} questa regola può essere alterata dimodoché solo il nodo interagente sia modificato portando alle interazioni «Azione-Azione».
 
-            L'idea successiva, al fine di ricavare un modello dell'evoluzione di \(f\), è di mediare le \ref{eqAlgoritmoInterazioniAzioneReazione} attraverso una funzione arbitraria \(\varphi\colon\mathbb R^3\to\mathbb R\), detta quantità osservabile, computabile dalle realizzazioni o di \(\mathbf V_{t+\Delta t}\) o di \(\mathbf V_{t+\Delta t}\); pertanto una volta applicato \(\varphi(\cdot)\) alle \ref{eqAlgoritmoInterazioniAzioneReazione},
+            L'idea successiva, al fine di ricavare un modello dell'evoluzione di \(f\), è di mediare le \ref{eqAlgoritmoInterazioniGas} attraverso una funzione arbitraria \(\varphi\colon\mathbb R^3\to\mathbb R\), detta quantità osservabile, computabile dalle realizzazioni o di \(\mathbf V_{t+\Delta t}\) o di \(\mathbf V_{t+\Delta t}\); pertanto una volta applicato \(\varphi(\cdot)\) alle \ref{eqAlgoritmoInterazioniGas},
             %
             \begin{equation*}
                 \begin{aligned}
@@ -522,6 +522,7 @@
             infatti dal'\cref{ossLeggiIndistinguibili} le due leggi sono di fatto identiche come lo è il dominio d'integrazione, quindi basta il cambio di variabile \(\mathbf v_*=\mathbf v\) nel secondo integrale per rendersi conto dell'equivalenza. Per il secondo membro sono necessarie due ulteriori fondamentali ipotesi:
 
             \begin{ipo}
+                \label{ipParitàTassoInterazioneGas}
                 Si assume che il nucleo di collisione sia una funzione pari:
                 %
                 \begin{equation}
@@ -534,12 +535,12 @@
             \end{ipo}
 
             \begin{ipo}[\textit{Caos} molecolare]
-                \label{ipCaosMolecolare}
-                Le particelle interagenti secondo le \ref{eqAlgoritmoInterazioniAzioneReazione} sono campionante indipendentemente. Tal'ipotesi è piú facile da giustificare matematicamente che fisicamente perché semplifica di molto conti; in ogni caso, la \ref{ipGasRarefatto} la corrobora poiché in un gas rarefatto è naturale che se due particelle interagiscono, prima che ricollidano, avranno perso ogni vicendevole dipendenza a causa delle innumerevoli altre interazioni colle altre particelle.
+                \label{ipCaoMolecolare}
+                Le particelle interagenti secondo le \ref{eqAlgoritmoInterazioniGas} sono campionante indipendentemente. Tal'ipotesi è piú facile da giustificare matematicamente che fisicamente perché semplifica di molto conti; in ogni caso, la \ref{ipGasRarefatto} la corrobora poiché in un gas rarefatto è naturale che se due particelle interagiscono, prima che ricollidano, avranno perso ogni vicendevole dipendenza a causa delle innumerevoli altre interazioni colle altre particelle.
             \end{ipo}
 
             \begin{oss}
-                Dal'\cref{ipCaosMolecolare}, unitamente alla \cref{prtLeggeCongiuntaIndipendente}, si deduce che la legge congiunta del vettore aleatorio \(\mathbf V\equiv(\mathbf V_t,\mathbf V^*_t)\) è data dal prodotto
+                Dal'\cref{ipCaoMolecolare}, unitamente alla \cref{prtLeggeCongiuntaIndipendente}, si deduce che la legge congiunta del vettore aleatorio \(\mathbf V\equiv(\mathbf V_t,\mathbf V^*_t)\) è data dal prodotto
                 \[
                     f_{\mathbf V}(\mathbf v,\mathbf v_*,t)
                     =f_{\mathbf V_t}(\mathbf v,t)f_{\mathbf V^*_t}(\mathbf v_*,t)
@@ -553,19 +554,19 @@
             \begin{equation}
                 \label{eqSommaSecondoMembroIOC}
                 \int_{\mathbb R^6}\langle(\varphi(\mathbf v))
-                B((\mathbf v-\mathbf v_*)\cdot n)\rangle
+                B(\mathbf v,\mathbf v_*,n)\rangle
                 f(\mathbf v,t)f(\mathbf v_*,t)\de\mathbf v\de\mathbf v_*,
             \end{equation}
             %
-            seguendo la medesima logica della \eqref{eqSommaPrimoMembroIOC}. Applicando i due risultati illustrati nelle \cref{eqSommaPrimoMembroIOC,eqSommaSecondoMembroIOC} si perviene finalmente alla forma debole dell'equazione di Bolztmann omogenea assimmetrica:
+            seguendo la medesima logica della \eqref{eqSommaPrimoMembroIOC}. Applicando i due risultati illustrati nelle \cref{eqSommaPrimoMembroIOC,eqSommaSecondoMembroIOC} si perviene finalmente all'equazione di Bolztmann omogenea assimmetrica in forma debole:
             %
             \begin{equation}
-                \label{eqFormaDeboleBoltzmannOmogeneoAssimmetrico}
+                \label{eqFormaDeboleBoltzmannOmogeneoAssimmetricoGas}
                 \derS{}t\int_{\mathbb R^3}\varphi f\de\mathbf v=
                 \frac1{4\pi}\int_{\mathbb R^6}\int_{\mathbb S^2}
                     B(\mathbf v,\mathbf v_*,n)
-                    \left(\frac{\varphi'-\varphi'_*}2-\varphi\right)
-                ff_*\de n\de\mathbf v_*\de\mathbf v,
+                    \left(\frac{\varphi'+\varphi'_*}2-\varphi\right)
+                ff_*\de n\de\mathbf v\de\mathbf v_*,
             \end{equation}
             %
             ove, per brevità di notazione, si sono sottintese le dipendenze per tutte le funzioni, espresse, salvo per il nucleo di collisione, da apici \(\prime\) e asterischi \(*\). Tuttavia, qualora le leggi d'interazioni siano simmetriche secondo la \cref{defLeggiInterazioneSimmetriche}, come in questo caso data la \cref{prpVelocitàCollisionali}, sempre con un cambio di variabili e sfruttrando la parità del nucleo di collisione vale
@@ -573,13 +574,13 @@
             \begin{equation*}
                 \int_{\mathbb R^6}\left(\left\langle
                     B(\mathbf v,\mathbf v_*,n)\varphi'
-                \right\rangle\right) ff_*\de\mathbf v_*\de\mathbf v,
+                \right\rangle\right) ff_*\de\mathbf v\de\mathbf v_*,
                 =\int_{\mathbb R^6}\left(\left\langle
                     B(\mathbf v,\mathbf v_*,n)\varphi'_*
-                \right\rangle\right) ff_*\de\mathbf v_*\de\mathbf v,
+                \right\rangle\right) ff_*\de\mathbf v\de\mathbf v_*,
             \end{equation*}
             %
-            da cui segue la forma debole dell'equazione di Bolztmann omogenea simmetrica:
+            da cui segue l'equazione di Bolztmann omogenea simmetrica in forma debole:
             %
             \begin{equation}
                 \label{eqFormaDeboleBoltzmannOmogeneoSimmetrico}
@@ -587,10 +588,10 @@
                 \frac1{4\pi}\int_{\mathbb R^6}\int_{\mathbb S^2}
                     B(\mathbf v,\mathbf v_*,n)
                     \left(\varphi'-\varphi\right)
-                ff_*\de n\de\mathbf v_*\de\mathbf v.
+                ff_*\de n\de\mathbf v\de\mathbf v_*.
             \end{equation}
             %
-            Si può anche ricavare la forma forte considerando la funzione invertendo le leggi d'interazione \eqref{eqLeggiInterazioneGas} \cite[§ 2.5, p. 15]{Loy2025EKTMAS}, ma il conto esula dagli scopi di questo elaborato; cionnonostante si riporta come riferimento la forma forte dell'equazione di Boltzmann omogenea simmetrica:
+            Si può anche ricavare la forma forte della \eqref{eqFormaDeboleBoltzmannOmogeneoSimmetrico} considerando le leggi d'interazione inverse della \eqref{eqLeggiInterazioneGas} \cite[§ 2.5, p. 15]{Loy2025EKTMAS}, ma il conto esula dagli scopi di questo elaborato; cionnonostante si riporta come riferimento per la sezione a venire:
             %
             \begin{equation}
                 \label{eqFormaForteBoltzmannOmogeneoSimmetrico}
@@ -598,11 +599,175 @@
                 B(\mathbf v,\mathbf v_*,n)\left(f'f'_*-ff_*\right)\de n\de\mathbf v_*.
             \end{equation}
 
-        \subsection{Equazione di Boltzmann disomogenea}
+        \subsection{Equazione di Boltzmann disomogenea}\label{secBoltzmannDisomogeno}
 
-        \subsection{Equazione di tipo Boltzmann omogenea}
+            L'equazione originariamente ricavata da Boltzmann non è la \eqref{eqFormaForteBoltzmannOmogeneoSimmetrico}, bensí è quella disomogenea la cui unica differenza è la presenza di un termine avvettivo \(\mathbf v\cdot\nabla f\) a primo membro:
+            %
+            \begin{equation}
+                \label{eqFormaForteBoltzmannDisomogeneoSimmetrico}
+                \derP ft+\mathbf v\cdot\nabla f
+                =\frac1{4\pi}\int_{\mathbb R^3}\int_{\mathbb S^2}
+                B(\mathbf v,\mathbf v_*,n)\left(f'f'_*-ff_*\right)
+                \de n\de\mathbf v_*,
+            \end{equation}
+            %
+            dove l'operatore \(\nabla\equiv(\partial_{x_1},\partial_{x_2},\partial_{x_3})\) è il gradiente spaziale e la distribuzione dipende ora anche dallo spazio: \(f\equiv f(\mathbf x,\mathbf v,t)\). Essa è un'equazione integro-differenziale della distribuzione statistica delle posizioni e delle velocità a tempo dato.
 
-    \section{Descrizione cinetica retale}\label{secDescrizioneCinetica} %  d'interazioni mediante da un grafo
+            Il primo membro della \eqref{eqFormaForteBoltzmannDisomogeneoSimmetrico} non è altro che la derivata materiale della distribuzione \(f\): posto \(B(\mathbf v,\mathbf v_*,t)\equiv0\), ovvero in mancanza di collisioni, l'equazione involve in una del trasporto lineare con soluzione nota.
+            
+            \begin{prp}
+                La soluzione dell'equazione del trasporto lineare
+                %
+                \begin{equation}
+                    \label{eqTrasportoLineare}
+                    \derP ft+\mathbf v\cdot\nabla f=0
+                \end{equation}
+                %
+                ha come soluzione \(f(\mathbf x,\mathbf v,t)=f_0(\mathbf x-\mathbf vt,\mathbf v)\) in cui \(f_0=f(x,v,0)\) è la distribuzione iniziale.
+            \end{prp}
+
+            \begin{proof}
+                Si procede usando il metodo delle caratteristiche: nella \eqref{eqTrasportoLineare} la velocità \(\mathbf v\) nell'operatore avvettivo non dipende né dallo spazio né dal tempo, quindi si possono prendere le curve \(\mathbf x(t)\) tali che
+                %
+                \begin{equation}
+                    \label{eqCurveCaratteristiche}
+                    \derS{\mathbf x}t=\mathbf v\ \ \implies\ \ \mathbf x(t)=\mathbf x_0+\mathbf vt
+                \end{equation}
+                %
+                dette, appunto, curve caratteristiche della \eqref{eqTrasportoLineare}; valutando allora la distribuzione \(f(\mathbf x,\mathbf v,t)\) lungo di esse si può definire \(\hat f(t)=f(\mathbf x(t),\mathbf v,t)\) che derivata equivale a
+                \[
+                    \derS{\hat f}t=\derP ft+\nabla f\cdot\derS{\mathbf x}t=\derP ft+\mathbf v\cdot\nabla f=0
+                    \ \ \implies\ \ \hat f(t)=\text{costante}\quad\forall t\geq0
+                \]
+                da cui si deduce che \(f\) è costante lungo le caratteristiche; ma dalla \eqref{eqCurveCaratteristiche} si può scrivere, trascurando la dipendenza dal tempo, \(\mathbf x_0=\mathbf x-\mathbf vt\), dunque la soluzione in un generico punto \((\mathbf x,\mathbf v,t)\) sarà data da
+                \[
+                    f(\mathbf x,\mathbf v,t)
+                    =\hat f(t)=\hat f(0)
+                    =f(\mathbf x_0,\mathbf v,0)
+                    =f_0(\mathbf x_0,\mathbf v)
+                    =f_0(\mathbf x-\mathbf vt,\mathbf v),
+                \]
+                considerando nella prima uguaglianza la caratteristica che al tempo \(t\) passa per \(\mathbf x\).
+            \end{proof}
+
+            Ciò significa che in assenza di collisioni la distribuzione iniziale \(f_0\) semplicemente trasla rigidamente nello spazio allo scorrere del tempo lungo la direzione della velocità costante \(\mathbf v\), movimento che rappresenta la variazione medi statistica delle posizioni molecolari.
+
+            D'altra parte il secondo membro della \eqref{eqFormaForteBoltzmannDisomogeneoSimmetrico} rappresenta la variazione media statistica dalle velocità molecolari a causa delle collisioni (viene perciò anche chiamato operatore collisionale).
+            
+            Pertanto la \eqref{eqFormaForteBoltzmannDisomogeneoSimmetrico} descrive una chiara separazione di effetti: il primo membro altera solo la posizione delle particelle per il trasporto libero, mentre il secondo comporta esclusivamente variazioni della velocità per le collisioni.
+
+            L'obbiettivo di Boltzmann tramite la \eqref{eqFormaForteBoltzmannDisomogeneoSimmetrico} era di raccordare due mondi: il mondo macroscopico, che all'equilibrio termodinamico restituisce quantità fisiche stazionarie e ben definite, e quello microscopico la cui descrizione molecolare implica una continua e caotica variazione delle stesse quantità fisiche anche in condizioni di equilibrio termodinamico (agitazione termica).
+
+            Ciò è stato possibile grazie all'introduzione dei momenti statistici, ossia di quantità macroscopiche calcolabili a partire dalla distribuzione \(f\) soddisfacente la \eqref{eqFormaForteBoltzmannDisomogeneoSimmetrico}; i principali sono
+            %
+            \begin{equation}
+                \label{eqPrincipaliMomentiBoltzmannGas}
+                \begin{aligned}
+                    \rho(\mathbf x,t)&\equiv\int_{\mathbb R^3}f(\mathbf x,\mathbf v,t)\de\mathbf v
+                    &\text{densità,}\\
+                    \mathbf u(\mathbf x,t)&\equiv\frac1{\rho(\mathbf x,t)}\int_{\mathbb R^3}\mathbf vf(\mathbf x,\mathbf v,t)\de\mathbf v
+                    &\text{velocità massica,}\\
+                    E(\mathbf x,t)&\equiv\frac1{\rho(\mathbf x,t)}\Vert\mathbf v\Vert^2\int_{\mathbb R^3}f(\mathbf x,\mathbf v,t)\de\mathbf v
+                    &\text{energia totale,}\\
+                    e(\mathbf x,t)&\equiv\frac1{\rho(\mathbf x,t)}\int_{\mathbb R^3}
+                    \Vert\mathbf v-\mathbf u(\mathbf x,t)\Vert^2f(\mathbf x,\mathbf v,t)\de\mathbf v
+                    &\text{energia interna,}\\
+                    \theta(\mathbf x,t)&\equiv\frac13 e(\mathbf x,t)
+                    &\text{temperatura.}
+                \end{aligned}
+            \end{equation}
+            %
+            Tali quantità sono definite da \(f\) ma questa è in genere infattibile da ricavare dalla \eqref{eqFormaForteBoltzmannDisomogeneoSimmetrico}, vista la difficile trattabilità analitica dell'equazione; eppure, tramite una sua attenta riformulazione in determinati regimi limite \cite{Loy2025EKTMAS,PareschiIMS2013}, è possibile svincolarsi del tutto dall'evoluzione puntuale della \(f\) ricavando un sistema chiuso dei soli momenti \eqref{eqPrincipaliMomentiBoltzmannGas}. La convergenza di questi a un valore stazionario è il nesso tra i due mondi attraverso la descrizione mesoscopica indotta dalla distribuzione \(f\). 
+
+        \subsection{Equazione di tipo Boltzmann omogenea}\label{secTipoBoltzmannOmogeno}
+
+            La derivazione dettagliata nel § \ref{secBoltzmannOmogeno} è valida in realtà per una classe di problemi molto piú generali, detti di tipo Boltzmann omogenei, la cui teoria è stata Pareschi \etal{} \cite{PareschiIMS2013}; sono chiamati cosí per due ragioni:
+
+            \begin{enumerate}[
+                label=\arabic*.,
+                topsep=0.5em,
+                parsep=0em,
+                itemsep=0.25em,
+                leftmargin=2em,
+                rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=3em,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item sono formulati per mezzo di equazioni integro-differenziali analoghe strutturalmente alla \eqref{eqFormaDeboleBoltzmannOmogeneoSimmetrico} e
+                \item sono applicati a contesti\footnotemark{} molto distanti da quello originale delle velocità di particelle di un gas.
+                \footnotetext{Esempi importati sono quello sociofisico, come i vari modelli sulle opinioni, ed econofisico, come quello qui considerato delle città};
+                \item non contengono
+            \end{enumerate}
+            
+            Si ripropongono in questo paragrafo molti risultati analoghi a quelli già visti nella § \ref{secBoltzmannOmogeno} senza però riscrivere tutt'i passaggi.
+
+            Sia \(\mathbf X_t\in I\subseteq\mathbb R^n\) il vettore aleatorio che descrive gli \(n\in\mathbb N_+\) stati microscopici degli agenti di un sistema, ove il dominio \(I\) degli stati non coincide necessariamente coll'intero spazio reale \(\mathbb R^n\).
+
+            Campionati due agenti indipendentemente (\cref{ipCaoMolecolare}), allora gli stati poscollisionali (postati), \(\mathbf X'_t\) e \(\mathbf X^{*\prime}_t\), si legano con quelli precollisionali (prestati), \(\mathbf X_t\) e \(\mathbf X^*_t\), tramite le leggi d'interazione
+            %
+            \begin{equation}
+                \label{eqStatiPosCollisionali}
+                % \eqref{eqVelocitàPosCollisionaliStatistiche}
+                \begin{aligned}
+                    \mathbf X'_t&=\psi(\mathbf X,\mathbf X_*,\mathbf y),\\
+                    \mathbf X^{*\prime}_t&=\psi_*(\mathbf X,\mathbf X_*,\mathbf y_*),
+                \end{aligned}
+            \end{equation}
+            %
+            ove ora \(\psi,\psi_*\colon\mathbb R^n\times\mathbb R^n\times\mathbb R^m\to\mathbb R^n\) sono generiche leggi d'interazione, non necessariamente simmetriche (si v. \cref{defLeggiInterazioneSimmetriche}) o lineari, mentre \(\mathbf y,\mathbf y_*\in\mathbb R^h\) con \(h\in\mathbb N_+\) rappresentano dei coefficienti potenzialmente stocastici.
+
+            L'interazione tra di essi avviene secondo una v.a. di Bernoulli del tipo
+            %
+            \begin{equation}
+                \label{eqBernoulliInterazione}
+                % \eqref{eqBernoulliInterazioneGas}
+                \Theta\sim\DstrBernoulli(\mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,t)\Delta t),
+            \end{equation}
+            %
+            con \[\mu(\mathbf X_t,\mathbf X^*_t,\mathbf W,t)\colon\mathbb R^n\times\mathbb R^n\times\mathbb R^k\times[0,+\infty)\to\mathbb R_+\] tasso d'interazione, per controllare quant'è "probabile"\footnotemark{} che i due agenti interagiscano, e un coefficiente \(\mathbf w\in\mathbf R^k\) potenzialmente stocastico.
+            \footnotetext{Se non si sa o non si vuole toccare quell'aspetto modellistico si può semplicemente porre unitario: \(\mu\equiv1\) \(\forall(\mathbf x,\mathbf x_*,w,t)\in\mathbb R^n\times\mathbb R^n\times\mathbb R^k\times[0,+\infty)\), in tal modo sottintendendo uniforme probabilità d'interazione.}
+
+            Nel complesso i due agenti s'interfacciano mediante l'algoritmo d'interazione
+            %
+            \begin{equation*}
+                \def\theequation{[AR]}
+                \refstepcounter{equation}
+                \label{eqAlgoritmoInterazioni}
+                % \eqref{eqAlgoritmoInterazioniGas}
+                [AR]\left\{
+                \begin{aligned}
+                    \mathbf X_{t+\Delta t}  &=(1-\Theta)\mathbf X_t+\Theta\mathbf X'_t,\\
+                    \mathbf X^*_{t+\Delta t}&=(1-\Theta)\mathbf X^*_t+\Theta\mathbf X^{*\prime}_t,
+                \end{aligned}
+                \right.
+                \notag
+            \end{equation*}
+            %
+            dove \(\Delta t\in\mathbb R_+\) è il passo temporale atto a discretizzare il tempo.
+
+            \begin{oss}
+                l'acronimo \ref{eqAlgoritmoInterazioni} sta per «Azione-Reazione» poiché si suppone che ogni interazione (azione) necessariamente modifica entrambi gli stati degli agenti coinvolti (reazione); in alcuni contesti \cite{Nurisso2024} questa regola può essere alterata dimodoché solo l'agente interagente sia modificato portando alle interazioni «Azione-Azione».
+            \end{oss}
+
+            Infine, riapplicando un ragionamento analogo a quello svolto nel § \ref{secBoltzmannOmogeno} colla quantità osservabile \(\varphi\colon\mathbb R^n\to\mathbb R\), si perviene all'equazione di tipo Boltzmann omogenea generale
+            %
+            \begin{equation}
+                \label{eqFormaDeboleBoltzmannOmogeneoAssimmetrico}
+                % \eqref{eqFormaDeboleBoltzmannOmogeneoAssimmetricoGas}
+                \derS{}t\int_{\mathbb R^n}\varphi f\de\mathbf x=
+                \int_{\mathbb R^{2n}}\left\langle
+                    \mu(\mathbf x,\mathbf x_*,w,t)
+                        \frac{\varphi'+\varphi'_*-\varphi-\varphi_*}2
+                    \right\rangle
+                ff_*\de\mathbf x\de\mathbf x_*,
+            \end{equation}
+            %
+            nella quale \(\langle\cdot\rangle\) rappresenta la media rispetto a tutt'i coefficienti potenzialmente stocastici (\(\mathbf y\), \(\mathbf y_*\) e \(\mathbf w\)), mentre il termine \(-\varphi-\varphi_*\) discende dal fatto che non si è ipotizzato che il tasso d'interazione \(\mu\) sia pari.
+
+    \section{Descrizione cinetica urbana su reti}\label{secDescrizioneCinetica} %  d'interazioni mediante da un grafo
         
         \subsection{Impostazione}
 
@@ -702,7 +867,7 @@
             è definita mediante una funzione \(\Psi_*:\mathcal P^2\times\Omega\to\mathcal P\) potenzialmente diversa da \(\Psi\). Questo tipo d'interazione, prendendo come riferimento \cite[§ 2.2.1]{Nurisso2024} sarà identificato come azione-reazione, e riassunto dall'algoritmo
             %
             \begin{equation*}
-                % \label{eqAlgoritmoInterazioniAzioneReazione}
+                % \label{eqAlgoritmoInterazioniGas}
                 % \refstepcounter{equation}
                 [AR]\left\{
                 \begin{aligned}
@@ -719,9 +884,9 @@
 
         \subsection{Derivazione esatta}
 
-            Una descrizione cinetica dell'algoritmo \refAlgIntAR{} coincide con dell'equazioni d'evoluzione per le distribuzioni di probabiltà \(f_i\) delle opinioni degli agenti; per derivarle si procede mediante un metodo classico nella teoria dei sistemi multiagente \cite{Nurisso2024,IMS2013}.
+            Una descrizione cinetica dell'algoritmo \ref{eqAlgoritmoInterazioni} coincide con dell'equazioni d'evoluzione per le distribuzioni di probabiltà \(f_i\) delle opinioni degli agenti; per derivarle si procede mediante un metodo classico nella teoria dei sistemi multiagente \cite{Nurisso2024,PareschiIMS2013}.
 
-            Sia \(\Phi\equiv\Phi(x,s):\mathcal I\times\mathcal P\to\mathbb R\) un osservabile arbitrario (funzione \textit{test}), cioè una quantità che si può calcolare sapendo lo stato microscopico di un generico agente rappresentativo del sistema. Allora dalla prima equazione in \refAlgIntAR{}, valutando il valore atteso dell'osservabile postinterazione rispetto agl'indici e alla popolazione a tempo fissato, si ha \daRivedere
+            Sia \(\Phi\equiv\Phi(x,s):\mathcal I\times\mathcal P\to\mathbb R\) un osservabile arbitrario (funzione \textit{test}), cioè una quantità che si può calcolare sapendo lo stato microscopico di un generico agente rappresentativo del sistema. Allora dalla prima equazione in \ref{eqAlgoritmoInterazioni}, valutando il valore atteso dell'osservabile postinterazione rispetto agl'indici e alla popolazione a tempo fissato, si ha \daRivedere
             %
             \begin{equation*}
                 %\label{}
@@ -769,7 +934,7 @@
                 \right].
             \end{equation}
             %
-            Si può ricavare una simile equazione ripetendo i precedenti passaggi ma colla seconda equazione di \refAlgIntAR{}, da cui
+            Si può ricavare una simile equazione ripetendo i precedenti passaggi ma colla seconda equazione di \ref{eqAlgoritmoInterazioni}, da cui
             %
             \begin{equation}
                 \label{eqDinamicaValoreAtteso2}
@@ -889,7 +1054,7 @@
         
             Si può ora approfondire il tipo d'interazioni ipotizzate tra città su grafi.
 
-            Innanzitutto, è chiaro che l'interazione d'interesse sia di tipo «azione-reazione» descritta da \refAlgIntAR{}: infatti, se una città interagisce con un'altra, scambiando popolazione, entrambi variano il proprio stato ma non è detto che la seconda interagisca a sua volta colla prima.
+            Innanzitutto, è chiaro che l'interazione d'interesse sia di tipo «azione-reazione» descritta da \ref{eqAlgoritmoInterazioni}: infatti, se una città interagisce con un'altra, scambiando popolazione, entrambi variano il proprio stato ma non è detto che la seconda interagisca a sua volta colla prima.
 
             Tuttavia, se una città può interagire con un'altra, allora è sempre possibile l'opposto; dunque il grafo in questione è diretto ma con struttura indiretta, ovvero la sua matrice d'adiacenza è simmetrica; a livello matematico, ciò implica che la matrice d'adiacenza \(\mathbf M\) è simmetrica.
 
