@@ -13,7 +13,7 @@
     BCOR5mm,
     numbers=noenddot,
     cleardoublepage=empty,
-    tablecaptionabove,
+    tablecaptionabove
 ]{scrreprt}
 
 \input{../Corpo/Pacchetti.tex}
@@ -24,6 +24,9 @@
     \Frontespizio
     \Dedica
 
+    \cleardoublepage
+    \phantomsection
+    \pdfbookmark[1]{\contentsname}{tableofcontents}
     \tableofcontents
     \linenumbers
 
@@ -35,7 +38,14 @@
 
     \input{../Corpo/Appendice.tex}
 
+    \cleardoublepage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{\listfigurename}
     \listoffigures
+
+    \cleardoublepage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{\listtablename}
     \listoftables
 
     \printbibliography

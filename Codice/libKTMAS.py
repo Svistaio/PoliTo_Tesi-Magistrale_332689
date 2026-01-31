@@ -70,7 +70,7 @@ class KineticSimulation():
         self.Mdt = M*dt
 
         # Approximated adjacency matrix
-        Mn = np.sum(M[:,:])
+        Mn = np.sum(M)
         self.wOdt = np.sum(M[:,:],axis=1)*dt/Mn
         self.wI = np.sum(M[:,:],axis=0)
         # M[:,:,1]  = wO@wI/Mn

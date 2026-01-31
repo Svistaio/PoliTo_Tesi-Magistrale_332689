@@ -4,6 +4,8 @@
 
 \chapter{Simulazioni}\label{secSimulazioni}
 
+    Quello che ho riscontrato è che i risultati ottenuti per la Sardegna sono di fatto gli stessi per tutte le regioni, inclusa l'Italia; questa è la ragione per cui in questa sezione ci si concentrerà solo su quella regione. Alla fine, però, si mostrano alcuni grafici anche per l'Italia intera.
+
     \section{Premesse}
 
         \subsection{Metodo Monte Carlo}\label{secMetodoMonteCarlo}
@@ -40,9 +42,32 @@
 
         \subsection{Grafici}
 
-    \section{Leggi d'emigrazione}
+    \section{Regole d'emigrazione}
+
+        La scelta di \(E(s,s_*)\) dipende da come si vuole modellizzare il fenomeno dell'immigrazione.
 
         \subsection{Popolazione}
+
+            Una prima possibilità consiste nella
+            %
+            \begin{equation}
+                \label{eqLeggeEmigrazione}
+                E(s,s_*)\equiv\lambda\frac{(s_*/s)^\alpha}{1+(s_*/s)^\alpha},
+            \end{equation}
+            %
+            che in essenza è la \cite[(2.2), § 2, p. 223]{Gualandi2019SDC} modificata mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019SDC}, ossia è una funzione di Hill di ordine \(\alpha\), in cui v'è un tasso di emigrazione maggiore verso città con popolazione relativa, data dal rapporto \(s_*/s\), maggiore; gli unici due parametri presenti, invece, presentano il seguente significato:
+
+            \begin{itemize}[label=\(\diamond\)]
+                \item \(\lambda\in(0,1)\) rappresenta l'attrattività dei poli, ossia la frazione che le città piú popolose riescono al massimo ad attrarre in un'interazione;
+                \item \(\alpha\in\mathbb R^+\) indica la rapidità d'emigrazione e influenza quanto rapidamente il rapporto \(s_*/s\) raggiunge la massima attrattività \(\lambda\).
+            \end{itemize}
+
+            In poche parole la \eqref{eqLeggeEmigrazione} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
+
+            In questo caso si hanno quindi interazioni non simmetriche, poiché dalla \eqref{eqLegameLineareInterazioneCittà} \(p\neq q\) e \(q\neq p\), e non lineari, a causa della \eqref{eqLeggeEmigrazione}.
+            
+            % Mediante la conservazione di popolazione ho rifatto molto velocemente i conti della formula prima del Teorema 5.1 a p. 16 di [1], confermando che d⟨s⟩/dt=0, come ci si aspetta da questo tipo d'interazione.
+
 
         \subsection{Popolazione-Connettività}
 

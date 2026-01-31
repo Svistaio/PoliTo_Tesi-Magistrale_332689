@@ -9,49 +9,58 @@
     \section{Definizioni miscellanee}\label{secDefinizioniGrafi}
 
         Innanzitutto s'inizia dando la definizione di rete:
-        %
+        
         \begin{dfn}[Grafo]
             \label{defGrafo}
             Un grafo è formato dalla coppia \(\mathcal G=(\mathcal I,\mathcal E)\), ove \(\mathcal I\) è l'insieme degl'indici dei nodi mentre \(\mathcal I\) è l'insieme dei lati, vale a dire di coppie d'indici \(\mathcal I\): due nodi \(i,j\in\mathcal I\) sono connessi sse \((i,j)\in\mathcal E\).
         \end{dfn}
-        %
+        
         Dall'insieme \(\mathcal E\) si può poi specializzare il concetto di grafo:
-        %
+        
         \begin{dfn}[Grafo \textnormal{[in]}diretto]
             \label{defGrafoInDiretto}
             Un grafo è indiretto sse dato \((i,j)\in\mathcal E\) allora \((j,i)\in\mathcal E\) e la direzione è trascurabile; altrimenti è detto diretto.
         \end{dfn}
-        %
-        La trascurabilità della direzione sarà discussa poco dopo nella § \ref{secRetiECittà}, anche se è facilmente intuibile dall'esempio.
-        %
-        \begin{dfn}[Matrice d'adiacenza unitaria e pesata]
+        
+        La trascurabilità della direzione sarà discussa poco dopo nella \cref{secRetiECittà}, anche se è facilmente intuibile dall'esempio.
+        
+        \begin{dfn}[Matrice d'adiacenza]
             \label{defMatriceAdiacenzaUnitariaPesata}
-            Sia \(\vert\mathcal I\vert\) la cardinalità dell'insieme degl'indici, ossia il numero d'indici totali, si definiscono la matrice d'adiacenza unitaria \(A\in\mathbb R^{\vert I\vert\times\vert I\vert}\) e pesata \(W\in\mathbb R^{\vert I\vert\times\vert I\vert}\) come:
+            \newcommand\hspz{\hspace{1em}}
+            Sia \(N\equiv\vert\mathcal I\vert\) la cardinalità dell'insieme degl'indici, ossia il numero di vertici totali, si definisce la matrice d'adiacenza \(\mathbf W\in\mathbb R^{N\times N}\) pesata come:
             %
             \begin{equation}
-                \label{eqMatriceAdiacenzaUnitariaPesata}
-                \newcommand\hspz{\hspace{0.5em}}
-                a_{i,j}\equiv
-                \left\{\begin{aligned}
-                    1&\hspz\text{ se }(i,j)\in\mathcal E\\
-                    0&\hspz\text{ altrimenti}
-                \end{aligned}\right.
-                \hspace{3em}
+                \label{eqMatriceAdiacenzaPesata}
                 w_{i,j}\equiv
                 \left\{\begin{aligned}
-                    q_{i,j}&\hspz\text{ se }(i,j)\in\mathcal E\\
-                    0&\hspz\text{ altrimenti}
+                    q_{i,j}&\hspz\text{ se }(i,j)\in\mathcal E,\\
+                    0&\hspz\text{ altrimenti},
                 \end{aligned}\right.
             \end{equation}
             %
-            ove \(q_{i,j}\) è il peso\footnote{Per es. la matrice d'adiacenza unitaria può essere vista come pesata ponendo \(q_{i,j}\equiv1\).} associato al lato \((i,j)\). Si noti che per i grafi indiretti ambo le matrici risultano simmetriche.
+            ove \(q_{i,j}\) è il peso associato al lato \((i,j)\); nel caso in cui \(q_{i,j}\equiv1\) \(\forall i,j\in\mathcal I\) si ha la matrice d'adiacenza unitaria \(\mathbf A\in\mathbb R^{N\times N}\):
+            %
+            \begin{equation}
+                \label{eqMatriceAdiacenzaUnitaria}
+                a_{i,j}\equiv
+                \left\{\begin{aligned}
+                    1&\hspz\text{ se }(i,j)\in\mathcal E,\\
+                    0&\hspz\text{ altrimenti}.
+                \end{aligned}\right.
+            \end{equation}
+            %
+            Si osserva che, se non altrimenti detto, scrivendo solo «matrice d'adiacenza» si sottintende sempre l'unitarietà.
         \end{dfn}
-        %
+
+        \begin{oss}
+            Per i grafi indiretti sia \(\mathbf W\) che \(\mathbf A\) sono simmetriche mentre per quelli diretti non è detto che sia cosí.
+        \end{oss}
+
         \tikzfigure{H}{.8\linewidth}
             {\input{../../Figure/Scelte/Altro/EsempioGrafo[In]Diretto.tex}}
             {Esempio di un grafo indiretto, della sua equivalente forma diretta [simmetrica] e della loro [identica] matrice d'adiacenza.}
             {1.2\linewidth}{figStrenghtVsDegree20}
-        %
+
         \begin{dfn}[Grado e Forza \textnormal{[entrate/uscente]}]
             \label{defGradoEntranteUscente}
             Dato un indice \(i\in\mathcal I\), in un grafo indiretto non pesato si definisce grado la somma
@@ -63,35 +72,27 @@
                 \sum_{j=1}^{\vert\mathcal I\vert}a_{j,i};
             \end{equation}
             %
-            d'altra parte in un grafo diretto non pesato la seconda equivalenza non è piú [necessariamente] valida, ragion per cui è necessario specializzare il grado in entrante e uscente 
+            d'altra parte in un grafo diretto non pesato la seconda equivalenza non è piú [necessariamente] valida, ragion per cui è necessario specializzare il grado entrante e uscente 
             %
             \begin{equation}
                 \label{eqGradoForzaGrafoDiretto}
-                k^i_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{j,i}
+                k^-_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{j,i}
                 \quad\text{e}\quad
-                k^o_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{i,j},
+                k^+_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{i,j},
             \end{equation}
             %
-            rispettivamente. Se il grafo è invece pesato le definizioni sono le stesse di \cref{eqGradoForzaGrafoIndiretto,eqGradoForzaGrafoDiretto} ma con \(w_{i,j}/w_{j,i}\) in luogo di \(a_{i,j}/a_{j,i}\).
+            rispettivamente.
+           
+            Se il grafo è invece pesato le definizioni sono le stesse di \cref{eqGradoForzaGrafoIndiretto,eqGradoForzaGrafoDiretto} ma con \(w_{i,j}/w_{j,i}\) in luogo di \(a_{i,j}/a_{j,i}\).
         \end{dfn}
-        %
-        Infine in questa trattazione vale la seguente fondamentale ipotesi:
-        %
-        \begin{ipo}
-            Il grafo \(\mathcal G\) è assunto statico: in altre parole, \(\mathcal I\) e \(\mathcal E\) sono costanti nel tempo.
-        \end{ipo}
-        %
-        In altre parole si è solo interessati a prevedere come la popolazione si distribuisce rispetto a una topologia prestabilita \textit{a priori}; ovviamente si tratta di una forte semplificazione dato che nella realtà la topologia delle connessioni interurbane si è chiaramente coevoluta assieme allo sviluppo delle città stesse.
-    
-        % Scrivere tutte le definizioni necessarie (matrice d'adiacenza unitaria e pesata, forza di un nodo, grafo)
 
     \section{Reti e città}\label{secRetiECittà}
 
-        Dopo aver studiato un po' di teoria sui grafi sorge successivamente il problema di come rappresentare mediante i grafi la moltitudine di collegamenti possibili tra le città
+        Dopo aver illustrato un po' di teoria sui grafi sorge successivamente il problema di come rappresentare con essi la moltitudine di collegamenti possibili tra le città
         
         Difatti vi sono molti modi di rappresentare le città mediante i grafi: i primi si pongono a livello \textit{intraurbano}, o considerando le strade come lati e le loro intersezioni come nodi \cite[§ 3.1.3.1 p. 17]{Barthelemy2011}, o rappresentando la rete di trasporto di tram, di bus e della metro \cite[§ 3.2.1 p. 22]{Barthelemy2011}; altri si pongono piú propriamente a livello \textit{interurbano} prendono singolarmente in considerazione varie reti dei trasporti (ferroviario \cite[§ 3.1.3.2 p. 17]{Barthelemy2011}, navale \cite[§ 3.1.4 p. 19]{Barthelemy2011}, aereo \cite[§ 3.1.2 p. 13]{Barthelemy2011}, ecc.).
 
-        Tuttavia, da quanto detto nella § \ref{secIntroduzione}, è chiaro che per predire la distribuzione della popolazione tra città valgono le seguenti osservazioni:
+        Tuttavia, da quanto detto nella \cref{secIntroduzione}, è chiaro che per predire la distribuzione della popolazione tra città valgono le seguenti osservazioni:
 
         \begin{enumerate}[
             label=\arabic*.,
@@ -112,9 +113,24 @@
 
         Ecco perché la corretta rete da considerare è quella legata ai movimenti pendolari \bracketcitesemi[§ 3.1.3.3 p. 18]{Barthelemy2011}[]{DeMontis2007} tra città che mostrano olisticamente tutt'i possibili collegamenti tra le città a prescindere del trasporto scelto; inoltre essa mostra collegamenti realistici associati a movimenti quotidiani anziché straordinari (vacanze, visite mediche, ecc.).
 
-        Una volta fissata la rappresentazione è necessario comprendere il tipo di grafo con cui si ha a che fare. Eppure la risposta è molto semplice e immediata dopo una semplice osservazione: un ente, ovvero una città, può interagire con un secondo senza che questo interagisca a sua volta col primo; si è dunque di fronte a un grafo diretto ma simmetrico (\ref{defGrafoInDiretto}) perché il contesto richiede di considerare la direzione d'interazione.
+        Una volta fissata la rappresentazione è necessario comprendere il tipo di grafo con cui si ha a che fare; eppure qui la risposta è immediata: un ente, ovvero una città, può interagire con un secondo senza che questo interagisca a sua volta col primo; si è dunque di fronte a un grafo diretto ma simmetrico (\ref{defGrafoInDiretto}) perché il contesto richiede di considerare la direzione d'interazione.
 
-        Come nota finale si osserva che questo tipo di grafo è spaziale \cite{Barthelemy2011,DeMontis2007}, ovvero i suoi nodi occupano un punto nello spazio euclideo; oltre a ciò tale osservazione è puramente formale, ma servirà successivamente quando si definiranno le leggi d'interazione. Perdipiú, contrariamente a quanto si possa pensare di primo inizialmente, tale grafo non è a invarianza di scala \cite{Barabasi1999} proprio a causa della sua natura spaziale \cite{Broido2019,Barthelemy2011}; ciò non esclude l'esistenza di nodi piú centrali di altri, ma solo che il massimo grado di un nodo è limitato superiormente dalla natura spaziale del grafo.
+        \begin{ipo}
+            \label{ipTipoGrafo}
+            Il grafo \(\mathcal G\) è diretto e simmetrico, per cui la matrice d'adiacenza \(\mathbf A\) è simmetrica.
+        \end{ipo}
+
+        Inoltre si osserva che questo tipo di grafo è spaziale \cite{Barthelemy2011,DeMontis2007}, ovvero i suoi nodi occupano un punto nello spazio euclideo, seppure, al momento, sia una caratteristica alquanto formale; tuttavia servirà tenerlo a mente quando si definiranno alcune regole d'interazione nel \cref{secSimulazioni}. Perdipiú, contrariamente a quanto si possa pensare di primo acchito, tale grafo non è a invarianza di scala \cite{Barabasi1999} a causa del tipo di grafo \cite{Broido2019,Barthelemy2011}; ciò non esclude l'esistenza di nodi piú centrali di altri, ma solo che il massimo grado di un nodo è limitato superiormente proprio dalla natura spaziale del grafo.
+
+        Infine in questa trattazione vale la seguente fondamentale ipotesi:
+
+        \begin{ipo}
+            \label{ipGrafoStatico}
+            Il grafo \(\mathcal G\) è assunto statico: in altre parole, \(\mathcal I\) e \(\mathcal E\) sono costanti nel tempo.
+        \end{ipo}
+
+        In altre parole si è solo interessati a prevedere come la popolazione si distribuisce rispetto a una topologia prestabilita \textit{a priori}; ovviamente si tratta di una forte semplificazione dato che nella realtà la topologia delle connessioni interurbane si è chiaramente coevoluta assieme allo sviluppo delle città stesse.
+
 
     \section{Cenni sui dati}\label{secCenniSuiDati}
 
@@ -178,7 +194,7 @@
         %
         ove \_ indica uno spazio, per la quale, tralasciando il fatto che vi sono in totale 6 città italiane collo stesso codice comunale, se ci si limita alla regione del Piemonte (vale a dire la stessa del comune di partenza «002007») esistono in realtà ben due città condividenti lo stesso codice: «001215» e «004215», eppure entrambe non hanno lo stesso codice provinciale («002») del comune di partenza. Da questo piccolo estratto, quindi, non si può nemmeno ipotizzare che il codice provinciale sia lo stesso tra il comune di partenza e d'arrivo; è allora chiaro che sia impossibile scegliere la prima metà per completare il codice del comune di destinazione\footnotemark{}.
 
-        \footnotetext{Si potrebbe scegliere, tra tutt'i comuni collo stesso codice comunale, quello che minimizza la distanza geografica (ossia euleriana) siccome le coordinate dei punti rappresentativi di ogni comune sono disponibili nell'ISTAT; in ogni caso, come si vedrà nella § \ref{secSimulazioni}, sono correzioni del tutto innecessarie.}
+        \footnotetext{Si potrebbe scegliere, tra tutt'i comuni collo stesso codice comunale, quello che minimizza la distanza geografica (ossia euleriana) siccome le coordinate dei punti rappresentativi di ogni comune sono disponibili nell'ISTAT; in ogni caso, come si vedrà nella \cref{secSimulazioni}, sono correzioni del tutto innecessarie.}
 
         \tikzfigure{H}{0.5\linewidth}
             {\input{../../Figure/Scelte/20/NA/SVsD.tex}}
