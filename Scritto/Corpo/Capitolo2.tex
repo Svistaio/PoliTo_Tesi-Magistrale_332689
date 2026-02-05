@@ -22,12 +22,17 @@
             Un grafo è indiretto sse dato \((i,j)\in\mathcal E\) allora \((j,i)\in\mathcal E\) e la direzione è trascurabile; altrimenti è detto diretto.
         \end{dfn}
         
-        La trascurabilità della direzione sarà discussa poco dopo nella \cref{secRetiECittà}, anche se è facilmente intuibile dall'esempio.
+        La trascurabilità della direzione sarà discussa poco dopo nella \cref{secRetiECittà}, anche se è facilmente intuibile dalla \cref{figEsempioGrafoInDiretto}.
         
+        \tikzfigure{H}{.8\linewidth}
+            {\input{../../Figure/Scelte/Altro/EsempioGrafo[In]Diretto.tex}}
+            {Esempio di un grafo indiretto, della sua equivalente forma diretta [simmetrica] e della loro [identica] matrice d'adiacenza.}
+            {1.2\linewidth}{figEsempioGrafoInDiretto}
+
         \begin{dfn}[Matrice d'adiacenza]
             \label{defMatriceAdiacenzaUnitariaPesata}
             \newcommand\hspz{\hspace{1em}}
-            Sia \(N\equiv\vert\mathcal I\vert\) la cardinalità dell'insieme degl'indici, ossia il numero di vertici totali, si definisce la matrice d'adiacenza \(\mathbf W\in\mathbb R^{N\times N}\) pesata come:
+            Sia \(N\equiv\vert\mathcal I\vert\in\NPlus\) la cardinalità dell'insieme degl'indici, ossia il numero di vertici totali, si definisce la matrice d'adiacenza \(\mathbf W\in\mathbb R^{N\times N}\) pesata come:
             %
             \begin{equation}
                 \label{eqMatriceAdiacenzaPesata}
@@ -52,14 +57,30 @@
             Si osserva che, se non altrimenti detto, scrivendo solo «matrice d'adiacenza» si sottintende sempre l'unitarietà.
         \end{dfn}
 
+        \begin{dfn}[Matrice trasposta]
+            Data \(\mathbf A\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), allora s'indica \(\mathbf A^\top\) la matrice trasposta cosí definita:
+            %
+            \begin{equation*}
+                a^\top_{i,j}=a_{j,i}\quad\forall i,j\in\{1,2,\ldots,N\}.
+            \end{equation*}
+        \end{dfn}
+
+        \begin{dfn}[Matrice simmetrica]
+            Data \(\mathbf A\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), allora
+            %
+            \begin{equation}
+                \label{eqMatriceAdiacenzaSimmetrica}
+                \mathbf A\text{ è simmetrica}
+                \ \ \iff\ \ 
+                a_{i,j}=a_{j,i}=a^\top_{i,j}
+                \ \ \iff\ \ 
+                \mathbf A=\mathbf A^\top.
+            \end{equation}
+        \end{dfn}
+
         \begin{oss}
             Per i grafi indiretti sia \(\mathbf W\) che \(\mathbf A\) sono simmetriche mentre per quelli diretti non è detto che sia cosí.
         \end{oss}
-
-        \tikzfigure{H}{.8\linewidth}
-            {\input{../../Figure/Scelte/Altro/EsempioGrafo[In]Diretto.tex}}
-            {Esempio di un grafo indiretto, della sua equivalente forma diretta [simmetrica] e della loro [identica] matrice d'adiacenza.}
-            {1.2\linewidth}{figStrenghtVsDegree20}
 
         \begin{dfn}[Grado e Forza \textnormal{[entrate/uscente]}]
             \label{defGradoEntranteUscente}
@@ -107,29 +128,48 @@
             %labelwidth=!,
             %labelsep=!,
         ]
-            \item tutte le rappresentazioni intraurbane vanno scartate perché sono troppo fini, oltre a considerare movimenti limitatamente a una sola città;
-            \item d'altra parte tutte quelle interurbane vanno considerate contemporaneamente e non singolarmente siccome ogn'individuo può scegliere diversi trasporti per muoversi.
+            \item ogni rappresentazione intraurbana va scartata perché sono troppo fini, oltre a considerare movimenti limitatamente a una sola città;
+            \item d'altra parte tutte quelle interurbane vanno considerate contemporaneamente e non singolarmente siccome ciascun individuo può scegliere diversi trasporti per muoversi.
         \end{enumerate}
 
         Ecco perché la corretta rete da considerare è quella legata ai movimenti pendolari \bracketcitesemi[§ 3.1.3.3 p. 18]{Barthelemy2011}[]{DeMontis2007} tra città che mostrano olisticamente tutt'i possibili collegamenti tra le città a prescindere del trasporto scelto; inoltre essa mostra collegamenti realistici associati a movimenti quotidiani anziché straordinari (vacanze, visite mediche, ecc.).
 
-        Una volta fissata la rappresentazione è necessario comprendere il tipo di grafo con cui si ha a che fare; eppure qui la risposta è immediata: un ente, ovvero una città, può interagire con un secondo senza che questo interagisca a sua volta col primo; si è dunque di fronte a un grafo diretto ma simmetrico (\ref{defGrafoInDiretto}) perché il contesto richiede di considerare la direzione d'interazione.
+        Una volta fissata la rappresentazione è necessario comprendere il tipo di grafo con cui si ha a che fare. Eppure qui la risposta è immediata dopo due osservazioni:
+       
+        \begin{enumerate}[
+            label=\arabic*.,
+            topsep=0.5em,
+            parsep=0em,
+            itemsep=0.25em,
+            leftmargin=2em,
+            rightmargin=1.5em,
+            % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %itemindent=!,
+            %labelindent=3em,
+            %labelwidth=!,
+            %labelsep=!,
+        ]
+            \item una città può interagire con un'altra senza che quest'ultima interagisca colla prima: è necessario considerare il senso di direzione;
+            \item ammesso che una città possa interagire con un'altra, allora è sempre possibile l'opposta: le potenziali interazioni sono simmetriche.
+        \end{enumerate}
+    
+        Dunque il grafo in questione è diretto ma con struttura indiretta (\cref{defGrafoInDiretto}), ovvero la sua matrice d'adiacenza \(\mathbf A\) è simmetrica.
 
         \begin{ipo}
             \label{ipTipoGrafo}
-            Il grafo \(\mathcal G\) è diretto e simmetrico, per cui la matrice d'adiacenza \(\mathbf A\) è simmetrica.
+            Il grafo \(\mathcal G\) è diretto e simmetrico (\(\mathbf A\) è simmetrica).
         \end{ipo}
 
-        Inoltre si osserva che questo tipo di grafo è spaziale \cite{Barthelemy2011,DeMontis2007}, ovvero i suoi nodi occupano un punto nello spazio euclideo, seppure, al momento, sia una caratteristica alquanto formale; tuttavia servirà tenerlo a mente quando si definiranno alcune regole d'interazione nel \cref{secSimulazioni}. Perdipiú, contrariamente a quanto si possa pensare di primo acchito, tale grafo non è a invarianza di scala \cite{Barabasi1999} a causa del tipo di grafo \cite{Broido2019,Barthelemy2011}; ciò non esclude l'esistenza di nodi piú centrali di altri, ma solo che il massimo grado di un nodo è limitato superiormente proprio dalla natura spaziale del grafo.
-
-        Infine in questa trattazione vale la seguente fondamentale ipotesi:
+        Inoltre in questa trattazione vale la seguente fondamentale ipotesi:
 
         \begin{ipo}
             \label{ipGrafoStatico}
-            Il grafo \(\mathcal G\) è assunto statico: in altre parole, \(\mathcal I\) e \(\mathcal E\) sono costanti nel tempo.
+            Il grafo \(\mathcal G\) è statico: \(\mathcal I\) e \(\mathcal E\) sono costanti nel tempo.
         \end{ipo}
 
         In altre parole si è solo interessati a prevedere come la popolazione si distribuisce rispetto a una topologia prestabilita \textit{a priori}; ovviamente si tratta di una forte semplificazione dato che nella realtà la topologia delle connessioni interurbane si è chiaramente coevoluta assieme allo sviluppo delle città stesse.
+
+        Infine si osserva che questo tipo di grafo è spaziale \cite{Barthelemy2011,DeMontis2007}, ovvero i suoi nodi occupano un punto nello spazio euclideo, seppure, al momento, sia una caratteristica alquanto formale; tuttavia servirà tenerlo a mente quando si definiranno alcune regole d'interazione nel \cref{secSimulazioni}. Perdipiú, contrariamente a quanto si possa pensare di primo acchito, tale grafo non è a invarianza di scala \cite{Barabasi1999} a causa del tipo di grafo \cite{Broido2019,Barthelemy2011}; ciò non esclude l'esistenza di nodi piú centrali di altri, ma solo che il massimo grado di un nodo è limitato superiormente proprio dalla natura spaziale del grafo.
 
 
     \section{Cenni sui dati}\label{secCenniSuiDati}
@@ -235,7 +275,7 @@
                     \hline
                     Connessione & Peso \\
                     \hline
-                    Cagliari-Quartu & 14709 \\
+                    Cagliari-Quartu SE & 14709 \\
                     Cagliari-Selargius & 7995 \\
                     Assemini-Selargius & 4418 \\
                     Porto Torres-Sassari & 4149 \\

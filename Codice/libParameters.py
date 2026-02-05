@@ -200,8 +200,8 @@ caseStudies = {
             "parametricStudy": True
         },
         "λ(rsk^α)/(1+rsk^α)": {
-            "attractivity": 0.01,
-            "convincibility": 0.4,
+            "attractivity": 0.5,
+            "convincibility": 0.5,
             "deviation": 0.05,
             "region": 19,
             "zetaFraction": 0.1,
@@ -213,16 +213,16 @@ caseStudies = {
             "analysis": False,
             "edgeWeights": True,
             "fluctuations": False,
-            "interactingLaw": 3,
+            "interactingLaw": 5,
             "PdfPopUp": False,
             "LaTeXConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
             "studiedParameter": 1,
-            "startValuePrmStudy": 0.3,
-            "endValuePrmStudy": 0.5,
-            "numberPrmStudy": 5,
-            "parametricStudy": False
+            "startValuePrmStudy": 0.1,
+            "endValuePrmStudy": 0.6,
+            "numberPrmStudy": 10,
+            "parametricStudy": True
         },
         "λ[rsk/(1+rsk)]^α": {
             "attractivity": 0.05,

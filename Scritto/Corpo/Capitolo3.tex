@@ -2,8 +2,6 @@
 % !TEX root = ../Testa/Principale.tex
 % LTeX: language=it
 
-% Verificare l'uso di R_+ nell'articolo di Nurisso
-
 \chapter[Teoria cinetica dei sistemi multiagente]{\texorpdfstring
     {Teoria cinetica dei\newline sistemi multiagente}
     {Teoria cinetica dei sistemi multiagente}%
@@ -12,6 +10,8 @@
     In questo capitolo è discussa la \TCSMA{} necessaria per ottenere e discutere i risultati nel \cref{secSimulazioni}.
    
     S'inizia prima dando delle nozioni generali di teoria della probabilità colle quali si deriva successivamente la celeberrima equazione di Boltzmann a partire da una descrizione stocastica delle particelle di un gas; quindi si passa a generalizzare tali risultati per mediare le interazioni tramite una struttura topologica sottostante gli agenti, sia in modo esatto che approssimato; successivamente si descrivono le equazioni cinetiche nel caso corrente; infine si conclude analizzando le ipotesi semplificative che portano dalla presente teoria a quella classica di Boltzmann.
+                
+    % che equivale all'equazione di tipo Boltzmann con interazioni simmetriche \daRivedere{} usata classicamente per modellizzare la distribuzione dell'energia cinetica tra una popolazione di particelle di un gas.
 
     \section{Definizioni preliminari di probabilità}\label{secDefinizioniPreliminariProbabilitàTCSMA}
 
@@ -20,14 +20,14 @@
         \begin{dfn}[Semiretta intera/reale positiva]
             In tutto questo elaborato si fanno uso dei seguenti sottinsiemi dei numeri reali e naturali:
             %
-            \begin{equation} % https://en.wikipedia.org/wiki/Positive_real_numbers
-                \label{eqRplusRplusStar}
+            \begin{equation*} % https://en.wikipedia.org/wiki/Positive_real_numbers
+                % \label{eqRplusRplusStar}
                 \begin{aligned}
                     \RPlus&\equiv\{x\in\mathbb R\ \colon\ x\ge0\}\subset\mathbb R,\\
                     % \RPlusStar&\equiv\{x\in\mathbb R\ \colon\ x>0\},\\
                     \NPlus&\equiv\{n\in\mathbb N\ \colon\ n\geq1\}\subset\mathbb N.
                 \end{aligned}
-            \end{equation}
+            \end{equation*}
         \end{dfn}
 
         \begin{dfn}[Variabile aleatoria]
@@ -120,7 +120,7 @@
         \end{dfn}
 
         \begin{dfn}[Valore atteso condizionato]
-            Sia \(X\in\mathbb R\) una variabile aleatoria assolutamente continua a media finita \(\mathbb E[X]<\infty\) e sia \(\mathcal G\subseteq\mathcal F\) una sotto-\(\sigma\)-algebra, allora l'attesa di \(X\) condizionata a \(\mathcal G\) è una variabile aleatoria \(Y\) tale che
+            Sia \(X\in\mathbb R\) una variabile aleatoria assolutamente continua a media finita \(\mathbb E[X]\infty\) e sia \(\mathcal G\subseteq\mathcal F\) una sotto-\(\sigma\)-algebra, allora l'attesa di \(X\) condizionata a \(\mathcal G\) è una variabile aleatoria \(Y\) tale che
 
             \begin{enumerate}[
                 label=AC\arabic*,
@@ -199,7 +199,7 @@
                 \equiv\sigma({\mathbf Y^{-1}(h^{-1}(B))\ |\ B\in\mathcal B(\mathbb R)})
                 \subseteq\sigma({\mathbf Y^{-1}(B)\ |\ B\in\mathcal B(\mathbb R^h)}),
             \]
-            a parole si considera la controimmagine tramite \(\mathbf Y\) dei borelliani filtrati da \(h\), ragion per cui la sigma algebra non potrà che essere contenuta in quella non filtrata.  
+            a parole si considera la controimmagine tramite \(\mathbf Y\) dei borelliani filtrati da \(h\), ragion per cui la \(\sigma\)-algebra non potrà che essere contenuta in quella non filtrata.  
             
             Per la \ref{ipAttesaCondizionataUgualeMisura} si verifica la condizione \(\forall A\in\sigma(\mathbf Y)\) avvalendosi della caratterizzazione di \(h(\mathbf Y)\) tramite \eqref{eqCondizionehVettoreAleatorio}:
             \[
@@ -215,7 +215,7 @@
                     =\int_\Omega\mathbb1_B(\mathbf Y)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
                     \\&=\int_\Omega\mathbb1_C(\mathbf Z)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
                     =\int_\Omega\mathbb1_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P
-                    =\int_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P.
+                    =\int_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P,
                 \end{aligned}
             \] % P. 127 di «Probabilità II {29-09-2022}.pdf»
             ove \(B\equiv\mathbf Y(A)\subseteq\mathbb R^k\) e \(C\equiv\mathbf Z(\mathbb R^h\times A)\subseteq\mathbb R^n\) dimodoché
@@ -253,7 +253,7 @@
 
             La \eqref{eqAttesaCondizionataEvento}, in pratica, si calcola svolgendo la media di \(\varphi(\mathbf X,\textbf Y)\) rispetto a \(\mathbf X\) dopo aver "fissato" l'evento \(\mathbf Y=\mathbf y\), vale a dire considerando la \(\mathbf Y\) come fosse un parametro uguale a \(\mathbf y\). 
 
-            Successivamente, se s'impone \(A=\Omega\) (sempre lecito essendo \(\mathcal G\) una \(\sigma\)-algebra) allora dalla \ref{ipAttesaCondizionataUgualeMisura} vale
+            Successivamente, se s'impone \(A=\Omega\) (sempre lecito essendo \(\mathcal G\) una \(\sigma\)-al\-ge\-bra) allora dalla \ref{ipAttesaCondizionataUgualeMisura} vale
             %
             \begin{equation}
                 \label{eqAttesaCondizionataInterpretazionePratica}
@@ -293,11 +293,11 @@
 
                     \begin{enumerate}[
                         label=G\arabic*,
-                        topsep=0.5em,
-                        parsep=0em,
-                        itemsep=0.25em,
-                        leftmargin=2.5em,
-                        rightmargin=1.5em,
+                        % topsep=0.5em,
+                        % parsep=0em,
+                        % itemsep=0.25em,
+                        leftmargin=2em,
+                        % rightmargin=1.5em,
                         % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
                         %itemindent=!,
                         %labelindent=3em,
@@ -326,10 +326,10 @@
                 Dalla \ref{ipGasCollisioniElastiche} si possono in realtà esprimere le velocità poscollisionali a partire da quelle precollisionali, definendo quelle che sono le regole d'interazione.
 
                 \begin{prp}[Regole d'interazione]\label{prpVelocitàCollisionali}
-                    Esistono due funzioni \(\psi,\psi_*\colon\mathbb R^3\to\mathbb R^3\) lineari che soddisfanno \cref{eqConservazioneImpulso,eqConservazioneEnergia} e tali che
+                    Esistono due funzioni \[\psi,\psi_*\colon\mathbb R^3\to\mathbb R^3\] lineari che soddisfanno \cref{eqConservazioneImpulso,eqConservazioneEnergia} e tali che
                     %
                     \begin{equation}
-                        \label{eqLeggiInterazioneGas}
+                        \label{eqRegoleInterazioneDeterministicheGas}
                         \begin{aligned}
                             \mathbf v'&=\psi(\mathbf v,\mathbf v_*)\equiv\mathbf v+[(\mathbf v_*-\mathbf v)\cdot n]n,\\
                             \mathbf v'_*&=\psi_*(\mathbf v,\mathbf v_*)\equiv\mathbf v_*+[(\mathbf v-\mathbf v_*)\cdot n]n,
@@ -380,11 +380,11 @@
                 %
                 Si noti come la precedente dimostrazione lasci arbitrario \(n\in\mathbb S^2\), seppure da un punto di vista fisico sia ragionevole porlo parallelo al vettore passante per i centri delle particelle collidenti.
 
-                Si osservi come le regole d'interazione nella \ref{eqLeggiInterazioneGas} sono bilineari e simmetriche secondo la seguente definzione:
+                Si osservi come le regole d'interazione nella \ref{eqRegoleInterazioneDeterministicheGas} sono bilineari e simmetriche secondo la seguente definzione:
 
-                \begin{dfn}[Regole d'interazione simmetriche]
-                    \label{defLeggiInterazioneSimmetriche}
-                    Due regole d'interazione del tipo \eqref{eqLeggiInterazioneGas} si dicono simmetriche sse
+                \begin{dfn}
+                    \label{defLeggiInterazioneSimmetricheGas}
+                    Se le regole d'interazione del tipo \eqref{eqRegoleInterazioneDeterministicheGas} verificano
                     \[
                         \begin{aligned}
                             \psi(\mathbf v,\mathbf v_*)&=\psi_*(\mathbf v_*,\mathbf v)\\
@@ -396,6 +396,7 @@
                             \mathbf v'_*&=\psi(\mathbf v_*,\mathbf v)
                         \end{aligned}
                     \]
+                    allora si dicono simmetriche.
                 \end{dfn}
 
             \subsubsection{Descrizione statistica}
@@ -410,41 +411,33 @@
                     \]
                 \end{oss}
 
-                Le regole d'interazione nella \eqref{eqLeggiInterazioneGas} diventano
+                Le regole d'interazione nella \eqref{eqRegoleInterazioneDeterministicheGas} diventano
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{RI}]_{\mathbf V}\)}
-                    \refstepcounter{equation}
+                \eqtag*{\([\text{RI}]_{\mathbf V}\)}{
                     \label{eqRegoleInterazioneGas}
                     [\text{RI}]_{\mathbf V}\left\{
                     \begin{aligned}
                         \mathbf V'&=\psi(\mathbf V,\mathbf V_*)\equiv\mathbf V+[(\mathbf V_*-\mathbf V)\cdot n]n,\\
                         \mathbf V'_*&=\psi_*(\mathbf V,\mathbf V_*)\equiv \mathbf V_*+[(\mathbf V-\mathbf V_*)\cdot n]n,
                     \end{aligned}\right.
-                    \notag
-                \end{equation*}
-                %
+                }%
                 in cui anche \(n\) risulta aleatoriamente distribuito; usualmente s'ipotizza \(n\sim\mathcal U(\mathbb S^2)\), vale a dire che non vi sono direzioni preferenziali essendo queste uniformemente distribuite sulla sfera unitaria.
 
                 Tuttavia l'interazione tra due particelle non è detto che avvenga, aspetto formulabile introducendo 
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{B}]_{\mathbf V}\)}
-                    \refstepcounter{equation}
+                \eqtag{\([\text{Ber}]_{\mathbf V}\)}{
                     \label{eqBernoulliInterazioneGas}
                     \Theta\sim\DstrBernoulli(B((\mathbf V^*_t-\mathbf V_t)\cdot n)\Delta t)
-                    \tag*{\([\text{B}]_{\mathbf V}\)}
-                \end{equation*}
-                %
+                }%
                 che è una variabile aleatoria di Bernoulli, indipendente da \(\mathbf V_t\) e \(\mathbf V^*_t\), la cui probabilità è descritta da due termini:
                 
                 \begin{enumerate}[
                     label=\arabic*.,
-                    topsep=0.5em,
-                    parsep=0em,
-                    itemsep=0.25em,
-                    leftmargin=2em,
-                    rightmargin=1.5em,
+                    % topsep=0.5em,
+                    % parsep=0em,
+                    % itemsep=0.25em,
+                    % leftmargin=2em,
+                    % rightmargin=1.5em,
                     % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
                     %itemindent=!,
                     %labelindent=3em,
@@ -463,19 +456,14 @@
 
                 Colle \ref{eqRegoleInterazioneGas} e \ref{eqBernoulliInterazioneGas}, lo stato dei due agenti al tempo \(t+\Delta t\) successivo è dunque dato dal seguente algoritmo d'interazione:
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{AR}]_{\mathbf V}\)}
-                    \refstepcounter{equation}
+                \eqtag*{\([\text{AR}]_{\mathbf V}\)}{
                     \label{eqAlgoritmoInterazioniGas}
-                    [\text{AR}]_{\mathbf V}\left\{
-                    \begin{aligned}
+                    [\text{AR}]_{\mathbf V}
+                    \left\{\begin{aligned}
                         \mathbf V_{t+\Delta t}  &=(1-\Theta)\mathbf V_t+\Theta\mathbf V'_t,\\
                         \mathbf V^*_{t+\Delta t}&=(1-\Theta)\mathbf V^*_t+\Theta\mathbf V^{*\prime}_t,
-                    \end{aligned}
-                    \right.
-                    \notag
-                \end{equation*}
-                %
+                    \end{aligned}\right.
+                }%
                 che di fatto è una regola che descrive se gli agenti interagiscono a coppie (modellizzato dalla \(\Theta\)) e, nel caso, come interagiscono (modellizzato dalle \(\mathbf V'_t\) e \(\mathbf V^{*\prime}_t\)) modificando il loro stato al tempo successivo.
 
             \subsubsection{Derivazione modello}
@@ -585,7 +573,7 @@
                     una scelta tipica è il valore assoluto \(\vert\cdot\vert\): \(B((\mathbf v-\mathbf v_*)\cdot n)\equiv\vert(\mathbf v-\mathbf v_*)\cdot n\vert\).
                 \end{ipo}
 
-                \begin{ipo}[\textit{Caos} molecolare]
+                \begin{ipo}[Caos molecolare]
                     \label{ipCaoMolecolare}
                     Le particelle interagenti secondo le \ref{eqAlgoritmoInterazioniGas} sono campionante indipendentemente. Tal'ipotesi è piú facile da giustificare matematicamente che fisicamente perché semplifica di molto conti; in ogni caso, la \ref{ipGasRarefatto} la corrobora poiché in un gas rarefatto è naturale che se due particelle interagiscono, prima che ricollidano, avranno perso ogni vicendevole dipendenza a causa delle innumerevoli altre interazioni colle altre particelle.
                 \end{ipo}
@@ -622,7 +610,7 @@
                 %
                 ove, per brevità di notazione, si sono sottintese le dipendenze per tutte le funzioni, espresse, salvo per il nucleo di collisione, da apici \(\prime\) e asterischi \(*\) (per una spiegazione piú dettagliata si legga poco dopo nel \cref{secTipoBoltzmannOmogeno}).
                
-                Tuttavia, qualora le regole d'interazione siano simmetriche secondo la \cref{defLeggiInterazioneSimmetriche}, come in questo caso data la \cref{prpVelocitàCollisionali}, sempre con un cambio di variabili e sfruttando la parità del nucleo di collisione vale
+                Tuttavia, qualora le regole d'interazione siano simmetriche secondo la \cref{defLeggiInterazioneSimmetricheGas}, come in questo caso data la \cref{prpVelocitàCollisionali}, sempre con un cambio di variabili e sfruttando la parità del nucleo di collisione vale
                 %
                 \begin{equation*}
                     \int_{\mathbb R^6}\left(\left\langle
@@ -636,16 +624,15 @@
                 da cui segue l'equazione di Bolztmann omogenea simmetrica in forma debole\footnotemark{}:%
                 \footnotetext{Si dice debole siccome essa vale per una una funzione \textit{test} \(\varphi\) arbitraria.}%
                 %
-                \begin{equation}
+                \eqtag{\([\text{EtB}]_{\mathbf V}\)}{
                     \label{eqFormaDeboleBoltzmannOmogeneoSimmetrico}
                     \derS{}t\int_{\mathbb R^3}\varphi f\de\mathbf v=
                     \frac1{4\pi}\int_{\mathbb R^6}\int_{\mathbb S^2}
                         B(\mathbf v,\mathbf v_*,n)
                         \left(\varphi'-\varphi\right)
                     ff_*\de n\de\mathbf v\de\mathbf v_*.
-                \end{equation}
-                %
-                Si può anche ricavare la forma forte della \eqref{eqFormaDeboleBoltzmannOmogeneoSimmetrico} considerando le regole d'interazione inverse della \eqref{eqLeggiInterazioneGas} \cite[§ 2.5, p. 15]{Loy2025EKTMAS}, ma il conto esula dagli scopi di questo elaborato; cionnonostante si riporta come riferimento per la sezione a venire:
+                }%
+                Si può anche ricavare la forma forte della \ref{eqFormaDeboleBoltzmannOmogeneoSimmetrico} considerando le regole d'interazione inverse della \ref{eqRegoleInterazioneGas} \cite[§ 2.5, p. 15]{Loy2025EKTMAS}, ma il conto esula dagli scopi di questo elaborato; cionnonostante si riporta come riferimento per il paragrafo a venire:
                 %
                 \begin{equation}
                     \label{eqFormaForteBoltzmannOmogeneoSimmetrico}
@@ -750,7 +737,7 @@
                 %labelwidth=!,
                 %labelsep=!,
             ]
-                \item sono formulati per mezzo di equazioni integro-differenziali analoghe strutturalmente alla \eqref{eqFormaDeboleBoltzmannOmogeneoSimmetrico} e
+                \item sono formulati per mezzo di equazioni integro-differenziali analoghe strutturalmente alla \ref{eqFormaDeboleBoltzmannOmogeneoSimmetrico} e
                 \item sono applicati a contesti\footnotemark{} molto distanti da quello originale delle velocità di particelle di un gas.
                 \footnotetext{Esempi importati sono quello sociofisico, come i vari modelli sulle opinioni, ed econofisico, come quello qui considerato delle città}
             \end{enumerate}
@@ -768,11 +755,11 @@
 
                     \begin{enumerate}[
                         label=B\arabic*,
-                        topsep=0.5em,
-                        parsep=0em,
-                        itemsep=0.25em,
-                        leftmargin=2.5em,
-                        rightmargin=1.5em,
+                        % topsep=0.5em,
+                        % parsep=0em,
+                        % itemsep=0.25em,
+                        % leftmargin=2.5em,
+                        % rightmargin=1.5em,
                         % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
                         %itemindent=!,
                         %labelindent=3em,
@@ -790,18 +777,14 @@
 
                 D'altra parte gli stati poscollisionali (postati), \(\mathbf X'_t\) e \(\mathbf X^{*\prime}_t\), si legano con quelli precollisionali (prestati), \(\mathbf X_t\) e \(\mathbf X^*_t\), tramite
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{RI}]_{\mathbf X}\)}
-                    \refstepcounter{equation}
+                \eqtag*{\([\text{RI}]_{\mathbf X}\)}{
                     \label{eqRegoleInterazione}
-                    [\text{RI}]_{\mathbf X}\left\{
-                    \begin{aligned}
+                    [\text{RI}]_{\mathbf X}
+                    \left\{\begin{aligned}
                         \mathbf X'_t&=\psi(\mathbf X_t,\mathbf X_t^*,\mathbf y),\\
                         \mathbf X^{*\prime}_t&=\psi_*(\mathbf X_t,\mathbf X_t^*,\mathbf y_*),
                     \end{aligned}\right.
-                    \notag
-                \end{equation*}
-                %
+                }%
                 ove ora
                 \[
                     \begin{aligned}
@@ -809,43 +792,40 @@
                         \psi_*&\colon\mathbb R^n\times\mathbb R^n\times\mathbb R^{h_*}\to\mathbb R^n
                     \end{aligned}
                 \]
-                sono generiche regole d'interazione, non necessariamente simmetriche (si veda \cref{defLeggiInterazioneSimmetriche}) o lineari, mentre \(\mathbf y\in\mathbb R^h\) e \(\mathbf y_*\in\mathbb R^{h_*}\), con \(h,h_*\in\mathbb N\), rappresentano dei coefficienti potenzialmente stocastici.
+                sono generiche regole d'interazione, non necessariamente lineari o simmetriche (\cref{defLeggiInterazioneSimmetriche}), mentre \(\mathbf y\in\mathbb R^h\) e \(\mathbf y_*\in\mathbb R^{h_*}\), con \(h,h_*\in\mathbb N\), rappresentano dei coefficienti potenzialmente stocastici.
 
                 L'interazione tra di essi avviene secondo una variabile aleatoria di Bernoulli del tipo
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{B}]_{\mathbf X}\)}
-                    \refstepcounter{equation}
+                \eqtag{\([\text{Ber}]_{\mathbf X}\)}{
                     \label{eqBernoulliInterazione}
                     \Theta\sim\DstrBernoulli(\mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,t)\Delta t),
-                    \tag*{\([\text{B}]_{\mathbf X}\)}
-                \end{equation*}
+                }%
+                con  tasso/nucleo d'interazione 
                 %
-                con  tasso/nucleo d'interazione \[\mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,t)\colon\mathbb R^n\times\mathbb R^n\times\mathbb R^k\times[0,+\infty)\to\RPlus,\] per controllare quant'è "probabile" che i due agenti interagiscano, e coefficienti \(\mathbf w\in\mathbf R^k\), con \(k\in\mathbb N\), potenzialmente stocastici.%
+                \eqtag{\([\text{NI}]_{\mathbf X}\)}{
+                    \label{eqNucleoInterazione}
+                    \mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,t)\colon\mathbb R^n\times\mathbb R^n\times\mathbb R^k\times[0,+\infty)\to\RPlus,
+                }%
+                per controllare quant'è "probabile" che i due agenti interagiscano, e coefficienti \(\mathbf w\in\mathbf R^k\), con \(k\in\mathbb N\), potenzialmente stocastici.%
                 \begin{oss}
                     Se non si sa o non si vuole toccare quell'aspetto modellistico si può semplicemente porre unitario:
                     \[
                         \mu\equiv1,\quad\forall(\mathbf x,\mathbf x_*,\mathbf w,t)
-                        \in\mathbb R^n\times\mathbb R^n\times\mathbb R^k\times[0,+\infty)i
+                        \in\mathbb R^n\times\mathbb R^n\times\mathbb R^k\times[0,+\infty)
                     \]
                     sottintendendo in tal modo un'uniforme "probabilità" d'interazione.
                 \end{oss}
                 
                 Nel complesso i due agenti s'interfacciano mediante l'algoritmo d'interazione
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{AR}]_{\mathbf X}\)}
-                    \refstepcounter{equation}
+                \eqtag*{\([\text{AR}]_{\mathbf X}\)}{
                     \label{eqAlgoritmoInterazione}
-                    [\text{AR}]_{\mathbf X}\left\{
-                    \begin{aligned}
+                    [\text{AR}]_{\mathbf X}
+                    \left\{\begin{aligned}
                         \mathbf X_{t+\Delta t}  &=(1-\Theta)\mathbf X_t+\Theta\mathbf X'_t,\\
                         \mathbf X^*_{t+\Delta t}&=(1-\Theta)\mathbf X^*_t+\Theta\mathbf X^{*\prime}_t,
-                    \end{aligned}
-                    \right.
-                    \notag
-                \end{equation*}
-                %
+                    \end{aligned}\right.
+                }%
                 dove \(\Delta t\in\RPlus\) è il passo temporale atto a discretizzare il tempo.
 
                 \begin{oss}
@@ -855,7 +835,7 @@
 
                 Infine, riapplicando un ragionamento analogo a quello svolto nel \cref{secBoltzmannOmogeno} colla quantità osservabile \(\varphi\colon\mathbb R^n\to\mathbb R\), si perviene all'equazione di tipo Boltzmann omogenea generale
                 %
-                \begin{equation}
+                \eqtag{\([\text{EtB}]_{\mathbf X}\)}{
                     \label{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico}
                     \derS{}t\int_{\mathbb R^n}\varphi f\de\mathbf x=
                     \int_{\mathbb R^{2n}}\left\langle
@@ -863,13 +843,58 @@
                             \frac{\varphi'+\varphi'_*-\varphi-\varphi_*}2
                         \right\rangle
                     ff_*\de\mathbf x\de\mathbf x_*,
-                \end{equation}
-                %
+                }%
                 nella quale \(\langle\cdot\rangle\) rappresenta la media rispetto a tutt'i coefficienti potenzialmente stocastici (\(\mathbf y\), \(\mathbf y_*\) e \(\mathbf w\)), mentre il termine \(-\varphi-\varphi_*\) discende dal fatto che non si è ipotizzato che il tasso d'interazione \(\mu\) sia pari.
                 
+                \begin{oss}[\ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} simmetrica]
+                    Qualora \ref{eqNucleoInterazione} sia pari (\cref{defNucleoInterazionePari}) e le regole d'interazione \ref{eqRegoleInterazione} siano simmetriche (\cref{defLeggiInterazioneSimmetriche}), la \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} si può riformulare come
+                    %
+                    \begin{equation}
+                        \label{eqFormaDeboleTipoBoltzmannOmogeneoSimmetrico}
+                        \derS{}t\int_{\mathbb R^n}\varphi f\de\mathbf x=
+                        \int_{\mathbb R^{2n}}\left\langle
+                                \mu(\mathbf x,\mathbf x_*,w,t)(\varphi'-\varphi)
+                            \right\rangle
+                        ff_*\de\mathbf x\de\mathbf x_*,
+                    \end{equation}
+                    %
+                    mediante un cambio di variabili atto a invertire \(\mathbf x\) e \(\mathbf x_*\) solo per la differenza \(\varphi'_*-\varphi_*\).
+                \end{oss}
+
+                \begin{dfn}[\ref{eqNucleoInterazione} pari]
+                    \label{defNucleoInterazionePari}
+                    Se il tasso d'interazione in \ref{eqNucleoInterazione} verifica
+                    \[
+                        \mu(\mathbf x,\mathbf x^*,\mathbf w,t)=\mu(\mathbf x^*,\mathbf x,\mathbf w,t)
+                        \quad\forall\mathbf x,\mathbf x^*\in I\subseteq\mathbb R^n
+                        \text{ e }\forall\mathbf w\in\mathbb R^k,
+                    \]
+                    allora \(\mu\) si dice pari.
+                \end{dfn}
+
+                \begin{dfn}[\ref{eqRegoleInterazione} simmetriche]
+                    \label{defLeggiInterazioneSimmetriche}
+                    Se le regole d'interazione del tipo \ref{eqRegoleInterazioneGas} verificano
+                    \[
+                        \begin{aligned}
+                            \psi(\mathbf x,\mathbf x^*,\mathbf y)&=\psi_*(\mathbf x^*,\mathbf x,\mathbf y)\\
+                            \psi_*(\mathbf x,\mathbf x^*,\mathbf y_*)&=\psi(\mathbf x^*,\mathbf x,\mathbf y_*)
+                        \end{aligned}
+                        \quad\forall\mathbf x,\mathbf x_*\in I\subseteq\mathbb R^n
+                        \text{ e }\forall\mathbf y,\mathbf y_*\in\mathbb R^h,
+                    \]
+                    allora si dicono simmetriche. In altre parole, la simmetria implica
+                    \[
+                        \mathbf X'_t=\psi_*(\mathbf X^*_t,\mathbf X_t,\mathbf y)
+                        \quad\text{e}\quad
+                        \mathbf X^{*\prime}_t=\psi(\mathbf X^*_t,\mathbf X_t,\mathbf y_*).
+                    \]
+                \end{dfn}
+
+
             \subsubsection{Notazione}
 
-                Nei previ paragrafi si è fatto spesso uso, specie per le varie equazioni [di tipo] Boltzmann \cref{eqFormaDeboleBoltzmannOmogeneoAssimmetricoGas,eqFormaDeboleBoltzmannOmogeneoSimmetrico,eqFormaForteBoltzmannOmogeneoSimmetrico,eqFormaForteBoltzmannDisomogeneoSimmetrico,eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico}, di una notazione abbreviata per tutti gli oggetti salvo il tasso d'interazione \(\mu\). In questo breve paragrafo si definiscono in maniera piú esplicita queste abbreviazioni facendo riferimento al contesto generale sviluppato poco fa.
+                Nei previ paragrafi si è fatto spesso uso, specie per le varie equazioni [di tipo] Boltzmann \cref{eqFormaDeboleBoltzmannOmogeneoAssimmetricoGas,eqFormaForteBoltzmannDisomogeneoSimmetrico,eqFormaForteBoltzmannOmogeneoSimmetrico}, \ref{eqFormaDeboleBoltzmannOmogeneoSimmetrico} e \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico}, di una notazione abbreviata per tutti gli oggetti salvo il tasso d'interazione \(\mu\). In questo breve paragrafo si definiscono in maniera piú esplicita queste abbreviazioni facendo riferimento al contesto generale sviluppato poco fa.
                 
                 Innanzitutto la densità congiunta \(f\) da sola sottintende la variabile dell'agente interagente \(\mathbf x\) mentre con un pedice \(f_*\) quella dell'agente ricevente \(\mathbf x_*\):
                 %
@@ -927,7 +952,7 @@
                     \newcommand\hspc{\hspace{\valtmp}}
                     f^i\equiv f(\mathbf x,t)
                     \hspc\text{e}\hspc
-                    f^i_*\equiv f(\mathbf x_*,t);
+                    f_i^*\equiv f(\mathbf x_*,t);
                 \end{equation*}
 
             \subsubsection{Analisi dimensionale}
@@ -953,6 +978,11 @@
                 \end{equation*}
                 %
                 in cui \(S_t\in\RPlus\) è la variabile aleatoria relativa alla popolazione dell'agente rappresentativo al tempo \(t\) ed è l'unica componente del processo stocastico a variare nel tempo per l'\cref{ipGrafoStatico}.
+
+                \begin{oss}[Sulla natura numerica della popolazione]
+                    \label{ossNaturaNumericaPopolazione}
+                    È naturale che non esistano frazioni di persone e che quindi rigorosamente \(S_t\in\mathbb N\) ma non sempre la scelta piú realistica è quella che modellisticamente è piú agevole; infatti trattare \(S_t\) come una variabile aleatoria discreta impone un codominio, appunto, discreto che è in genere piú difficile da manipolare matematicamente rispetto a un intervallo continuo. Tal'è la ragione nel scegliere \(S_t\) reale: dopo aver fatto i conti normalmente si può poi approssimare per eccesso o difetto ricavando la taglia intera effettiva; l'errore cosí commesso è di al piú una persona.
+                \end{oss}
 
                 Cosí ragionando si può nel complesso descrivere statisticamente lo stato microscopico \(\mathbf X_t\equiv(I,S_t)\) dell'agente rappresentativo colla densità congiunta
                 %
@@ -980,10 +1010,11 @@
                 \begin{equation*}
                     \begin{aligned}
                         \mathbb P_t(\mathcal I\times\RPlus)
-                        &=\int_{\RPlus}\int_{\mathcal I}f(i,s,t)\de i\de s
-                        =\frac1N\int_{\RPlus}\sum_{i\in\mathcal I}f_i(s,t)\de s
-                        \\&=\frac1N\sum_{i\in\mathcal I}\int_{\RPlus}f_i(s,t)\de s
-                        =\frac1N\sum_{i\in\mathcal I}1=\frac NN=1
+                        &=\int_{\mathcal I}\int_{\RPlus}f(i,s,t)\de s\de i
+                        =\frac1N\sum_{i\in\mathcal I}\int_{\mathcal I}\int_{\RPlus}
+                        f_i(s,t)\de s\otimes\delta(i-j)\de i
+                        \\&=\frac1N\sum_{i\in\mathcal I}\int_{\mathcal I}\delta(i-j)\de i
+                        =\frac1N\sum_{i\in\mathcal I}1=\frac NN=1,
                         \quad\forall t\geq0;
                     \end{aligned}
                 \end{equation*}
@@ -992,14 +1023,10 @@
 
                 Sempre come conseguenza del grafo, la \ref{eqBernoulliInterazione} deve dipendere dalla matrice d'adiacenza \(\mathbf A\):
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{B}]_S\)}
-                    \refstepcounter{equation}
+                \eqtag{\([\text{Ber}]^{\mathbf A}_S\)}{
                     \label{eqBernoulliInterazioneUrbana}
                     \Theta\sim\DstrBernoulli(A(I,I^*)\Delta t),
-                    \tag*{\([\text{B}]_S\)}
-                \end{equation*}
-                %
+                }%
                 ove \(A\colon\mathcal I\times\mathcal I\to\mathbb R\) è una funzione che a ogni coppia d'indici \((I,I^*)\) associa la relativa entrata nella matrice d'adiacenza
                 %
                 \begin{equation*}
@@ -1019,7 +1046,8 @@
                     %
                     \begin{equation}
                         \label{eqTassoInterazioneUrbano}
-                        \mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,t)\equiv A(I,I^*),
+                        % \mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,t)\equiv A(I,I^*),
+                        \mu(i,i_*)\equiv A(i,i_*),
                     \end{equation}
                     %
                     esso, cioè, è per definizione costante sia rispetto agli stati \(S_t\) e \(S^*_t\) che rispetto al tempo, oltre a non avere coefficienti\footnotemark{} \(\mathbf w\).%
@@ -1032,37 +1060,29 @@
 
                 D'altro canto le regole d'interazione nella \ref{eqRegoleInterazione} diventano
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{RI}]_S\)}
-                    \refstepcounter{equation}
+                \eqtag*{\([\text{RI}]_S\)}{
                     \label{eqRegoleInterazioneUrbane}
-                    [\text{RI}]_S\left\{ 
-                    \begin{aligned}
-                        S'_t&=\psi(S_t,S^*_t,I,I_*,\sigma),\\
-                        S^{*\prime}_t&=\psi_*(S_t,S^*_t,I,I_*).
+                    [\text{RI}]_S
+                    \left\{\begin{aligned}
+                        S'_t&=\psi(S_t,I,S^*_t,I_*,\gamma),\\
+                        S^{*\prime}_t&=\psi_*(S_t,I,S^*_t,I_*).
                     \end{aligned}\right.
-                    \notag
-                \end{equation*}
-                %
+                }%
                 \begin{oss}
-                    Confrontato al caso generale \ref{eqRegoleInterazione}, solo la funzione della città interagente \(\psi\) presenta un coefficiente stocastico \(y\equiv\sigma\in\mathbb R\), mentre quella relativa alla città ricevente \(\psi_*\) non dipende da potenziali coefficienti \(\mathbf y_*\)\footnotemark{}.
+                    Confrontato al caso generale \ref{eqRegoleInterazione}, solo la funzione della città interagente \(\psi\) presenta un coefficiente stocastico \(y\equiv\gamma\in\mathbb R\), mentre quella relativa alla città ricevente \(\psi_*\) non dipende da potenziali coefficienti\footnotemark{} \(\mathbf y_*\).%
                     \footnotetext{Come nell'\cref{ossConfrontoBernoulliClassicoUrbano}, tale condizione si può simbolicamente rappresentare ponendo \(h_*=0\).}%
                 \end{oss}
 
                 Unendo le \ref{eqBernoulliInterazioneUrbana} e \ref{eqRegoleInterazioneUrbane}, le \ref{eqAlgoritmoInterazione} si scrivono
                 %
-                \begin{equation*}
-                    \def\theequation{\([\text{AR}]_S\)}
-                    \refstepcounter{equation}
+                \eqtag*{\([\text{AR}]_S\)}{
                     \label{eqAlgoritmoInterazioneUrbano}
                     [\text{AR}]_S\left\{
                     \begin{aligned}
                         S_{t+\Delta t}&=(1-\Theta)S_t+\Theta S'_t,\\
                         S^*_{t+\Delta t}&=(1-\Theta)S^*_t+\Theta S^{*\prime}_t,
                     \end{aligned}\right.
-                    \notag
-                \end{equation*}
-                %
+                }%
                 coerentemente col fatto che in un cotesto urbano, qualora una città-nodo interagisca con un'altra, entrambe debbano variare il loro stato (\cref{ossAlgoritmoAzioneReazione}).
 
                 \begin{oss}
@@ -1072,8 +1092,8 @@
                     \[
                         [\text{RI}]_I\left\{
                         \begin{aligned}
-                            I'_t&=\psi(S_t,S^*_t,I,I_*)\equiv I_t,\\
-                            I^{*\prime}_t&=\psi_*(S_t,S^*_t,I,I_*)\equiv I_t^*,
+                            I'_t&=\psi(S_t,I,S^*_t,I_*)\equiv I_t,\\
+                            I^{*\prime}_t&=\psi_*(S_t,I,S^*_t,I_*)\equiv I_t^*,
                         \end{aligned}\right.
                     \]
                     da cui segue l'algoritmo d'interazione
@@ -1087,21 +1107,20 @@
                     che soddisfa la staticità di \(I\) e \(I_*\) e completa, assieme a \ref{eqAlgoritmoInterazioneUrbano}, la formulazione \ref{eqAlgoritmoInterazione} piú generale.
                 \end{oss}
 
-                Sia \(\Phi\colon\mathcal I\times\RPlus\to\mathbb R\) un'arbitraria quantità osservabile, dalla \ref{eqBernoulliInterazioneUrbana} l'equazione di tipo Boltzmann omogenea \cref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} ha forma
+                Sia \(\Phi\colon\mathcal I\times\RPlus\to\mathbb R\) un'arbitraria quantità osservabile, dalla \ref{eqBernoulliInterazioneUrbana} l'equazione di tipo Boltzmann omogenea \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} ha forma
                 %
-                \begin{equation}
-                    \label{eqFormaDeboleBoltzmannOmogeneoAssimetricoUrbano}
+                \eqtag{\([\text{EtB}]^{\mathbf A}_S\)}{
+                    \label{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano}
                     \derS{}t\int_{\mathcal I}\int_{\RPlus}
                     \Phi f\de v \de i=
                     \int_{\mathcal I^2}\int_{\RPlus^2}A(i,i_*)
                     \frac{\langle \Phi'+\Phi_*'-\Phi-\Phi_*\rangle}2
                     ff_*\de s\de s_*\de i\de i_*,
-                \end{equation}
-                %
-                ove si è usata la notazione abbreviata illustrata nel \cref{secTipoBoltzmannOmogeno}, mentre \(\langle\cdot\rangle\) indica il valore atteso rispetto alla variabile aleatoria \(\sigma\) nelle \ref{eqRegoleInterazioneUrbane}.
+                }%
+                ove si è usata la notazione abbreviata illustrata nel \cref{secTipoBoltzmannOmogeno}, mentre \(\langle\cdot\rangle\) indica il valore atteso rispetto alla variabile aleatoria \(\gamma\) nelle \ref{eqRegoleInterazioneUrbane}.
 
                 \begin{oss}
-                    Anche se la derivazione della \cref{eqFormaDeboleBoltzmannOmogeneoAssimetricoUrbano} è già stata spiegata nel dettaglio nel \cref{secBoltzmannOmogeno}, rimane interessante riportare la forma del passaggio piú difficile, ossia quella della media condizionata \cref{eqMediaCondizionataGas}:
+                    Anche se la derivazione della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano} è già stata spiegata nel dettaglio nel \cref{secBoltzmannOmogeno}, rimane interessante riportare la forma del passaggio piú difficile, ossia quella della media condizionata \cref{eqMediaCondizionataGas} (qui mostrato solo per \(S_{t+\Delta t}\)):
                     %
                     \begin{equation*}
                         %\label{}
@@ -1109,20 +1128,20 @@
                             \mathbb E[\Phi(I,S_{t+\Delta t})]=
                             \mathbb E\left[\mathbb E\right.[
                                 &\Phi\left(I,(1-\Theta)S_t
-                                +\Theta\Psi(S_t,S_t^*,\omega)
+                                +\Theta\psi(S_t,I,S_t^*,I_*,\sigma)
                                 A(I,I_*)\Delta t\right)|I,I_*
                             ]\left.\vphantom{\mathbb E}\right]\\
                             =\mathbb E\left[
                                 \mathbb E\right.[
                                 &\Phi(I,S_t)(1-A(I,I_*)\Delta t)
                                 \\&+\Phi\left(
-                                    I,\Psi(S_t,S_t^*,\omega)
+                                    I,\psi(S_t,I,S_t^*,I_*,\sigma)
                                 \right)A(I,I_*)\Delta t
                             ]\left.\vphantom{\mathbb E}\right].
                         \end{aligned}
                     \end{equation*}
                     %
-                    Si noti come il condizionamento sia solo rispetto a \(I\) a \(I_*\), proprio poiché \(\Theta\) in \ref{eqBernoulliInterazioneUrbana}, tramite il tasso d'interazione \(\mu\) nella \cref{eqTassoInterazioneUrbano}, dipende solo da quegli stati.
+                    Si noti come il condizionamento sia solo rispetto a \(I\) a \(I_*\), proprio poiché \(\Theta\) in \ref{eqBernoulliInterazioneUrbana}, tramite il tasso d'interazione \(\mu\) nella \cref{eqTassoInterazioneUrbano}, dipende solo da essi.
                 \end{oss}
             
                 %\begingroup
@@ -1206,141 +1225,143 @@
             
             \subsubsection{Analisi delle regole d'interazione}
 
-                Si può ora approfondire il tipo d'interazioni ipotizzate tra città su grafi.
+                Si approfondiscono in questo paragrafo le regole d'interazione \ref{eqRegoleInterazioneUrbane}.
 
-                Innanzitutto, è chiaro che l'interazione d'interesse sia di tipo «azione-reazione» descritta da \ref{eqAlgoritmoInterazione}: infatti, se una città interagisce con un'altra, scambiando popolazione, entrambi variano il proprio stato ma non è detto che la seconda interagisca a sua volta colla prima.
+                Innanzitutto, il perché nella \ref{eqAlgoritmoInterazioneUrbano} si considerano interazioni «Azione-Reazione» (\cref{ossAlgoritmoAzioneReazione}) discende da un vincolo fisico: se una città interagisce con un'altra, scambiando popolazione, necessariamente anche l'altra varia il proprio stato.
 
-                Tuttavia, se una città può interagire con un'altra, allora è sempre possibile l'opposto; dunque il grafo in questione è diretto ma con struttura indiretta, ovvero la sua matrice d'adiacenza è simmetrica; a livello matematico, ciò implica che la matrice d'adiacenza \(\mathbf M\) è simmetrica.
-
-                Gli stati postinterazione \eqref{eqStatiPostInterazioni} prendono come riferimento regole d'interazione lineari
+                Dopodiché, passando alle realizzazioni di tutte le variabili aleatorie considerate, vale a dire scrivendole in minuscolo e omettendo la dipendenza dal tempo, le regole d'interazione \ref{eqRegoleInterazioneUrbane} sono cosí definite\footnotemark{}%
+                \footnotetext{Sono state in parte ispirate dalla \cite[(2.1), p. 223]{Gualandi2019SDC}.}%
                 %
                 \begin{equation}
-                    \label{eqStatiPostInterazioniLineari}
-                    \left\{\begin{alignedat}{2}
-                        S_t'&=pS_t&&+qS_t^*,\\
-                        S_t^{*\prime}&=p_*S_t&&+q_*S_t^*,
-                    \end{alignedat}\right.
-                \end{equation}
-                %
-                le quali, specializzate, presentano invece la seguente forma:
-                %
-                \begin{equation}
-                    \label{eqSchemaInterazioneCittà}
+                    \label{eqRegoleInterazioneUrbaneEsplicite}
                     \left\{\begin{aligned}
-                        s'&=s\bigl(1-E(s,s_*)+\gamma\bigr)\\
-                        s_*'&=s_*+sI(s,s_*)
+                        \psi(s,i,s_*,i_*\gamma)&=s\bigl(1-E(s,i,s_*,i_*)+\gamma\bigr)\\
+                        \psi_*(s,i,s_*,i_*)&=s_*+sI(s,i,s_*,i_*)
                     \end{aligned}\right.
                 \end{equation}
                 %
-                ove \(s\) e \(s_*\) sono le città interagente e subente rispettivamente, \(E(s,s_*)\) e \(I(s,s_*)\) sono rispettivamente i tassi di emigrazione e immigrazione, mentre \(\gamma\) rappresenta fluttuazioni stocastiche da definire; rispetto alle regole d'interazione lineari \eqref{eqStatiPostInterazioniLineari} le \eqref{eqSchemaInterazioneCittà} soddisfanno
+                ove
                 %
-                \begin{equation}
-                    \label{eqLegameLineareInterazioneCittà}
-                    \begin{alignedat}{3}
-                        p(s,s_*)&\equiv s[1-E(s,s_*)+\gamma]
-                        \quad&&\text{e}\quad
-                        p_*(s,s_*)&&\equiv s_*\\
-                        q(s,s_*)&\equiv 0,
-                        \quad&&\text{e}\quad
-                        q_*(s,s_*)&&\equiv sI(s,s_*),
-                    \end{alignedat}
-                \end{equation}
-                %
-                rispettivamente per la prima e seconda legge d'interazione. Ovviamente questo scambio deve conservare [in media] la popolazione totale da cui 
-                %
-                \begin{equation}
-                    \label{eqLeggeImmigrazione}
+                \begin{equation*}
                     \begin{aligned}
-                        s+s_*&=\langle s+s_*\rangle=
-                        \langle s'+s_*'\rangle\\&=
-                        s-sE(s,s_*)+s_*+sI(s,s_*)
+                        E\colon\RPlus\times\RPlus\times\mathcal I\times\mathcal I\to[0,1],\\
+                        I\colon\RPlus\times\RPlus\times\mathcal I\times\mathcal I\to[0,1],
                     \end{aligned}
-                    \;\;\implies\;\;
-                    E(s,s_*)=I(s,s_*),
-                \end{equation}
+                \end{equation*}
                 %
-                ciò ha senso perché l'emigrazione e l'immigrazione sono fenomeni relativi (invertendo \(s\) ed \(s_*\) sarebbe l'opposto).
-            
-                Non manca che caratterizzare il tipo di perturbazione \(\gamma\) per avere uno stato postinterazione fisicamente sensato; difatti, è chiaro che rigorosamente \(\RPlus\equiv\mathbb N\) ma è piú agevole supporre \(\RPlus\equiv\mathbb R^+\) per poi approssimare per eccesso o difetto il numero intero effettivo; pertanto, dalla \eqref{eqSchemaInterazioneCittà}, si ha
+                sono rispettivamente i tassi d'emigrazione e immigrazione, mentre \(\gamma\) rappresenta fluttuazioni stocastiche. È perciò chiaro che, per avere un postato fisicamente sensato, \(\gamma\) dev'essere tale che
                 %
                 \begin{equation}
                     \label{eqVincoloPositivitàFluttuazioni}
-                    s'>0\;\;\implies\;\;\gamma>E(s,s_*)-1
+                    s'=s(1-E+\gamma)>0
+                    \quad\forall E\in[0,\lambda]
+                    \ \ \implies\ \ 
+                    \gamma>E-1
                 \end{equation}
                 %
-                mentre \(s_*'\) è per definizione sempre positivo. La scelta di \(>\) anziché \(\geq\) nella \eqref{eqVincoloPositivitàFluttuazioni} è ben fondata: di fatto si sta supponendo che le fluttuazioni non possono annullare la popolazione di una città; difatti qualora \(\gamma=E(s,s_*)-1\) si avrebbe \(s'=0\) dalla \eqref{eqSchemaInterazioneCittà}, situazione che si vuole evitare\footnotemark{} dato che nella \eqref{eqLeggeEmigrazione} compare il rapporto tra popolazioni delle città interagenti.
+                in cui \(\lambda\equiv\sup E\leq1\) è il limite superiore del tasso d'emigrazione i cui argomenti da qui fino alla fine di questo paragrafo sono sottintesi (lo stesso per il tasso d'immigrazione \(I\) verso la fine); d'altra parte \(s_*'\) è per definizione sempre positivo. La scelta di \(>\) anziché \(\geq\) nella \eqref{eqVincoloPositivitàFluttuazioni} è ben fondata: di fatto si sta supponendo che le fluttuazioni non possono annullare la popolazione di una città\footnotemark{}.%
+                \footnotetext{Ciò non significa che il modello non possa prevedere lo spopolamento di una città, poiché la sua taglia può arbitrariamente avvicinarsi a zero [ma mai esserne uguale], raggiungendolo solo \textit{a posteriori} dopo l'approssimazione dai numeri reali a quelli interi (\cref{ossNaturaNumericaPopolazione}).}%
 
-                \footnotetext{Ciò non significa che il modello non possa modellare lo spopolamento di una città, poiché la sua taglia può arbitrariamente avvicinarsi a zero [ma mai esserne uguale], raggiungendolo solo \textit{a posteriori} dopo l'approssimazione dai numeri reali a quelli interi.}
+                Perdipiú, le fluttuazioni rappresentano a grandi linee quei fenomeni complessivi di nascita e di morte che vengono considerati ma non direttamente modellati; pertanto valgono le seguenti ipotesi:
 
-                Perdipiú, le fluttuazioni rappresentano a grandi linee quei fenomeni complessivi di nascita e di morte che vengono considerati ma non direttamente modellati; pertanto \(\gamma\) deve soddisfare le seguenti due caratteristiche:
+                \begin{ipo}
+                    \(\gamma\) deve soddisfare le seguenti caratteristiche:
 
-                \begin{enumerate}[label=F\arabic*]
-                    \item\label{ipFluttuazioniPositivitàNegatività} possono assumere sia valori positivi che negativi, ma non minori del vincolo imposto da \eqref{eqVincoloPositivitàFluttuazioni};
-                    \item\label{ipFluttuazioniMediaNulla} la media è scelta arbitrariamente posta allo zero, ossia \(\langle\gamma\rangle=0\);
-                    \item\label{ipFluttuazioniProbabilitàDecrescente} seppure non vi siano limiti superiori per l'entità della fluttuazione, è chiaro che piú grande questa è meno è probabile.
-                \end{enumerate}
+                    \begin{enumerate}[
+                        label=F\arabic*,
+                        % topsep=0.5em,
+                        % parsep=0em,
+                        % itemsep=0.25em,
+                        % leftmargin=3em,
+                        % rightmargin=1.5em,
+                        % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                        %itemindent=!,
+                        %labelindent=3em,
+                        %labelwidth=!,
+                        %labelsep=!,
+                    ]
+                        \item\label{ipFluttuazioniPositivitàNegatività} possono assumere sia valori positivi che negativi, ma non minori del vincolo imposto da \eqref{eqVincoloPositivitàFluttuazioni};
+                        \item\label{ipFluttuazioniMediaNulla} la media è scelta arbitrariamente posta allo zero, ossia \(\langle\gamma\rangle=0\);
+                        \item\label{ipFluttuazioniProbabilitàDecrescente} seppure non vi siano limiti superiori per l'entità della fluttuazione, è chiaro che piú grande questa è meno è probabile.
+                    \end{enumerate}
+                \end{ipo}
                 
                 Con queste si possono allora analizzare alcune distribuzioni continue:
 
-                \begin{itemize}[label=\(\diamond\)]
-                    \item la distribuzione normale non soddisfà la \ref{ipFluttuazioniPositivitàNegatività} poiché può assumere valori reali arbitrari con probabilità non nulla;
-                    \item la distribuzione uniforme è adeguata solo per intervalli finiti e diventa degenere quando un suo estremo diverge, per cui non soddisfà né \ref{ipFluttuazioniMediaNulla} né \ref{ipFluttuazioniProbabilitàDecrescente}, mentre \ref{ipFluttuazioniPositivitàNegatività} si;
-                    \item la distribuzione esponenziale è quella piú promettente perché riflette sia \ref{ipFluttuazioniMediaNulla} (dopo un'opportuna traslazione dei valori campionati) che \ref{ipFluttuazioniProbabilitàDecrescente}, ma sfortunatamente non \ref{ipFluttuazioniPositivitàNegatività} perché il valore estremo \(\gamma=E(s,s_*)-1\) ha probabilità non nulla [anzi massima] d'essere campionato;
-                    \item l'unica distribuzione che soddisfà tutt'e tre le caratteristiche ricercate è proprio la distribuzione gamma.
-                \end{itemize}
+                \begin{enumerate}[
+                    label=\arabic*.,
+                    % topsep=0.5em,
+                    % parsep=0em,
+                    % itemsep=0.25em,
+                    % leftmargin=2em,
+                    % rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    %labelindent=3em,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item la distribuzione normale \(\mathcal N(\mu,\gamma)\) non soddisfà la \ref{ipFluttuazioniPositivitàNegatività} poiché può assumere valori reali arbitrari con probabilità non nulla;
+                    \item la distribuzione uniforme \(\mathcal U([a,b])\) è adeguata solo per intervalli finiti e diventa degenere quando un suo estremo diverge, per cui non soddisfà né \ref{ipFluttuazioniMediaNulla} né \ref{ipFluttuazioniProbabilitàDecrescente}, mentre \ref{ipFluttuazioniPositivitàNegatività} sí;
+                    \item la distribuzione esponenziale \(\DstrEsponenziale(\lambda)\) è quella piú promettente perché riflette sia \ref{ipFluttuazioniMediaNulla} (dopo un'opportuna traslazione dei valori campionati) che \ref{ipFluttuazioniProbabilitàDecrescente}, ma sfortunatamente non \ref{ipFluttuazioniPositivitàNegatività} perché la densità è non nulla al valore estremo \(\gamma=E-1\);
+                    \item l'unica distribuzione che soddisfà tutt'e tre le caratteristiche ricercate è proprio la distribuzione gamma \(\DstrGamma(\alpha,\beta)\).
+                \end{enumerate}
 
-                Si consideri allora una distribuzione gamma avente densità:
-                %
-                \begin{equation}
-                    \label{eqDistribuzioneGamma}
-                    f(x)=\frac1{\theta\Gamma(\alpha)}x^{\alpha-1}
-                    \exp\left(-\frac x\theta\right),
-                \end{equation}
-                %
-                ove \(\alpha\) e \(\theta\) sono i parametri rispettivamente di forma e di scala, mentre \(\Gamma(\alpha):\mathbb R^+\to\mathbb R^+\) è la funzione gamma:
-                %
-                \begin{equation}
-                    \label{eqFunzioneGamma}
-                    \Gamma(\alpha)\equiv\int_0^{+\infty}y^{\alpha+1}e^{-y}\de y.
-                \end{equation}
-                %
-                Si scelga \(\hat\gamma\sim\DstrGamma(\alpha,\theta)\), che soddisfà per definizione la \ref{ipFluttuazioniProbabilitàDecrescente}, e s'imponga
-                %
-                \begin{equation}
-                    \label{eqMediaVarianzaFluttuazioni}
-                    \langle\hat\gamma\rangle=1-E(s,s_*)=\alpha\theta
-                    \quad\text{e}\quad
-                    \langle\hat\gamma^2\rangle=\sigma^2=\alpha\theta^2,
-                \end{equation}
-                %
-                con \(\sigma\in\mathbb R^+\) equivalente alla deviazione \textit{standard} mentre \(\sigma^2\) alla varianza, da cui
-                %
-                \begin{equation}
-                    \label{eqParametriDstrGamma}
-                    \alpha=\frac{(1-E(s,s_*))^2}{\sigma^2}
-                    \quad\text{e}\quad
-                    \theta=\frac{\sigma^2}{1-E(s,s_*)}.
-                \end{equation}
-                %
-                Con tale scelta dei parametri è possibile soddisfare la \ref{ipFluttuazioniMediaNulla} semplicemente traslando i valori campionanti della \(\hat\gamma\) di \(-\langle\hat\gamma\rangle\), ossia si considera la distribuzione \(\gamma\sim\hat\gamma-\langle\hat\gamma\rangle\):
+                Si assuma allora \(\hat\gamma\sim\DstrGamma(\alpha,\beta)\) con densità
                 %
                 \begin{equation*}
-                    %\label{}
+                    % \label{eqDensitàDistribuzioneGamma}
+                    f_\gamma(x)=\frac1{\beta\Gamma(\alpha)}x^{\alpha-1}
+                    \exp\left(-\frac x\beta\right),
+                \end{equation*}
+                %
+                ove \(\alpha\) e \(\beta\) sono i parametri rispettivamente di forma e di scala, mentre
+                %
+                \begin{equation*}
+                    \Gamma(\alpha)\colon\RPlus\to\RPlus
+                \end{equation*}
+                %
+                è la funzione gamma
+                %
+                \begin{equation*}
+                    \Gamma(\alpha)\equiv\int_0^{+\infty}y^{\alpha+1}e^{-y}\de y.
+                \end{equation*}
+                %
+                Imponendo la \ref{ipFluttuazioniProbabilitàDecrescente} si ottiene
+                %
+                \begin{equation*}
+                    % \label{eqMediaVarianzaFluttuazioni}
+                    \langle\hat\gamma\rangle=1-E=\alpha\beta
+                    \quad\text{e}\quad
+                    \langle\hat\gamma^2\rangle\equiv\sigma^2=\alpha\beta^2,
+                \end{equation*}
+                %
+                in cui \(\sigma^2\) indica la varianza, da cui
+                %
+                \begin{equation*}
+                    % \label{eqParametriDstrGamma}
+                    \alpha=\frac{(1-E)^2}{\sigma^2}
+                    \quad\text{e}\quad
+                    \beta=\frac{\sigma^2}{1-E}.
+                \end{equation*}
+                %
+                La \ref{ipFluttuazioniMediaNulla} si può semplicemente soddisfare traslando i valori campionanti della \(\hat\gamma\) di \(-\langle\hat\gamma\rangle\), ossia si considera la distribuzione \(\gamma\sim\hat\gamma-\langle\hat\gamma\rangle\):
+                %
+                \begin{equation*}
                     \langle\gamma\rangle=
                     \langle\hat\gamma-\langle\hat\gamma\rangle\rangle=
                     \langle\hat\gamma\rangle-\langle\hat\gamma\rangle=0.
                 \end{equation*}
                 %
-                D'altra parte la \ref{ipFluttuazioniPositivitàNegatività} necessità di salvaguardarsi dai casi degeneri della distribuzione gamma: essa infatti se \(\alpha=1\) diventa un'esponenziale di parametro \(\theta\), mentre se \(\alpha<1\) diverge all'origine; per avere quindi una probabilità nulla di campionare l'origine [e quindi -\(\langle\hat\gamma\rangle\) dopo la traslazione] è necessario porre
+                D'altra parte per la \ref{ipFluttuazioniPositivitàNegatività} bisogna salvaguardarsi dai casi degeneri della distribuzione gamma: essa infatti se \(\alpha=1\) diventa \(\DstrEsponenziale(\beta)\), mentre se \(\alpha<1\) diverge all'origine; per avere quindi probabilità nulla di campionare da \(\hat\gamma\) l'origine [e quindi -\(\langle\hat\gamma\rangle\) dopo la traslazione] è necessario porre
                 %
                 \begin{equation*}
-                    %\label{}
                     \alpha>1
                     \;\;\implies\;\;
-                    \frac{(1-E(s,s_*))^2}{\sigma^2}>1,
+                    \frac{(1-E)^2}{\sigma^2}>1,
                 \end{equation*}
                 %
-                ma nel caso peggiore \(1-E(s,s_*)=1-\lambda\) da cui
+                ma nel caso peggiore \(1-E=1-\lambda\) da cui
                 %
                 \begin{equation}
                     \label{eqVincoloTraParametri}
@@ -1351,56 +1372,141 @@
                     \sigma<\vert1-\lambda\vert=1-\lambda,
                 \end{equation}
                 %
-                siccome \(E(s,s_*)\in(0,\lambda)\;\;\forall s,s_*\in\RPlus\) e \(\lambda\in(0,1)\). La \eqref{eqVincoloTraParametri} implica quindi che non è possibile avere una varianza arbitraria per poter soddisfare la \ref{ipFluttuazioniPositivitàNegatività}, ma che questa è limitata superiormente dall'attrattività dei poli: piú è grande \(\lambda\) piú piccola è la varianza, e viceversa.
+                siccome \(E\in[0,\lambda]\;\;\forall s,s_*\in\RPlus\). La \eqref{eqVincoloTraParametri} implica quindi che non è possibile avere una varianza arbitraria per poter soddisfare la \ref{ipFluttuazioniPositivitàNegatività}, ma che questa è limitata superiormente dal massimo tasso d'emigrazione \(\lambda\), interpretabile come attrattività: piú grande è \(\lambda\) piú piccola è la varianza, e viceversa.
 
-        \subsection{Equazione di tipo Boltzmann approssimata}
+                Si conclude osservando come sia naturale che l'interazione, ossia lo scambio di popolazione descritto dalle \cref{eqRegoleInterazioneUrbaneEsplicite}, debba conservare [in media] la popolazione totale:
+                %
+                \begin{equation*}
+                    % \label{eqLeggeImmigrazione}
+                    s+s_*=\langle s+s_*\rangle=
+                    \langle s'+s_*'\rangle=
+                    s-sE+s_*+sI
+                    % \begin{aligned}
+                    %     s+s_*&=\langle s+s_*\rangle=
+                    %     \langle s'+s_*'\rangle\\&=
+                    %     s-sE+s_*+sI
+                    % \end{aligned}
+                    \ \ \implies\ \ 
+                    E\equiv I,
+                \end{equation*}
+                %
+                il che ha senso perché l'emigrazione e l'immigrazione sono fenomeni relativi (invertendo \(s\) ed \(s_*\) sarebbe l'opposto).
 
-            Si premette innanzitutto che con approssimazione s'intende di abbandonare la topologia indotta dal grafo, ovverosia a trascurare la variabile aleatoria \(I\) sostituendola con qualche informazione che non permetta piú di distinguere i nodi, tornando dunque a tutti gli effetti a una descrizione classica di tipo di Boltzamnn seppure solo in maniera approssimata.
+                \begin{oss}
+                    Le \cref{eqRegoleInterazioneUrbaneEsplicite} non sono ancora complete siccome non si è esplicitata la regola d'emigrazione, la cui scelta, tuttavia, si può dunque vedere come la regola d'interazione stessa: è l'ultimo tassello del mosaico. Pertanto si lascia quest'ultima definizione al \cref{secSimulazioni} nel quale se ne propongono varie, si discutono quindi con vari studi parametrici per poi infine interpretarle analizzando cosa queste dicono sul fenomeno della migrazione.
+                \end{oss}
             
-            Per questo obbiettivo è però prima necessario riformulare la \cref{eqFormaDeboleBoltzmannOmogeneoAssimetricoUrbano} tramite una scelta oculata delle \(\Phi\):
-          
-            \begin{ipo}
-                \label{ipOsservabileUrbanoNodale}
-                Si considera la seguente classe di osservabili:
+        \subsection{Equazione di tipo Boltzmann approssimata}\label{secApprossimazione}
+
+            L'approssimazione si fonda sulla seguente matrice:
+            
+            \begin{dfn}[Matrice dei gradi \(\mathbf B\)]
+                \label{defMatriceGradi}
+                Sia \(\mathbf B\in\mathbb R^{N\times N}\) una matrice di rango uno
+                \[
+                    \mathbf B\equiv\frac{\mathbf k^+(\mathbf k^-)^\top}{D_N}
+                \]
+                definite tramite il prodotto diadico dei vettori
                 %
                 \begin{equation}
-                    \label{eqOsservabileApprossimante}
-                    \Phi(i,s)\equiv\delta(i-j)\varphi(s)
-                    \quad\forall j\in\mathcal I,
+                    \label{eqCriterioApprossimazioneA}
+                    \begin{aligned}
+                        \mathbf k^+&\equiv(k^+_1,k^+_2,\ldots,k^+_N)^\top=\mathbf A\mathbf 1\in\mathbb R^N,\\
+                        \mathbf k^-&\equiv(k^-_1,k^-_2,\ldots,k^-_N)^\top=\mathbf A^\top\mathbf 1\in\mathbb R^N,
+                    \end{aligned}
                 \end{equation}
                 %
+                rispettivamente dei gradi uscenti ed entranti, e la costante\footnotemark{}%
+                \footnotetext{La \(\Vert\cdot\Vert\) è la norma uno applicata alle matrici: \(\Vert\mathbf A\Vert_1\equiv\sum_{i,j\in\mathcal I}\vert a_{i,j}\vert\).}%
+                %
+                \begin{equation}
+                    \label{eqNormaUnoMatriceAdiacenza}
+                    D_N\equiv\sum_{i\in\mathcal I}k^+_i=\mathbf1^\top\mathbf k^+
+                    =\sum_{i\in\mathcal I}k^-_i=\mathbf1^\top\mathbf k^-
+                    =\mathbf1^\top\mathbf A\mathbf1=\Vert\mathbf A\Vert_1.
+                \end{equation}
+                %
+                Allora \(\mathbf B\) approssima la matrice d'adiacenza \(\mathbf A\) poiché per definizione vale 
+                \[
+                    \left.\begin{aligned}
+                        \mathbf B\mathbf 1
+                        &=\frac1{D_N}\mathbf k^+(\mathbf k^-)^\top\mathbf 1
+                        =\mathbf k^+\frac{D_N}{D_N}=\mathbf k^+\\
+                        \mathbf B^\top\mathbf 1
+                        &=\frac1{D_N}\mathbf k^-(\mathbf k^+)^\top\mathbf 1
+                        =\mathbf k^-\frac{D_N}{D_N}=\mathbf k^-\
+                    \end{aligned}\right\}
+                    \ \ \implies\ \ \mathbf B\approx\mathbf A.
+                \]
+                Inoltre, poiché \(\mathbf A\) è simmetrica (\cref{ipTipoGrafo}) vale \(\mathbf k^+=\mathbf k^-=\mathbf k\) e quindi
+                \[
+                    \mathbf B=\frac{\mathbf k\mathbf k^\top}{D_N}.
+                \]
+            \end{dfn}
+            
+            Tramite la \cref{defMatriceGradi}, la \ref{eqBernoulliInterazioneUrbana} diventa
+            %
+            \eqtag{\([\text{Ber}]^{\mathbf B}_S\)}{
+                \label{eqBernoulliInterazioneUrbanaApprossimata}
+                \Theta\sim\DstrBernoulli(B(I,I^*)\Delta t),
+            }%
+            da cui la \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano} si legge
+            %
+            \eqtag{\([\text{EtB}]^{\mathbf B}_S\)}{
+                \label{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbanoApprossimata}
+                \derS{}t\int_{\mathcal I}\int_{\RPlus}
+                \Phi g\de v \de i=
+                \int_{\mathcal I^2}\int_{\RPlus^2}B(i,i_*)
+                \frac{\langle \Phi'+\Phi_*'-\Phi-\Phi_*\rangle}2
+                gg_*\de s\de s_*\de i\de i_*,
+            }%
+            dove \(g\) e \(g_*\) sono densità definite come la \cref{eqDensitàCongiuntaUrbana} ma indicate diversamente per distinguerle da quelle esatte \(f\) ed \(f_*\).
+
+            Sorge però spontanea una domanda non di poco conto: perché non si può scegliere un'altra matrice \(\mathbf C\in\mathbb R^{N\times N}\) per approssimare la \(\mathbf A\), secondo altri criteri analoghi o dissimili alla \cref{eqCriterioApprossimazioneA}? La risposta non è immediata ma discende in essenza su come la \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbanoApprossimata} può essere riformulata. A tal scopo si necessita di un osservazione:
+
+            \begin{oss}[Teoria e Pratica]
+                \label{ossDiscrepanzaTeoriaPratica}
+                Come detto nel \cref{secIntroduzione}, l'interesse è di studiare la distribuzione della popolazione tra città; perciò, non a torto, si può vedere la densità \(f\) nella \cref{eqDensitàCongiuntaUrbana} come eccessivamente dettagliata, contenendo informazioni legate ai vertici: ai fini pratici è quindi sufficiente ricavare in qualche modo la densità marginale 
+                \( 
+                    \bar f(s,t)\equiv\int_{\mathcal I}f(i,s,t)\de i,\ \forall t\geq0,
+                \) 
+                che è esattamente quanto fatto nel \cref{secMetodoMonteCarlo} per i risultati delle venture simulazioni.
+            \end{oss}
+
+            Dall'\cref{ossDiscrepanzaTeoriaPratica} si possono pertanto specializzare gli osservabili:
+          
+            \begin{ipo}[Osservabili puntuali]
+                \label{ipOsservabileUrbanoNodale}
+                Si considera la seguente classe di osservabili: 
+                \(
+                    \Phi(i,s)\equiv\delta(i-j)\varphi(s),\ \forall j\in\mathcal I,
+                \) 
                 dove \(\varphi:\RPlus\to\mathbb R\) è una funzione arbitraria.
             \end{ipo}
            
-            Con tale scelta è possibile recuperare un sistema di equazioni debole per le \(f_i\): usando, infatti, la \cref{eqOsservabileApprossimante} nella \eqref{eqFormaDeboleBoltzmannOmogeneoAssimetricoUrbano} si ricava
+            Con tale scelta è possibile recuperare un sistema di equazioni debole per le \(g_i\): usando, infatti, l'\cref{ipOsservabileUrbanoNodale} nella \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbanoApprossimata} porta a
             %
             \begin{equation*}
                 \begin{aligned}
-                    \derS{}t\int_{\RPlus}\varphi f_j\de s=&
+                    \derS{}t\int_{\RPlus}\varphi g_j\de s=&
                     \frac1N\int_{\RPlus^2}%\int_{\RPlus}
                     \frac{\langle\varphi'-\varphi\rangle}2
-                    f_j\sum_{i\in\mathcal I}A(j,i)f^*_i\de s\de s_*\\&
+                    g_j\sum_{i\in\mathcal I}B(j,i)g^*_i\de s\de s_*\\&
                     +\frac1N
                     \int_{\RPlus^2}%\int_{\RPlus}
                     \frac{\langle\varphi'_*-\varphi_*\rangle}2
-                    f^*_j\sum_{i\in\mathcal I}A(i,j)f_i\de s\de s_*,%\\&
+                    s^*_j\sum_{i\in\mathcal I}B(i,j)g_i\de s\de s_*,%\\&
                     \quad\forall j\in\mathcal I,
                 \end{aligned}
             \end{equation*}
             %
-            ma essendo \(\mathbf A\) simmetrica (\cref{ipTipoGrafo}) vale
+            ma essendo \(\mathbf B\) simmetrica vale
             %
             \begin{equation*}
-                A(i,j)=A(j,i)\ \ \iff\ \ \mathbf A=\mathbf A^\top,
-            \end{equation*}
-            %
-            con \(\mathbf A^\top\) indicante la matrice trasposta, da cui
-            %
-            \begin{equation*}
-                \derS{}t\int_{\RPlus}\varphi f_j\de s=
-                \frac1N\int_{\RPlus^2}%\int_{\RPlus}
+                \derS{}t\int_{\RPlus}\varphi g_j\de s=
+                \frac1N\int_{\RPlus^2}
                 \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
-                f_j\sum_{i\in\mathcal I}A(j,i)f^*_i\de s\de s_*
+                g_j\sum_{i\in\mathcal I}B(j,i)g^*_i\de s\de s_*
                 \quad\forall j\in\mathcal I,
             \end{equation*}
             %
@@ -1408,19 +1514,19 @@
             %
             \begin{equation*}
                 \newcommand\hspc{\hspace{1.5em}}
-                \mathbf f\equiv\bigl(f_i\bigr)_{i\in\mathcal I}
+                \mathbf g\equiv\bigl(g_i\bigr)_{i\in\mathcal I}
                 \hspc\text{e}\hspc
-                \mathbf f_*\equiv\bigl(f^*_i\bigr)_{i\in\mathcal I},
+                \mathbf g_*\equiv\bigl(g^*_i\bigr)_{i\in\mathcal I},
             \end{equation*}
             %
             si legge
             %
             \begin{equation}
                 \label{eqSistemaDensitàNodiUrbano}
-                \derS{}t\int_{\RPlus}\varphi\mathbf f\de s=
+                \derS{}t\int_{\RPlus}\varphi\mathbf g\de s=
                 \frac1N\int_{\RPlus^2}
                 \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
-                \mathbf f\odot\mathbf A\mathbf f_*\de s\de s_*,
+                \mathbf g\odot\mathbf B\mathbf g_*\de s\de s_*,
             \end{equation}
             %
             ove \(\odot\) indica il prodotto di Hadamard (prodotto per elementi).
@@ -1429,360 +1535,382 @@
             %
             \begin{equation}
                 \label{eqDensitàMarginaleUrbanaS}
-                \bar f(s,t)
-                \equiv\int_{\mathcal I}f(i,s,t)\de i
-                =\frac1N\sum_{i\in\mathcal I}f_i
-                =\frac1N\mathbf 1^\top\mathbf f,
+                \bar g_N(s,t)
+                \equiv\int_{\mathcal I}g(i,s,t)\de i
+                % =\frac1N\sum_{j\in\mathcal I}g_j(s,t)
+                % \otimes\int_{\mathcal I}\delta(i-j)\de i
+                =\frac1N\sum_{i\in\mathcal I}g_i
+                =\frac1N\mathbf 1^\top\mathbf g,
             \end{equation}
             %
-            ove \(\mathbf 1\equiv(1,1,\ldots,1)\in\mathbb R^n\), che non è che la media tra le densità di \(S_t\) tra tutt'i vertici; premoltiplicando la \cref{eqSistemaDensitàNodiUrbano} per \(\frac1N\mathbf 1^\top\) e usando la \cref{eqDensitàMarginaleUrbanaS} si ha
+            ove \(\mathbf 1\equiv(1,1,\ldots,1)\in\mathbb R^n\), che non è che la media tra le densità di \(S_t\) tra tutt'i vertici\footnotemark{}; premoltiplicando la \cref{eqSistemaDensitàNodiUrbano} per \(\frac1N\mathbf 1^\top\) e usando la \cref{eqDensitàMarginaleUrbanaS} si ha%
+            \footnotetext{La medesima definizione vale anche per \(\bar f_N\) della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano}.}%
             %
-            \begin{equation}
+            \eqtag{\([\text{E}\bar g]\)}{
                 \label{eqDensitàMediaUrbanaS}
-                \derS{}t\int_{\RPlus}\varphi\bar f\de s=
+                \derS{}t\int_{\RPlus}\varphi\bar g\de s=
                 \frac1{N^2}\int_{\RPlus^2}
                 \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
-                \mathbf f^\top\mathbf A\mathbf f_*\de s\de s_*,
-            \end{equation}
-            %
+                \mathbf g^\top\mathbf B\mathbf g_*\de s\de s_*,
+            }%
+ 
             \begin{oss}
-                La \cref{eqDensitàMediaUrbanaS} si può anche direttamente ricavare usando, anziché la \cref{eqOsservabileApprossimante}, direttamente un osservabile indipendente dall'indice \(i\): \[\Phi(i,s)\equiv\varphi(s).\]
-                % ragione per cui la \cref{eqDensitàMediaUrbanaS} è l'equivalente equazione di tipo Boltzmann considerando solo lo stato \(S_t\) delle città. (in questo caso è sbagliato ma sarebbe cosí se si considerasse come matrice d'adiacenza quella unitaria: v. § 6.1 Nurisso et al.)
+                La \ref{eqDensitàMediaUrbanaS} si può anche ottenere usando, in luogo del'\cref{ipOsservabileUrbanoNodale}, direttamente un osservabile indipendente dall'indice \(i\): \(\Phi(i,s)\equiv\varphi(s),\) confermando quanto premesso nell'\cref{ossDiscrepanzaTeoriaPratica}, cioè che la \ref{eqDensitàMediaUrbanaS} si ricava perdendo le informazioni legati agl'indici negli osservabili.
             \end{oss}
 
-            La \cref{eqDensitàMediaUrbanaS} non è ancora un'equazione chiusa per \(\bar f\) per via del secondo membro nel quale \(\mathbf f^\top\mathbf A\mathbf f_*\) richiede sia di conoscere nel dettaglio le connessioni sottostanti del grafo che le distribuzioni della popolazione di ogni città.
-
-            Purtroppo la natura arbitraria delle \ref{eqRegoleInterazioneUrbane} non permette procedere esattamente, per cui sono necessarie delle approssimazioni:
-
-            \begin{dfn}[Approssimazione della \(\mathbf A\)]
-                \label{defApprossimazioneMatriceAdiacenzaRangoUno}
-                Sia \(\mathbf B\in\mathbb R^{N\times N}\) una matrice di rango uno
-                \[
-                    \mathbf B\equiv\frac{\mathbf k^+(\mathbf k^-)^\top}D
-                \]
-                definite tramite il prodotto diadico dei vettori
-                \[
-                    \begin{aligned}
-                        \mathbf k^+&\equiv(k^+_1,k^+_2,\ldots,k^+_N)^\top=\mathbf A\mathbf 1\in\mathbb R^N,\\
-                        \mathbf k^-&\equiv(k^-_1,k^-_2,\ldots,k^-_N)^\top=\mathbf A^\top\mathbf 1\in\mathbb R^N,
-                    \end{aligned}
-                \]
-                dei gradi uscenti ed entranti rispettivamente, e la costante\footnotemark{}%
-                \footnotetext{La \(\Vert\cdot\Vert\) è la norma uno applicata alle matrici: \(\Vert\mathbf A\Vert_1\equiv\sum_{i,j\in\mathcal I}\vert a_{i,j}\vert\).}%
-                \[
-                    D\equiv\sum_{i\in\mathcal I}k^+_i=\mathbf1^\top\mathbf k^+
-                    =\sum_{i\in\mathcal I}k^-_i=\mathbf1^\top\mathbf k^-
-                    =\Vert\mathbf A\Vert_1.
-                \]
-                Allora \(\mathbf B\) approssima la matrice d'adiacenza \(\mathbf A\) poiché per definizione vale 
-                \[
-                    \left.\begin{aligned}
-                        \mathbf B\mathbf 1
-                        &=\frac1D\mathbf k^+(\mathbf k^-)^\top\mathbf 1
-                        =\mathbf k^+\frac DD=\mathbf k^+\\
-                        \mathbf B^\top\mathbf 1
-                        &=\frac1D\mathbf k^-(\mathbf k^+)^\top\mathbf 1
-                        =\mathbf k^-\frac DD=\mathbf k^-\
-                    \end{aligned}\right\}
-                    \ \ \implies\ \ \mathbf B\approx\mathbf A.
-                \]
-                Inoltre, poiché \(\mathbf A\) è simmetrica (\cref{ipTipoGrafo}) vale \(\mathbf k^+=\mathbf k^-=\mathbf k\) e quindi
-                \[
-                    \mathbf B=\frac{\mathbf k\mathbf k^\top}D.
-                \]
-            \end{dfn}
-            
-            Approssimando la \(\mathbf A\) colla \cref{defApprossimazioneMatriceAdiacenzaRangoUno}, la \cref{eqDensitàMediaUrbanaS} diventa
+            La \ref{eqDensitàMediaUrbanaS} non è ancora un'equazione chiusa per \(\bar g\) per via del secondo membro nel quale \(\mathbf g^\top\mathbf B\mathbf g_*\) richiede sia di conoscere nel dettaglio le connessioni sottostanti del grafo che le distribuzioni della popolazione di ogni città. Tuttavia, avvalendosi della definizione della \(\mathbf B\), la \ref{eqDensitàMediaUrbanaS} diventa
             %
-            \begin{equation*}
-                \derS{}t\int_{\RPlus}\varphi\bar h\de s=
+            \begin{equation}
+                \label{eqPrimaIntroduzioneDensitàGradi}
+                \derS{}t\int_{\RPlus}\varphi\bar g_N\de s=
                 \frac1{N^2}\int_{\RPlus^2}
-                \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
-                \mathbf h^\top\mathbf B\mathbf h_*\de s\de s_*,
-            \end{equation*}
+                \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}{2D_N}
+                (\mathbf k^\top\mathbf g)(\mathbf k^\top\mathbf g_*)\de s\de s_*,
+            \end{equation}
             %
-            ove sono state rinominate le densità \(\bar f\), \(\mathbf f\) e \(\mathbf f_*\) per distinguerle da quelle esatte; espandendo \(\mathbf B\) si ha
-            %
-            \begin{equation*}
-                % \label{eqDensitàMediaUrbanaSApprossimata}
-                \derS{}t\int_{\RPlus}\varphi\bar h\de s=
-                \frac1{N^2}\int_{\RPlus^2}
-                \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}{2D}
-                (\mathbf k^\top\mathbf h)(\mathbf k^\top\mathbf h_*)\de s\de s_*.
-            \end{equation*}
-            %
-            S'introduca poi una nuova densità:
+            che richiede d'introdurre una nuova densità di probabilità:
 
             \begin{dfn}[Densità dei gradi \(\mathbf k\)]
                 \label{defDensitàGradi}
                 Sia
                 \[
-                    g_N\colon\RPlus\times\{0,1,\ldots,N\}\times\RPlus\to\RPlus,
+                    d_N\colon\RPlus\times\{0,1,\ldots,N\}\times\RPlus\to\RPlus,
                 \]
-                la densità di probabilità che al tempo \(t\) un agente abbia popolazione \(s\) e grado \(k\), definizione che la lega alle \(f_i\) nella \cref{eqDensitàCongiuntaUrbana} dalla relazione
+                la densità di probabilità dell'evento che al tempo \(t\) un agente abbia popolazione \(s\) e grado \(k\), definizione che la lega alle \(g_i\) dalla relazione
                 \[
-                    g_N(s,k,t)=\frac1N\sum_{i\in\mathcal I_k}f_i(s,t),
+                    d_N(s,k,t)=\frac1N\sum_{i\in\mathcal I_k}g_i(s,t),
                 \]
                 ove
                 \[
-                    \mathcal I_k\equiv\{i\in\mathcal I_k\ |\ k_i=k\}
+                    \mathcal I_k\equiv\{i\in\mathcal I\ |\ k_i=k\}\subseteq\mathcal I
                 \]
                 è l'insieme dei nodi con grado \(k\); da essa ne seguono altre due:
-                \[
-                    \begin{aligned}
-                        \bar f(s,t)
-                        &=\frac1N\sum_{i\in\mathcal I}f_i(s,t)
-                        =\sum_{k=0}^N\frac1N\sum_{i\in\mathcal I_k}f_i(s,t)
-                        =\sum_{k=0}^Ng_N(s,k,t),\\
-                        \mathbf k^\top\mathbf f(s,t)
-                        &=\sum_{i\in\mathcal I}k_if_i(s,t)
-                        =\sum_{k=0}^Nk\sum_{i\in\mathcal I_k}f_i(s,t)
-                        =N\sum_{k=0}^Nkg_N(s,k,t).
-                    \end{aligned}
-                \]
+                %
+                \begin{align}
+                    \bar g_N(s,t)
+                    &=\frac1N\sum_{i\in\mathcal I}g_i(s,t)
+                    =\sum_{k=0}^N\frac1N\sum_{i\in\mathcal I_k}g_i(s,t)
+                    =\sum_{k=0}^Nd_N(s,k,t),\label{eqDensitàGradiMarginale}\\
+                    \mathbf k^\top\mathbf g(s,t)
+                    &=\sum_{i\in\mathcal I}k_ig_i(s,t)
+                    =\sum_{k=0}^Nk\sum_{i\in\mathcal I_k}g_i(s,t)
+                    =N\sum_{k=0}^Nkd_N(s,k,t).\notag
+                \end{align}
+                %
+                Un analogo discorso vale per le \(f_i\) in luogo delle \(g_i\).
             \end{dfn}
 
-            Avvalendosi della \cref{defDensitàGradi} si può riformulare la precedente equazione in termini di \(g_N\):
+            E dalla \cref{defDensitàGradi} segue la sua normalizzazione:
+
+            \begin{dfn}[Densità dei gradi \(\mathbf k\) normalizzati]
+                \label{defDensitàGradiNormalizzata}
+                Siano
+                \[
+                    \underhat k_i\equiv\frac{k_i}N\in\underhat{\mathcal K},\quad\forall i\in\mathcal I,
+                \]
+                i gradi normalizzati di un generico nodo rappresentativo di \(\mathcal G\), in cui
+                \[
+                    \underhat{\mathcal K}\equiv\left\{\frac kN\ |\ k=0,1,\ldots,N\right\}\subseteq[0,1]
+                \]
+                è l'insieme discreto dei gradi normalizzati; allora la densità dei gradi normalizzati
+                \[
+                    \underhat d_N\colon\RPlus\times\underhat{\mathcal K}\times\RPlus\to\RPlus,
+                \]
+                è cosí definita
+                %
+                \begin{equation}
+                    \label{eqDensitàGradiNormalizzati}
+                    \underhat d_N(s,\underhat k,t)\equiv Nd_N(s,N\underhat k,t).
+                \end{equation}
+            \end{dfn}
+
+            \begin{oss}
+                \label{ossNaturaDensitàGradi}
+                Visto che due elementi consecutivi dell'insieme \(\underhat{\mathcal K}\) sono separati da un passo costante e uguale a \(1/N\), si può definire \(\Delta\underhat k\equiv1/N\) che da \cref{eqDensitàGradiNormalizzati} implica
+                \[
+                    \sum_{\underhat k\in\underhat{\mathcal K}}\int_{\RPlus}
+                    \underhat d_N(s,\underhat k,t)\de s\Delta\underhat k
+                    =\sum_{k\in\mathcal K}\int_{\RPlus}d_N(s,k,t)\de s=1,\quad\forall t\geq0,
+                \]
+                cosa che permette di vedere la \(\underhat d_N\) come funzione costante a tratti dei gradi normalizzati \(\underhat k\), e similmente per \(d_N\) (basta definire \(\Delta k\equiv1\)) essendone un mero riscalamento.
+            \end{oss}
+
+            \begin{oss}
+                L'\cref{ossNaturaDensitàGradi} dà la possibilità anche d'interpretare la \cref{eqDensitàGradiMarginale} come un uguaglianza tra densità marginali: \(\bar g_N=\bar d_N=\bar{\underhat d}_N\).
+            \end{oss}
+
+            Con tutte queste definizioni e osservazioni, la \cref{eqPrimaIntroduzioneDensitàGradi} si può riformulare in termini di \(\underhat d_N\)
             %
             \begin{equation*}
-                \derS{}t\sum_{k=0}^N\int_{\RPlus}\varphi g_N(s,k,t)\de s=
-                \sum_{k,k_*=0}^N\int_{\RPlus^2}kk_*
-                \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}{2D}
-                g_Ng^*_N\de s\de s_*,
+                \derS{}t\sum_{k=0}^N\int_{\RPlus}\varphi d_N\de s=
+                N^2\sum_{k,k_*=0}^N\int_{\RPlus^2}\frac{kk_*}{D_N}
+                \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                d_Nd^*_N\de s\de s_*,
             \end{equation*}
             %
-            dove si è aggiunto un asterisco al grado moltiplicato a \(g_N^*\) per distinguerlo da quello moltiplicato a \(g_N\).
+            dove \(k_*\) è il grado associato a \(g_N^*\), e poi in termini di \(\underhat d_N\)
             %
             \begin{equation*}
-                \derS{}t\int_{\mathcal I}\int_{\RPlus}
-                \Phi f\de v \de i=
-                \int_{\mathcal I^2}\int_{\RPlus^2}B(i,i_*)
-                \frac{\langle \Phi'+\Phi_*'-\Phi-\Phi_*\rangle}2
-                ff_*\de s\de s_*\de i\de i_*,
+                \underbrace{
+                    \derS{}t\sum_{k\in\underhat{\mathcal K}}\int_{\RPlus}\varphi\underhat d_N\de s\Delta\underhat k
+                    \vphantom{\frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}{2D_N}}
+                }_{\Circled{\mathrm{I}}} =
+                \underbrace{
+                    \sum_{\underhat k,\underhat k_*\in\underhat{\mathcal K}}\int_{\RPlus^2}
+                    \frac{\underhat k\underhat k_*}{D_N}
+                    \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                    \underhat d_N\underhat d^*_N\de s\de s_*.
+                }_{\Circled{\mathrm{II}}}
             \end{equation*}
             %
+            Il secondo membro si può ulteriormente manipolare moltiplicando e dividendo per \(N^2\) e definendo il grado normalizzato medio
+            %
+            \begin{equation}
+                \label{eqGradoMedio}
+                \bar D_N\equiv\frac{D_N}{N^2}=
+                \sum_{\underhat k\in\underhat{\mathcal K}}
+                \int_{\RPlus}\underhat k\underhat d_N\de s\Delta\underhat k,
+            \end{equation}
+            %
+            da cui
+            %
+            \begin{equation*}
+                \Circled{\mathrm{II}}=
+                \sum_{\underhat k,\underhat k_*\in\underhat{\mathcal K}}\int_{\RPlus^2}\frac{\underhat k\underhat k_*}{\bar D_N}
+                \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                \underhat d_N\underhat d^*_N\de s\de s_*\Delta\underhat k\Delta\underhat k_*.
+            \end{equation*}
+            %
+            Valutando il limite \(N\to\infty\) alla \cref{eqGradoMedio} e ai membri \(\Circled{\mathrm I}\) e \(\Circled{\mathrm{II}}\)
+            %
+            \begin{equation*}
+                \begin{aligned}
+                    \cref{eqGradoMedio}&\xrightarrow{N\to\infty}
+                    \bar D\equiv\int_0^1\int_{\RPlus}\underhat k\underhat d\ \de s\de\underhat k,
+                    \hspace{1.5em}\Circled{\mathrm I}\xrightarrow{N\to\infty}
+                    \derS{}t\int_0^1\int_{\RPlus}\varphi\underhat d\ \de s\de\underhat k\\
+                    \Circled{\mathrm{II}}&\xrightarrow{N\to\infty}
+                    \int_0^1\int_0^1\int_{\RPlus^2}\frac{\underhat k\underhat k_*}{\bar D}
+                    \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                    \underhat d\underhat d^*\ \de s\de s_*\de\underhat k\de\underhat k_*,
+                \end{aligned}
+            \end{equation*}
+            %
+            si perviene infine a un'equazione di tipo Boltzmann:
+            %
+            \eqtag{\([\text{EtB}]^k_S\)}{
+                \label{eqTipoBoltzmannGrafoRilassato}
+                \derS{}t\int_0^1\int_{\RPlus}\hspace{-1em}\varphi\underhat d\ \de s\de\underhat k=
+                \int_0^1\int_0^1\int_{\RPlus^2}\hspace{-0.5em}\frac{\underhat k\underhat k_*}{\bar D}
+                \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                \underhat d\underhat d^*\ \de s\de s_*\de\underhat k\de\underhat k_*.
+            }%
 
-            % \begin{equation*}
-            %     m\equiv ck^+k^-_*,
-            % \end{equation*}
-            % %
-            % e \(c\equiv\frac DN\)
+            Si è dunque dimostrato il seguente teorema:
 
-            % Euristicamente si può riflettere in questo modo: con \(N\gg1\) le singole connessioni sono meno importati, per cui vengono meno i dettagli mentre la panoramica può essere ragionevolmente essere colta da \(\mathbf B\); tuttavia lungi dall'essere una dimostrazione rigorosa, tale riflessione può essere vista piú come un intuito potenzialmente vero o falso.
+            \begin{teo}[di rilassamento della topologia]
+                \label{teoRilassamentoTopologia}
+                La \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbanoApprossimata} è formalmente equivalente nel limite \(N\to\infty\) a un'equazione di tipo Boltzmann di forma \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} con microstato \(\mathbf X_t\equiv\{\underhat K,S_t\}\), ove \(\underhat K\in[0,1]\) è la variabile aleatoria dei gradi normalizzati, osservabili \(\varphi(s)\) indipendenti da \(\underhat k\) e nucleo d'interazione \(\mu(\underhat k,\underhat k_*)\equiv(\underhat k\underhat k_*)/\bar D\).
+            \end{teo}
+            
+            Il significato del \cref{teoRilassamentoTopologia} è profondo: approssimare \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano} con \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbanoApprossimata} coincide col perdere la distinguibilità indotta dal grafo, rilassando in tal modo la topologia la quale non scompare ma rimane solo come distribuzione dei gradi; tale riduzione è come sfocare i dettagli delle connessioni tra i vertici: si passa da uno specifico grafo a una classe di grafi. Nella \cref{figSchemaRiassuntivoApprosimazione} è presente uno schema riassuntivo del corrente paragrafo.
 
-            % ma con microstato \((K,S_t)\) e nucleo d'interazione \(\mu\equiv1/m\) in cui
-            % %
-            % \begin{equation*}
-            %     \bar g\approx\bar h\approx\bar f
-            % \end{equation*}
-            % %
-            % e
-            % %
-            % \begin{equation*}
-            %     \bar g\xrightarrow{N\to+\infty}\bar h\approx\bar f
-            % \end{equation*}
-            % %
-            % testo successivo
-            % \(\Circled{\mathrm{III}}\) \(k\) \(\kappa\) \(K\)
-       
-            % Vale allora il seguente:
+            \begin{oss}
+                Il \cref{teoRilassamentoTopologia} motiva anche il perché non si possa considerare una generica matrice \(\mathbf C\) che approssima la \(\mathbf A\): non è detto che rilassi la topologia portando a un'equazione analoga alla \ref{eqTipoBoltzmannGrafoRilassato}.
+            \end{oss}
 
-            % \begin{teo}[di approssimazione]
-            %     Presa una qualunque regola d'interazione del tipo \ref{eqRegoleInterazioneUrbane}, l'equazione \cref{eqDensitàMediaUrbanaS} mediata dal grafo con la matrice d'adiacenza \(\mathbf A\) approssimata dalla matrice \(\mathbf B\) di rango uno è formalmente equivalente nel limite \(N\to+\infty\) a un'equazione di tipo Boltzmann analoga alla \cref{eqFormaDeboleBoltzmannOmogeneoAssimetricoUrbano}.
-            % \end{teo}
+            \tikzfigure*{htb}
+                {\input{../../Figure/Scelte/Altro/SchemaRiassuntivoApprossimazione.tex}}
+                {Schema riassuntivo del \cref{secApprossimazione}.}
+                {\linewidth}{figSchemaRiassuntivoApprosimazione}
+            
+            \begin{oss}
+                La \cref{figSchemaRiassuntivoApprosimazione} contiene al suo interno \(\underhat f\) che ha un'analoga definizione alla \cref{defDensitàGradiNormalizzata}, ma normalizzando gl'indici: siano
+                \[
+                    \underhat i\equiv\frac iN\in\underhat{\mathcal I},\quad\forall i\in\mathcal I,
+                \]
+                gl'indici normalizzati di un generico nodo rappresentativo di \(\mathcal G\), in cui
+                \[
+                    \underhat{\mathcal I}\equiv\left\{\frac iN\ |\ i=0,1,\ldots,N\right\}\subseteq[0,1]
+                \]
+                è l'insieme discreto degl'indici normalizzati. Allora la \cref{eqDensitàCongiuntaUrbana} normalizzata, per analogia colla \cref{eqDensitàGradiNormalizzati}, si può definire
+                \[
+                    \underhat f(\underhat i,s,t)=Nf(N\underhat i,s,t)=\sum_{j\in\mathcal I}f_j(s,t)\otimes\delta(N\underhat i-j),
+                \]
+                ma per la condizione di normalità \(\mathbb P([0,1]\times\RPlus)=1\), \(\forall t\geq0\), deve valere\footnotemark{}%
+                \footnotetext{Si ricordi che l'indice \(j\) non è un argomento della densità \(f_j\), quindi può essere cambiato con un altro indice purché sia distinto da tutti gli altri secondo la trasformazione scelta.}%
+                \[
+                    f_{\underhat j}(s,t)=Nf_j(s,t)\quad\text{ove }j=N\underhat j,
+                \]
+                anch'essa analoga alla \cref{eqDensitàGradiNormalizzati}; difatti con questa la \(\underhat f\) si scrive
+                \[
+                    \underhat f(\underhat i,s,t)
+                    =\frac1N\sum_{\underhat j\in\underhat{\mathcal I}}f_{\underhat j}(s,t)\otimes\delta(N(\underhat i-\underhat j))
+                    =\frac1N\sum_{\underhat j\in\underhat{\mathcal I}}f_{\underhat j}(s,t)\otimes\delta(\underhat i-\underhat j).
+                \]
+                Con tali definizioni la densità marginale \(\bar f\) si può riformulare mediante il cambio di variabili \(i=N\underhat i\):
+                \[
+                    \bar f_N
+                    =\int_{\mathcal I}f(i,s,t)\de i
+                    =\int_{\underhat{\mathcal I}}Nf(\underhat i,s,t)\de\underhat i
+                    =\int_{\underhat{\mathcal I}}\underhat f(\underhat i,s,t)\de\underhat i
+                    =\underhat{\bar f}_N
+                    =\frac1N\sum_{\underhat i\in\underhat{\mathcal I}}f_{\underhat i}(s,t),
+                \]
+                e, definendo il passo \(\Delta\underhat i\equiv1/N\) tra due indici normalizzati consecutivi, si arriva al limite \(N\to\infty\) a
+                \[
+                    \bar f_N=\underhat{\bar f}_N
+                    =\sum_{\underhat i\in\underhat{\mathcal I}}f_{\underhat i}(s,t)\Delta\underhat i
+                    \ \ \xrightarrow{N\to\infty}\ \ 
+                    \bar f=\underhat{\bar f}
+                    =\int_0^1f_{\underhat i}(s,t)\de\underhat i,
+                \]
+                mentre la \(\underhat f\) diventa
+                \[
+                    \underhat f(\underhat i,s,t)
+                    =\int_0^1f_{\underhat j}(s,t)\otimes\delta(\underhat i-\underhat j)\de\underhat j
+                    =f_{\underhat i}(s,t).
+                \]
+                Similmente vale per \(\bar g\).
+            \end{oss}
 
-            % \begin{oss}
-            %     La matrice \(\mathbf B\) approssima \(\mathbf A\) solo per quanto riguarda i vettori dei gradi uscenti ed entranti; inoltre in questo caso di grafo simmetrico, anche la \(\mathbf B\) è, tanto quanto \(\mathbf A\), una matrice simmetrica per via dell'equivalenza \(\mathbf k^+=\mathbf k^-\).
-            % \end{oss}
+            \begin{oss}[Sulla bontà di \(\mathbf A\approx\mathbf B\)]
+                Su un aspetto è al momento non ci si può esprimere: quanto bene la \(\mathbf B\) approssima la matrice \(\mathbf A\) in generale? Sarebbe necessario elaborare ulteriormente la teoria per trovare una risposta, obbiettivo, come già detto, non di questa tesi. Tuttavia, euristicamente, si può riflettere in questo modo: con \(N\gg1\) le singole connessioni sono meno importati, per cui vengono meno i dettagli, mentre la panoramica può essere ragionevolmente colta da \(\mathbf B\); ciò suggerirebbe che piú sono i nodi migliore è l'approssimazione \(\mathbf A\approx\mathbf B\). Tale breve riflessione è però solo un intuito, \textit{non} una dimostrazione rigorosa, e dunque anche potenzialmente falsa.
+            \end{oss}
 
-        \subsection{Nesso discreto-continuo}\label{secNessoDC}
+        \subsection{Altri nessi distinguibile-indistinguibile}\label{secNessiDI}
 
-            È d'interesse esplorare il legame presente tra la \eqref{eqBoltzmannConGrafo} coll'equazione classica di Boltzmann \daRivedere{}.
+            Nel precedente paragrafo si è esplorato come si può "perdere" la struttura sottostante indotta dal grafo passando a una densità dipendente dal grado dei nodi, recuperando in tal modo un'equazione classica di tipo Boltzmann. Risulta perciò stimolante esplorare se sussitano certe ipotesi che permettano di trasformare la \ref{eqDensitàMediaUrbanaS} in una forma della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico}, approfondendo cosí i legami tra la teoria retale sviluppata nei due previ due paragrafi e la teoria di tipo Botlzmann.
 
             \subsubsection{Ipotesi semplificative}
 
-                A questo scopo si possono fare tre principali ipotesi semplificative da applicare alla \eqref{eqBoltzmannConGrafo}:
+                A questo scopo valgono le seguenti:
 
-                \begin{enumerate}[
-                    label=S\arabic*,
-                    topsep=0.5em,
-                    parsep=0em,
-                    itemsep=0.25em,
-                    leftmargin=2.5em,
-                    rightmargin=1.5em,
-                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
-                    %itemindent=!,
-                    % labelindent=1em,
-                    %labelwidth=!,
-                    %labelsep=!,
-                ]
-                    \item\label{ipMatriceUnitaria} Si presuppone che il grafo sia completamente connesso e quindi che la matrice d'adiacenza sia unitaria \(A\equiv\mathbb1\).
-                    %
-                    \item\label{ipAgentiIndistinguibili} Si assume che gli agenti siano indistinguibili rispetto al grafo:
-                    %
-                    \begin{equation}
-                        f_i(s,t)=f_j(s,t)=f(s,t)
-                        \quad\forall i,j\in\mathcal I,
-                    \end{equation}
-                    %
-                    \item\label{ipInterazioniSimmetriche} S'ipotizza che le interazioni siano simmetriche:% \(\psi(s,s_*)=\psi_*(s_*,s).\)
-                    %
-                    \begin{equation}
-                        s'=\Psi(s,s_*)=\Psi_*(s_*,s),
-                        \;\;\text{ove }s_*=\Psi_*(s,s_*).
-                    \end{equation}
-                \end{enumerate}
+                \begin{ipo}
+                    Esistono tre principali ipotesi semplificative della \ref{eqDensitàMediaUrbanaS}:
 
-            \subsubsection{Analisi della \texorpdfstring{\ref{ipMatriceUnitaria}}{IS1}}
+                    \begin{enumerate}[
+                        label=S\arabic*,
+                        % topsep=0.5em,
+                        % parsep=0em,
+                        % itemsep=0.25em,
+                        % leftmargin=2.5em,
+                        % rightmargin=1.5em,
+                        % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                        %itemindent=!,
+                        % labelindent=1em,
+                        %labelwidth=!,
+                        %labelsep=!,
+                    ]
+                        \item\label{ipMatriceUnitaria} Il grafo è completamente connesso con matrice d'adiacenza unitaria:
+                            \[
+                                \mathbf A\equiv\mathbb1
+                                \ \ \iff\ \ 
+                                a_{i,j}\equiv1
+                                \quad\forall i,j\in\mathcal I.
+                            \]
+                        \item\label{ipAgentiIndistinguibili} Gli agenti sono indistinguibili rispetto al grafo:
+                            \[
+                                f_i(s,t)=f_j(s,t)=f(s,t)
+                                \quad\forall i,j\in\mathcal I,
+                            \]
+                        \item\label{ipInterazioniSimmetriche} Le regole d'interazione \ref{eqRegoleInterazioneUrbane} sono simmetriche (\cref{defLeggiInterazioneSimmetriche}).
+                    \end{enumerate}
+                \end{ipo}
 
-                Con tal'ipotesi la \eqref{eqBoltzmannConGrafo} diventa
-                %
-                \begin{equation*}
-                    % \begin{aligned}
-                    %     \derS{}t\int_{\RPlus}\varphi f_i\de s=
-                    %     \frac1{2N}\left[\vphantom{\int_{\RPlus^2}}\right.&
-                    %     \smash{\sum_{j\in\mathcal I}}\int_{\RPlus^2}
-                    %     \langle\varphi'-\varphi\rangle f_if^*_j\de s\de s_*\\
-                    %     +&\smash{\sum_{j\in\mathcal I}}\int_{\RPlus^2}
-                    %     \langle\varphi'_*-\varphi_*\rangle f_jf^*_i\de s\de s_*
-                    %     \left.\vphantom{\int_{\RPlus^2}}\right],
-                    % \end{aligned}
-                    %
-                    \derS{}t\int_{\RPlus}\varphi f_i\de s=
-                    \frac1{2N}\left[\vphantom{\int_{\RPlus^2}}\right.
-                    \smash{\sum_{j\in\mathcal I}}\int_{\RPlus^2}
-                    \langle\varphi'-\varphi\rangle f_if^*_j\de s\de s_*
-                    +\smash{\sum_{j\in\mathcal I}}\int_{\RPlus^2}
-                    \langle\varphi'_*-\varphi_*\rangle f_jf^*_i\de s\de s_*
-                    \left.\vphantom{\int_{\RPlus^2}}\right],
-                \end{equation*}
-                %
-                e valutando la distribuzione marginale della \eqref{eqDensitàCongiuntaUrbana} rispetto agl'indici
-                %
-                \begin{equation}
-                    \label{eqDistribuzioneMarginaleIndici}
-                    F(s,t)\equiv\int_{\mathcal I}f(x,s,t)\de x=
-                    \frac1N\sum_{i\in\mathcal I}f_i(s,t)
-                    \otimes\int_{\mathcal I}\delta(x-i)\de x=
-                    \frac1N\sum_{i\in\mathcal I}f_i(s,t),
-                \end{equation}
-                %
-                che corrisponde a una media tra le distribuzione dei singoli agenti, si ricava
-                %
-                \begin{equation*}
-                    % \label{}
-                    % \begin{aligned}
-                    %     \derS{}t\int_{\RPlus}\varphi f_i\de s=
-                    %     \frac1{2N}\left[\vphantom{\int_{\RPlus^2}}\right.&
-                    %     \int_{\RPlus^2}
-                    %     \langle\varphi'-\varphi\rangle f_iF^*\de s\de s_*\\
-                    %     +&\int_{\RPlus^2}
-                    %     \langle\varphi'_*-\varphi_*\rangle F_jf^*_i\de s\de s_*
-                    %     \left.\vphantom{\int_{\RPlus^2}}\right],
-                    % \end{aligned}
-                    %
-                    \derS{}t\int_{\RPlus}\varphi f_i\de s=
-                    \frac12\left[\vphantom{\int_{\RPlus^2}}\right.
-                    \int_{\RPlus^2}
-                    \langle\varphi'-\varphi\rangle f_iF^*\de s\de s_*
-                    +\int_{\RPlus^2}
-                    \langle\varphi'_*-\varphi_*\rangle Ff^*_i\de s\de s_*
-                    \left.\vphantom{\int_{\RPlus^2}}\right];
-                \end{equation*}
-                %
-                mediando ora rispetto a tutti gli agenti, si ha
-                %
-                \begin{equation}
-                    \label{eqBoltzmannConGrafoUnitario}
-                    % \begin{aligned}
-                    %     \derS{}t\int_{\RPlus}\varphi F\de s&=
-                    %     \frac1{2N}\left[\vphantom{\int_{\RPlus^2}}\right.
-                    %     \int_{\RPlus^2}
-                    %     \langle\varphi'-\varphi\rangle FF^*\de s\de s_*
-                    %     +\int_{\RPlus^2}
-                    %     \langle\varphi'_*-\varphi_*\rangle FF^*\de s\de s_*
-                    %     \left.\vphantom{\int_{\RPlus^2}}\right]\\&=
-                    %     \frac1{2N}\int_{\RPlus^2}
-                    %     \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle FF^*\de s\de s_*
-                    % \end{aligned}
-                    \derS{}t\int_{\RPlus}\varphi F\de s=
-                    \frac12\int_{\RPlus^2}
-                    \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
-                    FF^*\de s\de s_*,
-                \end{equation}
-                %
-                la quale è formalmente analoga a quella classica di Boltzmann \daRivedere{}. Ciò significa che con tal'ipotesi semplificativa, nonostante gli agenti siano distinti, questi si possono vedere come indistinguibili purché si consideri la distribuzione media \eqref{eqDistribuzioneMarginaleIndici}.
+            \subsubsection{Analisi della \texorpdfstring{\ref{ipMatriceUnitaria}}{S1}}
 
-                Tale risultato è anche confermato a livello pratico nell'algoritmo \ref{algMonteCarlo}, illustrato nel paragrafo a venire, ove una matrice d'adiacenza unitaria porta ad avere un algoritmo del tutto analogo a quello classico; pertanto l'unica distribuzione che può calcolare \ref{algMonteCarlo} è proprio quella media \(F\).
-
-            \subsubsection{Analisi della \texorpdfstring{\ref{ipAgentiIndistinguibili}}{IS2}}
-
-                La previa discussione suggerisce di studiare anche il caso in cui gli agenti siano effettivamente indistinguibili; tuttavia, prima di affrontarlo assieme alla prima ipotesi risulta interessante analizzare tale ipotesi isolatamente. Pertanto la \eqref{eqBoltzmannConGrafo} diventa
+                Notando che \(\mathbf A=\mathbb1=\mathbf1\mathbf1^\top\), la \ref{eqDensitàMediaUrbanaS} diventa
                 %
                 \begin{equation*}
                     \begin{aligned}
-                        \derS{}t\int_{\RPlus}\varphi f\de s&=
-                        \frac1{2N}\sum_{j\in\mathcal I}A(i,j)
-                        \int_{\RPlus^2}
-                        \langle\varphi'-\varphi\rangle
-                        ff^*\de s\de s_*\\&
-                        +\frac1{2N}\sum_{j\in\mathcal I}A(j,i)
-                        \int_{\RPlus^2}
-                        \langle\varphi'_*-\varphi_*\rangle
-                        ff^*\de s\de s_*,
+                        \derS{}t\int_{\RPlus}\varphi\bar f\de s
+                        &=\frac1{N^2}\int_{\RPlus^2}
+                        \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                        \mathbf f^\top\mathbf1\mathbf1^\top\mathbf f_*\de s\de s_*\\
+                        &=\frac1{N^2}\int_{\RPlus^2}
+                        \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                        (\mathbf1^\top\mathbf f)(\mathbf1^\top\mathbf f_*)\de s\de s_*\\
+                        &=\int_{\RPlus^2}
+                        \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                        \left(\frac1N\mathbf1^\top\mathbf f\right)
+                        \left(\frac1N\mathbf1^\top\mathbf f_*\right)\de s\de s_*,
                     \end{aligned}
                 \end{equation*}
                 %
-                che sommata su tutti gl'indici porta a
-                %
-                \begin{equation*}
-                    \derS{}t\int_{\RPlus}\varphi f\de s=
-                    \frac1{2N^2}\sum_{i,j\in\mathcal I}A(i,j)
-                    \int_{\RPlus^2}
-                    \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
-                    ff^*\de s\de s_*,
-                \end{equation*}
-                %
-                e definendo \(L\equiv\sum_{i,j\in\mathcal I}A(i,j)\) si arriva a
+                ma ricordando \cref{eqDensitàMarginaleUrbanaS} si arriva a
                 %
                 \begin{equation}
-                    \label{eqBoltzmannConAgentiIndistinguibili}
-                    \derS{}t\int_{\RPlus}\varphi f\de s=
-                    \frac L{N^2}\left[\frac12
-                    \smash{\sum_{i,j\in\mathcal I}}A(i,j)
+                    \label{eqTipoBoltzmannConGrafoUnitario}
+                    \derS{}t\int_{\RPlus}\varphi\bar f\de s=
                     \int_{\RPlus^2}
-                    \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
-                    ff^*\de s\de s_*\right].
+                    \frac{\langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle}2
+                    \bar f\bar f_*\de s\de s_*,
                 \end{equation}
                 %
-                In questo contesto il rapporto \(L/N^2\in[0,1]\) rappresenta topologicamente simile è la rete a una completamente connessa\footnotemark{}; d'altra parte l'equazione è analoga a quella classica di Boltzmann \daRivedere{}.
-                
-                Dunque l'indistinguibilità degli agenti ha una notevole conseguenza sulla \eqref{eqBoltzmannConGrafo}, riassumendo l'effetto complessivo del grafo al solo coefficiente \(L/N^2\) che quindi ne rappresenta gli ultimi bagliori prima di una sua totale scomparsa per la \ref{ipMatriceUnitaria}.
+                la quale è analoga alla classica equazione di tipo Boltzmann \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} con microstato \(\mathbf X_t\equiv S_t\) scalare, regole d'interazione \ref{eqRegoleInterazioneUrbane} e nucleo d'interazione unitario\footnotemark{} \(\mu\equiv1\) nella \ref{eqBernoulliInterazione}. Ciò significa che con \ref{ipMatriceUnitaria} gli agenti, nonostante siano distinti per il grafo, si possono vedere come indistinguibili purché si consideri la distribuzione media \eqref{eqDensitàMarginaleUrbanaS}.%
+                \footnotetext{Tale risultato implica anche che un nucleo di collisione unitario nella \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} è il corrispettivo di una matrice unitaria nella \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano}.}%
 
-                \footnotetext{Difatti \(L\) è interpretabile come il numero di lati presenti in un grafo diretto e che ha come limite superiore prorio \(N^2\), ossia il numero totale di coppie [e quindi lati] dati \(N\) nodi.}
+            \subsubsection{Analisi della \texorpdfstring{\ref{ipAgentiIndistinguibili}}{S2}}
 
-            \subsubsection{Analisi della \texorpdfstring{\ref{ipMatriceUnitaria}, \ref{ipAgentiIndistinguibili} e \ref{ipInterazioniSimmetriche}}{IS1, IS2 e IS3}}
-
-                Visto che vale \ref{ipMatriceUnitaria} si può partire dalla \eqref{eqBoltzmannConGrafoUnitario} nella quale la distribuzione media \eqref{eqDistribuzioneMarginaleIndici} diventa per \ref{ipAgentiIndistinguibili}                %
+                Sotto tal'ipotesi, che equivale coll'assumere
                 \begin{equation*}
-                        F(s,t)=\frac1N\sum_{i\in\mathcal I}f_i(s,t)
-                        \overset{\tref{ipAgentiIndistinguibili}{2^\circ}}=
-                        \frac1N\sum_{i\in\mathcal I}f(s,t)=f(s,t),
+                    \mathbf f=\mathbf1f
+                    \quad\text{e}\quad
+                    \mathbf f_*=\mathbf1f_*,
+                \end{equation*}
+                la \ref{eqDensitàMediaUrbanaS} diventa
+                %
+                \begin{equation*}
+                    \begin{aligned}
+                        \derS{}t\int_{\RPlus}\varphi\bar f\de s
+                        &=\frac1{N^2}\int_{\RPlus^2}
+                        \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                        f\mathbf1^\top\mathbf A\mathbf1f_*\de s\de s_*\\
+                        &=\frac{\mathbf1^\top\textbf A\mathbf1}{N^2}\int_{\RPlus^2}
+                        \frac{\langle\varphi'+\varphi'_*-\varphi-\varphi_*\rangle}2
+                        ff_*\de s\de s_*
+                    \end{aligned}
                 \end{equation*}
                 %
-                ossia la \(F\) coincide con quella di tutti gli agenti\footnotemark, essendo questi, appunto, indistinguibili.
-                \footnotetext{Si noti anche che la perdita della dipendenza della distribuzione media dal numero di nodi \(N\) è coerente colla situazione in cui \(N\to\infty\), condizione fondamentale analoga a casi classici come lo studio del gas nel quale \(N\gg1\) ben approssima il limite.}
-
-                In tal modo la \eqref{eqBoltzmannConGrafoUnitario} diventa
+                e rimembrando \cref{eqNormaUnoMatriceAdiacenza} si ottiene
                 %
                 \begin{equation*}
                     \derS{}t\int_{\RPlus}\varphi f\de s=
-                    \frac12\int_{\RPlus^2}
-                    \langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle
+                    \int_{\RPlus^2}\frac{D_N}{N^2}
+                    \frac{\langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle}2
+                    ff^*\de s\de s_*.
+                \end{equation*}
+                %
+                In questo contesto il rapporto \(D_N/N^2\in[0,1]\) (grado medio normalizzato della rete) rappresenta quanto la rete è topologicamente simile a una completamente connessa\footnotemark{}.%
+                \footnotetext{Difatti \(D_N\) è interpretabile come il numero di lati presenti in un grafo diretto e che ha come limite superiore prorio \(N^2\), ossia il numero totale di coppie [e quindi lati] dati \(N\) nodi.}%
+               
+                Per il resto l'equazione è analoga alla classica equazione di tipo Boltzmann \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} con microstato \(\mathbf X_t\equiv S_t\) scalare, regole d'interazione \ref{eqRegoleInterazioneUrbane} e nucleo d'interazione nella \ref{eqBernoulliInterazione} costante \(\mu\equiv D_N/N^2=\bar D_N\).
+                
+                Dunque l'indistinguibilità degli agenti ha una notevole conseguenza sulla \ref{eqDensitàMediaUrbanaS}: riassume l'effetto complessivo del grafo al solo coefficiente \(\bar D_N\) il quale, dunque, ne rappresenta gli ultimi bagliori prima di una sua totale scomparsa per la \ref{ipMatriceUnitaria}.
+
+            \subsubsection{Analisi della \texorpdfstring{\ref{ipMatriceUnitaria}, \ref{ipAgentiIndistinguibili} e \ref{ipInterazioniSimmetriche}}{S1, S2 e S3}}
+
+                Visto che vale la \ref{ipMatriceUnitaria} si può partire dalla \eqref{eqTipoBoltzmannConGrafoUnitario} nella quale la densità media \cref{eqDensitàMarginaleUrbanaS} diventa per \ref{ipAgentiIndistinguibili}                %
+                %
+                \begin{equation*}
+                    \bar f(s,t)=\frac1N\sum_{i\in\mathcal I}f_i(s,t)
+                    \overset{\ref{ipAgentiIndistinguibili}}=
+                    \frac1N\sum_{i\in\mathcal I}f(s,t)=f(s,t),
+                \end{equation*}
+                %
+                ossia la \(\bar f\) coincide con quella di tutti gli agenti\footnotemark{}, essendo questi, appunto, indistinguibili.%
+                \footnotetext{Si noti anche che la perdita della dipendenza della distribuzione media dal numero di nodi \(N\) è coerente col limite \(N\to\infty\), sempre ben approssimabile nei casi classici con un numero di agenti \(N\gg1\) [come lo studio di un gas].}%
+
+                In tal modo la \eqref{eqTipoBoltzmannConGrafoUnitario} diventa
+                %
+                \begin{equation*}
+                    \derS{}t\int_{\RPlus}\varphi f\de s=\int_{\RPlus^2}
+                    \frac{\langle\varphi'-\varphi+\varphi'_*-\varphi_*\rangle}2
                     ff^*\de s\de s_*,
                 \end{equation*}
                 %
-                che unita all \ref{ipInterazioniSimmetriche} porta all'equivalenza (mediante il cambio di variabili \(s_*=s\) e \(s=s_*\))
+                che unita all'\ref{ipInterazioniSimmetriche} porta all'equivalenza
                 %
                 \begin{equation*}
                     \int_{\RPlus^2}
@@ -1791,12 +1919,12 @@
                     \langle\varphi'-\varphi\rangle ff^*dsds_*,
                 \end{equation*}
                 %
-                e quindi a
+                dalla quale si ha
                 %
                 \begin{equation*}
                     \derS{}t\int_{\RPlus}\varphi fds=
                     \int_{\RPlus^2}
-                    \langle\varphi'-\varphi\rangle ff^*dsds_*,
+                    \langle\varphi'-\varphi\rangle ff^*dsds_*.
                 \end{equation*}
                 %
-                che equivale alla formula classica di Boltzmann con interazioni simmetriche \daRivedere{} usata classicamente per modellizzare la distribuzione dell'energia cinetica tra una popolazione di particelle di un gas.
+                Quest'equazione, come per gli altri casi, è analoga alla classica equazione di tipo Boltzmann simmetrica \cref{eqFormaDeboleTipoBoltzmannOmogeneoSimmetrico} con microstato \(\mathbf X_t\equiv S_t\) scalare, regole d'interazione \ref{eqRegoleInterazioneUrbane} e nucleo d'interazione nella \ref{eqBernoulliInterazione} unitario \(\mu\equiv1\).%
