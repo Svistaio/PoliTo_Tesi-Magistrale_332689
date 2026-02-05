@@ -4,47 +4,107 @@
 
 \chapter{Simulazioni}\label{secSimulazioni}
 
-    Quello che ho riscontrato è che i risultati ottenuti per la Sardegna sono di fatto gli stessi per tutte le regioni, inclusa l'Italia; questa è la ragione per cui in questa sezione ci si concentrerà solo su quella regione. Alla fine, però, si mostrano alcuni grafici anche per l'Italia intera.
+    In questo capitolo si applicheranno tutta la teoria affrontata in quello precedente. Come consuetudine, è prima necessario un paragrafo propedeutico per approfondire l'algoritmo con cui sono stati svolte le simulazioni; questo è seguíto dalle definizioni dei grafici da analizzare e da una rapida spiegazione del perché le fluttuazioni possono [anzi devono] essere trascurate in questa trattazione. Per i risultati, invece, si propongono varie leggi d'emigrazione che si studiano tramite dei studi parametrici concludendo cercando d'interpretare cosa queste dicono sul fenomeno della migrazione in sé. Infine si mostrano brevemente alcuni risultati per l'Italia, mostrando che tutta la teoria scala bene col numero d'agenti.
 
     \section{Premesse}
 
         \subsection{Metodo Monte Carlo}\label{secMetodoMonteCarlo}
 
-            \newcommand\ave[1]{\left\langle#1\right\rangle}
-            \newcommand\bM{\mathbf M}
-            \newcommand\cO{\mathcal O}
-            \begin{algorithm}[!t]
-                \caption{Algoritmo di Monte Carlo per equazioni di tipo su un grafo}
+            Nel contesto delle \TCSMA{} l'obbiettivo, com'è chiaro dal \cref{secTCSM}, è quello di ricavare la densità \(f(\mathbf x,t)\) nella \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} al variare del tempo. Si potrebbe allora pensare di discretizzare quest'ultima equazione mediante il Metodo delle Differenze Finite, degli Elementi Finiti o dei Volumi Finiti; tuttavia, vi sono due principali problemi:
+           
+            \begin{enumerate}[
+                label=\arabic*.,
+                % topsep=0.5em,
+                % parsep=0em,
+                % itemsep=0.25em,
+                % leftmargin=2em,
+                % rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=3em,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item l'impossibilità, in generale, di ricavare la forma forte della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico}, specie nel caso di \ref{eqRegoleInterazione} non lineari;
+                \item anche ipotizzando di trovare la forma forte a cui applicare i precedenti metodi, la sua natura integro differenziale la rende complessa da manipolare dato che l'operatore collisionale\footnotemark{}, come%
+                \footnotetext{Vale a dire la parte integrale della forma forte dell'equazione di tipo Boltzmann, in genere scritta a secondo membro.}%
+                \[
+                    Q(f,f)(v,t)\equiv
+                    \frac1{4\pi}\int_{\mathbb R^3}\int_{\mathbb S^2}
+                    B(\mathbf v,\mathbf v_*,n)
+                    \left(f(v',t)f(v'_*,t)-f(v,t)f(v_*,t)\right)
+                    \de n\de\mathbf v_*
+                \]
+                nella \cref{eqFormaForteBoltzmannDisomogeneoSimmetrico}, dipende dalla densità medesima.
+            \end{enumerate}
+
+            Per tali ragioni si procede in maniera piú diretta: conoscendo l'algoritmo d'interazione \ref{eqAlgoritmoInterazione}, che governa le interazioni binarie tra agenti, si possono quindi direttamente simulare tutte le molteplici collisioni mediante un metodo di Monte Carlo di tipo Nanbu-Babovsky, descritto nel dettaglio nell'\cref{algMonteCarlo}.
+            
+            \begin{algorithm}[htb]
+                \caption{Algoritmo \ref{eqAlgoritmoInterazioneUrbano} di tipo Nanbu-Babovsky}
                 \label{algMonteCarlo}
-                \begin{algorithmic}[1]
-                    \Require adjacency matrix \(\bM\); initial state \(V_0\in\cO^N\); time step \(\Delta{t}>0\); final time \(T>0\)
-                    \State \(\tilde{V}\gets V_0\)
-                    \State \(t\gets 1\)
-                    \For{\(t<T\)}
-                    \State \(\ave{\varphi}(t)\gets\frac{1}{N}\sum_{i=1}^N\varphi(\tilde{V}(i))\)
-                    \State \(V\gets\tilde{V}\)
-                    \State \(P\gets \text{random permutation of } \left\{1,\,\dots,\,N\right\}\)
-                    \State \(p_1\gets (P(1),\,\dots,\,P(N/2))\)
-                    \State \(p_2\gets (P(N/2 + 1),\,\dots,\,P(N))\)
-                    \State \(i\gets 1\)
-                    \For{\(i<N/2\)}
-                    \State \(\Theta\sim\operatorname{Bernoulli}\!\left(B(p_1(i),p_2(i))\Delta{t}\right)\)
-                    \State \(\tilde{V}(p_1(i))\gets V(p_1(i))(1-\Theta)+\Psi(V(p_1(i)),V(p_2(i)))\Theta\)
-                    \State \(\tilde{V}(p_2(i))\gets V(p_2(i))(1-\Theta)+\Psi_\ast(V(p_2(i)),V(p_1(i)))\Theta\)
-                    \State \(i\gets i+1\)
-                    \EndFor
-                    \State \(t\gets t+\Delta t\)
-                    \EndFor
-                \end{algorithmic}
+                \KwDati{%
+                    \justifying
+                    \(N\in\NPlus\) (numero d'agenti); %
+                    \(\Delta t\leq 1\) (passo temporale); %
+                    \(\sigma\) (fluttuazione); %
+                    \(T>0\) (tempo finale); %
+                    \(\bar q_0(s)\) (densità iniziale); %
+                    \(\mathbf A\) (matrice d'adiacenza); %
+                    \(\mathbf B\) (matrice d'adiacenza approssimata);%
+                }
+
+                \(\pazocal S^0\gets\{s_1^0,s_2^0,\dots,s_N^0\}\subseteq\RPlus\) campionati da \(\bar q_0\)\;
+                \Per{\(n=0,1,2,\dots,\left\lfloor T/\Delta t\right\rfloor-1\)}{
+
+                    \(P\gets\) permutazione indipendente di \(\{1,2,\ldots,N\}\)\;
+
+                    \Per{\(i=1,2,\dots,\left\lfloor N/2\right\rfloor\)}{
+
+                        \(j\gets\left\lfloor N/2\right\rfloor+i\), \(s_i^n\gets P(i)\) e \(s_j^n\gets P(j)\)\;
+
+                        % Si campiona \(\Theta\sim\DstrBernoulli(A(i,j)(\Delta t))\)\;
+                        \uSea{esatto}{
+                            \(\Theta\gets\DstrBernoulli(A(i,j)(\Delta t))\)\;
+                        }
+                        \Altrimenti(\tcp*[h]{è approssimato}){
+                            \(\Theta\gets\DstrBernoulli(B(i,j)(\Delta t))\)\;
+                        }
+
+                        \uSea{\(\Theta=1\)}{
+                            \(E\gets E(s_i^n,i,s_j^n,j)\)\;
+                            \(\gamma\gets\DstrGamma((1-E)^2/\sigma^2,\sigma^2/(1-E))\)\;
+
+                            \(s_i^{n+1}\gets s_i^n(1-E+\gamma)\)\tcp*[r]{città interangente}
+                            \(s_j^{n+1}\gets s_j^n+s_i^nE\)\tcp*[r]{città ricevente}
+                        }
+                        \Altrimenti{
+                            \(s_i^{n+1}\gets s_i^n\) e \(s_j^{n+1}\gets s_j^n\)\;
+                        }
+
+                        % \(s_i^{n+1}\gets s_i^n(1-\Theta)+\Theta\psi(s_i^n,i,s_j^n,j,\gamma)\)\;
+                        % \(s_j^{n+1}\gets s_j^n(1-\Theta)+\Theta\psi_*(s_i^n,i,s_j^n,j)\)\;
+                    }
+
+                    \(\pazocal S^{n+1}\gets\{s_1^{n+1},s_2^{n+1},\dots,s_N^{n+1}\}\)\;
+                    \(\bar q(s,(n+1)\Delta{t})\gets\) istogramma di \(\pazocal S^{n+1}\)\;
+
+                }
             \end{algorithm}
 
-        \subsection{Fluttuazioni}
-
-        \subsection{Grafici}
+        \subsection{Definizione dei grafici}
+        
+        \subsection{Sulle fluttuazioni \texorpdfstring{\(\gamma\)}{γ}}
 
     \section{Regole d'emigrazione}
 
+        \(s\) e \(s_*\) vanno intese come la città interagente e ricevente rispettivamente
+               
         La scelta di \(E(s,s_*)\) dipende da come si vuole modellizzare il fenomeno dell'immigrazione.
+
+        Si vuole evitare lo spopolamento delle città a causa delle fluttuazioni nella \cref{eqVincoloPositivitàFluttuazioni} dato che nella \eqref{eqLeggeEmigrazione} compare il rapporto tra popolazioni delle città interagenti
+
+        Si avvisa anche sono stati ottenuti dei risultati analoghi a quelli della Sardegna per tutte le regioni italiane, Italia inclusa; questa è la ragione per cui in questo paragrafo ci si concentrerà solo su quella regione, mostrandone anche alcuni per l'Italia.
 
         \subsection{Popolazione}
 
@@ -68,11 +128,12 @@
             
             % Mediante la conservazione di popolazione ho rifatto molto velocemente i conti della formula prima del Teorema 5.1 a p. 16 di [1], confermando che d⟨s⟩/dt=0, come ci si aspetta da questo tipo d'interazione.
 
-
         \subsection{Popolazione-Connettività}
 
         \subsection{Popolazione-Connettività frazionata}
 
         \subsection{Popolazione-Forza}
+
+        \subsection{Interpretazioni}
         
-    \section{Interpretazione}
+    \section{Il caso dell'Italia}

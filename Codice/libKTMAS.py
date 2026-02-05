@@ -265,14 +265,14 @@ class KineticSimulation():
         lbl = self.lbl
         clr = self.clr
 
+        Nf = 13 # Numbers of figures
         if figData is None:
             figData = self.figData
-            Nf = 12 # Numbers of figures
             fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
             saveFig = True
 
-        sMaxEA = csSv.max()
-        sMinEA = csSv.min()
+        sMaxEA = csSv.max(); sMaxR = csRv.max();
+        sMinEA = csSv.min(); sMinR = csRv.min();
 
         sMaxER = max(csSv[:,:,0].max(),csRv.max())
         sMinER = min(csSv[:,:,0].min(),csRv.min())
@@ -290,7 +290,7 @@ class KineticSimulation():
                 # The option «'fd'» stands for «Freedman-Diaconis» and
                 # uses Numpy to calculate the optimal edges for the data
                 edges = np.histogram_bin_edges(vl,bins='fd')
-                return len(edges) - 1
+                return len(edges)-1
 
             for j in range(v.shape[0]):
                 nBin = EstimateBinNumber(v[j,:])
@@ -398,12 +398,43 @@ class KineticSimulation():
                 ax=ax[0+t+1]
             )
 
+            # Real plot
+            if t:
+                libF.CreateHistogramPlot(
+                    csRv,
+                    nBins[2],
+                    getattr(figData,f'fig{idx+3}'),
+                    limits=(sMinR,sMaxR),
+                    xScale='log',
+                    label=f'{lbl[2]} histogram',
+                    color=clr[2],
+                    alpha=0.35,
+                    idx=2,
+                    ax=ax[3]
+                )
+                libF.CreateLognormalFitPlot(
+                    csRv,
+                    getattr(figData,f'fig{idx+3}'),
+                    limits=(sMinR,sMaxR),
+                    xScale='log',
+                    label=f'{lbl[2]} lognormal fit (ML)',
+                    # (
+                    #     fr'{lbl[2]} mean value $\langle k\rangle$',
+                    #     f'{lbl[2]} lognormal fit (ML)'
+                    # ),
+                    color=clr[2],
+                    alpha=1,
+                    bimodal=True,
+                    idx=2,
+                    ax=ax[3]
+                )
+
 
             ### Power law vs bimodal lognormal fit log-log ###
 
             if t: libF.CreateParetoFitPlot(
                 csRv,
-                getattr(figData,f'fig{idx+3}'),
+                getattr(figData,f'fig{idx+4}'),
                 yScale='log',
                 label=(
                     f'{lbl[2]} empirical CCDF',
@@ -414,11 +445,11 @@ class KineticSimulation():
                 alpha=(0.6,1),
                 bimodal=True,
                 idx=1,
-                ax=ax[3]
+                ax=ax[4]
             )
             libF.CreateParetoFitPlot(
                 csSv[:,:,t],
-                getattr(figData,f'fig{idx+3+t+1}'),
+                getattr(figData,f'fig{idx+4+t+1}'),
                 upperbound=sMaxEA,
                 yScale='log',
                 Ni=Ni,
@@ -432,7 +463,7 @@ class KineticSimulation():
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
                 bimodal=True,
                 idx=1,
-                ax=ax[3+t+1]
+                ax=ax[4+t+1]
             )
 
 
@@ -441,7 +472,7 @@ class KineticSimulation():
             # Exact-Approximated plot
             libF.CreateParetoFitPlot(
                 csSv[:,:,t],
-                getattr(figData,f'fig{idx+6}'),
+                getattr(figData,f'fig{idx+7}'),
                 upperbound=sMaxEA,
                 yScale='log',
                 Ni=Ni,
@@ -453,13 +484,13 @@ class KineticSimulation():
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
                 idx=t+1,
-                ax=ax[6]
+                ax=ax[7]
             )
 
             # Exact-Real and Approximated-Real plots
             libF.CreateParetoFitPlot(
                 csSv[:,:,t],
-                getattr(figData,f'fig{idx+6+t+1}'),
+                getattr(figData,f'fig{idx+7+t+1}'),
                 upperbound=sMaxER if t == 0 else sMaxAR,
                 yScale='log',
                 Ni=Ni,
@@ -471,11 +502,11 @@ class KineticSimulation():
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
                 idx=1,
-                ax=ax[6+t+1]
+                ax=ax[7+t+1]
             )
             libF.CreateParetoFitPlot(
                 csRv,
-                getattr(figData,f'fig{idx+6+t+1}'),
+                getattr(figData,f'fig{idx+7+t+1}'),
                 upperbound=sMaxER if t == 0 else sMaxAR,
                 yScale='log',
                 label=(
@@ -485,7 +516,7 @@ class KineticSimulation():
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
                 idx=2,
-                ax=ax[6+t+1]
+                ax=ax[7+t+1]
             )
 
 
@@ -494,7 +525,7 @@ class KineticSimulation():
             # Exact-Approximated plot
             blS = libF.CreateParetoFitPlot(
                 csSv[:,:,t],
-                getattr(figData,f'fig{idx+9}'),
+                getattr(figData,f'fig{idx+10}'),
                 upperbound=sMaxEA,
                 yScale='lin',
                 Ni=Ni,
@@ -506,13 +537,13 @@ class KineticSimulation():
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
                 idx=t+1,
-                ax=ax[9]
+                ax=ax[10]
             )
 
             # Exact-Real and Approximated-Real plots
             libF.CreateParetoFitPlot(
                 csSv[:,:,t],
-                getattr(figData,f'fig{idx+9+t+1}'),
+                getattr(figData,f'fig{idx+10+t+1}'),
                 upperbound=sMaxER if t == 0 else sMaxAR,
                 yScale='log',
                 Ni=Ni,
@@ -524,7 +555,7 @@ class KineticSimulation():
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
                 idx=1,
-                ax=ax[9+t+1]
+                ax=ax[10+t+1]
             )
             blR = libF.CreateParetoFitPlot(
                 csRv,
@@ -586,43 +617,26 @@ class KineticSimulation():
                     '',
                     fr'$\alpha={self.a}$',
                     fr'$il={self.il+1}$',
-                    fr'$dt={self.dt}$',
+                    fr'$\Delta t={self.dt}$',
                     fr'$sf={self.sf}$',
                 ]],
                 p=p,dp=dp,
                 offset=offset
             )
 
-        if not saveFig: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
-
-        # Style
-        for j in range(3):
+        for f in range(Nf):
             libF.SetFigStyle(
                 r'$cs$',r'$P(cs)$',
-                yNotation='sci',xScale='log', # ,xNotation="sci"
-                ax=ax[0+j],data=getattr(figData,f'fig{idx+j}')
-            )
-
-            libF.SetFigStyle(
-                r'$cs$',r'$P(cs)$',
-                xScale='log',yScale='log',
-                ax=ax[3+j],data=getattr(figData,f'fig{idx+3+j}')
-            )
-
-            libF.SetFigStyle(
-                r'$cs$',r'$P(cs)$',
-                xScale='log',yScale='log',
-                ax=ax[6+j],data=getattr(figData,f'fig{idx+6+j}')
-            )
-
-            libF.SetFigStyle(
-                r'$cs$',r'$P(cs)$',
-                xScale='log',yScale='lin',
-                ax=ax[9+j],data=getattr(figData,f'fig{idx+9+j}')
+                yNotation='sci' if f<3 else 'plain',
+                xScale='log',
+                yScale='log' if f<10 and f>3 else 'lin',
+                ax=ax[f],
+                data=getattr(figData,f'fig{idx+f}')
             )
 
         # CentreFig()
         if saveFig: figData.SaveFig('SizeDistributionFittings')
+        else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
 
     def AverageSizeFig(
         self,
@@ -684,6 +698,7 @@ class KineticSimulation():
         )
 
         if saveFig: figData.SaveFig('AverageSize')
+        else: libF.Text(ax,(1.1,.5),self.studiedPrmString)
 
     def SizeVsDegreeFig(
         self,
@@ -764,6 +779,7 @@ class KineticSimulation():
 
         # CentreFig()
         if saveFig: figData.SaveFig('SizeVsDegree')
+        else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
 
     def SizeDistrEvolutionFig(
         self,
@@ -820,6 +836,7 @@ class KineticSimulation():
 
         # CentreFig()
         if saveFig: figData.SaveFig('SizeDistributionEvolution')
+        else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
 
     def SizeEvolutionsFig(
         self,
@@ -888,6 +905,7 @@ class KineticSimulation():
 
         # CentreFig()
         if saveFig: figData.SaveFig('SizeEvolutions')
+        else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
 
     def ShowFig(self):
         from matplotlib.pyplot import show
@@ -902,17 +920,18 @@ class ParametricStudy():
         Nv = clsPrm.numberPrmStudy; self.Nv = Nv
 
         self.KS = [None]*Nv
+        frmt = '.3f'
         for s,val in enumerate(np.linspace(sV,eV,Nv)):
             match sp:
                 case 0: 
                     clsPrm.attractivity = val
-                    string = fr'$\lambda={val:.2f}$'
+                    string = fr'$\lambda={val:{frmt}}$'
                 case 1:
                     clsPrm.convincibility = val
-                    string = fr'$\alpha={val:.2f}$'
+                    string = fr'$\alpha={val:{frmt}}$'
                 case 2:
                     clsPrm.zetaFraction = val
-                    string = fr'$\zeta={val:.2f}$'
+                    string = fr'$\zeta={val:{frmt}}$'
 
             self.KS[s] = KineticSimulation(clsPrm,clsReg)
             self.KS[s].sid = s+1
@@ -933,7 +952,7 @@ class ParametricStudy():
         fw = self.fw
         fh = self.fh
 
-        nCol = 12 # Figures for each row
+        nCol = 13 # Figures for each row
         nRow = self.Nv
         fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
@@ -1118,7 +1137,7 @@ def MonteCarloAlgorithm(
             Nc,hNc,nk,
             Mdt,wOdt,wI,
             di,idi,il,
-            l,a,s,f,z#,rng
+            l,a,s,f,z
         ) # Warm-up iteration to avoid polluting the initial time t0
         snapshots[:,nsid,0] = vrtState[:,0]
         snapshots[:,nsid,1] = vrtState[:,1]
@@ -1131,7 +1150,7 @@ def MonteCarloAlgorithm(
                 Nc,hNc,nk,
                 Mdt,wOdt,wI,
                 di,idi,il,
-                l,a,s,f,z#,rng
+                l,a,s,f,z
             )
             snapshots[:,nsid,0] = vrtState[:,0]
             snapshots[:,nsid,1] = vrtState[:,1]
@@ -1152,7 +1171,7 @@ def MonteCarloAlgorithm(
             Nc,hNc,nk,
             Mdt,wOdt,wI,
             di,idi,il,
-            l,a,s,f,z#,rng
+            l,a,s,f,z
         ) # Warm-up iteration to avoid polluting the initial time t0
         snapshots[:,nsid,0] = vrtState[:,0]
         snapshots[:,nsid,1] = vrtState[:,1]
@@ -1165,7 +1184,7 @@ def MonteCarloAlgorithm(
                 Nc,hNc,nk,
                 Mdt,wOdt,wI,
                 di,idi,il,
-                l,a,s,f,z#,rng
+                l,a,s,f,z
             )
             snapshots[:,nsid,0] = vrtState[:,0]
             snapshots[:,nsid,1] = vrtState[:,1]
@@ -1178,7 +1197,7 @@ def EvolveState(
     cs,P,Nc,hNc,nk,
     Mdt,wOdt,wI,
     di,idi,il,
-    l,a,s,f,z#,rng
+    l,a,s,f,z
 ):
     for _ in range(nk):
         FYDInPlaceShuffle(P,Nc)
@@ -1223,53 +1242,6 @@ def EvolveState(
 
             # p = 1 if p>1 else (0 if p<0 else p)
             # theta = np.random.binomial(1,p)
-
-    """
-    for _ in range(nP): # nk/100
-        FYDInPlaceShuffle(P,Nc)
-        # P = np.random.permutation(Nc)
-        # pi = P[:hNc]; pr = P[hNc:]
-
-        for _ in range(itd): # 100
-            for i in range(hNc):
-                ii = P[i]; ir = P[i+hNc]
-
-                # t = 0
-                p = Mdt[ii,ir]
-                if p > 0:
-                    theta = np.random.random() < p
-
-                    if theta == 1:
-                        si = cs[ii,0]; sr = cs[ir,0]
-
-                        e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
-                        ga = StochasticFluctuations(s,e) if f else 0
-
-                        cs[ii,0] = si*(1-e+ga) 
-                        cs[ir,0] = sr+si*e
-
-                # t = 1
-                p = wOdt[ii]*wI[ir] 
-                # Apparently it's more efficient to access two values from two separate vectors and to multiply them, than it is to access the same pre-computed value from a matrix; the same holds for the product «di[ir]*idi[ii]» inside «NonLinearEmigration()»
-                # However, in order for this property to be valid the matrix has to have an underlying more simple structure which in both cases is rank 1
-                # In other words this trick does not work with the adjacency matrix «Mdt[ii,ir]» which cannot be computed from simpler elements
-                theta = np.random.random() < p
-
-                if theta == 1:
-                    si = cs[ii,1]; sr = cs[ir,1]
-
-                    e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
-                    ga = StochasticFluctuations(s,e) if f else 0
-
-                    cs[ii,1] = si*(1-e+ga) 
-                    cs[ir,1] = sr+si*e
-
-                # In the exact case it's reasonalbe to check whether p is actually positive before evaluating the Bernoulli distribution with «np.random.random()<p» since A can has zero components
-                # However its approximations Ap does not have zero components by definition (it's a complete network), hence that check becomes useless
-
-                # p = 1 if p>1 else (0 if p<0 else p)
-                # theta = np.random.binomial(1,p)
-    """
 
 @njit(cache=True)
 def FYDInPlaceShuffle(v,n):
@@ -1417,5 +1389,54 @@ else:
                 clsPrm,clsReg,p,di,
                 np.array(typ,dtype=np.int64)
             )
+"""
+#endregion
+
+#region Alternative «EvolveState» where a single permutation is used «its=1/dt» times to reduce computation costs; this approach, however, goes against the fundamental philosophy/assumption of sampling two agents independently at each iteration and, hence, it's been discarded
+"""
+for _ in range(nP): # nk/100
+    FYDInPlaceShuffle(P,Nc)
+    # P = np.random.permutation(Nc)
+    # pi = P[:hNc]; pr = P[hNc:]
+
+    for _ in range(itd): # 100
+        for i in range(hNc):
+            ii = P[i]; ir = P[i+hNc]
+
+            # t = 0
+            p = Mdt[ii,ir]
+            if p > 0:
+                theta = np.random.random() < p
+
+                if theta == 1:
+                    si = cs[ii,0]; sr = cs[ir,0]
+
+                    e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+                    ga = StochasticFluctuations(s,e) if f else 0
+
+                    cs[ii,0] = si*(1-e+ga) 
+                    cs[ir,0] = sr+si*e
+
+            # t = 1
+            p = wOdt[ii]*wI[ir] 
+            # Apparently it's more efficient to access two values from two separate vectors and to multiply them, than it is to access the same pre-computed value from a matrix; the same holds for the product «di[ir]*idi[ii]» inside «NonLinearEmigration()»
+            # However, in order for this property to be valid the matrix has to have an underlying more simple structure which in both cases is rank 1
+            # In other words this trick does not work with the adjacency matrix «Mdt[ii,ir]» which cannot be computed from simpler elements
+            theta = np.random.random() < p
+
+            if theta == 1:
+                si = cs[ii,1]; sr = cs[ir,1]
+
+                e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+                ga = StochasticFluctuations(s,e) if f else 0
+
+                cs[ii,1] = si*(1-e+ga) 
+                cs[ir,1] = sr+si*e
+
+            # In the exact case it's reasonalbe to check whether p is actually positive before evaluating the Bernoulli distribution with «np.random.random()<p» since A can has zero components
+            # However its approximations Ap does not have zero components by definition (it's a complete network), hence that check becomes useless
+
+            # p = 1 if p>1 else (0 if p<0 else p)
+            # theta = np.random.binomial(1,p)
 """
 #endregion

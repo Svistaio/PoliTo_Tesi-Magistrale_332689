@@ -1,0 +1,140 @@
+
+% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\begin{tikzpicture}[
+    node distance=2cm, 
+    auto,
+    >=Stealth,
+    every node/.style={font=\large}
+]
+    \dimTesto{12pt}
+
+    \newcommand\xpad{\hspace{0.75em}}
+    \newcommand\arrowText{\dimTesto{8pt}\(\xpad N\to\infty\xpad\)}
+    \newlength\arrowLen
+    \settowidth\arrowLen{\arrowText} 
+
+    \newcommand\vseptext{3em}
+
+    % Nodi principali
+    \newcommand\hsepbound\arrowLen
+    \newcommand\vsepbound{1.25em}
+
+    \node(dN) {\(\underhat{\bar d}_N\)};
+    \node(d) [right=\hsepbound of dN] {\(\underhat{\bar d}\)};
+
+    \node(gN) [below=\vsepbound of dN] {\(\underhat{\bar g}_N\)};
+    \node(g) at (d |- gN) {\(\underhat{\bar g}\)};
+
+    \node(fN) [below=\vsepbound of gN] {\(\underhat{\bar f}_N\)};
+    \node(f) at (d |- fN) {\(\underhat{\bar f}\)};
+
+    % Frecce
+    \newcommand\vsepNinf{-0.1em}
+    \draw[->] (dN) -- (d) node[midway,above=\vsepNinf] {\arrowText};
+    \draw[->] (gN) -- (g) node[midway,above=\vsepNinf] {\arrowText};
+    \draw[->] (fN) -- (f) node[midway,above=\vsepNinf] {\arrowText};
+
+    % Uguaglianze e approssimazioni
+    \path(dN) -- (gN) node [midway,rotate=90,anchor=center] {\(=\)};
+    \path(d) -- (g) node [midway,rotate=90,anchor=center] {\(=\)};
+
+    \path(gN) -- (fN) node [midway,rotate=90,anchor=center] {\(\approx\)};
+    \path(g) -- (f) node [midway,rotate=90,anchor=center] {\(\approx\)};
+    
+    % Etichette
+    \newcommand\hseplabel{2em}
+    \path(dN) -- (gN) coordinate[midway] (midhg);
+    \node(teo) [left=\hseplabel of midhg,anchor=center] {\dimTesto{7pt}\cref{teoRilassamentoTopologia}};
+
+    \path(gN) -- (fN) coordinate[midway] (midgf);
+    \node(star) [left=\hseplabel of midgf,anchor=center] {\dimTesto{7pt}\cref{defMatriceGradi}}; % \(\Circled{\ast}\)
+
+    % Annotazioni
+    \newcommand\hsepAnnotation{5.5em}
+    \node (textK) [right=\hsepAnnotation of d,anchor=center] {\dimTesto{10pt} Topologia rilassata};
+    \node (textB) [right=\hsepAnnotation of g,anchor=center] {\dimTesto{10pt} Topologia esatta (\(\mathbf B\))};
+    \node (textA) [right=\hsepAnnotation of f,anchor=center] {\dimTesto{10pt} Topologia esatta (\(\mathbf A\))};
+
+    % Frecce
+    % \draw[->] (textK.west) -- (d.east);
+    % \draw[->] (textB.west) -- (g.east);
+    % \draw[->] (textA.west) -- (f.east);
+
+    % Rettangoli
+    \newcommand\linewidthRectangle{0pt}
+    \newcommand\paddingRectangle{0.5pt}
+    \begin{scope}[
+        % Stile locale: esiste solo tra \begin{scope} e \end{scope}
+        rectangleStyle/.style={
+            inner sep=\paddingRectangle,
+            line width=\linewidthRectangle,
+            fill opacity=0.2
+        }
+    ]
+        \draw [rectangleStyle,fill=gray!75] (textK.north west) rectangle (textK.south east);
+        \draw [rectangleStyle,fill=blue!75] (textK.north west |- textB.north west) rectangle (textK.south east |- textB.south east);
+        \draw [rectangleStyle,fill=red!75] (textK.north west |- textA.north west) rectangle (textK.south east |- textA.south east);
+    \end{scope}
+\end{tikzpicture}
+
+%\begingroup Vecchia versione
+    % \begin{tikzpicture}[
+    %     node distance=2cm, 
+    %     auto,
+    %     >=Stealth,
+    %     every node/.style={font=\large}
+    % ]
+    %     \newcommand\xpad{\hspace{0.75em}}
+    %     \newcommand\arrowText{\dimTesto{8pt}\(\xpad N\to+\infty\xpad\)}
+    %     \newlength\arrowLen
+    %     \settowidth\arrowLen{\arrowText} 
+    %     \newcommand\hsepbound\arrowLen
+
+    %     \newcommand\vsepbound{1.5em}
+    %     \newcommand\hsepmiddle{2em}
+    %     \newcommand\vseptext{3em}
+
+    %     \newcommand\vsepNinf{0.1em}
+    %     \newcommand\vsepBraces{0.75em}
+    %     \newcommand\vsepMatrices{2.5em}
+    %     \newcommand\braceAmplitude{5pt}
+
+    %     % Nodi sinistri
+    %     \node(d) {\(\bar d\)};
+    %     \node(dN) [right=\hsepbound of d] {\(\bar h_N\)};
+    %     \node(g) [below=\vsepbound of d] {\(\bar g\)};
+    %     \node(gN) [below=\vsepbound of dN] {\(\bar g_N\)};
+
+    %     % Nodi destri
+    %     \node (fN) [right=\hsepmiddle of gN] {\(\bar f_N\)};
+    %     \node (f) [right=\hsepbound of fN] {\(\bar f\)};
+
+    %     % Frecce
+    %     \draw[<-] (d) -- (dN) node[midway,below=\vsepNinf] {\arrowText};
+    %     \draw[<-] (g) -- (gN) node[midway,above=\vsepNinf] {\arrowText};
+    %     \draw[->] (fN) -- (f) node[midway,above=\vsepNinf] {\arrowText};
+
+    %     % Uguaglianze e approssimazioni
+    %     \path(d) -- (g) node [midway,rotate=90,anchor=center] {\(=\)};
+    %     \path(dN) -- (gN) node [midway,rotate=90,anchor=center] {\(=\)};
+    %     \path(gN) -- (fN) node [midway,anchor=center] {\(\approx\)};
+
+    %     % Parentesi graffe
+    %     \draw[decorate,decoration={brace,amplitude=\braceAmplitude,mirror,raise=\vsepBraces}]
+    %         (g.west) -- (gN.east) node [black,midway,yshift=-\vsepMatrices] {\(\mathbf B\)};
+
+    %     \draw[decorate,decoration={brace,amplitude=\braceAmplitude,mirror,raise=\vsepBraces}]
+    %         (fN.west) -- (f.east) node [black,midway,yshift=-\vsepMatrices] {\(\mathbf A\)};
+
+    %     \draw[decorate,decoration={brace,amplitude=\braceAmplitude,raise=\vsepBraces}]
+    %         (d.west) -- (dN.east) node [black,midway,yshift=\vsepBraces] (topBrace) {};
+        
+    %     % Freccia quadrata superiore e annotazione
+    %     \path (fN) -- (f) coordinate[midway] (midX);
+    %     \node (text) [anchor=center] at (midX |- d) {\dimTesto{10pt} Privo di topologia};
+    %     \draw[->] (text.north) -- ++(0,0.6) -| (topBrace.north);
+    %     % \draw[->] (text.north) to[out=160,in=90] (topBrace.north);
+    % \end{tikzpicture}
+%\endgroup

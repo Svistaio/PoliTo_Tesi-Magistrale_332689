@@ -36,7 +36,10 @@
     positioning,
     shapes.geometric,
     plotmarks,
-    arrows.meta
+    arrows.meta,
+    calc,
+    decorations.pathreplacing,
+    backgrounds
 }
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
@@ -51,6 +54,7 @@
 \newcounter{figposcount} % Crea un contatore unico per tracciare la posizione
 \usepackage{xstring}
     
+\usepackage{accents}
 \usepackage{
     amsmath,
     amsfonts,
@@ -67,13 +71,16 @@
     stfloats
 }
 
-% \usepackage[italiano,ruled]{algorithm2e}
-\usepackage{
-    algorithm,
-    algpseudocode
-}
+\usepackage[
+    italiano,
+    italianokw,
+    ruled,
+    vlined,
+    linesnumbered
+]{algorithm2e}
 
 \usepackage{enumitem}
+\usepackage{ragged2e} 
 
 % \usepackage{hyperref} % Già caricato da «classicthesis» colle impostazioni
 \hypersetup{
