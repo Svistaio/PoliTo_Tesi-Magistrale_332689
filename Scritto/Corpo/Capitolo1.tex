@@ -48,14 +48,14 @@
         {Funzione \(\DstrLognormale(0,1)\).}
         {\linewidth}{figEsempioFunzioneLognormale}
 
-    Perdipiú da Gualandi \etal{} \cite{Gualandi2019HBLD,Gualandi2019SDC} ci si è poi resi conto che per fittare l'intera distribuzione è sufficiente considerare una lognormale bimodale, vale a dire una combinazione convessa della \eqref{eqDistribuzioneLognormale}
+    Perdipiú da Gualandi \etal{} \cite{Gualandi2019HBLD,Gualandi2019SDC} ci si è poi resi conto che l'intera distribuzione è ben fittata da una lognormale bimodale, vale a dire una combinazione convessa della \eqref{eqDistribuzioneLognormale}
     %
     \begin{equation}
         \label{eqDistribuzioneLognormaleBimodale}
-        f_S(s)=\xi f_{S_1}(s)+(1-\xi)f_{S_2}(s),
+        f_S(s)\approx f_X=\xi f_{S_1}(s)+(1-\xi)f_{S_2}(s),
     \end{equation}
     %
-    ove \(\xi\in(0,1)\) è un parametro da fittare tanto quanto le medie e le varianze associate a \(S_1,S_2\sim\DstrLognormale(\mu,\sigma)\), per un totale di 5 parametri.
+    ove \(\xi\in(0,1)\), \(S_1,S_2\sim\DstrLognormale(\mu,\sigma)\) e \(X\sim\BiLognormal(\xi,\mu_1,\sigma_1,\mu_2,\sigma_2)\).
 
     Pertanto l'obbiettivo di questa tesi è il seguente: si vuole simulare attraverso la \hypertarget{acrTeorieCineticheSistemiMultiAgenti}{Teoria Cinetica dei Sistemi MultiAgente} (\TCSMA) le interazioni tra città su un grafo spaziale, tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate (principalmente corpo lognormale e coda di Pareto); una volta raggiunto questo scopo si potrà poi meditare sulle implicazioni della legge d'interazione riguardo al fenomeno dell'emigrazione, che è alla base delle interazioni tra città.
 

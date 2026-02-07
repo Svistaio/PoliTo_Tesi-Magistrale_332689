@@ -251,7 +251,7 @@
             \]
             è la densità di \(\mathbf X\) condizionata dall'evento \(\mathbf Y=\mathbf y\).
 
-            La \eqref{eqAttesaCondizionataEvento}, in pratica, si calcola svolgendo la media di \(\varphi(\mathbf X,\textbf Y)\) rispetto a \(\mathbf X\) dopo aver "fissato" l'evento \(\mathbf Y=\mathbf y\), vale a dire considerando la \(\mathbf Y\) come fosse un parametro uguale a \(\mathbf y\). 
+            La \eqref{eqAttesaCondizionataEvento}, in pratica, si calcola svolgendo la media di \(\varphi(\mathbf X,\textbf Y)\) rispetto a \(\mathbf X\) dopo aver "fissato" l'evento \(\mathbf Y=\mathbf y\), vale a dire considerando la \(\mathbf Y\) come fosse un parametro uguale alla realizzazione \(\mathbf y\). 
 
             Successivamente, se s'impone \(A=\Omega\) (sempre lecito essendo \(\mathcal G\) una \(\sigma\)-al\-ge\-bra) allora dalla \ref{ipAttesaCondizionataUgualeMisura} vale
             %
@@ -261,7 +261,7 @@
                 =\mathbb E[\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y]],
             \end{equation}
             %
-            il che significa che l'attesa di \(\varphi(\mathbf X,\mathbf Y)\) si calcola mediando rispetto a \(\mathbf Y\) la variabile aleatoria \(\mathbb E[\mathbf X|\mathbf Y]\), ricavata dalla \eqref{eqAttesaCondizionataEvento} ma considerando \(\mathbf y\) arbitrario.
+            il che significa che l'attesa di \(\varphi(\mathbf X,\mathbf Y)\) si calcola mediando rispetto a \(\mathbf Y\) la variabile aleatoria \(\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y]\), ricavata dalla \eqref{eqAttesaCondizionataEvento} ma considerando \(\mathbf y\) arbitrario.
         \end{oss}
 
         \begin{dfn}[Processo stocastico]
@@ -1776,6 +1776,10 @@
 
             \begin{oss}[Sulla bontà di \(\mathbf A\approx\mathbf B\)]
                 Su un aspetto è al momento non ci si può esprimere: quanto bene la \(\mathbf B\) approssima la matrice \(\mathbf A\) in generale? Sarebbe necessario elaborare ulteriormente la teoria per trovare una risposta, obbiettivo, come già detto, non di questa tesi. Tuttavia, euristicamente, si può riflettere in questo modo: con \(N\gg1\) le singole connessioni sono meno importati, per cui vengono meno i dettagli, mentre la panoramica può essere ragionevolmente colta da \(\mathbf B\); ciò suggerirebbe che piú sono i nodi migliore è l'approssimazione \(\mathbf A\approx\mathbf B\). Tale breve riflessione è però solo un intuito, \textit{non} una dimostrazione rigorosa, e dunque anche potenzialmente falsa.
+            \end{oss}
+
+            \begin{oss}
+                Si veda \cite{Nurisso2024} per la dimostrazione del \cref{teoRilassamentoTopologia} in un contesto delle reti sociali e nel caso di un grafo diretto, non necessariamente simmetrico, oltre che di \ref{eqRegoleInterazione} lineari e simmetriche.
             \end{oss}
 
         \subsection{Altri nessi distinguibile-indistinguibile}\label{secNessiDI}

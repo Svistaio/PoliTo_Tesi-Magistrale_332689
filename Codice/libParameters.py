@@ -124,32 +124,32 @@ parameters = {
 }
 
 caseStudies = {
-    "selected": "λ(rsk^α)/(1+rsk^α)",
+    "selected": "Default",
     "list": {
         "Default": {
-            "attractivity": 0.05,
-            "convincibility": 0.5,
+            "attractivity": 0.2,
+            "convincibility": 0.444,
             "deviation": 0.05,
             "region": 19,
             "zetaFraction": 0.1,
             "timestep": 0.01,
-            "timesteps": int(1e5),
-            "iterations": 3,
+            "timesteps": int(3e6),
+            "iterations": 30,
             "progressBar": False,
             "extraction": False,
             "analysis": False,
-            "edgeWeights": False,
-            "fluctuations": True,
+            "edgeWeights": True,
+            "fluctuations": False,
             "interactingLaw": 3,
             "PdfPopUp": False,
             "LaTeXConversion": False,
-            "snapshots": 100,
-            "smoothingFactor": 10,
-            "studiedParameter": 1,
-            "startValuePrmStudy": 0.1,
-            "endValuePrmStudy": 1.0,
-            "numberPrmStudy": 3,
-            "parametricStudy": False
+            "snapshots": 1000,
+            "smoothingFactor": 50,
+            "studiedParameter": 0,
+            "startValuePrmStudy": 0.15,
+            "endValuePrmStudy": 0.25,
+            "numberPrmStudy": 10,
+            "parametricStudy": True
         },
         "λ(rsk/α)/(1+rsk/α)": {
             "attractivity": 0.05,
@@ -200,7 +200,7 @@ caseStudies = {
             "parametricStudy": True
         },
         "λ(rsk^α)/(1+rsk^α)": {
-            "attractivity": 0.5,
+            "attractivity": 0.3,
             "convincibility": 0.5,
             "deviation": 0.05,
             "region": 19,
@@ -213,14 +213,14 @@ caseStudies = {
             "analysis": False,
             "edgeWeights": True,
             "fluctuations": False,
-            "interactingLaw": 5,
+            "interactingLaw": 3,
             "PdfPopUp": False,
             "LaTeXConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
             "studiedParameter": 1,
             "startValuePrmStudy": 0.1,
-            "endValuePrmStudy": 0.6,
+            "endValuePrmStudy": 1,
             "numberPrmStudy": 10,
             "parametricStudy": True
         },

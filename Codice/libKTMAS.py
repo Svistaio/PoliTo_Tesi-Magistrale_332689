@@ -48,8 +48,8 @@ class KineticSimulation():
             dtype=np.int64
         ); self.ns = ns
 
-        sf = clsPrm.smoothingFactor; self.sf = sf
-        ks = int(Ns/sf); self.ks = ks # Kernerl size
+        Nw = clsPrm.smoothingFactor; self.Nw = Nw
+        ks = int(Ns/Nw); self.ks = ks # Kernel size
         self.times = ns[::ks]*dt
 
         self.R = int(clsPrm.region)
@@ -196,14 +196,14 @@ class KineticSimulation():
     def EvaluateSimulationData(self):
         Ni = self.Ni
         data = self.data
-        sf = self.sf
+        Nw = self.Nw
         ks = self.ks
 
         def Convolve(v):
             Nrw, _, Nty = v.shape # Number of rows, times and types
 
             filter = np.array([float(1/ks)]*ks)
-            sv = np.zeros((Nrw,sf+1,Nty),dtype=float) # Smoothed vector
+            sv = np.zeros((Nrw,Nw+1,Nty),dtype=float) # Smoothed vector
 
             for r in range(Nrw):
                 for t in range(Nty):
@@ -559,7 +559,7 @@ class KineticSimulation():
             )
             blR = libF.CreateParetoFitPlot(
                 csRv,
-                getattr(figData,f'fig{idx+9+t+1}'),
+                getattr(figData,f'fig{idx+10+t+1}'),
                 upperbound=sMaxER if t == 0 else sMaxAR,
                 yScale='log',
                 label=(
@@ -569,7 +569,7 @@ class KineticSimulation():
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
                 idx=2,
-                ax=ax[9+t+1]
+                ax=ax[10+t+1]
             )
 
 
@@ -618,7 +618,7 @@ class KineticSimulation():
                     fr'$\alpha={self.a}$',
                     fr'$il={self.il+1}$',
                     fr'$\Delta t={self.dt}$',
-                    fr'$sf={self.sf}$',
+                    fr'$Nw={self.Nw}$',
                 ]],
                 p=p,dp=dp,
                 offset=offset
@@ -852,7 +852,7 @@ class KineticSimulation():
         snapshots = self.itAvrConvSnapshots
 
         ki = self.dk
-        sf = self.sf
+        sf = self.Nw
 
         if figData is None:
             figData = self.figData
