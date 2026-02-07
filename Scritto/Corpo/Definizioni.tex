@@ -189,8 +189,8 @@
 
 %\begingroup Liste
     \setlist[enumerate]{
-        topsep=0.5em,
-        parsep=0em,
+        % topsep=0.5em,
+        % parsep=0em,
         itemsep=0.25em,
         leftmargin=2em,
         rightmargin=1.5em,
@@ -202,8 +202,8 @@
     }
 
     \setlist[itemize]{
-        topsep=0.5em,
-        parsep=0em,
+        % topsep=0.5em,
+        % parsep=0em,
         itemsep=0.25em,
         leftmargin=2em,
         rightmargin=1.5em,
@@ -243,9 +243,20 @@
     \newcommand\derP[2]{\frac{\partial#1}{\partial#2}}
     
     \DeclareMathOperator\DstrLognormale{Lognormale}
+    \DeclareMathOperator\BiLognormal{BiLognormale}
     \DeclareMathOperator\DstrBernoulli{Bernoulli}
     \DeclareMathOperator\DstrEsponenziale{Exp}
     \DeclareMathOperator\DstrGamma{Gamma}
+    \DeclareMathOperator\DstrStudent{Student}
+    
+    \DeclareMathOperator\IC{IC}
+    \DeclareMathOperator\Histogram{Istogramma}
+    % \DeclareMathOperator\Pareto{Pareto}
+
+    % \newcommand\underdot[1]{\underaccent{\scalebox{0.3}{\(\bullet\)}}{#1}}
+    % \newcommand\underhat[1]{\underaccent{\check}{#1}}
+    \newcommand\underhat[1]{\underaccent{\hat}{#1}} % Circonflesso sottoscritto
+    \renewcommand\undertilde[1]{\underaccent{\tilde}{#1}} % Tilde sottoscritta
 
     % \newcommand\independent{\perp\!\!\!\!\!\!\!\!\!\!\perp}
     \newcommand\independent{\perp\hspace{-.5em}\perp}
@@ -320,11 +331,6 @@
     \makeatother
 
     \DeclareMathAlphabet\pazocal{OMS}{zplm}{m}{n}
-
-    % \newcommand\underdot[1]{\underaccent{\scalebox{0.3}{\(\bullet\)}}{#1}}
-    % \newcommand\underhat[1]{\underaccent{\check}{#1}}
-    \newcommand\underhat[1]{\underaccent{\hat}{#1}} % Circonflesso sottoscritto
-    
 %\endgroup
 
 %\begingroup Frontespizio

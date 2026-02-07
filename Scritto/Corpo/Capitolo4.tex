@@ -4,7 +4,7 @@
 
 \chapter{Simulazioni}\label{secSimulazioni}
 
-    In questo capitolo si applicheranno tutta la teoria affrontata in quello precedente. Come consuetudine, è prima necessario un paragrafo propedeutico per approfondire l'algoritmo con cui sono stati svolte le simulazioni; questo è seguíto dalle definizioni dei grafici da analizzare e da una rapida spiegazione del perché le fluttuazioni possono [anzi devono] essere trascurate in questa trattazione. Per i risultati, invece, si propongono varie leggi d'emigrazione che si studiano tramite dei studi parametrici concludendo cercando d'interpretare cosa queste dicono sul fenomeno della migrazione in sé. Infine si mostrano brevemente alcuni risultati per l'Italia, mostrando che tutta la teoria scala bene col numero d'agenti.
+    In questo capitolo si applicheranno tutta la teoria affrontata in quello precedente. Innanzitutto si descrive l'algoritmo con cui sono stati svolte le simulazioni; quindi si spiegano le formule che definiscono i grafici a venire per poi motivare rapidamente il perché le fluttuazioni possono [anzi devono] essere trascurate. Per i risultati, invece, si propongono varie leggi d'emigrazione che s'illustrano tramite dei studi parametrici, cercando successivamente d'interpretare cosa queste dicono sul fenomeno della migrazione in sé. Infine si mostrano brevemente alcuni risultati per l'Italia, confermando che i risultati migliorano col numero d'agenti.
 
     \section{Premesse}
 
@@ -38,31 +38,32 @@
                 nella \cref{eqFormaForteBoltzmannDisomogeneoSimmetrico}, dipende dalla densità medesima.
             \end{enumerate}
 
-            Per tali ragioni si procede in maniera piú diretta: conoscendo l'algoritmo d'interazione \ref{eqAlgoritmoInterazione}, che governa le interazioni binarie tra agenti, si possono quindi direttamente simulare tutte le molteplici collisioni mediante un metodo di Monte Carlo di tipo Nanbu-Babovsky, descritto nel dettaglio nell'\cref{algMonteCarlo}.
+            Per tali ragioni si procede in maniera piú semplice: conoscendo \ref{eqAlgoritmoInterazione}, che governa le interazioni binarie tra agenti, si possono quindi direttamente simulare tutte le molteplici collisioni mediante un metodo di Monte Carlo di tipo Nanbu-Babovsky, descritto nel dettaglio nell'\cref{algMonteCarlo} nel quale \(T>0\) è il tempo finale di simulazione, mentre \(P\) è la popolazione totale.
             
             \begin{algorithm}[htb]
                 \caption{Algoritmo \ref{eqAlgoritmoInterazioneUrbano} di tipo Nanbu-Babovsky}
                 \label{algMonteCarlo}
                 \KwDati{%
                     \justifying
-                    \(N\in\NPlus\) (numero d'agenti); %
-                    \(\Delta t\leq 1\) (passo temporale); %
-                    \(\sigma\) (fluttuazione); %
-                    \(T>0\) (tempo finale); %
-                    \(\bar q_0(s)\) (densità iniziale); %
-                    \(\mathbf A\) (matrice d'adiacenza); %
-                    \(\mathbf B\) (matrice d'adiacenza approssimata);%
+                    \(N\in\NPlus\), %(numero d'agenti), %
+                    \(\Delta t\leq 1\), %(passo temporale), %
+                    \(\sigma\), %(fluttuazione), %
+                    \(T>0\), %(tempo finale), %
+                    \(P\), %(Popolazione totale), %
+                    \(\mathbf A\) %(matrice d'adiacenza) %
+                    e \(\mathbf B\) %(matrice d'adiacenza approssimata)%
+                    ;%
                 }
-
-                \(\pazocal S^0\gets\{s_1^0,s_2^0,\dots,s_N^0\}\subseteq\RPlus\) campionati da \(\bar q_0\)\;
+                %
+                \(\pazocal S^0\gets(s_1^0,s_2^0,\dots,s_N^0)\equiv(P/N)\mathbf 1\in\RPlus^N\)\;\label{algMonteCarloDistribuzioneIniziale}
                 \Per{\(n=0,1,2,\dots,\left\lfloor T/\Delta t\right\rfloor-1\)}{
-
+                    %
                     \(P\gets\) permutazione indipendente di \(\{1,2,\ldots,N\}\)\;
-
+                    %
                     \Per{\(i=1,2,\dots,\left\lfloor N/2\right\rfloor\)}{
-
+                        %
                         \(j\gets\left\lfloor N/2\right\rfloor+i\), \(s_i^n\gets P(i)\) e \(s_j^n\gets P(j)\)\;
-
+                        %
                         % Si campiona \(\Theta\sim\DstrBernoulli(A(i,j)(\Delta t))\)\;
                         \uSea{esatto}{
                             \(\Theta\gets\DstrBernoulli(A(i,j)(\Delta t))\)\;
@@ -70,29 +71,271 @@
                         \Altrimenti(\tcp*[h]{è approssimato}){
                             \(\Theta\gets\DstrBernoulli(B(i,j)(\Delta t))\)\;
                         }
-
+                        %
                         \uSea{\(\Theta=1\)}{
                             \(E\gets E(s_i^n,i,s_j^n,j)\)\;
                             \(\gamma\gets\DstrGamma((1-E)^2/\sigma^2,\sigma^2/(1-E))\)\;
-
+                            %
                             \(s_i^{n+1}\gets s_i^n(1-E+\gamma)\)\tcp*[r]{città interangente}
                             \(s_j^{n+1}\gets s_j^n+s_i^nE\)\tcp*[r]{città ricevente}
                         }
                         \Altrimenti{
                             \(s_i^{n+1}\gets s_i^n\) e \(s_j^{n+1}\gets s_j^n\)\;
                         }
-
+                        %
                         % \(s_i^{n+1}\gets s_i^n(1-\Theta)+\Theta\psi(s_i^n,i,s_j^n,j,\gamma)\)\;
                         % \(s_j^{n+1}\gets s_j^n(1-\Theta)+\Theta\psi_*(s_i^n,i,s_j^n,j)\)\;
                     }
-
-                    \(\pazocal S^{n+1}\gets\{s_1^{n+1},s_2^{n+1},\dots,s_N^{n+1}\}\)\;
-                    \(\bar q(s,(n+1)\Delta{t})\gets\) istogramma di \(\pazocal S^{n+1}\)\;
-
+                    %
+                    \(\pazocal S^{n+1}\gets(s_1^{n+1},s_2^{n+1},\dots,s_N^{n+1})\)\;
+                    \(\bar q(s,(n+1)\Delta{t})\gets\) istogramma di \(\pazocal S^{n+1}\)\;\label{algMonteCarloDistribuzioneNesima}
                 }
             \end{algorithm}
 
+            \begin{oss}
+                Nella linea \ref{algMonteCarloDistribuzioneNesima} \(\bar q\) è una densità generale: va intesa come \(\bar f\) se l'approccio è esatto e come \(\bar g\) se è approssimato.
+            \end{oss}
+
+            \begin{oss}
+                Piú in generale nella linea \cref{algMonteCarloDistribuzioneIniziale} \(\pazocal S_0\) si può campionare da una densità \(\bar q_0\) iniziale; tuttavia non conoscendone alcuna per la distribuzione della popolazione, si è deciso di definire \(\pazocal S^0\) come un vettore uniforme rispetto a una popolazione massima \(P\) iniziale.
+            \end{oss}
+
         \subsection{Definizione dei grafici}
+
+            Per analizzare i risultati delle simulazioni è opportuno descrivere nel dettaglio i grafici che li descrivono; prima, però, si scrivono un paio di parole sulla natura stocastica dell'\cref{algMonteCarlo} e sulla struttura dei risultati.
+           
+            \subsubsection{Intervallo di confidenza}
+
+                Innanzitutto simulando la \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano} mediante \cref{algMonteCarlo}, e quindi l'algoritmo \ref{eqAlgoritmoInterazione}, si sta introducendo nei risultati un rumore di natura stocastica: piú simulazioni daranno risultati diversi per cui la singola non ha rilevanza statistica; bisogna cioè calcolarne molteplici e valutare sugl'intervalli di confidenza per conoscere l'incertezza della stima della media.
+
+                Sia \(R\in\NPlus\) il numero di simulazioni eseguite e \(\mathbf S\in\RPlus^R\) il vettore aleatorio della popolazione di una città relativa a ciascuna simulazione. Per l'\cref{algMonteCarlo} le componenti \((S_1,S_2,\ldots,S_R)\) di \(\mathbf S\) sono indipendenti e identicamente distribuite dalla densità \(q\), proprietà che permette di definire
+                %
+                \begin{equation*}
+                    \bar S\equiv\frac1R\sum_{r=1}^RS_r
+                    \hspace{1em}\text{e}\hspace{1em}
+                    V\equiv\frac1{R-1}\sum_{r=1}^R(S_r-\bar S)^2,
+                \end{equation*}
+                %
+                rispettivamente la media e la varianza campionarie. Allora, data \(\mu\) la \textit{vera}\footnotemark{} media di \(q\), la distribuzione \(T\) di Student con parametro \(R-1\) si scrive%
+                \footnotetext{Vale a dire \(\mu\) \textit{non} è una variabile aleatoria ma l'esatto parametro della media di \(q\).}%
+                %
+                \begin{equation*}
+                    T=\frac{\bar S-\mu}{\sqrt{V/R}}\sim\DstrStudent(R-1).
+                \end{equation*}
+                %
+                Da questa si può definire l'intervallo di confidenza [simmetrico] con livello di confidenza \(\alpha\) ponendo
+                %
+                \begin{equation}
+                    \label{eqCondizioneIntervalloConfindenza}
+                    \mathbb P\left(-t_{R-1}^{\alpha/2}\leq T\leq t_{R-1}^{\alpha/2}\right)=1-\alpha
+                \end{equation}
+                %
+                ove \(t_{R-1}^{\alpha/2}\in\mathbb R\) è quel valore reale tale che
+                %
+                \begin{equation*}
+                    \mathbb P\left(T<t_{R-1}^{\alpha/2}\right)=1-\frac\alpha2.
+                \end{equation*}
+                %
+                Esplicitando la \(T\) nella \cref{eqCondizioneIntervalloConfindenza} e isolando la media \(\mu\) si ha
+                %
+                \begin{equation*}
+                    \mathbb P\left(
+                        \bar S-t_{R-1}^{\alpha/2}\sqrt{\frac VR}
+                        \leq\mu\leq
+                        \bar S+t_{R-1}^{\alpha/2}\sqrt{\frac VR}
+                    \right)=1-\alpha,
+                \end{equation*}
+                %
+                da cui
+                %
+                \begin{equation}
+                    \label{eqIntervalloConfidenza}
+                    \IC^\alpha_R(\mathbf S)\equiv\left[
+                        \bar S-t_{R-1}^{\alpha/2}\sqrt{\frac VR},
+                        \bar S+t_{R-1}^{\alpha/2}\sqrt{\frac VR}
+                    \right]
+                \end{equation}
+                %
+                è la stima intervallare che definisce l'intervallo di confidenza ricercato, esprimibile anche piú compattamente come \(\IC^\alpha_R(\mathbf S)\equiv\bar S\pm t_{R-1}^{\alpha/2}\sqrt{V/R}\).
+                
+                \begin{ipo}[livello di confidenza]
+                    Si sceglie \(\alpha\equiv0.05\) cosí d'avere un intervallo con livello di confidenza \(0.95\).   
+                \end{ipo}
+                
+                Il significato dell'intervallo di confidenza in essenza è l'errore statistico commesso: esso valuta quanto è probabile che la stima intervallare \cref{eqIntervalloConfidenza} contenga il parametro \(\mu\); in altre parole \(\IC^\alpha_R\) misura l'incertezza sulla stima della media: preso un campione \(\mathbf s\), piú l'intervallo di confidenza è esteso piú la media campionaria \(\bar s\) è una stima incerta dell'effettiva media \(\mu\); viceversa piú è stretto, piú la stima \(\bar s\) è precisa nel senso che \(\mu\) si trova in un intorno piccolo della media campionaria. Sotto questo punto di vista è concettualmente analogo alla precisione di uno strumento di misura.
+
+                \begin{oss}
+                    La stima intervallare \cref{eqIntervalloConfidenza} appena ricavata vale tanto per il vettore aleatorio \(\mathbf S\) che per le sue realizzazioni \(\mathbf s\), le quali sono, appunto, il risultato delle \(R\) simulazioni.
+                \end{oss}
+
+            \subsubsection{Struttura dei risultati}
+
+                I dati presentano una struttura di un tensore del quart'ordine \(\mathbf s\in\RPlus^{N_f\times2\times N\times R}\) i cui indici hanno il seguente significato
+                %
+                \begin{equation*}
+                    s^{n,a}_{i,r}
+                    \left\{\begin{aligned}
+                        n\ &=\text{ istante temporale},\\
+                        a\ &=\text{ tipo di simulazione},\\
+                        i\ &=\text{ indice della città},\\
+                        r\ &=\text{ numero della simulazione}.
+                    \end{aligned}\right.
+                \end{equation*}
+                % 
+                L'istante temporale è definito tramite tre parametri in \(\NPlus\):
+
+                \begin{itemize}[
+                    label=\(\diamond\),
+                    topsep=0.5em,
+                    parsep=0em,
+                    itemsep=0.25em,
+                    leftmargin=2em,
+                    rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    labelindent=30pt,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item \(N_t\equiv\left\lfloor T/\Delta t\right\rfloor\) è il numero totale di tempi simulati;
+                    \item \(N_s\ll N_t\) è il numero di catture dai tempi simulati;
+                    \item \(N_f<N_s\) è il numero di tempi ridotti dalle catture.
+                \end{itemize}
+
+                Sia le catture che la riduzione sono campinate in intervalli equispaziati con passi
+                %
+                \begin{equation*}
+                    \Delta s=N_t/N_s
+                    \quad\text{e}\quad
+                    \Delta f=N_s/N_f
+                \end{equation*}
+                %
+                ove si suppone, per semplicità, che \(N_s\) e \(N_f\) siano divisori ordinatamente di \(N_t\) e \(N_s\), da cui
+                %
+                \begin{equation*}
+                    N_t/N_s-\left\lfloor N_t/N_s\right\rfloor=0
+                    \quad\text{e}\quad
+                    N_s/N_f-\left\lfloor N_s/N_f\right\rfloor=0,
+                \end{equation*}
+                %
+                e ugualmente si assume per \(\Delta t\) e \(T\).
+              
+                Tramite l'\cref{algMonteCarlo} si simulano in totale \(N_t\) tempi con passo \(\Delta t\) di cui \(N_s\) sono salvati nel tensore \[\undertilde{\mathbf s}\in\RPlus^{N_s}\times\RPlus^2\times\RPlus^N\times\RPlus^R\] delle catture:
+                %
+                \begin{equation*}
+                    \undertilde s^{n,a}_{i,r}\equiv\pazocal S^{n\Delta s}
+                    \quad\forall n,\ \forall a,\ \forall i,\ \forall r;
+                \end{equation*}
+                %
+                successivamente si convolve \(\undertilde{\mathbf s}\) rispetto all'indice del tempo:
+                %
+                \begin{equation*}
+                    s^{n,a}_{i,r}\equiv\frac1{N_f}\sum_{j=1}^{N_f}\undertilde s^{(n-1)N_f+j,a}_ir{,}
+                    \quad\forall n,\ \forall a,\ \forall i,\ \forall r,
+                \end{equation*}
+                %
+                vale a dire si mediano ogni \(\Delta f\) elementi delle \(N_s\) catture. Tale mollificazione è necessaria per rendere \(\mathbf s\) meno rumoroso rispetto a \(\undertilde{\mathbf s}\) e quindi piú leggibile una volta raffigurato.
+
+                Per quanto riguarda gl'istanti temporali considerati, si hanno tre forme a seconda di come s'intende l'indice \(n\):
+                %
+                \begin{equation*}
+                    \newcommand\hsep{\hspace{1em}}
+                    \begin{aligned}
+                        t_n&=n\Delta t&\hsep&\forall n\in\{1,2,\ldots,N_t\},\\
+                        t^s_n&=t_n\Delta s&\hsep&\forall n\in\{1,2,\ldots,N_s\},\\
+                        t^f_n&=t^s_n\Delta f&\hsep&\forall n\in\{1,2,\ldots,N_f\},
+                    \end{aligned}
+                \end{equation*}
+                %
+                rispettivamente per i tempi discretizzati, campionanti e ridotti; a prescindere vale comunque \(t_{N_t}=t^s_{N_s}=t^f_{N_f}=T\).
+ 
+                \begin{oss}
+                    I parametri temporali \(N_t\), \(N_s\) ed \(N_f\) non contano il tempo iniziale perché fa riferimento alla distribuzione iniziale \(\mathbf s_0\in\RPlus^N\).
+                \end{oss}
+
+                \begin{oss}
+                    Per molti grafici si considera solo la distribuzione al tempo finale \(T\), cosicché \(\mathbf s^{N_f}\in\RPlus^{2\times N\times R}\) è un tensore del terz'ordine; inoltre s'indica impropriamente \(\mathbf s^{N_f}\) con \(\mathbf s^T\) per leggerezza di notazione.
+                \end{oss}
+
+                \begin{ipo}
+                    In questa trattazione si considerano \(N_f=100\), \(N_s=1000\) mentre \(N_t\) viene scelto per essere poco superiore al tempo di convergenza della simulazione, se i risultati convergono, ma sicuramente è un multiplo di \(10\) per garantire che \(N_s\) sia un suo divisore.
+                \end{ipo}
+
+            \subsubsection{Istogrammi e lognormale bimodale}
+
+                Il primo grafico riguarda gl'istogrammi [normalizzati] della distribuzione al tempo finale \(T\). Si inizia considerando il massimo e il minimo elemento del tensore \(\mathbf s^T\),
+                %
+                \begin{equation*}
+                    s_{\max}\equiv\max_{a,i,r}\ s^{T,a}_{i,r}
+                    \quad\text{e}\quad
+                    s_{\min}\equiv\min_{a,i,r}\ s^{T,a}_{i,r},
+                \end{equation*}
+                %
+                coi quali si può definire una griglia comune equispaziata su cui costruire gl'istogrammi. Siano \(N_c\) il numero di intervalli della griglia, ossia il numero di classi, allora definita \(\Histogram\colon\mathbb R^N\to\mathbb R^{N_c}\) come la funzione che restituisce i valori [normalizzati] delle classi dell'istogramma, il tensore degl'istogrammi \(\mathbf h\in\RPlus^{2\times N_c\times R}\) si scrive
+                %
+                \begin{equation*}
+                    \mathbf h^a_{\cdot,r}\equiv\Histogram(\mathbf s^{T,a}_{\cdot,r}),
+                    \quad\forall a,\ \forall r.
+                \end{equation*}
+                %
+                Valutati gl'intervalli di confidenza
+                %
+                \begin{equation*}
+                    \IC_R^{0.05}(\mathbf h^a_c)=\bar h^a_c\pm t^{0.025}_{R-1}\sqrt{\frac{V^a_c}R},
+                    \quad\forall a,\ \forall c,
+                \end{equation*}
+                %
+                si possono rappresentare con \(\bar{\mathbf h}^a\) l'istogramma medio della simulazione esatta e approssimata, e con \(\pm t^{0.025}_{R-1}\sqrt{V^a_c/R}\) l'errore stocastico sulle stime dei valori medi delle classi.
+
+                Per quanto riguarda i fittaggi lognormali bimodali la logica è simile: sia
+                %
+                \begin{equation*}
+                    \mathcal L(x;\mathbf s^{T,a}_{\cdot,r})\colon\RPlus\to\RPlus,
+                    \quad\forall a,\ \forall r,
+                \end{equation*}
+                %
+                la densità di una lognormale bimodale fittata dal vettore \(\mathbf s^{T,a}_{\cdot,r}\), la cui forma esplicita è la \cref{eqDistribuzioneLognormaleBimodale}, e sia
+                %
+                \begin{equation*}
+                    \mathcal L(x;\mathbf s^{T,a})\colon\RPlus\to\RPlus^R
+                \end{equation*}
+                %
+                la funzione vettoriale tale che
+                %
+                \begin{equation*}
+                    \mathcal L(x;\mathbf s^{T,a})\equiv
+                    \begin{bmatrix}
+                        \mathcal L(x;\mathbf s^{T,a}_{\cdot,1})&
+                        \mathcal L(x;\mathbf s^{T,a}_{\cdot,2})&
+                        \cdots&
+                        \mathcal L(x;\mathbf s^{T,a}_{\cdot,R})
+                    \end{bmatrix}^\top,
+                \end{equation*}
+                %
+                che in essenza raccoglie tutt'i fittaggi in un unico vettore. Allora gl'intervalli di confidenza hanno forma
+                %
+                \begin{equation*}
+                    \IC_R^{0.05}(\mathcal L(x;\mathbf s^{T,a}))=\bar{\mathcal L}^a(x)\pm t^{0.025}_{R-1}\sqrt{\frac{V^a(x)}R},
+                    \quad\forall x\in[s_{\min},s_{\max}],\ \forall a,
+                \end{equation*}
+                %
+                in cui, come prima, \(\bar{\mathcal L}^a(x)\) è la funzione media mentre \(\pm t^{0.025}_{R-1}\sqrt{V^a(x)/R}\) la sua incertezza stocastica.
+
+                \begin{oss}
+                    Essendo \(x\) continuo, l'insieme degl'intervalli di confidenza forma per le funzioni un fascio di confidenza.
+                \end{oss}
+
+            \subsubsection{Pareto \textit{vs} lognormale bimodale}
+        
+            \subsubsection{Pareto e relativi indici}
+        
+            \subsubsection{Taglia media}
+        
+            \subsubsection{Taglie \textit{vs} gradi}
+            
+                L'intervallo di confidenza non è applicato a tutt'i grafici perché molti sono già troppo affollati e l'aggiunta di un ulteriore barra verticale/orizzontale li renderebbe eccessivamente densi.
+        
+            \subsubsection{Evoluzioni delle taglie}
         
         \subsection{Sulle fluttuazioni \texorpdfstring{\(\gamma\)}{γ}}
 
@@ -106,7 +349,7 @@
 
         Si avvisa anche sono stati ottenuti dei risultati analoghi a quelli della Sardegna per tutte le regioni italiane, Italia inclusa; questa è la ragione per cui in questo paragrafo ci si concentrerà solo su quella regione, mostrandone anche alcuni per l'Italia.
 
-        \subsection{Popolazione}
+        \subsection{Regola taglia}
 
             Una prima possibilità consiste nella
             %
@@ -122,18 +365,18 @@
                 \item \(\alpha\in\mathbb R^+\) indica la rapidità d'emigrazione e influenza quanto rapidamente il rapporto \(s_*/s\) raggiunge la massima attrattività \(\lambda\).
             \end{itemize}
 
-            In poche parole la \eqref{eqLeggeEmigrazione} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
-
-            In questo caso si hanno quindi interazioni non simmetriche, poiché dalla \eqref{eqLegameLineareInterazioneCittà} \(p\neq q\) e \(q\neq p\), e non lineari, a causa della \eqref{eqLeggeEmigrazione}.
+            In questo caso si hanno quindi interazioni non simmetriche e non lineari, a causa della \eqref{eqLeggeEmigrazione}.
             
             % Mediante la conservazione di popolazione ho rifatto molto velocemente i conti della formula prima del Teorema 5.1 a p. 16 di [1], confermando che d⟨s⟩/dt=0, come ci si aspetta da questo tipo d'interazione.
 
-        \subsection{Popolazione-Connettività}
+        \subsection{Regola taglia-gradi}
 
-        \subsection{Popolazione-Connettività frazionata}
+        \subsection{Regola frazionata}
 
-        \subsection{Popolazione-Forza}
+        \subsection{Regola taglia-forza}
 
         \subsection{Interpretazioni}
+
+            In poche parole la \eqref{eqLeggeEmigrazione} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
         
     \section{Il caso dell'Italia}
