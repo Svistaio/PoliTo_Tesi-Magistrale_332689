@@ -644,9 +644,9 @@ def CreateParetoFitPlot(
 
         Formally it should be
         
-            1-np.arange(1,n+1,dtype=float)/Nc-(Nc-n)/Nc=
-            (n-np.arange(1,n+1,dtype=float))/Nc=
-            [(n-np.arange(1,n+1,dtype=float))/n][n/Nc]
+                1-np.arange(1,n+1,dtype=float)/Nc-(Nc-n)/Nc=
+                (n-np.arange(1,n+1,dtype=float))/Nc=
+        (*)     [(n-np.arange(1,n+1,dtype=float))/n][n/Nc]
         
         hence the correct variables are:
 
@@ -656,7 +656,7 @@ def CreateParetoFitPlot(
 
         without the constant translation 0.5, which is just necessary to avoid having a zero value at the tail end in a log-log plot.
 
-        However, since the only relevant information is the Pareto index, the exact probability value can be omitted
+        However, since the only relevant information is the Pareto index, the exact probability value can be omitted: indeed, by dividing (*) by [n/Nc] the CCDF is rescaled in a linear scale while translated upward in a logarithmic one; both transformations do not affect the actual trend of the CCDF from which the Pareto index is calculated
     """
 
     if Ni>1:
@@ -698,6 +698,7 @@ def CreateParetoFitPlot(
     if bimodal:
         xFl = np.log(xF)
         yFData = [None]*Ni
+        Nc = v.shape[1]
 
         for r in range(Ni):
             xi,loc1,shape1,loc2,shape2 = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
@@ -706,7 +707,8 @@ def CreateParetoFitPlot(
             ccdfFit2 = stats.norm.sf(xFl,loc=loc2,scale=shape2)
 
             yFData[r] = xi*ccdfFit1+(1-xi)*ccdfFit2
-            yFData[r] /= yFData[r][0] # Normalization
+            # yFData[r] /= yFData[r][0] # Normalization
+            yFData[r] /= n/Nc # Rescaling
             # It's necessary to effectively compare it with the Pareto fitting
 
         yF = yFData if Ni>1 else yFData[0]

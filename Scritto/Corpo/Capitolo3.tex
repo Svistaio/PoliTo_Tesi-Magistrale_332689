@@ -7,9 +7,7 @@
     {Teoria cinetica dei sistemi multiagente}%
 }\label{secTCSM}
 
-    In questo capitolo è discussa la \TCSMA{} necessaria per ottenere e discutere i risultati nel \cref{secSimulazioni}.
-   
-    S'inizia prima dando delle nozioni generali di teoria della probabilità colle quali si deriva successivamente la celeberrima equazione di Boltzmann a partire da una descrizione stocastica delle particelle di un gas; quindi si passa a generalizzare tali risultati per mediare le interazioni tramite una struttura topologica sottostante gli agenti, sia in modo esatto che approssimato; successivamente si descrivono le equazioni cinetiche nel caso corrente; infine si conclude analizzando le ipotesi semplificative che portano dalla presente teoria a quella classica di Boltzmann.
+    In questo capitolo è discussa la \TCSMA{} necessaria per ottenere e discutere i risultati nel \cref{secSimulazioni}. S'inizia prima dando delle nozioni generali di teoria della probabilità colle quali si deriva successivamente la celeberrima equazione di Boltzmann a partire da una descrizione stocastica delle particelle di un gas; quindi si passa a generalizzare tali risultati per mediare le interazioni tramite una struttura topologica sottostante gli agenti, sia in modo esatto che approssimato; successivamente si descrivono le equazioni cinetiche nel caso corrente; infine si conclude analizzando le ipotesi semplificative che portano dalla presente teoria a quella classica di Boltzmann.
                 
     % che equivale all'equazione di tipo Boltzmann con interazioni simmetriche \daRivedere{} usata classicamente per modellizzare la distribuzione dell'energia cinetica tra una popolazione di particelle di un gas.
 
@@ -176,7 +174,7 @@
             ]
                 \item \(n,h,k\in\mathbb N_+\) tali che \(n=h+k\);
                 \item un vettore aleatorio \(\mathbf Z=(\mathbf X,\mathbf Y)\in\mathbb R^n\) assolutamente continuo costituito da \(\mathbf X\in\mathbb R^h\) e \(\mathbf Y\in\mathbb R^k\) con densità congiunta \(f_{\mathbf Z}(\mathbf x,\mathbf y)\) e marginali \(f_{\mathbf X}\) e \(f_{\mathbf Y}\);
-                \item una funzione \(\varphi\colon\mathbb R^n\to\mathbb R\) misurabile e tale che \(\mathbb E[\varphi(\mathbf Z)]=\mathbb E[\varphi(\mathbf X,\mathbf Y)]<\infty\);
+                \item una funzione \(\varphi\colon\mathbb R^n\to\mathbb R\) misurabile e tale che \[\mathbb E[\varphi(\mathbf Z)]=\mathbb E[\varphi(\mathbf X,\mathbf Y)]<\infty;\]
             \end{enumerate}
 
             allora si può definire \(h\colon\mathbb R^k\to\mathbb R\) tramite la seguente equazione
@@ -211,14 +209,14 @@
                     \\&=\int_B\int_{\mathbb R^h}h(\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
                     \overset{\eqref{eqCondizionehVettoreAleatorio}}{=}
                     \int_B\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
-                    \\&=\int_{\mathbb R^n}\mathbb1_B(\mathbf y)\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
-                    =\int_\Omega\mathbb1_B(\mathbf Y)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
-                    \\&=\int_\Omega\mathbb1_C(\mathbf Z)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
-                    =\int_\Omega\mathbb1_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+                    \\&=\int_{\mathbb R^n}\chi_B(\mathbf y)\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+                    =\int_\Omega\chi_B(\mathbf Y)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+                    \\&=\int_\Omega\chi_C(\mathbf Z)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+                    =\int_\Omega\chi_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P
                     =\int_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P,
                 \end{aligned}
             \] % P. 127 di «Probabilità II {29-09-2022}.pdf»
-            ove \(B\equiv\mathbf Y(A)\subseteq\mathbb R^k\) e \(C\equiv\mathbf Z(\mathbb R^h\times A)\subseteq\mathbb R^n\) dimodoché
+            ove \(\chi_A\), \(\chi_B\) e \(\chi_C\) sono funzioni indicatrici dei rispettivi insiemi, e in piú vale \(B\equiv\mathbf Y(A)\subseteq\mathbb R^k\) e \(C\equiv\mathbf Z(\mathbb R^h\times A)\subseteq\mathbb R^n\) dimodoché
             \[
                 A=\mathbf Y^{-1}(B)=\mathbf Z^{-1}(C).
             \]
@@ -963,7 +961,7 @@
 
         In questo paragrafo si applicano i concetti della teoria sviluppata nei \cref{secDefinizioniGrafi,secTipoBoltzmannOmogeno} e, in particolare, la notazione usata e definita. S'inizia mostrando una derivazione esatta la quale, cioè, considera la topologia esatta; quindi si approfondisce un'approssimazione nella quale si "perde" la topologia indotta dalla rete; infine, si considerano i collegamenti tra la derivazione esatta e qualla di tipo Boltzmann sotto determinate ipotesi.
 
-        \subsection{Equazione di tipo Boltzmann esatta}
+        \subsection{Equazione di tipo Boltzmann esatta}\label{secTipoBoltzmannUrbano}
             
             \subsubsection{Descrizione e derivazione}
 
@@ -1581,9 +1579,12 @@
                     d_N(s,k,t)=\frac1N\sum_{i\in\mathcal I_k}g_i(s,t),
                 \]
                 ove
-                \[
+                %
+                \begin{equation}
+                    \label{eqInsiemeNodiGradok}
                     \mathcal I_k\equiv\{i\in\mathcal I\ |\ k_i=k\}\subseteq\mathcal I
-                \]
+                \end{equation}
+                %
                 è l'insieme dei nodi con grado \(k\); da essa ne seguono altre due:
                 %
                 \begin{align}
