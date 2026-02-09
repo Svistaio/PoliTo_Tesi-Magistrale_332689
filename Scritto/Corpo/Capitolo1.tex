@@ -10,12 +10,10 @@
     \begin{equation}
         \label{eqLeggeZipf}
         f\propto\frac1 r\quad\text{ove}
-        \left\{
-        \begin{split}
-            &f\text{ è la frequenza della parola,}\\
-            &r\text{ è il suo rango nella classifica;}
-        \end{split}
-        \right.
+        \left\{\begin{aligned}
+            f&\text{ è la frequenza della parola,}\\
+            r&\text{ è il suo rango nella classifica;}
+        \end{aligned}\right.
         % https://en.wikipedia.org/wiki/Zipf%27s_law#cite_note-7
         % https://archive.org/details/in.ernet.dli.2015.90211/page/n393/mode/1up
     \end{equation}
@@ -26,13 +24,13 @@
     \footnotetext{Affinché \(f_S(s)\) esista bisogna rigorosamente anche supporre che \(S\) sia assolutamente continua, ma qui non è necessario entrare nei dettagli per i quali si rimanda ai \cref{secDefinizioniPreliminariProbabilitàTCSMA,secDescrizioneCineticaUrbana}.}%
     %
     \begin{equation}
-        \label{eqDistribuzionePareto}
-        R(s)\equiv\int_{s}^{+\infty}f_S(t)\de t\approx\frac{c}{s^p}
+        \label{eqFunzioneRipartizioneComplementarePareto}
+        R(s)\equiv\int_{s}^{+\infty}f_S(t)\de t\approx\frac c{s^\beta}
         \quad\text{se }s\gg1,
         % https://en.wikipedia.org/wiki/Pareto_distribution#Relation_to_Zipf's_law
     \end{equation}
     %
-    per una certa costante \(c\in\RPlus\) e con \(R(s)\) uguale alla funzione di ripartizione complementare di \(S\): essa rappresenta matematicamente il numero di città con popolazione maggiore o uguale a \(s\) e, qualora l'indice di Pareto \(p\) fosse unitario, è analoga al rango \(r\) nella \eqref{eqLeggeZipf}.
+    per una certa costante \(c\in\RPlus\) e con \(R(s)\) uguale alla funzione di ripartizione complementare di \(S\): essa rappresenta matematicamente il numero di città con popolazione maggiore o uguale a \(s\) e, qualora l'indice di Pareto \(\beta\) fosse unitario, è analoga al rango \(r\) nella \eqref{eqLeggeZipf}.
 
     Piú recentemente \cite{Eeckhout2004,Gualandi2019HBLD} si è scoperto che al di fuori della coda la \(f_S(s)\) è ben fittata dalla distribuzione lognormale con densità di probabilità
     %
@@ -86,4 +84,4 @@
 
     Lo scritto sarà cosí suddiviso: nel secondo capitolo si affronteranno brevemente e [superficialmente] alcuni concetti della teoria dei grafi, soprattutto quelli pertinenti alla topologia interurbana; quindi nel terzo la \TCSMA{} è approfondita prima da un punto di vista classico, e poi mediata dai grafi sia esattamente che approssimatamente; infine negli ultimi due si illustreranno i principali risultati concludendo con delle note finali e potenziali sviluppi futuri.
     
-    Per il lettore interessato sarà anche presente un'appendice ove il codice di Python dell'implementazione è spiegato a grandi linee.
+    Per il lettore interessato è anche presente un'appendice ove il codice di Python dell'implementazione è spiegato a grandi linee.
