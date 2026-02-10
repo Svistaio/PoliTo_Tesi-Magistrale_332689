@@ -230,7 +230,7 @@
             %
             \begin{equation}
                 \label{eqAttesaCondizionataEvento}
-                h(y)
+                h(\mathbf y)
                 =\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)
                 f_{\mathbf X|\mathbf Y=\mathbf y}(\mathbf x)\de\mathbf x
                 =\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y=\mathbf y]
@@ -955,6 +955,126 @@
 
             \subsubsection{Analisi dimensionale}
 
+                Finora tutte le equazioni passate fanno riferimento a un tempo adimensionale, sebbene l'introduzione di un tempo sia una modifica alquanto indolore e che lasci trasparire un'interessante interpretazione del passo temporale \(\Delta t\).
+                
+                Sia dunque \(\tilde t=\tau t\) il tempo dimensionale scomposto nel prodotto di in uno adimensionale \(t\) e della dimensione \(\tau\).
+
+                \begin{oss}
+                    Seguendo la notazione ISO \cite[§ 6.2]{ISO80k3} \(\tilde t\) dev'essere scritto \(\tilde t=\{t\}\times[t]\) ma, per leggerezza di notazione, si omettono le parentesi ponendo \(\tau\equiv[t]\): l'importante è vedere \(t\) come il valore numerico variabile e adimensionale, mentre \(\tau\) come la dimensione costante e fissa.
+                \end{oss}
+
+                Detto ciò, mediante la derivata dimensionale
+                %
+                \begin{equation*}
+                    \derS\cdot t=\tau\derS\cdot{\tilde t}
+                \end{equation*}
+                %
+                e le riformulazioni
+                %
+                \begin{equation*}
+                    \tilde f(\mathbf x,\tilde t)\equiv f(\mathbf x,\tilde t/\tau),
+                    \quad\text{ e }\quad
+                    \tilde f_*(\mathbf x_*,\tilde t)\equiv f(\mathbf x_*,\tilde t/\tau),
+                \end{equation*}
+                %
+                abbreviate con \(\tilde f\) e \(\tilde f_*\) rispettivamente, la \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} diventa
+                %
+                \begin{equation}
+                    \label{eqTipoBoltzmannSemiDimensionale}
+                    \derS{}{\tilde t}\int_{\mathbb R^n}\varphi\tilde f\de\mathbf x=
+                    \frac1\tau\int_{\mathbb R^{2n}}\left\langle
+                        \mu(\mathbf x,\mathbf x_*,w,\tilde t/\tau)
+                            \frac{\varphi'+\varphi'_*-\varphi-\varphi_*}2
+                        \right\rangle
+                    \tilde f\tilde f_*\de\mathbf x\de\mathbf x_*.
+                \end{equation}
+                %
+                Per capire come varia il tasso d'interazione \(\mu\) è sufficinete dimensionalizzare la \ref{eqBernoulliInterazione}:
+                %
+                \begin{equation*}
+                    \Theta\sim\DstrBernoulli\left(
+                        \mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,\tilde t/\tau)\frac{\Delta\tilde t}\tau,
+                    \right),
+                \end{equation*}
+                %
+                da cui si deduce il tasso d'interazione dimensionale \(\tilde\mu\):
+                %
+                \begin{equation*}
+                    \tilde\mu(\mathbf x,\mathbf x_*,w,\tilde t)
+                    \equiv\frac1\tau\mu(\mathbf x,\mathbf x_*,w,\tilde t/\tau),
+                \end{equation*}
+                %
+                che trasforma la \cref{eqTipoBoltzmannSemiDimensionale} nell'equazione di tipo Boltzmann dimensionale
+                %
+                \begin{equation}
+                    \label{eqTipoBoltzmannDimensionale}
+                    \derS{}{\tilde t}\int_{\mathbb R^n}\varphi\tilde f\de\mathbf x=
+                    \int_{\mathbb R^{2n}}\left\langle
+                        \tilde\mu(\mathbf x,\mathbf x_*,w,\tilde t)
+                            \frac{\varphi'+\varphi'_*-\varphi-\varphi_*}2
+                        \right\rangle
+                    \tilde f\tilde f_*\de\mathbf x\de\mathbf x_*.
+                \end{equation}
+
+                \begin{oss}[frequenza d'interazione]
+                    Dall'identità \(\Delta\tilde t=\tau\Delta t\) si può interpretare \(\Delta t\) come la frazione della dimensione \(\tau\) dopo la quale può avvenire un'interazione, da cui si deduce che \(\Delta\tilde t\) è l'intervallo di tempo tra due interazioni.
+                   
+                    Di conseguenza si può vedendo l'\ref{eqAlgoritmoInterazione} come un fenomeno periodico di periodo \(\Delta\tilde t\) e frequenza
+                    %
+                    \begin{equation*}
+                        \tilde f\equiv\frac1{\Delta\tilde t}=\frac1{\tau\Delta t}\equiv\frac1\tau f,
+                    \end{equation*}
+                    %
+                    in cui, come prima \(1/\tau\) è la dimensione della frequenza adimensionale \(f\).
+
+                    Ecco che il reciproco del passo temporale \(\Delta t\) prende il significato della frequenza d'interazione del fenomeno, nell'unità di tempo sia adimensionale che dimensionale mediante \(1/\tau\).
+                \end{oss}
+
+                \begin{oss}[Scelta di \(\tau\)]
+                    La precedente osservazione permette anche di esplicitare un metodo con cui decidere la dimensione temporale \(\tau\): si consideri \(\Delta t=0.01\), allora la frequenza è di \(100\) interazioni nell'unità di tempo. In un fenomeno come quello urbano si possono allora escludere due scale:
+
+                    \begin{itemize}[
+                        label=\(\diamond\),
+                        % topsep=0.5em,
+                        % parsep=0em,
+                        itemsep=0.1em,
+                        % leftmargin=2em,
+                        % rightmargin=1.5em,
+                        % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                        %itemindent=!,
+                        % labelindent=30pt,
+                        %labelwidth=!,
+                        %labelsep=!,
+                    ]
+                        \item quella dei mesi o superiori, perché è irrealistico che in un arco temporale cosí lungo vi siano solo 100 interazioni tra le città;
+                        \item similmente quella dei secondi o inferiori per un ragionamento simile a quello di prima ma opposto.
+                    \end{itemize}
+
+                    È pertanto naturale che la scala ideale in tal contesto sia quella dei giorni.
+                \end{oss}
+
+                Cionnonostante, in questo scritto non si studia un'equazione di tipo Boltzmann dimensionale analoga alla \cref{eqTipoBoltzmannDimensionale} per tre principali motivazioni:
+
+                \begin{enumerate}[
+                    label=\arabic*.,
+                    % topsep=0.5em,
+                    % parsep=0em,
+                    itemsep=0.1em,
+                    % leftmargin=2em,
+                    % rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    %labelindent=3em,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item la dimensione va considerata solo se si è interessati a studiare il transitorio, non la distribuzione stazionaria;
+                    \item lo studio di quest'ultimo è incompatibile coll'\cref{ipGrafoStatico} di grafo statico; 
+                    \item mancano i dati storici, sia attendibili che su scale temporali adeguate, per poter confrontare il transitorio simulato con quello reale.
+                \end{enumerate}
+
+                Tali sono le ragioni per cui il tempo sarà sempre considerato adimensionale da qui in poi: l'obbiettivo è studiare la distribuzione stazionaria raggiunta, non in quanto tempo si raggiunge (tempo di convergenza).
+
     \section{Descrizione cinetica urbana su reti}\label{secDescrizioneCineticaUrbana} %  d'interazioni mediante da un grafo
     
         Si analizza adesso il caso del tessuto interurbano descritto nel \cref{secRetiECittà}, considerando le città sia come agenti che come nodi di una rete che ne regola le interazioni: due città possono interagire sse sono connessi; è anche ovvio che l'interazione modifichi, in qualche modo da definire, la loro popolazione.
@@ -1067,7 +1187,7 @@
                     \end{aligned}\right.
                 }%
                 \begin{oss}
-                    Confrontato al caso generale \ref{eqRegoleInterazione}, solo la funzione della città interagente \(\psi\) presenta un coefficiente stocastico \(y\equiv\gamma\in\mathbb R\), mentre quella relativa alla città ricevente \(\psi_*\) non dipende da potenziali coefficienti\footnotemark{} \(\mathbf y_*\).%
+                    Confrontato a \ref{eqRegoleInterazione}, solo la funzione della città interagente \(\psi\) presenta un coefficiente stocastico \(y\equiv\gamma\in\mathbb R\), mentre quella relativa alla città ricevente \(\psi_*\) non dipende da potenziali coefficienti\footnotemark{} \(\mathbf y_*\).%
                     \footnotetext{Come nell'\cref{ossConfrontoBernoulliClassicoUrbano}, tale condizione si può simbolicamente rappresentare ponendo \(h_*=0\).}%
                 \end{oss}
 
@@ -1228,7 +1348,7 @@
                 Innanzitutto, il perché nella \ref{eqAlgoritmoInterazioneUrbano} si considerano interazioni «Azione-Reazione» (\cref{ossAlgoritmoAzioneReazione}) discende da un vincolo fisico: se una città interagisce con un'altra, scambiando popolazione, necessariamente anche l'altra varia il proprio stato.
 
                 Dopodiché, passando alle realizzazioni di tutte le variabili aleatorie considerate, vale a dire scrivendole in minuscolo e omettendo la dipendenza dal tempo, le regole d'interazione \ref{eqRegoleInterazioneUrbane} sono cosí definite\footnotemark{}%
-                \footnotetext{Sono state in parte ispirate dalla \cite[(2.1), p. 223]{Gualandi2019SDC}.}%
+                \footnotetext{Sono state in parte ispirate dalla \cite[(2.1) p. 223]{Gualandi2019SDC}.}%
                 %
                 \begin{equation}
                     \label{eqRegoleInterazioneUrbaneEsplicite}
@@ -1302,7 +1422,7 @@
                     \item la distribuzione normale \(\mathcal N(\mu,\gamma)\) non soddisfà la \ref{ipFluttuazioniPositivitàNegatività} poiché può assumere valori reali arbitrari con probabilità non nulla;
                     \item la distribuzione uniforme \(\mathcal U([a,b])\) è adeguata solo per intervalli finiti e diventa degenere quando un suo estremo diverge, per cui non soddisfà né \ref{ipFluttuazioniMediaNulla} né \ref{ipFluttuazioniProbabilitàDecrescente}, mentre \ref{ipFluttuazioniPositivitàNegatività} sí;
                     \item la distribuzione esponenziale \(\DstrEsponenziale(\lambda)\) è quella piú promettente perché riflette sia \ref{ipFluttuazioniMediaNulla} (dopo un'opportuna traslazione dei valori campionati) che \ref{ipFluttuazioniProbabilitàDecrescente}, ma sfortunatamente non \ref{ipFluttuazioniPositivitàNegatività} perché la densità è non nulla al valore estremo \(\gamma=E-1\);
-                    \item l'unica distribuzione che soddisfà tutt'e tre le caratteristiche ricercate è proprio la distribuzione gamma \(\DstrGamma(\alpha,\beta)\).
+                    \item l'unica distribuzione che soddisfà tutt'e tre le caratteristiche ricercate è proprio la distribuzione \(\DstrGamma(\alpha,\beta)\).
                 \end{enumerate}
 
                 Si assuma allora \(\hat\gamma\sim\DstrGamma(\alpha,\beta)\) con densità

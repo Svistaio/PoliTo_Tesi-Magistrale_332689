@@ -21,13 +21,21 @@
 
 \begin{document}
 
+    \pagenumbering{roman}
+
     \Frontespizio
+
     \Dedica
+    \Sommario
 
     \cleardoublepage
     \phantomsection
     \pdfbookmark[1]{\contentsname}{tableofcontents}
     \tableofcontents
+
+    \cleardoublepage
+    \pagenumbering{arabic}
+
     \linenumbers
 
     \input{../Corpo/Capitolo1.tex}

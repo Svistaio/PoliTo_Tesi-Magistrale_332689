@@ -56,15 +56,15 @@ class ParametersGUI(tk.Tk):
             pad=pad,
             title='Population parameters'
         )
-        timePrmFrame = Frame(
-            mainFrame,
-            pad=pad,
-            title='Time parameters'#,labelWidth=3
-        )
         simPrmFrame = Frame(
             mainFrame,
             pad=pad,
             title='Simulation parameters'
+        )
+        timePrmFrame = Frame(
+            mainFrame,
+            pad=pad,
+            title='Time parameters'#,labelWidth=3
         )
         ppcPrmFrame = Frame(
             mainFrame,

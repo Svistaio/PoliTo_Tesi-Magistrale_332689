@@ -14,8 +14,6 @@
 %\endgroup
 
 %\begingroup Citazioni
-    \newcommand\etal{\textit{et al.}}
-
     % Comando per definire citazioni con note separate da un punto e virgola: [citazione1, nota1; citazione2, nota2; ecc.]
     \DeclareMultiCiteCommand{\bracketcitesemi}[\mkbibbrackets]{\cite}{\addsemicolon\space}
  
@@ -74,6 +72,131 @@
     \crefrangeformat{ipo}{Ipp.~#3#1#4--#5#2#6}
     \crefmultiformat{ipo}{Ipp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
     \crefrangemultiformat{ipo}{Ipp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+%\endgroup
+
+%\begingroup Abbreviazioni
+    \newcommand\etal{\textit{et al.}}
+    \newcommand\TCSMA{\hyperlink{acrTeorieCineticheSistemiMultiAgenti}{TCSMA}}
+%\endgroup
+
+%\begingroup Matematica
+    \numberwithin{equation}{chapter}
+    \numberwithin{figure}{chapter}
+    \numberwithin{table}{chapter}
+
+    \newcommand\SpazMate[3]{ % Spaz[iatura] Mate[matica]
+        \thinmuskip = #1mu\relax
+        \medmuskip = #2mu\relax
+        \thickmuskip = #3mu\relax
+    }
+    \SpazMate123
+
+    \newcommand\de[1][]{\mathrm{d}#1}
+    \newcommand\derS[3][d]{\frac{\mathrm{#1}#2}{\mathrm{#1}#3}}
+    \newcommand\derP[2]{\frac{\partial#1}{\partial#2}}
+    
+    \DeclareMathOperator\DstrLognormale{Lognormale}
+    \DeclareMathOperator\BiLognormal{BiLognormale}
+    \DeclareMathOperator\DstrBernoulli{Bernoulli}
+    \DeclareMathOperator\DstrEsponenziale{Exp}
+    \DeclareMathOperator\DstrGamma{Gamma}
+    \DeclareMathOperator\DstrStudent{Student}
+    
+    \DeclareMathOperator\IC{IC}
+    \DeclareMathOperator\Histogram{Istogramma}
+    % \DeclareMathOperator\Pareto{Pareto}
+
+    % \newcommand\underdot[1]{\underaccent{\scalebox{0.3}{\(\bullet\)}}{#1}}
+    % \newcommand\underhat[1]{\underaccent{\check}{#1}}
+    \newcommand\underhat[1]{\underaccent{\hat}{#1}} % Circonflesso sottoscritto
+    \renewcommand\undertilde[1]{\underaccent{\tilde}{#1}} % Tilde sottoscritta
+
+    % \newcommand\independent{\perp\!\!\!\!\!\!\!\!\!\!\perp}
+    \newcommand\independent{\perp\hspace{-.5em}\perp}
+
+    % \newcommand\sepEnv{0.5em}
+    % \mdfdefinestyle{ars_style}{
+    %     linecolor=gray!40,
+    %     linewidth=0.5pt,
+    %     roundcorner=0pt,
+    %     innertopmargin=\sepEnv,
+    %     innerbottommargin=\sepEnv,
+    %     innerleftmargin=0pt,
+    %     innerrightmargin=0pt,
+    %     backgroundcolor=gray!5,
+    %     skipabove=\baselineskip,
+    %     skipbelow=\baselineskip
+    % }
+
+    % \newtheoremstyle{compact}
+    %     {0pt}{0pt}{\itshape}{0pt}{\bfseries}
+    %     {.}{5pt plus 5pt minus 5pt}{}
+    % \theoremstyle{compact}
+
+    % \newmdtheoremenv[style=ars_style]{dfn}{Definizione}[chapter]
+    % \newmdtheoremenv[style=ars_style]{ipo}{Ipotesi}[chapter]
+    % \newmdtheoremenv[style=ars_style]{oss}{Osservazione}[chapter]
+    % \newmdtheoremenv[style=ars_style]{prt}{Proprietà}[chapter]
+
+    % \newmdtheoremenv[style=ars_style]{prp}{Proposizione}[chapter]
+    % \newmdtheoremenv[style=ars_style]{lmm}{Lemma}[chapter]
+    % \newmdtheoremenv[style=ars_style]{teo}{Teorema}[chapter]
+    % \newmdtheoremenv[style=ars_style]{crl}{Corollario}[chapter]
+
+    \theoremstyle{definition}
+    \newtheorem{dfn}{Definizione}[chapter]
+    \newtheorem{ipo}{Ipotesi}[chapter]
+    \newtheorem{oss}{Osservazione}[chapter]
+    \newtheorem{prt}{Proprietà}[chapter]
+
+    \theoremstyle{plain}
+    \newtheorem{prp}{Proposizione}[chapter]
+    \newtheorem{lmm}{Lemma}[chapter]
+    \newtheorem{teo}{Teorema}[chapter]
+    \newtheorem{crl}{Corollario}[chapter]
+
+    \newcommand\RPlus{\mathbb R_+}
+    % \newcommand\RPlusStar{\mathbb R^*_+}
+    \newcommand\NPlus{\mathbb N_+}
+
+    \makeatletter
+        \newcommand\eqtag{\@ifstar{\eqtag@star}{\eqtag@nostar}}
+        
+        \newcounter{eqtag}
+        \newcommand\eqtag@nostar[2]{%
+            \begin{equation*}%
+                \refstepcounter{eqtag}%
+                % \def\@currentlabeltype{eqtag}%
+                \protected@edef\@currentlabel{#1}%
+                #2%
+                \tag*{#1}%
+            \end{equation*}%
+        }
+        \newcommand\eqtag@star[2]{%
+            \begin{equation*}%
+                \refstepcounter{eqtag}%
+                % \def\@currentlabeltype{eqtag}%
+                \protected@edef\@currentlabel{#1}%
+                #2%
+                \notag%
+            \end{equation*}%
+        }
+    \makeatother
+
+    \DeclareMathAlphabet\pazocal{OMS}{zplm}{m}{n}
+    \newcommand\TreQuarti{{3\hspace{-0.15em}/\hspace{-0.15em}4}}
+    \newcommand\UnQuarto{{1\hspace{-0.15em}/\hspace{-0.15em}4}}
+%\endgroup
+
+%\begingroup Algoritmi
+    \SetKwIF{Sea}{AltSe}{Altrimenti}{se}{allora}{altrimenti se}{altrimenti}{fine se}
+    \SetKwInput{KwDati}{Dati}
+    \SetKwFor{Per}{per}{fai}{fine per}
+    \SetKwRepeat{Ripeti}{ripeti}{finché}
+
+    \newcommand\pythoncommfont[1]{\footnotesize\ttfamily\textcolor{gray}{#1}}
+    \SetCommentSty{pythoncommfont}
+    \SetKwComment{tcp}{\# }{}
 %\endgroup
 
 %\begingroup TikZ
@@ -189,9 +312,9 @@
 
 %\begingroup Liste
     \setlist[enumerate]{
-        % topsep=0.5em,
-        % parsep=0em,
-        itemsep=0.25em,
+        topsep=0.5em,
+        parsep=0em,
+        itemsep=0.2em,
         leftmargin=2em,
         rightmargin=1.5em,
         % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
@@ -200,139 +323,18 @@
         %labelwidth=!,
         %labelsep=!,
     }
-
     \setlist[itemize]{
-        % topsep=0.5em,
-        % parsep=0em,
-        itemsep=0.25em,
+        topsep=0.5em,
+        parsep=0em,
+        itemsep=0.2em,
         leftmargin=2em,
         rightmargin=1.5em,
         % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
         %itemindent=!,
-        labelindent=30pt,
+        % labelindent=3em,
         %labelwidth=!,
         %labelsep=!,
     }
-%\endgroup
-
-%\begingroup Algoritmi
-    \SetKwIF{Sea}{AltSe}{Altrimenti}{se}{allora}{altrimenti se}{altrimenti}{fine se}
-    \SetKwInput{KwDati}{Dati}
-    \SetKwFor{Per}{per}{fai}{fine per}
-    \SetKwRepeat{Ripeti}{ripeti}{finché}
-
-    \newcommand\pythoncommfont[1]{\footnotesize\ttfamily\textcolor{gray}{#1}}
-    \SetCommentSty{pythoncommfont}
-    \SetKwComment{tcp}{\# }{}
-%\endgroup
-
-%\begingroup Matematica
-    \numberwithin{equation}{chapter}
-    \numberwithin{figure}{chapter}
-    \numberwithin{table}{chapter}
-
-    \newcommand\SpazMate[3]{ % Spaz[iatura] Mate[matica]
-        \thinmuskip = #1mu\relax
-        \medmuskip = #2mu\relax
-        \thickmuskip = #3mu\relax
-    }
-    \SpazMate123
-
-    \newcommand\de[1][]{\mathrm{d}#1}
-    \newcommand\derS[3][d]{\frac{\mathrm{#1}#2}{\mathrm{#1}#3}}
-    \newcommand\derP[2]{\frac{\partial#1}{\partial#2}}
-    
-    \DeclareMathOperator\DstrLognormale{Lognormale}
-    \DeclareMathOperator\BiLognormal{BiLognormale}
-    \DeclareMathOperator\DstrBernoulli{Bernoulli}
-    \DeclareMathOperator\DstrEsponenziale{Exp}
-    \DeclareMathOperator\DstrGamma{Gamma}
-    \DeclareMathOperator\DstrStudent{Student}
-    
-    \DeclareMathOperator\IC{IC}
-    \DeclareMathOperator\Histogram{Istogramma}
-    % \DeclareMathOperator\Pareto{Pareto}
-
-    % \newcommand\underdot[1]{\underaccent{\scalebox{0.3}{\(\bullet\)}}{#1}}
-    % \newcommand\underhat[1]{\underaccent{\check}{#1}}
-    \newcommand\underhat[1]{\underaccent{\hat}{#1}} % Circonflesso sottoscritto
-    \renewcommand\undertilde[1]{\underaccent{\tilde}{#1}} % Tilde sottoscritta
-
-    % \newcommand\independent{\perp\!\!\!\!\!\!\!\!\!\!\perp}
-    \newcommand\independent{\perp\hspace{-.5em}\perp}
-
-    % \newcommand\sepEnv{0.5em}
-    % \mdfdefinestyle{ars_style}{
-    %     linecolor=gray!40,
-    %     linewidth=0.5pt,
-    %     roundcorner=0pt,
-    %     innertopmargin=\sepEnv,
-    %     innerbottommargin=\sepEnv,
-    %     innerleftmargin=0pt,
-    %     innerrightmargin=0pt,
-    %     backgroundcolor=gray!5,
-    %     skipabove=\baselineskip,
-    %     skipbelow=\baselineskip
-    % }
-
-    % \newtheoremstyle{compact}
-    %     {0pt}{0pt}{\itshape}{0pt}{\bfseries}
-    %     {.}{5pt plus 5pt minus 5pt}{}
-    % \theoremstyle{compact}
-
-    % \newmdtheoremenv[style=ars_style]{dfn}{Definizione}[chapter]
-    % \newmdtheoremenv[style=ars_style]{ipo}{Ipotesi}[chapter]
-    % \newmdtheoremenv[style=ars_style]{oss}{Osservazione}[chapter]
-    % \newmdtheoremenv[style=ars_style]{prt}{Proprietà}[chapter]
-
-    % \newmdtheoremenv[style=ars_style]{prp}{Proposizione}[chapter]
-    % \newmdtheoremenv[style=ars_style]{lmm}{Lemma}[chapter]
-    % \newmdtheoremenv[style=ars_style]{teo}{Teorema}[chapter]
-    % \newmdtheoremenv[style=ars_style]{crl}{Corollario}[chapter]
-
-    \theoremstyle{definition}
-    \newtheorem{dfn}{Definizione}[chapter]
-    \newtheorem{ipo}{Ipotesi}[chapter]
-    \newtheorem{oss}{Osservazione}[chapter]
-    \newtheorem{prt}{Proprietà}[chapter]
-
-    \theoremstyle{plain}
-    \newtheorem{prp}{Proposizione}[chapter]
-    \newtheorem{lmm}{Lemma}[chapter]
-    \newtheorem{teo}{Teorema}[chapter]
-    \newtheorem{crl}{Corollario}[chapter]
-
-    \newcommand\RPlus{\mathbb R_+}
-    % \newcommand\RPlusStar{\mathbb R^*_+}
-    \newcommand\NPlus{\mathbb N_+}
-
-    \makeatletter
-        \newcommand\eqtag{\@ifstar{\eqtag@star}{\eqtag@nostar}}
-        
-        \newcounter{eqtag}
-        \newcommand\eqtag@nostar[2]{%
-            \begin{equation*}%
-                \refstepcounter{eqtag}%
-                % \def\@currentlabeltype{eqtag}%
-                \protected@edef\@currentlabel{#1}%
-                #2%
-                \tag*{#1}%
-            \end{equation*}%
-        }
-        \newcommand\eqtag@star[2]{%
-            \begin{equation*}%
-                \refstepcounter{eqtag}%
-                % \def\@currentlabeltype{eqtag}%
-                \protected@edef\@currentlabel{#1}%
-                #2%
-                \notag%
-            \end{equation*}%
-        }
-    \makeatother
-
-    \DeclareMathAlphabet\pazocal{OMS}{zplm}{m}{n}
-    \newcommand\TreQuarti{{3\hspace{-0.15em}/\hspace{-0.15em}4}}
-    \newcommand\UnQuarto{{1\hspace{-0.15em}/\hspace{-0.15em}4}}
 %\endgroup
 
 %\begingroup Frontespizio
@@ -383,6 +385,7 @@
 
 %\begingroup Dedica
     \newcommand\Dedica{
+        \cleardoublepage
         \thispagestyle{empty}
         \phantomsection
         \pdfbookmark[1]{Dedica}{Dedica}
@@ -397,6 +400,24 @@
     }
 %\endgroup
 
-%\begingroup Altro
-    \newcommand\TCSMA{\hyperlink{acrTeorieCineticheSistemiMultiAgenti}{TCSMA}}
+%\begingroup Sommario
+    \newcommand{\Sommario}{
+        \cleardoublepage
+        \phantomsection
+        \pdfbookmark[1]{Sommario}{Sommario}
+        \begingroup
+            \let\clearpage\relax
+            \let\cleardoublepage\relax
+            
+            \chapter*{Sommario}
+            Testo in italiano relativo alla modellizzazione della distribuzione 
+            della popolazione su reti spaziali[cite: 4, 16].
+            
+            \vfill
+            
+            \chapter*{Abstract}
+            English translation of the summary[cite: 17, 18].
+        \endgroup
+        \vfill
+    }
 %\endgroup
