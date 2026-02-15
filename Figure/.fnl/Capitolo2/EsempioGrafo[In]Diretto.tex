@@ -14,8 +14,10 @@
     }, % Ponendo la separazione interna nulla la dimensione del cerchio sarà data dalla chiave «minimum size», oltre che dalla dimensione del testo stesso
     edge/.style={thick}
 ]
+    % \renewcommand\subCaptionSize{10}
+
     \pgfmathsetmacro\radius{1.5}
-    \newcommand\hSepPlot{9em}
+    \newcommand\hSepPlot{10em}
     \newcommand\hSepLabel{1.5em}
 
     % Grafo Indiretto a forma di triangolo equilatero
@@ -28,7 +30,7 @@
     \draw[edge] (B) -- (C);
     \draw[edge] (C) -- (A);
 
-    \node[left=\hSepLabel of A] {\sottoDidascalia[]{}};
+    \node[left=\hSepLabel of A] {\dimTesto{\subCaptionSize}\sottoDidascalia[]{}};
     % \node[below=\hSepLabel of 1] {\textbf{Grafo Indiretto}};
     
     % Grado diretto a forma di triangolo equilatero
@@ -46,7 +48,7 @@
         \draw[edge, -{Stealth}] (C) edge[bend left=15] (A);
         \draw[edge, -{Stealth}] (A) edge[bend left=15] (C);
 
-        \node[left=\hSepLabel of A] {\sottoDidascalia[]{}};
+        \node[left=\hSepLabel of A] {\dimTesto{\subCaptionSize}\sottoDidascalia[]{}};
         % \node[below=\hSepLabel of A] {\textbf{Grafo Diretto Simmetrico}};
     \end{scope}
 
@@ -67,7 +69,7 @@
             \)%
         };%
 
-        \node at (90:\radius) {\sottoDidascalia[]{}};
+        \node at (90:\radius) {\dimTesto{\subCaptionSize}\sottoDidascalia[]{}};
         % \pgfmathparse{\radius/sqrt(3)}
         % \node[above=\pgfmathresult em of M] {\sottoDidascalia[]{}};
     \end{scope}%

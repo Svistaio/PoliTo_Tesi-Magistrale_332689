@@ -3,33 +3,35 @@
 
 \definecolor{mycolor1}{rgb}{0.00000,0.44700,0.74100}%
 %
-\begin{tikzpicture}%[trim axis left,trim axis right]
+\newcommand\plotWidth{10cm}
+\pgfmathsetlengthmacro\plotHeight{0.618*\plotWidth}
+\begin{tikzpicture}
+    % \renewcommand\labelSize{10}
+    % \renewcommand\tickSize{9}
+    % \renewcommand\legendSize{9}
+
     \begin{axis}[%
         name=SVsD,
-        % width=4.521in,
-        % height=3.566in,
+        width=\plotWidth,height=\plotHeight,
+        scale only axis,
         % at={(0.758in,0.481in)},
         scale only axis,
-        xmode=log,
-        xmin=10,
-        xmax=283,
-        xminorticks=true,
-        xlabel style={font=\color{white!15!black}},
-        xlabel={$k$},
-        ymode=log,
-        ymin=10,
-        ymax=100000,
-        yminorticks=true,
-        ylabel style={font=\color{white!15!black}},
-        ylabel={$s(k)$},
+        xmin=10,xmax=283,
+        ymin=10,ymax=100000,
+        xlabel={$k$},ylabel={$s(k)$},
+        xlabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+        ylabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+        xticklabel style={font=\dimTesto{\tickSize}},
+        yticklabel style={font=\dimTesto{\tickSize}},
+        xmode=log,ymode=log,
+        xmajorgrids,ymajorgrids,
+        xminorticks=true,yminorticks=true,
+        axis x line*=bottom,axis y line*=left,
         axis background/.style={fill=white},
-        axis x line*=bottom,
-        axis y line*=left,
-        xmajorgrids,
-        ymajorgrids,
         grid style={dashed},
         legend pos=north west,
         legend style={
+            font=\dimTesto{\legendSize},
             legend cell align=left,
             align=left,
             draw=white!15!black

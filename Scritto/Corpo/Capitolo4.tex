@@ -94,7 +94,7 @@
         \end{oss}
 
         \begin{oss}
-            Piú in generale, nella linea \ref{algMonteCarloDistribuzioneIniziale}, \(\pazocal S_0\) si può campionare da una densità \(\bar l_0\) iniziale; tuttavia non conoscendone alcuna per la distribuzione della popolazione, si è deciso di definire \(\pazocal S^0\) come un vettore uniforme rispetto a una popolazione massima \(P\) iniziale.
+            Piú in generale, nella linea \ref{algMonteCarloDistribuzioneIniziale}, \(\pazocal S_0\) si può campionare da una densità \(\bar l_0\) iniziale; tuttavia non conoscendone alcuna per la distribuzione della popolazione, si è deciso di definire \(\pazocal S^0\) come un vettore uniforme rispetto a una popolazione totale \(P\) iniziale.
         \end{oss}
 
     \section{Rappresentazione dei risultati}
@@ -166,7 +166,7 @@
             \end{equation}
             %
             \begin{ipo}[livello di confidenza]
-                Si sceglie \(\alpha\equiv0.05\) cosí d'avere un intervallo con livello di confidenza \(0.95\).   
+                Si sceglie \(\alpha=0.05\) cosí d'avere un intervallo con livello di confidenza \(0.95\).   
             \end{ipo}
             %
             Il significato dell'intervallo di confidenza in essenza è l'errore statistico commesso: esso valuta quanto è probabile che la stima intervallare \cref{eqIntervalloConfidenza} contenga il parametro \(\mu\); in altre parole \(\IC^\alpha_R\) misura l'incertezza sulla stima della media: preso un campione \(\mathbf s\), piú l'intervallo di confidenza è esteso piú la media campionaria \(\bar s\) è una stima incerta dell'effettiva media \(\mu\); viceversa piú è stretto, piú la stima \(\bar s\) è precisa nel senso che \(\mu\) si trova in un intorno piccolo della media campionaria. Sotto questo punto di vista è concettualmente analogo alla precisione di uno strumento di misura.
@@ -261,7 +261,7 @@
             \end{oss}
 
             \begin{ipo}
-                In questa trattazione si considerano \(N_f=50\), \(N_s=1000\) mentre \(N_t\) viene scelto per essere poco superiore al tempo di convergenza della simulazione, se i risultati convergono, ma sicuramente è un multiplo di \(10\) per garantire che \(N_s\) sia un suo divisore.
+                In questa trattazione si considerano \(\Delta t=0.01\), \(N_s=1000\), \(N_f=50\) mentre \(N_t\) viene scelto per essere poco superiore al tempo di convergenza della simulazione, se i risultati convergono, ma sicuramente è un multiplo di \(10\) per garantire che \(N_s\) sia un suo divisore.
             \end{ipo}
 
             \begin{oss}
@@ -574,25 +574,72 @@
         
         \subsection{Sulle fluttuazioni \texorpdfstring{\(\gamma\)}{γ}}
 
-    \section{Regole d'emigrazione}
+            Nelle \ref{eqRegoleInterazioneUrbaneEsplicite} è stato introdotto per completezza il termine \(\gamma\) legato alle fluttuazioni, ossia a quei fenomeni di morte e nascita che caratterizzano la naturale variazione di una popolazione intorno a una media. Si argomenta adesso che è possibile trascurarle per due ragioni:
 
-        \(s\) e \(s_*\) vanno intese come la città interagente e ricevente rispettivamente
+            \begin{enumerate}[
+                label=\arabic*.,
+                % topsep=0.5em,
+                % parsep=0em,
+                % itemsep=0.25em,
+                % leftmargin=2em,
+                % rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=3em,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item si è interessati solo alla predizione della distribuzione stazionaria da confrontare con quella reale del 1991 e
+                \item dal vincolo \cref{eqVincoloSimmetricoTraParametri} le uniche perturbazioni simmetriche sono per loro natura piccole, essendo concentrate in un intorno dell'origine.
+            \end{enumerate}
+
+            In effetti la \cref{figConfrontoConESenzaFluttuazioni} conferma che \(\gamma\) introduce solo una lieve incertezza sui risultati, simulati coi parametri nella \cref{tabParametriConEsenzaGamma} e colla regola d'interazione
+            %
+            \begin{equation}
+                E(s,s_*,i,i_*)\equiv
+                (1-\zeta)\lambda\frac{\frac{(s_*/s)(w_{i_*}/w_i)}\alpha}{1+\frac{(s_*/s)(w_{i_*}/w_i)}\alpha}
+                +\zeta\lambda\frac{\frac{(s/s_*)(w_i/w_{i_*})}\alpha}{1+\frac{(s/s_*)(w_i/w_{i_*})}\alpha},
+                \label{eqVarianteRegolaTagliaForzaFrazionata}
+            \end{equation}
+            %
+            che è spiegata implicitamente nel corso del \cref{secRegoleEmigrazione} ed è brevemente discussa piú nel dettaglio nel \cref{secVariantiRegoleInterazione}.
+
+            \begin{table}[htb]
+                \centering
+                \begin{tabular}{cccccc}
+                    \hline
+                    &\(\lambda\)&\(\alpha\)&\(\zeta\)&\(\sigma\)&\(N_t\)\\
+                    \hline
+                    Senza \(\gamma\)&\(0.1\)&\(1\)&\(0.1\)&--&\(10^6\)\\
+                    Con \(\gamma\)&\(0.1\)&\(1\)&\(0.1\)&\(0.05\)&\(10^6\)\\
+                    \hline
+                \end{tabular}
+                \caption{Parametri della \cref{figConfrontoConESenzaFluttuazioni}.}
+                \label{tabParametriConEsenzaGamma}
+            \end{table}
+
+            Dunque \(\gamma\) introduce solo del lieve rumore che, sebbene abbia il nobile scopo di rendere piú realistico il modello, non aiuta a interpretare i risultati rispetto a quelli reali.
+
+            \tikzfigure{p}
+                {\input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}}
+                {Confronto di una simulazione con e senza fluttuazioni; la regola d'emigrazione è la \cref{eqVarianteRegolaTagliaForzaFrazionata} mentre i parametri sono illustrati nella \cref{tabParametriConEsenzaGamma}.}
+                {.6\linewidth}{figConfrontoConESenzaFluttuazioni}
+
+
+    \section{Regole d'emigrazione}\label{secRegoleEmigrazione}
+
+        La scelta di \(E\) dipende da come si vuole modellizzare il fenomeno dell'immigrazione. In tutte le regole a venire \(s\) e \(s_*\) vanno intese come rispettivamente la città interagente e ricevente
                
-        La scelta di \(E(s,s_*)\) dipende da come si vuole modellizzare il fenomeno dell'immigrazione.
-
-        Si vuole evitare lo spopolamento delle città a causa delle fluttuazioni nella \cref{eqVincoloPositivitàFluttuazioni} dato che nella \eqref{eqLeggeEmigrazione} compare il rapporto tra popolazioni delle città interagenti
-
         Infine si avvisa che per tutte le regioni italiane, Italia inclusa, sono stati ottenuti analoghi risultati a quelli venturi della Sardegna; questa è la ragione per cui in questo paragrafo ci si concentrerà solo su quella regione, sebbene alcuni sono analizzati anche per l'Italia alla fine.
 
         \subsection{Regola taglia}
 
             Una prima possibilità consiste nella
             %
-            \begin{equation}
-                \label{eqLeggeEmigrazione}
+            \eqtag{\([\text{RE}]_T\)}{
+                \label{eqLeggeEmigrazioneTaglia}
                 E(s,s_*)\equiv\lambda\frac{(s_*/s)^\alpha}{1+(s_*/s)^\alpha},
-            \end{equation}
-            %
+            }%
             che in essenza è la \cite[(2.2), § 2, p. 223]{Gualandi2019SDC} modificata mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019SDC}, ossia è una funzione di Hill di ordine \(\alpha\), in cui v'è un tasso di emigrazione maggiore verso città con popolazione relativa, data dal rapporto \(s_*/s\), maggiore; gli unici due parametri presenti, invece, presentano il seguente significato:
 
             \begin{itemize}[label=\(\diamond\)]
@@ -601,17 +648,40 @@
             \end{itemize}
 
             In questo caso si hanno quindi interazioni non simmetriche e non lineari, a causa della \eqref{eqLeggeEmigrazione}.
+
+            Si vuole evitare lo spopolamento delle città a causa delle fluttuazioni nella \cref{eqVincoloPositivitàFluttuazioni} dato che nella \eqref{eqLeggeEmigrazione} compare il rapporto tra popolazioni delle città interagenti
             
             % Mediante la conservazione di popolazione ho rifatto molto velocemente i conti della formula prima del Teorema 5.1 a p. 16 di [1], confermando che d⟨s⟩/dt=0, come ci si aspetta da questo tipo d'interazione.
 
         \subsection{Regola taglia-gradi}
 
+            \eqtag{\([\text{RE}]_{TD}\)}{
+                \label{eqLeggeEmigrazioneTagliaGradi}
+                E_{TD}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(k_{i_*}/k_i)]^\alpha}{1+[(s_*/s)(k_{i_*}/k_i)]^\alpha},
+            }%
+
         \subsection{Regola frazionata}
+            
+            \eqtag{\([\text{RE}]^f_{TD}\)}{
+                \label{eqLeggeEmigrazioneTagliaGradiFrazionata}
+                E^f_{TD}(s,s_*,i,i_*)\equiv (1-\zeta)E_{TD}(s,s_*,k_i,k_{i_*})+\zeta E_{TD}(s_*,s,k_{i_*},k_i)
+            }%
 
         \subsection{Regola taglia-forza}
 
+            \eqtag{\([\text{RE}]_{TF}\)}{
+                \label{eqLeggeEmigrazioneTagliaForza}
+                E_{TD}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(w_{i_*}/w_i)]^\alpha}{1+[(s_*/s)(w_{i_*}/w_i)]^\alpha},
+            }%
+
         \subsection{Interpretazioni}
 
-            In poche parole la \eqref{eqLeggeEmigrazione} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
+            In poche parole la \eqref{eqLeggeEmigrazioneTaglia} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
         
+    \section{Altri casi notevoli}
+
+        \subsection{Varianti delle regole d'interazione}\label{secVariantiRegoleInterazione}
+
         \subsection{Il caso dell'Italia}
+
+        \subsection{Il caso della Valle d'Aosta}

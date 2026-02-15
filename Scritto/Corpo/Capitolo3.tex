@@ -413,8 +413,8 @@
                 %
                 \eqtag*{\([\text{RI}]_{\mathbf V}\)}{
                     \label{eqRegoleInterazioneGas}
-                    [\text{RI}]_{\mathbf V}\left\{
-                    \begin{aligned}
+                    [\text{RI}]_{\mathbf V}
+                    \left\{\begin{aligned}
                         \mathbf V'&=\psi(\mathbf V,\mathbf V_*)\equiv\mathbf V+[(\mathbf V_*-\mathbf V)\cdot n]n,\\
                         \mathbf V'_*&=\psi_*(\mathbf V,\mathbf V_*)\equiv \mathbf V_*+[(\mathbf V-\mathbf V_*)\cdot n]n,
                     \end{aligned}\right.
@@ -1350,39 +1350,52 @@
                 Dopodiché, passando alle realizzazioni di tutte le variabili aleatorie considerate, vale a dire scrivendole in minuscolo e omettendo la dipendenza dal tempo, le regole d'interazione \ref{eqRegoleInterazioneUrbane} sono cosí definite\footnotemark{}%
                 \footnotetext{Sono state in parte ispirate dalla \cite[(2.1) p. 223]{Gualandi2019SDC}.}%
                 %
-                \begin{equation}
+                \eqtag*{\([\text{RE}]\)}{
                     \label{eqRegoleInterazioneUrbaneEsplicite}
+                    [\text{RE}]
                     \left\{\begin{aligned}
                         \psi(s,i,s_*,i_*\gamma)&=s\bigl(1-E(s,i,s_*,i_*)+\gamma\bigr)\\
                         \psi_*(s,i,s_*,i_*)&=s_*+sI(s,i,s_*,i_*)
                     \end{aligned}\right.
-                \end{equation}
-                %
+                }%
                 ove
                 %
                 \begin{equation*}
                     \begin{aligned}
-                        E\colon\RPlus\times\RPlus\times\mathcal I\times\mathcal I\to[0,1],\\
-                        I\colon\RPlus\times\RPlus\times\mathcal I\times\mathcal I\to[0,1],
+                        E\colon\RPlus\times\RPlus\times\mathcal I\times\mathcal I\to\RPlus,\\
+                        I\colon\RPlus\times\RPlus\times\mathcal I\times\mathcal I\to\RPlus,
                     \end{aligned}
                 \end{equation*}
                 %
-                sono rispettivamente i tassi d'emigrazione e immigrazione, mentre \(\gamma\) rappresenta fluttuazioni stocastiche. È perciò chiaro che, per avere un postato fisicamente sensato, \(\gamma\) dev'essere tale che
+                sono rispettivamente i tassi d'emigrazione e immigrazione, i cui argomenti sono per brevità sottintesi da qui in poi, mentre \(\gamma\) rappresenta fluttuazioni stocastiche. Si caratterizza ulteriormente \(E\):
+
+                \begin{ipo}
+                    Per avere un postato \(s\) fisicamente sensato, ossia positivo, quando \(\gamma=0\), si assume che il tasso d'emigrazione \(E\) sia superiormente limitato dalla costante \(\lambda\equiv\sup E\), tale che \(\lambda\in(0,1)\), e inferiormente limitato dall'origine:
+                    %
+                    \begin{equation*}
+                        0\leq E\leq\lambda<1,\ \ \forall s,\ \forall s_*,\ \forall i,\ \forall i_*.
+                    \end{equation*}
+                    %
+                    D'altra parte il postato \(s_*'\) [per il momento] non si considera poiché è per definizione sempre positivo qualunque sia il tasso d'immigrazione \(I\in[0,+\infty)\).
+                \end{ipo}
+               
+                Se invece \(\gamma\) è non nullo, dev'essere anch'esso limitato:
                 %
                 \begin{equation}
                     \label{eqVincoloPositivitàFluttuazioni}
                     s'=s(1-E+\gamma)>0
-                    \quad\forall E\in[0,\lambda]
                     \ \ \implies\ \ 
-                    \gamma>E-1
+                    \gamma>E-1,
+                    \ \ \forall E\in[0,\lambda],
                 \end{equation}
                 %
-                in cui \(\lambda\equiv\sup E\leq1\) è il limite superiore del tasso d'emigrazione i cui argomenti da qui fino alla fine di questo paragrafo sono sottintesi (lo stesso per il tasso d'immigrazione \(I\) verso la fine); d'altra parte \(s_*'\) è per definizione sempre positivo. La scelta di \(>\) anziché \(\geq\) nella \eqref{eqVincoloPositivitàFluttuazioni} è ben fondata: di fatto si sta supponendo che le fluttuazioni non possono annullare la popolazione di una città\footnotemark{}.%
+                La scelta di \(>\) anziché \(\geq\) nella \eqref{eqVincoloPositivitàFluttuazioni} è ben fondata: di fatto si sta supponendo che le fluttuazioni non possono annullare la popolazione di una città\footnotemark{}.%
                 \footnotetext{Ciò non significa che il modello non possa prevedere lo spopolamento di una città, poiché la sua taglia può arbitrariamente avvicinarsi a zero [ma mai esserne uguale], raggiungendolo solo \textit{a posteriori} dopo l'approssimazione dai numeri reali a quelli interi (\cref{ossNaturaNumericaPopolazione}).}%
 
                 Perdipiú, le fluttuazioni rappresentano a grandi linee quei fenomeni complessivi di nascita e di morte che vengono considerati ma non direttamente modellati; pertanto valgono le seguenti ipotesi:
 
                 \begin{ipo}
+                    \label{ipFluttuazioni}
                     \(\gamma\) deve soddisfare le seguenti caratteristiche:
 
                     \begin{enumerate}[
@@ -1398,12 +1411,12 @@
                         %labelwidth=!,
                         %labelsep=!,
                     ]
-                        \item\label{ipFluttuazioniPositivitàNegatività} possono assumere sia valori positivi che negativi, ma non minori del vincolo imposto da \eqref{eqVincoloPositivitàFluttuazioni};
+                        \item\label{ipFluttuazioniPositivitàNegatività} può assumere sia valori positivi che negativi, ma non minori del vincolo imposto da \eqref{eqVincoloPositivitàFluttuazioni};
                         \item\label{ipFluttuazioniMediaNulla} la media è scelta arbitrariamente posta allo zero, ossia \(\langle\gamma\rangle=0\);
                         \item\label{ipFluttuazioniProbabilitàDecrescente} seppure non vi siano limiti superiori per l'entità della fluttuazione, è chiaro che piú grande questa è meno è probabile.
                     \end{enumerate}
                 \end{ipo}
-                
+
                 Con queste si possono allora analizzare alcune distribuzioni continue:
 
                 \begin{enumerate}[
@@ -1429,7 +1442,7 @@
                 %
                 \begin{equation*}
                     % \label{eqDensitàDistribuzioneGamma}
-                    f_\gamma(x)=\frac1{\beta\Gamma(\alpha)}x^{\alpha-1}
+                    f_\gamma(x)=\frac1{\beta^\alpha\Gamma(\alpha)}x^{\alpha-1}
                     \exp\left(-\frac x\beta\right),
                 \end{equation*}
                 %
@@ -1445,13 +1458,13 @@
                     \Gamma(\alpha)\equiv\int_0^{+\infty}y^{\alpha+1}e^{-y}\de y.
                 \end{equation*}
                 %
-                Imponendo la \ref{ipFluttuazioniProbabilitàDecrescente} si ottiene
+                Imponendo la \ref{ipFluttuazioniPositivitàNegatività} si ottiene
                 %
                 \begin{equation*}
                     % \label{eqMediaVarianzaFluttuazioni}
                     \langle\hat\gamma\rangle=1-E=\alpha\beta
                     \quad\text{e}\quad
-                    \langle\hat\gamma^2\rangle\equiv\sigma^2=\alpha\beta^2,
+                    \Varianza(\hat\gamma)\equiv\sigma^2=\alpha\beta^2,
                 \end{equation*}
                 %
                 in cui \(\sigma^2\) indica la varianza, da cui
@@ -1473,45 +1486,68 @@
                 %
                 D'altra parte per la \ref{ipFluttuazioniPositivitàNegatività} bisogna salvaguardarsi dai casi degeneri della distribuzione gamma: essa infatti se \(\alpha=1\) diventa \(\DstrEsponenziale(\beta)\), mentre se \(\alpha<1\) diverge all'origine; per avere quindi probabilità nulla di campionare da \(\hat\gamma\) l'origine [e quindi -\(\langle\hat\gamma\rangle\) dopo la traslazione] è necessario porre
                 %
-                \begin{equation*}
-                    \alpha>1
-                    \;\;\implies\;\;
-                    \frac{(1-E)^2}{\sigma^2}>1,
-                \end{equation*}
-                %
-                ma nel caso peggiore \(1-E=1-\lambda\) da cui
-                %
                 \begin{equation}
                     \label{eqVincoloTraParametri}
+                    \alpha>1
+                    \ \ \implies\ \ 
+                    \frac{(1-E)^2}{\sigma^2}\geq
                     \frac{(1-\lambda)^2}{\sigma^2}>1
-                    \;\;\implies\;\;
-                    \sigma^2<(1-\lambda)^2
-                    \;\;\implies\;\;
-                    \sigma<\vert1-\lambda\vert=1-\lambda,
+                    \ \ \implies\ \ 
+                    % \sigma^2<(1-\lambda)^2
+                    % \ \ \implies\ \ 
+                    \sigma<\vert1-\lambda\vert=1-\lambda.
                 \end{equation}
                 %
-                siccome \(E\in[0,\lambda]\;\;\forall s,s_*\in\RPlus\). La \eqref{eqVincoloTraParametri} implica quindi che non è possibile avere una varianza arbitraria per poter soddisfare la \ref{ipFluttuazioniPositivitàNegatività}, ma che questa è limitata superiormente dal massimo tasso d'emigrazione \(\lambda\), interpretabile come attrattività: piú grande è \(\lambda\) piú piccola è la varianza, e viceversa.
+                La \eqref{eqVincoloTraParametri} implica quindi che non è possibile avere una varianza arbitraria per poter soddisfare la \ref{ipFluttuazioniPositivitàNegatività}, ma che questa è limitata superiormente dal massimo tasso d'emigrazione \(\lambda\), interpretabile come attrattività: piú grande è \(\lambda\) piú piccola è la varianza, e viceversa.
 
-                Si conclude osservando come sia naturale che l'interazione, ossia lo scambio di popolazione descritto dalle \cref{eqRegoleInterazioneUrbaneEsplicite}, debba conservare [in media] la popolazione totale:
+                In realtà la \(\sigma\) non può davvero assumere valori arbitrari tra \(0\) e \(1-\lambda\): difatti se \(\sigma\to1-\lambda\) vale \(\alpha\to1\) e dunque la distribuzione gamma tende a un'esponenziale; questo ha l'effetto d'introdurre una pericolosa asimmetria nella densità, come si può notare nella la \cref{figTransizioneAsimmetria}: una volta centrata rispetto alla media la moda (il valore piú frequente) ha valore negativo portando, in un orizzonte temporale finito, le perturbazioni negative a essere quelle piú frequenti.
+
+                \tikzfigure{htb}
+                    {\input{../../Figure/.fnl/Capitolo3/AssimmetriaGamma.tex}}
+                    {Transizione della densità gamma verso l'asimmetria con \(\lambda=0.1\) ed \(E=\lambda\), da cui \(\langle\hat\gamma\rangle=0.9\) e \(\beta=\langle\hat\gamma\rangle/\alpha\).}
+                    {.775\linewidth}{figTransizioneAsimmetria}
+
+                Il risultato è che con \(\sigma\) molto elevato le città tendono a spopolarsi perché v'è una preferenza per fluttuazioni negative. Per ovviare al problema bisogna ulteriormente vincolare \(\sigma\) dimodoché l'indice di asimmetria
                 %
                 \begin{equation*}
-                    % \label{eqLeggeImmigrazione}
-                    s+s_*=\langle s+s_*\rangle=
-                    \langle s'+s_*'\rangle=
-                    s-sE+s_*+sI
-                    % \begin{aligned}
-                    %     s+s_*&=\langle s+s_*\rangle=
-                    %     \langle s'+s_*'\rangle\\&=
-                    %     s-sE+s_*+sI
-                    % \end{aligned}
-                    \ \ \implies\ \ 
-                    E\equiv I,
+                    \rho\equiv\frac2{\sqrt{\alpha}}
                 \end{equation*}
                 %
-                il che ha senso perché l'emigrazione e l'immigrazione sono fenomeni relativi (invertendo \(s\) ed \(s_*\) sarebbe l'opposto).
+                sia sufficientemente piccolo; dalla \cref{figTransizioneAsimmetria} si può perciò imporre \(\rho\leq0.2\), cioè
+                %
+                \begin{equation}
+                    \label{eqVincoloSimmetricoTraParametri}
+                    \alpha\geq100
+                    \;\;\implies\;\;
+                    \frac{(1-E)^2}{\sigma^2}\geq100
+                    \;\;\implies\;\;
+                    \sigma\leq\frac{1-\lambda}{10},
+                \end{equation}
+                %
+                dove, come nella \cref{eqVincoloTraParametri}, si è imposto nell'ultima implicazione il caso peggiore \(E=\lambda\). Dunque il vero limite superiore, per preservare la simmetria, è di un ordine di grandezza inferiore a quello precedentemente stimato.
+                
+                \begin{oss}
+                    Quello qui mostrato è solo un possibile modello stocastico perturbativo; infatti, modificando le \cref{ipFluttuazioni}, se ne può scegliere un altro: ad esempio si può imporre una distribuzione uniforme oppure si può troncare una gaussiana affinché soddisfi il vincolo di positività \cref{eqVincoloPositivitàFluttuazioni}.
+                \end{oss}
+
+                Non manca che caratterizzare il tasso d'immigrazione \(I\):
+
+                \begin{ipo}%[Caratterizzazione di \(I\)]
+                    Si postula che l'interazione \cref{eqRegoleInterazioneUrbaneEsplicite} conservi [in media] la popolazione totale:
+                    %
+                    \begin{equation*}
+                        s+s_*=\langle s+s_*\rangle=
+                        \langle s'+s_*'\rangle
+                        \overset{\dimTesto{10}\ref{ipFluttuazioniMediaNulla}}{=}
+                        s-sE+s_*+sI,
+                        % \ \ \implies\ \ 
+                    \end{equation*}
+                    %
+                    da cui \(E\equiv I\), che è ragionevole siccome l'emigrazione e l'immigrazione sono fenomeni relativi (invertendo \(s\) ed \(s_*\) sarebbe l'opposto).
+                \end{ipo}
 
                 \begin{oss}
-                    Le \cref{eqRegoleInterazioneUrbaneEsplicite} non sono ancora complete siccome non si è esplicitata la regola d'emigrazione, la cui scelta, tuttavia, si può dunque vedere come la regola d'interazione stessa: è l'ultimo tassello del mosaico. Pertanto si lascia quest'ultima definizione al \cref{secSimulazioni} nel quale se ne propongono varie, si discutono quindi con vari studi parametrici per poi infine interpretarle analizzando cosa queste dicono sul fenomeno della migrazione.
+                    Le \cref{eqRegoleInterazioneUrbaneEsplicite} non sono ancora complete siccome non si è esplicitata la regola d'emigrazione, la cui scelta, tuttavia, si può dunque vedere come la regola d'interazione stessa: è l'ultimo tassello del mosaico. Pertanto si lascia quest'ultima definizione al \cref{secRegoleEmigrazione} nel quale se ne propongono varie, si discutono quindi con vari studi parametrici per poi infine interpretarle analizzando cosa queste dicono sul fenomeno della migrazione.
                 \end{oss}
             
         \subsection{Equazione di tipo Boltzmann approssimata}\label{secApprossimazione}
@@ -1661,7 +1697,7 @@
                 =\frac1N\mathbf 1^\top\mathbf g,
             \end{equation}
             %
-            ove \(\mathbf 1\equiv(1,1,\ldots,1)\in\mathbb R^n\), che non è che la media tra le densità di \(S_t\) tra tutt'i vertici\footnotemark{}; premoltiplicando la \cref{eqSistemaDensitàNodiUrbano} per \(\frac1N\mathbf 1^\top\) e usando la \cref{eqDensitàMarginaleUrbanaS} si ha%
+            ove \(\mathbf 1\equiv(1,1,\ldots,1)\in\mathbb R^N\), che non è che la media tra le densità di \(S_t\) tra tutt'i vertici\footnotemark{}; premoltiplicando la \cref{eqSistemaDensitàNodiUrbano} per \(\frac1N\mathbf 1^\top\) e usando la \cref{eqDensitàMarginaleUrbanaS} si ha%
             \footnotetext{La medesima definizione vale anche per \(\bar f_N\) della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano}.}%
             %
             \eqtag{\([\text{E}\bar g]\)}{
@@ -1840,8 +1876,8 @@
                 Il \cref{teoRilassamentoTopologia} motiva anche il perché non si possa considerare una generica matrice \(\mathbf C\) che approssima la \(\mathbf A\): non è detto che rilassi la topologia portando a un'equazione analoga alla \ref{eqTipoBoltzmannGrafoRilassato}.
             \end{oss}
 
-            \tikzfigure*{htb}
-                {\input{../../Figure/Scelte/Altro/SchemaRiassuntivoApprossimazione.tex}}
+            \tikzfigure{htb}
+                {\input{../../Figure/.fnl/Capitolo3/SchemaRiassuntivoApprossimazione.tex}}
                 {Schema riassuntivo del \cref{secApprossimazione}.}
                 {\linewidth}{figSchemaRiassuntivoApprosimazione}
             

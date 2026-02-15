@@ -382,6 +382,7 @@ def LoadCaseStudies(cls):
             prm = getattr(cls,key)
             dictCS[name][prm] = val
 
+        # After all parameters have been loaded the external lists are saved as well
         for (prmName,prmlist) in [
             ('region','regionList'),
             ('interactingLaw','intLawList'),
@@ -389,6 +390,6 @@ def LoadCaseStudies(cls):
         ]:
             prm = getattr(cls,prmName)
             value = dictCS[name][prm]
-            dictCS[name][prm] = getattr(cls,prmlist).name[value]
+            dictCS[name][prm] = getattr(cls,prmlist).list[value]
 
     return dictCS, selectedCS, listCS

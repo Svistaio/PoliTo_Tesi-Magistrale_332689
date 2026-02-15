@@ -93,11 +93,11 @@ class ParametersGUI(tk.Tk):
 
         #region Population parameters
         popPrmFrame.LabelSlider(
-            self.attractivity,0.001,(0,1),
+            self.attractivity,1e-3,(1e-3,1-1e-3),
             extremes=(False,False)
         )
         popPrmFrame.LabelSlider(
-            self.deviation,0.001,(0,1),
+            self.deviation,1e-4,(1e-4,1),
             extremes=(True,False)
         )
         self.SetDeviationUpperLimit()
@@ -106,10 +106,23 @@ class ParametersGUI(tk.Tk):
         popPrmFrame.LabelEntry(self.population)
         self.attractivity.var.trace_add('write',self.SetDeviationUpperLimit)
 
-        popPrmFrame.LabelEntry(self.zetaFraction,colSpan=2)
+        popPrmFrame.LabelEntry(self.zetaValue,colSpan=2)
 
         popPrmFrame.LabelComboBox(self.region)
         self.region.var.trace_add('write',self.SetPopulation)
+        #endregion
+
+        #region Simulation parameters
+        simPrmFrame.CheckBox(self.extraction)
+        simPrmFrame.CheckBox(self.analysis)
+        simPrmFrame.CheckBox(self.zetaFraction)
+        simPrmFrame.CheckBox(self.edgeWeights)
+        simPrmFrame.CheckBox(self.fluctuations)
+        self.zetaFraction.var.trace_add('write',self.SetZetaFractionState)
+        self.fluctuations.var.trace_add('write',self.SetDeviationState)
+
+        simPrmFrame.LabelComboBox(self.interactingLaw)
+        self.interactingLaw.var.trace_add('write',self.InteractingLawCallBack)
         #endregion
 
         #region Time parameters
@@ -119,23 +132,13 @@ class ParametersGUI(tk.Tk):
         timePrmFrame.CheckBox(self.progressBar)
         #endregion
 
-        #region Simulation parameters
-        simPrmFrame.CheckBox(self.extraction)
-        simPrmFrame.CheckBox(self.analysis)
-        simPrmFrame.CheckBox(self.edgeWeights)
-        simPrmFrame.CheckBox(self.fluctuations)
-        self.fluctuations.var.trace_add('write',self.SetDevitaionState)
-
-        simPrmFrame.LabelComboBox(self.interactingLaw)
-        self.interactingLaw.var.trace_add('write',self.InteractingLawCallBack)
-        #endregion
-
         #region Postprocessing parameters
         ppcPrmFrame.CheckBox(self.PdfPopUp)
         ppcPrmFrame.CheckBox(self.LaTeXConversion)
         ppcPrmFrame.LabelSlider(
             self.snapshots,1,
             (1,self.timesteps.var.get()),
+            sliderLength=250,
             colSpan=ppcPrmFrame.nCol
         ) # Number of screenshots [not considering the initial state]
         self.timesteps.var.trace_add(
@@ -146,6 +149,7 @@ class ParametersGUI(tk.Tk):
         ppcPrmFrame.LabelSlider(
             self.smoothingFactor,1,
             (1,self.snapshots.var.get()),
+            sliderLength=250,
             colSpan=ppcPrmFrame.nCol
         )
         self.snapshots.var.trace_add(
@@ -182,7 +186,7 @@ class ParametersGUI(tk.Tk):
         self.caseStudy = libP.Parameter(
             'Case studies',
             selectedCS,
-            lst=listCS,
+            list=listCS,
         )
 
         buttonFrame.LabelComboBox(
@@ -206,7 +210,7 @@ class ParametersGUI(tk.Tk):
         #endregion
 
     # Callbacks
-    def SetDevitaionState(self,*args):
+    def SetDeviationState(self,*args):
         checked = self.fluctuations.var.get()
         self.deviation.wid['state'] = 'normal' if checked else 'disabled'
         self.deviation.wid['sliderrelief'] = 'raised' if checked else 'flat'
@@ -219,7 +223,7 @@ class ParametersGUI(tk.Tk):
                 if l >= 1:
                     l=1-res
                     self.attractivity.var.set(l)
-                self.deviation.wid['to'] = 1-l-res
+                self.deviation.wid['to'] = ((1-l)/10//res+1)*res
         except Exception:
             pass
 
@@ -229,7 +233,7 @@ class ParametersGUI(tk.Tk):
         self.population.var.set(popReg)
 
     def SetConvincibility(self,*args):
-        if self.intLawList.code[self.interactingLaw.var.get()] in (1,2):
+        if self.intLawList.code[self.interactingLaw.var.get()] == 1:
             l = self.attractivity.var.get()
             self.convincibility.var.set(np.round(l/.01-1,decimals=2))
         else:
@@ -243,26 +247,29 @@ class ParametersGUI(tk.Tk):
         self.destroy() # Close the window after any button is pressed
 
     def InteractingLawCallBack(self,*args):
-        if self.intLawList.code[self.interactingLaw.var.get()] in (2,4,6):
-            self.zetaFraction.frame.grid()
-            self.studiedParameter.wid['values'] = self.studiedPrmList.name
-        else:
-            self.zetaFraction.frame.grid_remove()
-            self.studiedParameter.wid['values'] = self.studiedPrmList.name[:-1]
-
-        if self.intLawList.code[self.interactingLaw.var.get()] in (1,2,5,6):
+        if self.intLawList.code[self.interactingLaw.var.get()] in (1,3):
             self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
             self.DisableCallBack(self.attractivity)
 
-        self.ResizeWindow()
+    def SetZetaFractionState(self,*args):
+        checked = self.zetaFraction.var.get()
+
+        if checked:
+            self.zetaValue.wid['state'] = 'normal'
+            self.studiedParameter.wid['values'] = self.studiedPrmList.list
+        else:
+            self.zetaValue.wid['state'] = 'disabled'
+            self.studiedParameter.wid['values'] = self.studiedPrmList.list[:-1]
+
+        if self.parametricStudy.var.get(): self.SetStudiedParameterState()
 
     def SetSliderUpperLimit(self,slider,ref):
         try:
             val = ref.var.get()
         except Exception:
             return
-        slider.wid["to"] = val
+        slider.wid["to"] = val if val<1e4 else 1e4
 
     def ShowParametricStudyFrame(self,*args):
         frame = self.pspPrmFrame
@@ -278,11 +285,15 @@ class ParametersGUI(tk.Tk):
         self.attractivity.wid['state'] = state
         self.attractivity.wid['sliderrelief'] = 'raised'
         self.convincibility.wid['state'] = state
-        self.zetaFraction.wid['state'] = state
+
+        value = self.studiedPrmList.code[self.studiedParameter.var.get()]
+        if self.zetaFraction.var.get() == 0:
+            if value == 2: self.studiedParameter.var.set(self.studiedParameter.list[0])
+        else:
+            self.zetaValue.wid['state'] = state
 
         checked = self.parametricStudy.var.get()
         state = 'disabled' if checked else 'normal'
-        value = self.studiedPrmList.code[self.studiedParameter.var.get()]
 
         if checked:
             match value:
@@ -292,7 +303,7 @@ class ParametersGUI(tk.Tk):
                 case 1:
                     self.convincibility.wid['state'] = state
                 case 2: 
-                    self.zetaFraction.wid['state'] = state
+                    self.zetaValue.wid['state'] = state
 
     def SetCaseStudy(self,*args):
         caseStudy = self.caseStudy.var.get()
@@ -300,7 +311,7 @@ class ParametersGUI(tk.Tk):
             prm.var.set(val)
 
         self.InteractingLawCallBack()
-        if self.intLawList.code[self.interactingLaw.var.get()] in (1,2):
+        if self.intLawList.code[self.interactingLaw.var.get()] == 1:
             self.SetConvincibility()
         self.ShowParametricStudyFrame()
         self.SetStudiedParameterState()
@@ -675,17 +686,21 @@ class Frame(ttk.Frame):
         data,
         bounds,
         res,
-        extremes
+        extremes,
+        length
     ):
-        # Measure the character length in pixels
-        fieldInput = ttk.Entry(
-            master=self,
-            font=self.normalFontStyle,
-            width=self.entryWidth
-        )
-        fieldInput.grid(row=0,column=1)
-        l = fieldInput.winfo_reqwidth()
-        fieldInput.destroy()
+        if length is None:
+            # Measure the character length in pixels
+            fieldInput = ttk.Entry(
+                master=self,
+                font=self.normalFontStyle,
+                width=self.entryWidth
+            )
+            fieldInput.grid(row=0,column=1)
+            l = fieldInput.winfo_reqwidth()
+            fieldInput.destroy()
+        else:
+            l = length
 
         # Create the slider widget
         self.CheckDataType(data)
@@ -718,7 +733,7 @@ class Frame(ttk.Frame):
         if width is None: width = self.comboBoxWidth
         data.wid = ttk.Combobox(
             master=self,
-            values=data.lst,
+            values=data.list,
             textvariable=data.var,
             state=state,
             font=self.normalFontStyle,
@@ -817,6 +832,7 @@ class Frame(ttk.Frame):
     def LabelSlider(
         self,data,res,bounds,
         extremes=(True,True),
+        sliderLength=None,
         pos=None,
         labelWidth=None,
         colSpan=1
@@ -838,7 +854,8 @@ class Frame(ttk.Frame):
             data,
             bounds,
             res,
-            extremes
+            extremes,
+            sliderLength
         )
 
     def LabelComboBox(

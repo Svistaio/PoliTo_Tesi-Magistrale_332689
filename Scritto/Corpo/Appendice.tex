@@ -4,15 +4,22 @@
 
 \appendix
 
-\chapter*{Appendice}
+\cleardoublepage
+\phantomsection
 \addcontentsline{toc}{chapter}{Appendice}
+\chapter*{Appendice}
 
     \setcounter{section}{0}
     \renewcommand\thesection{\Alph{section}}
     \renewcommand\thesubsection{\thesection.\arabic{subsection}}
 
-    % \setcounter{equation}{0}
     \numberwithin{equation}{section}
     \renewcommand\theequation{\thesection.\arabic{equation}}
 
     \section{Codice}\label{apnCodice}
+
+        \lstinputlisting[
+            language=Python,
+            caption={Codice «main.py»},
+            label={lstMain}
+        ]{../../Codice/main.py}

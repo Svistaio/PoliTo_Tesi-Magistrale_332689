@@ -1,0 +1,222 @@
+
+% !TEX root = ../../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\begin{tikzpicture}%
+    %\begingroup Comandi
+        \definecolor{colore}{rgb}{0.50196,0.50196,0.50196}%
+    
+        % \renewcommand\titleSize{12}
+        \renewcommand\subCaptionSize{9}
+        \renewcommand\labelSize{8}
+        \renewcommand\tickSize{7}
+        \renewcommand\legendSize{6}
+
+        \pgfmathsetmacro\plotWidth{7}
+        \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+        \pgfmathsetmacro\halfHeightPlot{\plotHeight/2}
+        \pgfmathsetmacro\lineWidth{.5pt}
+        \pgfmathsetmacro\lineMidWidth{.75pt}
+        \pgfmathsetmacro\lineThickWidth{1.2pt}
+        
+        \pgfmathsetmacro\xPlotSep{2.25}
+        \pgfmathsetmacro\yPlotSepI{1.5}
+        \pgfmathsetmacro\yPlotSepII{3}
+        \pgfmathsetmacro\xLegendSep{.25cm}
+    %\endgroup
+
+    %\begingroup Impostazioni pgfplots
+        %\begingroup Gruppi
+        \pgfplotsset{
+            /pgfplots/group/plotGroup/.style={
+                horizontal sep=\xPlotSep em,
+                vertical sep=\yPlotSepI em,
+                % x descriptions at=edge bottom,
+            },
+            /pgfplots/group/plotGroup1/.style={
+                plotGroup,
+                group name=Group1,
+                group size=2 by 4,
+            },
+            /pgfplots/group/plotGroup2/.style={
+                plotGroup,
+                group name=Group2,
+                group size=2 by 1,
+            }
+        }
+        %\endgroup
+
+        %\begingroup Colonne
+        \pgfplotsset{
+            plotColumn/.style={
+                width=\plotWidth cm,
+                height=\plotHeight cm,
+                scale only axis,
+                xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                ylabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                xticklabel style={font=\dimTesto{\tickSize}},
+                yticklabel style={font=\dimTesto{\tickSize}},
+                axis x line*=bottom,
+                xmajorgrids,ymajorgrids,
+                xminorticks=true,yminorticks=true,
+                axis background/.style={fill=white},
+                grid style={dashed}
+            },
+            plotColumn1/.style={
+                plotColumn,
+                axis y line*=left,
+                ylabel={\(\underhat{\bar f}_N(s)\)},
+                y tick scale label style={
+                    xshift=-.4cm,
+                    at={(0,1)},
+                    anchor=south east,
+                },
+            },
+            plotColumn2/.style={
+                plotColumn,
+                axis y line*=right,
+                ylabel={\(\underhat{\bar f}_N(s)\)},
+                y tick scale label style={
+                    xshift=.4cm,
+                    at={(1,1)},
+                    anchor=south west,
+                },
+            },
+        }
+        %\endgroup
+
+        %\begingroup Legende
+        \pgfplotsset{
+            plotLegend/.style={
+                font=\dimTesto{\legendSize},
+                legend cell align=left,
+                align=left,
+                % draw=white!15!black,
+                draw=none, % Bordo invisibile
+                fill=white,
+                fill opacity=0.5,
+                text opacity=1,
+            },
+            plotLegend1/.style={legend style={plotLegend},legend pos=north east},
+            plotLegend2/.style={legend style={plotLegend},legend pos=south west},
+            plotLegend3/.style={legend style={plotLegend},legend pos=north west},
+        }
+        %\endgroup
+    %\endgroup
+
+    \begin{groupplot}[group style=plotGroup1]
+        \nextgroupplot[%
+            plotColumn1,plotLegend1,xmode=log,
+            xmin=100,xmax=1000000,
+            ymin=0,ymax=0.0004,
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig2_g.05.tex}
+
+        \nextgroupplot[%
+            plotColumn2,plotLegend1,xmode=log,
+            xmin=100,xmax=1000000,
+            ymin=0,ymax=0.00045,
+            ytick={0,0.0001,0.0002,0.0003,0.0004},
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig2_g0.tex}
+
+        \nextgroupplot[%
+            plotColumn1,plotLegend1,xmode=log,
+            xmin=100,xmax=1000000,
+            ymin=0,ymax=0.00045,
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig3_g.05.tex}
+
+        \nextgroupplot[%
+            plotColumn2,plotLegend1,xmode=log,
+            xmin=100,xmax=1000000,
+            ymin=0,ymax=0.00045,
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig3_g0.tex}
+
+        \nextgroupplot[%
+            plotColumn1,plotLegend2,
+            xmode=log,ymode=log,
+            xmin=3637.5,xmax=204237,
+            ymin=0.00531914893617021,ymax=1,
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig9_g.05.tex}
+
+        \nextgroupplot[%
+            plotColumn2,plotLegend2,
+            xmode=log,ymode=log,
+            xmin=3637.5,xmax=204237,
+            ymin=0.00531914893617021,ymax=1,
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig9_g0.tex}
+
+        \nextgroupplot[%
+            plotColumn1,plotLegend2,
+            xmode=log,ymode=log,
+            xmin=3637.5,xmax=204237,
+            ymin=0.00531914893617021,ymax=1,
+            xlabel={\(s\)},
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig10_g.05.tex}
+
+        \nextgroupplot[%
+            plotColumn2,plotLegend2,
+            xmode=log,ymode=log,
+            xmin=3637.5,xmax=204237,
+            ymin=0.00531914893617021,ymax=1,
+            xlabel={\(s\)},
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig10_g0.tex}
+    \end{groupplot}
+
+    \begin{groupplot}[group style=plotGroup2]
+        \nextgroupplot[%
+            plotColumn1,plotLegend3,
+            at={($(Group1 c1r4.south west)-(0,\yPlotSepII em)-(0,\plotHeight cm)$)},
+            xmin=0,xmax=10000,
+            ymin=4100,ymax=4800,
+            xlabel={\(t\)},ylabel={\(\langle s\rangle\)},
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/AS_g.05.tex}
+
+        \nextgroupplot[%
+            plotColumn2,plotLegend3,
+            xmin=0,xmax=10000,
+            ymin=4395.3279999995,ymax=4395.3280000005,
+            xlabel={\(t\)},ylabel={\(\langle s\rangle\)},
+        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/AS_g0.tex}
+    \end{groupplot}
+
+    %\begingroup Didascalie
+        \tikzset{
+            Titolo/.style={
+                text width=\plotWidth cm,
+                align=center,
+                % anchor=center,
+                anchor=south,
+                font=\dimTesto{\titleSize}\bfseries,
+            }
+        }
+        \node[Titolo] at (Group1 c1r1.north) {Con fluttuazioni \(\gamma\)};
+        \node[Titolo] at (Group1 c2r1.north) {Senza fluttuazioni \(\gamma\)};
+
+        \tikzset{
+            SubCaption/.style={
+                % text width=\plotWidth cm,
+                align=center,
+                font=\dimTesto{\subCaptionSize},
+            },
+            SubCaption1/.style={SubCaption,anchor=south east},
+            SubCaption2/.style={SubCaption,anchor=north east},
+            SubCaption3/.style={SubCaption,anchor=south west},
+        }
+
+        \node[SubCaption1] at (Group1 c1r1.south east) {\sottoDidascalia[]{}};
+        \node[SubCaption1] at (Group1 c2r1.south east) {\sottoDidascalia[]{}};
+        \node[SubCaption1] at (Group1 c1r2.south east) {\sottoDidascalia[]{}};
+        \node[SubCaption1] at (Group1 c2r2.south east) {\sottoDidascalia[]{}};
+    
+        \node[SubCaption2] at (Group1 c1r3.north east) {\sottoDidascalia[]{}};
+        \node[SubCaption2] at (Group1 c2r3.north east) {\sottoDidascalia[]{}};
+        \node[SubCaption2] at (Group1 c1r4.north east) {\sottoDidascalia[]{}};
+        \node[SubCaption2] at (Group1 c2r4.north east) {\sottoDidascalia[]{}};
+
+        \node[SubCaption3] at (Group2 c1r1.south west) {\sottoDidascalia[]{}};
+        \node[SubCaption3] at (Group2 c2r1.south west) {\sottoDidascalia[]{}};
+    
+        % https://tex.stackexchange.com/questions/632045/get-subcaption-for-every-plot-using-groupplot-pgf-tikz-after-2020-update
+    %\endgroup
+
+    \redefineTikZbounds{Group1 c1r1}{Group2 c2r1}
+\end{tikzpicture}%
