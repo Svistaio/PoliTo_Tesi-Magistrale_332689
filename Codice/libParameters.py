@@ -45,7 +45,7 @@ parameters = {
         "text": "Region selected",
         "val": "region"
     },
-    "zetaFraction": {
+    "zetaValue": {
         "text": "ζ",
         "val": 1.0
     },
@@ -80,6 +80,10 @@ parameters = {
     "fluctuations": {
         "text": "Fluctuations",
         "val": True
+    },
+    "zetaFraction": {
+        "text": "Fraction",
+        "val": False
     },
     "interactingLaw": {
         "text": "Interacting law",
@@ -123,135 +127,6 @@ parameters = {
     }
 }
 
-caseStudies = {
-    "selected": "Default",
-    "list": {
-        "Default": {
-            "attractivity": 0.1,
-            "convincibility": 1,
-            "deviation": 0.05,
-            "region": 19,
-            "zetaFraction": 0.01,
-            "timestep": 0.01,
-            "timesteps": int(1e6),
-            "iterations": 100,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": True,
-            "fluctuations": False,
-            "interactingLaw": 2,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
-            "snapshots": 1000,
-            "smoothingFactor": 50,
-            "studiedParameter": 0,
-            "startValuePrmStudy": .01,
-            "endValuePrmStudy": 0.2,
-            "numberPrmStudy": 10,
-            "parametricStudy": True
-        },
-        "λ(rsk/α)/(1+rsk/α)": {
-            "attractivity": 0.05,
-            "deviation": 0.05,
-            "region": 19,
-            "zetaFraction": 0.1,
-            "timestep": 0.01,
-            "timesteps": int(5e5),
-            "iterations": 15,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": False,
-            "fluctuations": True,
-            "interactingLaw": 1,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
-            "snapshots": 100,
-            "smoothingFactor": 10,
-            "studiedParameter": 0,
-            "startValuePrmStudy": 1.0,
-            "endValuePrmStudy": 1.0,
-            "numberPrmStudy": 1,
-            "parametricStudy": False
-        },
-        "(1-ζ)efl_k/α+ζefs_k": {
-            "attractivity": 0.05,
-            "deviation": 0.05,
-            "region": 19,
-            "zetaFraction": 0.1,
-            "timestep": 0.01,
-            "timesteps": int(1e7),
-            "iterations": 15,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": False,
-            "fluctuations": True,
-            "interactingLaw": 2,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
-            "snapshots": 100,
-            "smoothingFactor": 10,
-            "studiedParameter": 0,
-            "startValuePrmStudy": 0.01,
-            "endValuePrmStudy": 0.1,
-            "numberPrmStudy": 5,
-            "parametricStudy": True
-        },
-        "λ(rsk^α)/(1+rsk^α)": {
-            "attractivity": 0.3,
-            "convincibility": 0.5,
-            "deviation": 0.05,
-            "region": 19,
-            "zetaFraction": 0.1,
-            "timestep": 0.01,
-            "timesteps": int(1e7),
-            "iterations": 15,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": True,
-            "fluctuations": False,
-            "interactingLaw": 3,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
-            "snapshots": 100,
-            "smoothingFactor": 10,
-            "studiedParameter": 1,
-            "startValuePrmStudy": 0.1,
-            "endValuePrmStudy": 1,
-            "numberPrmStudy": 10,
-            "parametricStudy": True
-        },
-        "λ[rsk/(1+rsk)]^α": {
-            "attractivity": 0.05,
-            "convincibility": 0.3,
-            "deviation": 0.05,
-            "region": 19,
-            "zetaFraction": 0.1,
-            "timestep": 0.01,
-            "timesteps": int(1e7),
-            "iterations": 15,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": False,
-            "fluctuations": True,
-            "interactingLaw": 5,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
-            "snapshots": 100,
-            "smoothingFactor": 10,
-            "studiedParameter": 1,
-            "startValuePrmStudy": 0.3,
-            "endValuePrmStudy": 1,
-            "numberPrmStudy": 3,
-            "parametricStudy": False
-        }
-    }
-}
-
 regionList = [
     'Piemonte',
     "Valle d'Aosta",
@@ -279,17 +154,148 @@ regionList = [
 intLawList = [
     'λ(rs^α)/(1+rs^α)',         # 0
     'λ(rsk/α)/(1+rsk/α)',       # 1
-    '(1-ζ)efl_k/α+ζefs_k/α',    # 2
-    'λ(rsk^α)/(1+rsk^α)',       # 3
-    '(1-ζ)efl_k^α+ζefs_k^α',    # 4
-    'λ[rsk/(1+rsk)]^α',         # 5
-    '(1-ζ)[efl_k]^α+ζ[efs_k]^α' # 6
+    'λ(rsk^α)/(1+rsk^α)',       # 2
+    'λ[rsk/(1+rsk)]^α',         # 3
 ]
+
+caseStudies = {
+    "selected": "Default",
+    "list": {
+        "Default": {
+            "attractivity": 0.1,
+            "convincibility": 1,
+            "deviation": 0.05,
+            "region": 19,
+            "zetaValue": 0.1,
+            "timestep": 0.01,
+            "timesteps": int(1e6),
+            "iterations": 3,
+            "progressBar": False,
+            "extraction": False,
+            "analysis": False,
+            "edgeWeights": True,
+            "fluctuations": False,
+            "zetaFraction": True,
+            "interactingLaw": 1,
+            "PdfPopUp": False,
+            "LaTeXConversion": False,
+            "snapshots": 1000,
+            "smoothingFactor": 50,
+            "studiedParameter": 2,
+            "startValuePrmStudy": 1e-2,
+            "endValuePrmStudy": 1e-1,
+            "numberPrmStudy": 10,
+            "parametricStudy": False
+        },
+        "λ(rsk/α)/(1+rsk/α)": {
+            "attractivity": 0.05,
+            "deviation": 0.05,
+            "region": 19,
+            "zetaValue": 0.1,
+            "timestep": 0.01,
+            "timesteps": int(5e5),
+            "iterations": 15,
+            "progressBar": False,
+            "extraction": False,
+            "analysis": False,
+            "edgeWeights": False,
+            "fluctuations": True,
+            "zetaFraction": False,
+            "interactingLaw": 1,
+            "PdfPopUp": False,
+            "LaTeXConversion": False,
+            "snapshots": 100,
+            "smoothingFactor": 10,
+            "studiedParameter": 0,
+            "startValuePrmStudy": 1.0,
+            "endValuePrmStudy": 1.0,
+            "numberPrmStudy": 1,
+            "parametricStudy": False
+        },
+        "(1-ζ)efl_k/α+ζefs_k": {
+            "attractivity": 0.05,
+            "deviation": 0.05,
+            "region": 19,
+            "zetaValue": 0.1,
+            "timestep": 0.01,
+            "timesteps": int(1e7),
+            "iterations": 15,
+            "progressBar": False,
+            "extraction": False,
+            "analysis": False,
+            "edgeWeights": False,
+            "fluctuations": True,
+            "zetaFraction": True,
+            "interactingLaw": 1,
+            "PdfPopUp": False,
+            "LaTeXConversion": False,
+            "snapshots": 100,
+            "smoothingFactor": 10,
+            "studiedParameter": 0,
+            "startValuePrmStudy": 0.01,
+            "endValuePrmStudy": 0.1,
+            "numberPrmStudy": 5,
+            "parametricStudy": True
+        },
+        "λ(rsk^α)/(1+rsk^α)": {
+            "attractivity": 0.1,
+            "convincibility": 0.5,
+            "deviation": 0.8,
+            "region": 19,
+            "zetaValue": 0.1,
+            "timestep": 0.01,
+            "timesteps": int(4e5),
+            "iterations": 100,
+            "progressBar": False,
+            "extraction": False,
+            "analysis": False,
+            "edgeWeights": True,
+            "fluctuations": True,
+            "zetaFraction": False,
+            "interactingLaw": 2,
+            "PdfPopUp": False,
+            "LaTeXConversion": False,
+            "snapshots": 1000,
+            "smoothingFactor": 50,
+            "studiedParameter": 1,
+            "startValuePrmStudy": 0.1,
+            "endValuePrmStudy": 1,
+            "numberPrmStudy": 10,
+            "parametricStudy": False
+        },
+        "λ[rsk/(1+rsk)]^α": {
+            "attractivity": 0.05,
+            "convincibility": 0.3,
+            "deviation": 0.05,
+            "region": 19,
+            "zetaValue": 0.1,
+            "timestep": 0.01,
+            "timesteps": int(1e7),
+            "iterations": 15,
+            "progressBar": False,
+            "extraction": False,
+            "analysis": False,
+            "edgeWeights": False,
+            "fluctuations": True,
+            "zetaFraction": False,
+            "interactingLaw": 3,
+            "PdfPopUp": False,
+            "LaTeXConversion": False,
+            "snapshots": 100,
+            "smoothingFactor": 10,
+            "studiedParameter": 1,
+            "startValuePrmStudy": 0.3,
+            "endValuePrmStudy": 1,
+            "numberPrmStudy": 3,
+            "parametricStudy": False
+        }
+    }
+}
 
 prmStudyList = [
     parameters['attractivity']['text'],
     parameters['convincibility']['text'],
-    parameters['zetaFraction']['text']
+    parameters['zetaValue']['text']
 ]
 
 regPopDict = { # Italian region sizes in 1991
@@ -344,7 +350,7 @@ class Parameter:
     lbl: Any = None
     wid: Any = None
     frame: Any = None
-    lst: Any = None
+    list: Any = None
     cbid: Any = None
 
 class Parameters():
@@ -353,11 +359,11 @@ class Parameters():
             setattr(self,text,value)
 
 class ComboBoxList():
-    def __init__(self,attribute,lst):
-        attribute.lst = lst
-        self.name = lst
+    def __init__(self,attribute,list):
+        attribute.list = list
+        self.list = list
         self.code = {
-            r:i for i,r in enumerate(lst)
+            r:i for i,r in enumerate(list)
         }
 
 def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
@@ -389,7 +395,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                 "text":"Region selected",
                 "val":"region"
             },
-            "zetaFraction": {
+            "zetaValue": {
                 "text":"ζ",
                 "val":1.0
             },
@@ -470,7 +476,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "convincibility": 0.5,
                     "deviation": 0.05,
                     "region": 19,
-                    "zetaFraction": 0.1,
+                    "zetaValue": 0.1,
                     "timestep": 0.01,
                     "timesteps": 100000,
                     "iterations": 3,
@@ -538,7 +544,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "convincibility": 0.3,
                     "deviation": 0.05,
                     "region": 19,
-                    "zetaFraction": 0.1,
+                    "zetaValue": 0.1,
                     "timestep": 0.01,
                     "timesteps": 10000000,
                     "iterations": 15,
@@ -562,7 +568,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "convincibility": 0.3,
                     "deviation": 0.05,
                     "region": 19,
-                    "zetaFraction": 0.1,
+                    "zetaValue": 0.1,
                     "timestep": 0.01,
                     "timesteps": 10000000,
                     "iterations": 15,

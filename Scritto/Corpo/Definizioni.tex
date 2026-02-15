@@ -13,10 +13,15 @@
     \newcommand\tref[2]{\hyperref[#1]{#2}}
 %\endgroup
 
-%\begingroup Citazioni
+%\begingroup Riferimenti
     % Comando per definire citazioni con note separate da un punto e virgola: [citazione1, nota1; citazione2, nota2; ecc.]
     \DeclareMultiCiteCommand{\bracketcitesemi}[\mkbibbrackets]{\cite}{\addsemicolon\space}
  
+    \crefname{eqtag}{}{}
+    \crefrangeformat{eqtag}{#3#1#4--#5#2#6}
+    \crefmultiformat{eqtag}{#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+    \crefrangemultiformat{eqtag}{#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}
+    
     \crefname{equation}{}{}
     \crefrangeformat{equation}{(#3#1#4--#5#2#6)}
     \crefmultiformat{equation}{(#2#1#3}{,~#2#1#3)}{,~#2#1#3}{,~#2#1#3)}
@@ -43,9 +48,14 @@
     \crefrangemultiformat{table}{Tabb.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
 
     \crefname{algorithm}{Alg.}{Algg.}
-    \crefrangeformat{figure}{Algg.~#3#1#4--#5#2#6}
-    \crefmultiformat{figure}{Algg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{figure}{Algg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    \crefrangeformat{algorithm}{Algg.~#3#1#4--#5#2#6}
+    \crefmultiformat{algorithm}{Algg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{algorithm}{Algg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{listing}{List.}{Listt.}
+    \crefrangeformat{listing}{Listt.~#3#1#4--#5#2#6}
+    \crefmultiformat{listing}{Listt.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{listing}{Listt.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
     
     \crefname{prp}{Prop.}{Propp.}
     \crefrangeformat{prp}{Propp.~#3#1#4--#5#2#6}
@@ -102,6 +112,7 @@
     \DeclareMathOperator\DstrGamma{Gamma}
     \DeclareMathOperator\DstrStudent{Student}
     
+    \DeclareMathOperator\Varianza{var}
     \DeclareMathOperator\IC{IC}
     \DeclareMathOperator\Histogram{Istogramma}
     % \DeclareMathOperator\Pareto{Pareto}
@@ -199,6 +210,125 @@
     \SetKwComment{tcp}{\# }{}
 %\endgroup
 
+%\begingroup Codice
+    % Ispirato da https://gist.github.com/nhtranngoc/88b72d9bfb656a3de227eea38ed80627
+
+    % Colori «Monokai» adattati per fondo bianco
+    \definecolor{mkPinkDark}{RGB}{191,0,96}    % Rosa scuro virato verso un rosso cremisi/magenta scuro
+    \definecolor{mkGreenDark}{RGB}{100,140,20} % Verde scuro virato verso un verde oliva saturo
+    \definecolor{mkYellowDark}{RGB}{180,130,0} % Giallo scuro virato verso ocra/oro (il giallo puro è illeggibile su bianco)
+    \definecolor{mkBlueDark}{RGB}{0,120,150}   % Blu scuro virato verso un ciano scuro/petrolio
+    \definecolor{mkOrangeDark}{RGB}{204,102,0} % Arancio scuro virato verso arancio bruciato
+    \definecolor{mkGrayDark}{RGB}{105,105,105} % Grigio scuro
+
+    % Correzione per colorare la parentesi tonda finale
+    \makeatletter
+    \patchcmd{\lsthk@SelectCharTable}{`)}{``}{}{}
+    \makeatother
+    % È un problema noto a cui, per fortuna, si può rimediare ma solo perché il mio codice non contiene retrotacche «`»
+    % https://tex.stackexchange.com/questions/172945/coloring-in-listing
+    % https://www.reddit.com/r/LaTeX/comments/u98usu/listings_using_literate_to_color_single_symbols/
+    % https://tex.stackexchange.com/questions/442585/how-to-change-style-for-right-parenthesis-inside-lstlisting-environment
+    % https://tex.stackexchange.com/questions/73795/problem-with-literate-and-breaklines-true-in-listings-package
+
+    \lstset{
+        language=Python,
+        columns=flexible,
+        lineskip=-2pt,
+        breaklines=true,
+        showstringspaces=false,
+        keepspaces=true,
+        % title=\lstname,         % Mostra il nome della filza come titolo preceduto da «\lstinputlisting;»
+        % captionpos=b,           % Imposta la posizione della didascalia al fondo
+        % showspaces=false,       % Mostra gli spazi sostituendoli con trattini bassi «_»
+        % showstringspaces=false, % Mostra gli spazi sostituendoli tra le stringhe con trattini bassi «_»
+        % showtabs=false,         % Mostra le tabulazioni tra le stringhe con trattini bassi «_»
+        % tabsize=4,              % Imposta la dimensione della tabulazione uguale a 2 spazi
+        % breakatwhitespace=true, % Imposta che l'accapo automatico sia applicato solo a spazi bianchi
+        %
+        % Colori
+        basicstyle=\small\ttfamily\color{black}, % Testo base nero
+        keywordstyle=\color{mkPinkDark},
+        stringstyle=\color{mkYellowDark},
+        commentstyle=\color{mkGrayDark}\itshape,
+        % identifierstyle=\color{monokaiGreen}
+        literate=* %
+            {(}{{\textcolor{mkYellowDark}{(}}}1 %
+            {)}{{\textcolor{mkYellowDark}{)}}}1 %
+            {=}{{\textcolor{mkPinkDark}{=}}}1,
+        %
+        %\begingroup Elementi verdi scuri
+        emph={
+            % Librerie esterne
+            multiprocessing,
+            freeze_support,
+            %
+            % Librerie/funzioni personali
+            main,
+            %
+            libGUIs,
+            ParametersGUI,
+            GatherParameters,
+            %
+            libData,libD,
+            ExtractRegionData,
+            LoadRegionData,
+            %
+            libNetworks,libN,
+            NetworkAnalysis,
+            DegreeDistributionFig,
+            WeightDistributionFig,
+            StrengthDistributionFig,
+            BetweennessCentralityFig,
+            StrengthVsDegreeFig,
+            AClusteringCoefficientFig,
+            WClusteringCoefficientFig,
+            AAssortativityFig,
+            WAssortativityFig,
+            %
+            libKTMAS,libK,
+            ParametricStudy,
+            KineticSimulation,
+            MonteCarloSimulation,
+            SizeDistrFittingsFig,
+            AverageSizeFig,
+            SizeVsDegreeFig,
+            SizeDistrEvolutionFig,
+            SizeEvolutionsFig,
+            %
+            libFigures
+            ShowFig,
+        },emphstyle=\color{mkGreenDark},
+        %\endgroup
+        %
+        %\begingroup Elementi arancioni scuri
+        emph={[2]
+            self,
+            True,
+            False,
+            None
+        },emphstyle={[2]\color{mkOrangeDark}},
+        %\endgroup
+        %
+        %\begingroup Elementi blu scuri
+        emph={[3]
+            def,
+        },emphstyle={[3]\color{mkBlueDark}},
+        %\endgroup
+        %
+        % Numerazione
+        numbers=left,
+        numberstyle=\tiny\color{gray},
+        xleftmargin=2em,
+        framexleftmargin=1.5em,
+        % stepnumber=1,  % L'incremente tra due linee
+        % numbersep=5pt, % Quanto distano i numeri di linea dal codice
+    }
+
+    \renewcommand\lstlistingname{Listato}
+    \renewcommand\lstlistlistingname{Elenco dei listati}
+%\endgroup
+
 %\begingroup TikZ
     \newcommand\didascalia[2]{%
         \captionsetup{width=#2} % aboveskip=-.2cm,
@@ -213,7 +343,7 @@
     \makeatletter
         \newcommand\tikzfigure{\@ifstar{\tikzfigure@star}{\tikzfigure@nostar}}
         
-        \newcommand\tikzfigure@nostar[6]{%
+        \newcommand\tikzfigure@nostar[5]{%
             \begin{figure}[#1]%
                 \centering%
                 \IfSubStr{#1}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
@@ -227,47 +357,8 @@
                         \hspace*{0.5\paperwidth}%
                         % Centra la figura TikZ riseptto a questo punto
                         \makebox[0pt][c]{%
-                            \begin{minipage}{#2}%
-                                \centering
-                                \addtocounter{figure}{1}%
-                                \setcounter{subfigure}{0}%
-                                \resizebox{\linewidth}{!}{#3}%
-                                \addtocounter{figure}{-1}%
-                                \didascalia{#4}{#5}%
-                                \label{#6}%
-                            \end{minipage}%
-                        }%
-                    }%
-                }{% Altrimenti centra la figura rispetto al corpo del testo
-                    \makebox[\textwidth][c]{%
-                        \begin{minipage}{#2}%
-                            \centering
-                            \addtocounter{figure}{1}%
-                            \setcounter{subfigure}{0}%
-                            \resizebox{\linewidth}{!}{#3}%
-                            \addtocounter{figure}{-1}%
-                            \didascalia{#4}{#5}%
-                            \label{#6}%
-                        \end{minipage}%
-                    }%
-                }% Cosa che non richiede l'uso del pacchetto «zref»
-            \end{figure}%
-        }
-        \newcommand\tikzfigure@star[5]{%
-            \begin{figure}[#1]%
-                \centering%
-                \IfSubStr{#1}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
-                    \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
-                    \stepcounter{figposcount}%
-                    \zsaveposx{figpos-\thefigposcount}%
-                    \makebox[0pt][l]{%
-                        % Muove indietro il cursore del testo fino al lato sinistro del foglio
-                        \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
-                        % Muove avanti il cursore del testo fino al centro del foglio
-                        \hspace*{0.5\paperwidth}%
-                        % Centra la figura TikZ riseptto a questo punto
-                        \makebox[0pt][c]{%
-                            \begin{minipage}{\linewidth}%
+                            \begin{minipage}{\paperwidth}%
+                                \vspace*{-1em}
                                 \centering
                                 \addtocounter{figure}{1}%
                                 \setcounter{subfigure}{0}%
@@ -293,6 +384,47 @@
                 }% Cosa che non richiede l'uso del pacchetto «zref»
             \end{figure}%
         }
+        \newcommand\tikzfigure@star[6]{%
+            \begin{figure}[#1]%
+                \centering%
+                \IfSubStr{#1}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
+                    \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
+                    \stepcounter{figposcount}%
+                    \zsaveposx{figpos-\thefigposcount}%
+                    \makebox[0pt][l]{%
+                        % Muove indietro il cursore del testo fino al lato sinistro del foglio
+                        \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+                        % Muove avanti il cursore del testo fino al centro del foglio
+                        \hspace*{0.5\paperwidth}%
+                        % Centra la figura TikZ riseptto a questo punto
+                        \makebox[0pt][c]{%
+                            \begin{minipage}{#2}%
+                                \vspace*{-0.5em}
+                                \centering
+                                \addtocounter{figure}{1}%
+                                \setcounter{subfigure}{0}%
+                                \resizebox{\linewidth}{!}{#3}%
+                                \addtocounter{figure}{-1}%
+                                \didascalia{#4}{#5}%
+                                \label{#6}%
+                            \end{minipage}%
+                        }%
+                    }%
+                }{% Altrimenti centra la figura rispetto al corpo del testo
+                    \makebox[\textwidth][c]{%
+                        \begin{minipage}{#2}%
+                            \centering
+                            \addtocounter{figure}{1}%
+                            \setcounter{subfigure}{0}%
+                            \resizebox{\linewidth}{!}{#3}%
+                            \addtocounter{figure}{-1}%
+                            \didascalia{#4}{#5}%
+                            \label{#6}%
+                        \end{minipage}%
+                    }%
+                }% Cosa che non richiede l'uso del pacchetto «zref»
+            \end{figure}%
+        }
     \makeatother
 
     \newcommand\redefineTikZbounds[2]{
@@ -308,6 +440,13 @@
             (#2.east |- Fondo); % ordinate date dalla cima e fondo originali
             % L'operatore «|-» in «(A |- B)» prende come ascissa quella del punto A mentre come coordinata quella del punto B
     }
+
+    % La dimensione del testo di base è 11pt
+    \newcommand\titleSize{11}
+    \newcommand\subCaptionSize{10}
+    \newcommand\labelSize{10}
+    \newcommand\tickSize{9}
+    \newcommand\legendSize{9}
 %\endgroup
 
 %\begingroup Liste
@@ -359,7 +498,7 @@
                 \centering\huge\bfseries%
                 Modellizzazione della distribuzione della popolazione tra città su reti spaziali mediante la teoria cinetica dei sistemi multiagente
             }\\[1.5cm]
-            \includegraphics[width=0.25\textwidth]{../../Figure/Scelte/Altro/LogoPoliTO.jpg}
+            \includegraphics[width=0.25\textwidth]{../../Figure/.fnl/Frontespizio/LogoPoliTO.jpg}
             %
             \vfill
             %
@@ -410,13 +549,14 @@
             \let\cleardoublepage\relax
             
             \chapter*{Sommario}
-            Testo in italiano relativo alla modellizzazione della distribuzione 
-            della popolazione su reti spaziali[cite: 4, 16].
+                
+                La corrente tesi studia la distribuzione della popolazione mediante la teoria cinetica dei sistemi multiagente su reti spaziali, interpretando le città come agenti/vertici e rappresentando le connessioni interurbane come lati. Sono state proposte varie regole d'emigrazione per regolare le interazioni tra agenti, i cui risultati sono principalmente due: l'adattamento lognormale bimodale della distribuzione della popazione tra le città e l'adattamento di Pareto della coda. Nel complesso il modello restituisce dei risultati coerenti colla distribuzione reale dedotta dai dati ISTAT della Sardegna; perdipiú l'adattamento lognormale bimodale segue meglio la coda della distribuzione rispetto a quello di Pareto, sebbene nella prima metà coincidano.
             
             \vfill
             
             \chapter*{Abstract}
-            English translation of the summary[cite: 17, 18].
+
+                The current thesis investigates population distribution through the kinetic theory of multi-agent systems on spatial networks, interpreting cities as agents/vertices and representing interurban links as edges. Various emigration rules have been proposed to regulate the interactions between agents, yielding two primary results: the bimodal log-normal fit of the total population distribution among cities and the Pareto fit of the distribution tail. Overall, the model provides results consistent with the actual distribution derived from ISTAT data of Sardinia; furthermore, the bimodal log-normal fit follows the distribution tail more accurately than the Pareto one, although the two coincide in the first half.
         \endgroup
         \vfill
     }

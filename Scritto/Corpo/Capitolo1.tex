@@ -41,8 +41,8 @@
     %
     ove \(X\sim\DstrLognormale(\mu,\sigma)\); come suggerisce il nome, la peculiarità di tale distribuzione è che vale \(\log X\sim\mathcal N(\mu,\sigma)\) (\cref{figEsempioFunzioneLognormale}) in cui \(\mathcal N(\mu,\sigma)\) indica la distribuzione gaussiana.
 
-    \tikzfigure{H}{.75\linewidth}
-        {\input{../../Figure/Scelte/Altro/EsempioFunzioneLognormale.tex}}
+    \tikzfigure{H}
+        {\input{../../Figure/.fnl/Capitolo1/EsempioFunzioneLognormale.tex}}
         {Funzione \(\DstrLognormale(0,1)\).}
         {\linewidth}{figEsempioFunzioneLognormale}
 
@@ -50,7 +50,7 @@
     %
     \begin{equation}
         \label{eqDistribuzioneLognormaleBimodale}
-        f_S(s)\approx f_X=\xi f_{S_1}(s)+(1-\xi)f_{S_2}(s),
+        f_S(s)\approx f_X(s)=\xi f_{S_1}(s)+(1-\xi)f_{S_2}(s),
     \end{equation}
     %
     ove \(\xi\in(0,1)\), \(S_1,S_2\sim\DstrLognormale(\mu,\sigma)\) e \(X\sim\BiLognormal(\xi,\mu_1,\sigma_1,\mu_2,\sigma_2)\).
@@ -74,7 +74,7 @@
         %labelwidth=!,
         %labelsep=!,
     ]
-        \item o applicano la \TCSMA{} alle città senza considerare una naturale topologia sottostante \cite{Gualandi2019SDC}\footnotemark{} o, in senso opposto, considera la struttura da grafo senza applicare la \TCSMA{} \cite{Berliant2018};
+        \item o applicano la \TCSMA{} alle città senza considerare una naturale topologia sottostante \cite{Gualandi2019SDC}\footnotemark{} o, in senso opposto, considerano la struttura da grafo senza applicare la \TCSMA{} \cite{Berliant2018};
         \footnotetext{In particolare \cite{Gualandi2019SDC}, nonostante sia un articolo molto interessante e che giunge a conclusioni altrettanto importanti, astrae eccessivamente le interazioni tra città oltre a non definire con sufficiente chiarezza che cosa s'intende per \textit{dintorni}.}
         \item altri vedono i nodi piú come luoghi ove vivono e interagiscono gli agenti, creando cosí un modello descritto da un sistema di equazioni di Boltzmann elevate e accoppiate \cite{Loy2021};
         \item infine, l'articolo che piú si avvicina all'obbiettivo di questa tesi applica, tuttavia, la sua teoria nel contesto delle reti sociali \cite{Nurisso2024}.

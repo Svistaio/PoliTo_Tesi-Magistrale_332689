@@ -30,9 +30,8 @@ class KineticSimulation():
 
         self.l = float(clsPrm.attractivity)
         self.a = float(clsPrm.convincibility)
-        self.s = float(clsPrm.deviation)
-        self.f = clsPrm.fluctuations
-        self.z = float(clsPrm.zetaFraction)
+        self.s = clsPrm.fluctuations*float(clsPrm.deviation)
+        self.z = clsPrm.zetaFraction*float(clsPrm.zetaValue)
 
         self.Ni = int(clsPrm.iterations)
         Nc = int(clsReg.Nc); self.Nc = Nc
@@ -77,7 +76,12 @@ class KineticSimulation():
         # In this case wO=wI but it's better to define them rigorously
 
         self.typ = np.array([0,1],dtype=np.int64)
-        self.lbl = ('Ext.','Apx.','Real')
+        self.lblEn = ('Ext.','Apx.','Real')
+        self.lblIt = (
+            ('esatto','appr.','reale'),
+            ('esatta','appr.','reale'),
+            ('Esatto','Appr.','Reale'),
+        )
         self.clr = ('#0072B2','#D55E00','#000000')
         # self.clr = ('blue','red')
 
@@ -108,7 +112,6 @@ class KineticSimulation():
         l = self.l
         a = self.a
         s = self.s
-        f = self.f
         z = self.z
         il = self.il
         typ = self.typ.size
@@ -147,7 +150,7 @@ class KineticSimulation():
                         futures[p] = executor.submit(
                             MonteCarloAlgorithm,
                             p,Nc,Ns,p0,typ,
-                            l,a,s,f,z,il,gui
+                            l,a,s,z,il,gui
                         )
                     bar.mainloop()
 
@@ -173,8 +176,8 @@ class KineticSimulation():
                             MonteCarloAlgorithm,
                             process,[Nc]*Ni,[Ns]*Ni,
                             [p0]*Ni,[typ]*Ni,[l]*Ni,
-                            [a]*Ni,[s]*Ni,[f]*Ni,
-                            [z]*Ni,[il]*Ni,[gui]*Ni
+                            [a]*Ni,[s]*Ni,[z]*Ni,
+                            [il]*Ni,[gui]*Ni
                         )
                     ); self.data = data
             finally:
@@ -187,7 +190,7 @@ class KineticSimulation():
             self.snapshots,
             self.siVrtState,
             self.typ,
-            self.lbl,
+            self.lblEn,
             self.li2Name,
             Ni,
             self.sid
@@ -262,7 +265,8 @@ class KineticSimulation():
         csSum = self.nodeSumVrtState
 
         typ = self.typ
-        lbl = self.lbl
+        # lbl = self.lblEn
+        lbl = self.lblIt
         clr = self.clr
 
         Nf = 13 # Numbers of figures
@@ -310,7 +314,8 @@ class KineticSimulation():
                 xScale='log',
                 Ni=Ni,
                 ta=ta,
-                label=f'{lbl[t]} histogram',
+                # label=f'{lbl[t]} histogram',
+                label=f'Istogramma {lbl[0][t]}',
                 color=clr[t],
                 alpha=(0.35,0.45) if Ni>1 else 0.35,
                 idx=t+1,
@@ -323,7 +328,8 @@ class KineticSimulation():
                 xScale='log',
                 Ni=Ni,
                 ta=ta,
-                label=f'{lbl[t]} lognormal fit (ML)',
+                # label=f'{lbl[t]} lognormal fit (ML)',
+                label=fr"Adatt. BLN {lbl[0][t]} ($\mathit{{ML}}$)",
                 # (
                 #     fr'{lbl[t]} mean value $\langle k\rangle$',
                 #     f'{lbl[t]} lognormal fit (ML)'
@@ -338,13 +344,14 @@ class KineticSimulation():
             # Exact-Real and Approximated-Real plots
             libF.CreateHistogramPlot(
                 csSv[:,:,t],
-                np.max(nBins[[0,2]]),
+                max(nBins[t],nBins[2]),
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
                 Ni=Ni,
                 ta=ta,
-                label=f'{lbl[t]} histogram',
+                # label=f'{lbl[t]} histogram',
+                label=f'Istogramma {lbl[0][t]}',
                 color=clr[t],
                 alpha=(0.35,0.45) if Ni>1 else 0.35,
                 idx=1,
@@ -357,11 +364,8 @@ class KineticSimulation():
                 xScale='log',
                 Ni=Ni,
                 ta=ta,
-                label=f'{lbl[t]} lognormal fit (ML)',
-                # (
-                #     fr'{lbl[t]} mean value $\langle k\rangle$',
-                #     f'{lbl[t]} lognormal fit (ML)'
-                # ),
+                # label=f'{lbl[t]} lognormal fit (ML)',
+                label=fr"Adatt. BLN {lbl[0][t]} ($\mathit{{ML}}$)",
                 color=clr[t],#(clr[t],clr[t]),
                 alpha=(1,0.15) if Ni>1 else 1,
                 bimodal=True,
@@ -371,11 +375,12 @@ class KineticSimulation():
 
             libF.CreateHistogramPlot(
                 csRv,
-                np.max(nBins[1:]),
+                max(nBins[t],nBins[2]),
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
-                label=f'{lbl[2]} histogram',
+                # label=f'{lbl[2]} histogram',
+                label=f'Istogramma {lbl[0][2]}',
                 color=clr[2],
                 alpha=0.35,
                 idx=2,
@@ -386,11 +391,8 @@ class KineticSimulation():
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
-                label=f'{lbl[2]} lognormal fit (ML)',
-                # (
-                #     fr'{lbl[2]} mean value $\langle k\rangle$',
-                #     f'{lbl[2]} lognormal fit (ML)'
-                # ),
+                # label=f'{lbl[2]} lognormal fit (ML)',
+                label=fr"Adatt. BLN {lbl[0][2]} ($\mathit{{ML}}$)",
                 color=clr[2],
                 alpha=1,
                 bimodal=True,
@@ -406,7 +408,8 @@ class KineticSimulation():
                     getattr(figData,f'fig{idx+3}'),
                     limits=(sMinR,sMaxR),
                     xScale='log',
-                    label=f'{lbl[2]} histogram',
+                    # label=f'{lbl[2]} histogram',
+                    label=f'Istogramma {lbl[0][2]}',
                     color=clr[2],
                     alpha=0.35,
                     idx=2,
@@ -417,11 +420,8 @@ class KineticSimulation():
                     getattr(figData,f'fig{idx+3}'),
                     limits=(sMinR,sMaxR),
                     xScale='log',
-                    label=f'{lbl[2]} lognormal fit (ML)',
-                    # (
-                    #     fr'{lbl[2]} mean value $\langle k\rangle$',
-                    #     f'{lbl[2]} lognormal fit (ML)'
-                    # ),
+                    # label=f'{lbl[2]} lognormal fit (ML)',
+                    label=fr'Adatt. BLN {lbl[0][2]} ($\mathit{{ML}}$)',
                     color=clr[2],
                     alpha=1,
                     bimodal=True,
@@ -436,10 +436,15 @@ class KineticSimulation():
                 csRv,
                 getattr(figData,f'fig{idx+4}'),
                 yScale='log',
+                # label=(
+                #     f'{lbl[2]} empirical CCDF',
+                #     f'{lbl[2]} Pareto fit (ML)',
+                #     f'{lbl[2]} bimodal lognormal fit (ML)'
+                # ),
                 label=(
-                    f'{lbl[2]} empirical CCDF',
-                    f'{lbl[2]} Pareto fit (ML)',
-                    f'{lbl[2]} bimodal lognormal fit (ML)'
+                    f'FRC empirica {lbl[1][2]}',
+                    fr"Adatt. Pareto {lbl[0][2]} ($\mathit{{ML}}$)",
+                    fr"Adatt. BLN {lbl[0][2]} ($\mathit{{ML}}$)"
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
@@ -454,10 +459,15 @@ class KineticSimulation():
                 yScale='log',
                 Ni=Ni,
                 ta=ta,
+                # label=(
+                #     f'{lbl[t]} empirical CCDF',
+                #     f'{lbl[t]} Pareto fit (ML)',
+                #     f'{lbl[t]} bimodal lognormal fit (ML)'
+                # ),
                 label=(
-                    f'{lbl[t]} empirical CCDF',
-                    f'{lbl[t]} Pareto fit (ML)',
-                    f'{lbl[t]} bimodal lognormal fit (ML)'
+                    f'FRC empirica {lbl[1][t]}',
+                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)",
+                    fr"Adatt. BLN {lbl[0][t]} ($\mathit{{ML}}$)"
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -477,9 +487,13 @@ class KineticSimulation():
                 yScale='log',
                 Ni=Ni,
                 ta=ta,
+                # label=(
+                #     f'{lbl[t]} empirical CCDF',
+                #     f'{lbl[t]} Pareto fit (ML)'
+                # ),
                 label=(
-                    f'{lbl[t]} empirical CCDF',
-                    f'{lbl[t]} Pareto fit (ML)'
+                    f'FRC empirica {lbl[1][t]}',
+                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -495,9 +509,13 @@ class KineticSimulation():
                 yScale='log',
                 Ni=Ni,
                 ta=ta,
+                # label=(
+                #     f'{lbl[t]} empirical CCDF',
+                #     f'{lbl[t]} Pareto fit (ML)'
+                # ),
                 label=(
-                    f'{lbl[t]} empirical CCDF',
-                    f'{lbl[t]} Pareto fit (ML)'
+                    f'FRC empirica {lbl[1][t]}',
+                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -509,9 +527,13 @@ class KineticSimulation():
                 getattr(figData,f'fig{idx+7+t+1}'),
                 upperbound=sMaxER if t == 0 else sMaxAR,
                 yScale='log',
+                # label=(
+                #     f'{lbl[2]} empirical CCDF',
+                #     f'{lbl[2]} Pareto fit (ML)'
+                # ),
                 label=(
-                    f'{lbl[2]} empirical CCDF',
-                    f'{lbl[2]} Pareto fit (ML)'
+                    f'FRC empirica {lbl[1][t]}',
+                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
@@ -530,9 +552,13 @@ class KineticSimulation():
                 yScale='lin',
                 Ni=Ni,
                 ta=ta,
+                # label=(
+                #     f'{lbl[t]} empirical CCDF',
+                #     fr'{lbl[t]} Pareto fit (ML)'
+                # ),
                 label=(
-                    f'{lbl[t]} empirical CCDF',
-                    fr'{lbl[t]} Pareto fit (ML)'
+                    f'FRC empirica {lbl[1][t]}',
+                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -548,9 +574,13 @@ class KineticSimulation():
                 yScale='log',
                 Ni=Ni,
                 ta=ta,
+                # label=(
+                #     f'{lbl[t]} empirical CCDF',
+                #     fr'{lbl[t]} Pareto fit (ML)'
+                # ),
                 label=(
-                    f'{lbl[t]} empirical CCDF',
-                    fr'{lbl[t]} Pareto fit (ML)'
+                    f'FRC empirica {lbl[1][t]}',
+                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -562,9 +592,13 @@ class KineticSimulation():
                 getattr(figData,f'fig{idx+10+t+1}'),
                 upperbound=sMaxER if t == 0 else sMaxAR,
                 yScale='log',
+                # label=(
+                #     f'{lbl[2]} empirical CCDF',
+                #     fr'{lbl[2]} Pareto fit (ML)'
+                # ),
                 label=(
-                    f'{lbl[2]} empirical CCDF',
-                    fr'{lbl[2]} Pareto fit (ML)'
+                    f'FRC empirica {lbl[1][2]}',
+                    fr"Adatt. Pareto {lbl[0][2]} ($\mathit{{ML}}$)",
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
@@ -575,7 +609,8 @@ class KineticSimulation():
 
             libF.Text(
                 ax[7],(p[0],p[1]+(1/2-t)*dp[1]),
-                fr'{lbl[t]}:$\quad$'+
+                # fr'{lbl[t]}:$\quad$'+
+                fr"{lbl[2][t]}:$\quad$"+
                 libF.DataString(xiS,Ni,ta,r'\xi')+
                 libF.DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
                 libF.DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
@@ -601,9 +636,9 @@ class KineticSimulation():
                 dp=(dp[0]/1.5,dp[1])
             )
 
-            offset = 0 if self.il in (2,4,6) else 1
+            offset = 0 if self.z>0 else 1
             p = (.5,p[1])
-            dp = (.475-.07*offset,dp[1])
+            dp = (1-.3*offset,dp[1])
             libF.TextBlock(
                 ax[-1],[[ '',
                     fr'$\lambda={self.l}$',
@@ -626,7 +661,7 @@ class KineticSimulation():
 
         for f in range(Nf):
             libF.SetFigStyle(
-                r'$cs$',r'$P(cs)$',
+                r'$s$',r'$\bar f_N(s)$',
                 yNotation='sci' if f<3 else 'plain',
                 xScale='log',
                 yScale='log' if f<10 and f>3 else 'lin',
@@ -652,7 +687,8 @@ class KineticSimulation():
         csSa = self.avrState
         csRa = np.ones_like(times)*self.realSizeDistr.mean()
         
-        lbl = self.lbl
+        # lbl = self.lblEn
+        lbl = self.lblIt
         clr = self.clr
 
         if figData is None:
@@ -668,7 +704,8 @@ class KineticSimulation():
                 else getattr(figData,f'fig{idx}'),
                 Ni=Ni,
                 ta=ta,
-                label=rf"{lbl[t]} city size average $\langle s\rangle$",
+                # label=rf"{lbl[t]} city size average $\langle s\rangle$",
+                label=fr'Taglia media {lbl[1][t]}',
                 color=clr[t],
                 alpha=(1,0.15) if Ni>1 else 1,
                 idx=t+1,
@@ -682,7 +719,8 @@ class KineticSimulation():
             else getattr(figData,f'fig{idx}'),
             linestyle='--',
             linewidth=0.75,
-            label=rf"{lbl[2]} city size average $\langle s\rangle$",
+            # label=rf"{lbl[2]} city size average $\langle s\rangle$",
+            label=rf'Taglia media {lbl[1][2]}',
             color=clr[2],
             alpha=1,
             idx=3,
@@ -691,7 +729,7 @@ class KineticSimulation():
 
         # CentreFig()
         libF.SetFigStyle(
-            r"$t$",r"$\langle cs\rangle$",
+            r"$t$",r"$\langle s\rangle$",
             data=figData.fig if saveFig
             else getattr(figData,f'fig{idx}'),
             ax=ax
@@ -713,7 +751,8 @@ class KineticSimulation():
         csRv = self.realSizeDistr
 
         typ = self.typ
-        lbl = self.lbl
+        # lbl = self.lblEn
+        lbl = self.lblIt
         clr = self.clr
 
         si = self.siAvrState
@@ -729,7 +768,8 @@ class KineticSimulation():
             libF.CreateScatterPlot(
                 ki,csSv[:,t],
                 getattr(figData,f'fig{idx}'),
-                label=lbl[t],
+                # label=lbl[t],
+                label=f'Dispersione {lbl[1][t]}',
                 color=clr[t],
                 idx=t+1,
                 ax=ax[0]
@@ -738,7 +778,8 @@ class KineticSimulation():
             libF.CreateScatterPlot(
                 ki,csSv[:,t],
                 getattr(figData,f'fig{t+1+idx}'),
-                label=lbl[t],
+                # label=lbl[t],
+                label=f'Dispersione {lbl[1][t]}',
                 color=clr[t],
                 idx=1,
                 ax=ax[t+1]
@@ -747,7 +788,8 @@ class KineticSimulation():
             libF.CreateScatterPlot(
                 ki,csRv,
                 getattr(figData,f'fig{t+1+idx}'),
-                label=lbl[2],
+                # label=lbl[2],
+                label=f'Dispersione {lbl[1][2]}',
                 color=clr[2],
                 idx=2,
                 ax=ax[t+1]
@@ -874,7 +916,9 @@ class KineticSimulation():
 
         labels = ['']*Nk
         classes = np.linspace(0,Nk-1,6,dtype=np.int64)
-        for i in classes: labels[i] = f'k={dk[i]}'
+        for i in classes:
+            # labels[i] = f'Class k={dk[i]}'
+            labels[i] = f'Classe k={dk[i]}'
 
         for t in typ: # t[ype]
             # norm = LogNorm(
@@ -1106,7 +1150,7 @@ def InitializeMCSWorker(
 
 def MonteCarloAlgorithm(
     p,Nc,Ns,p0,typ,
-    l,a,s,f,z,il,gui
+    l,a,s,z,il,gui
 ):
     Mdt = workersShM['parameters']["Mdt"]
     wOdt = workersShM['parameters']["wOdt"]
@@ -1137,7 +1181,7 @@ def MonteCarloAlgorithm(
             Nc,hNc,nk,
             Mdt,wOdt,wI,
             di,idi,il,
-            l,a,s,f,z
+            l,a,s,z
         ) # Warm-up iteration to avoid polluting the initial time t0
         snapshots[:,nsid,0] = vrtState[:,0]
         snapshots[:,nsid,1] = vrtState[:,1]
@@ -1150,7 +1194,7 @@ def MonteCarloAlgorithm(
                 Nc,hNc,nk,
                 Mdt,wOdt,wI,
                 di,idi,il,
-                l,a,s,f,z
+                l,a,s,z
             )
             snapshots[:,nsid,0] = vrtState[:,0]
             snapshots[:,nsid,1] = vrtState[:,1]
@@ -1171,7 +1215,7 @@ def MonteCarloAlgorithm(
             Nc,hNc,nk,
             Mdt,wOdt,wI,
             di,idi,il,
-            l,a,s,f,z
+            l,a,s,z
         ) # Warm-up iteration to avoid polluting the initial time t0
         snapshots[:,nsid,0] = vrtState[:,0]
         snapshots[:,nsid,1] = vrtState[:,1]
@@ -1184,7 +1228,7 @@ def MonteCarloAlgorithm(
                 Nc,hNc,nk,
                 Mdt,wOdt,wI,
                 di,idi,il,
-                l,a,s,f,z
+                l,a,s,z
             )
             snapshots[:,nsid,0] = vrtState[:,0]
             snapshots[:,nsid,1] = vrtState[:,1]
@@ -1194,10 +1238,11 @@ def MonteCarloAlgorithm(
 
 @njit(cache=True)
 def EvolveState(
-    cs,P,Nc,hNc,nk,
-    Mdt,wOdt,wI,
+    cs,P,Nc,
+    hNc,nk,Mdt,
+    wOdt,wI,
     di,idi,il,
-    l,a,s,f,z
+    l,a,s,z
 ):
     for _ in range(nk):
         FYDInPlaceShuffle(P,Nc)
@@ -1216,7 +1261,7 @@ def EvolveState(
                     si = cs[ii,0]; sr = cs[ir,0]
 
                     e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
-                    ga = StochasticFluctuations(s,e) if f else 0
+                    ga = StochasticFluctuations(s,e) if s>0 else 0
 
                     cs[ii,0] = si*(1-e+ga) 
                     cs[ir,0] = sr+si*e
@@ -1232,7 +1277,7 @@ def EvolveState(
                 si = cs[ii,1]; sr = cs[ir,1]
 
                 e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
-                ga = StochasticFluctuations(s,e) if f else 0
+                ga = StochasticFluctuations(s,e) if s>0 else 0
 
                 cs[ii,1] = si*(1-e+ga) 
                 cs[ir,1] = sr+si*e
@@ -1262,73 +1307,81 @@ def NonLinearEmigration(
         sr,dir,  # Receiving city size
         il,l,a,z
     ):
-    if si <= 0: return 0
+    if si <= 0:
+        return 0
 
     if il == 0:
         rs = sr/si
-        return l*(rs**a)/(1+rs**a)
+        efl = l*(rs**a)/(1+rs**a)
+
+        if z == 0:
+            return efl
+        else:
+            if sr <= 0:
+                return 0
+            else:
+                irs = 1/rs
+                efs = l*(irs**a)/(1+irs**a)
+                return (1-z)*efl+z*efs
 
     elif il == 1:
         rsk = (sr/si)*dir*idii
-        return l*(rsk/a)/(1+rsk/a)
-
-    elif il == 2:
-        if sr <= 0: return 0
-
-        rsk = (sr/si)*dir*idii
         efl = l*(rsk/a)/(1+rsk/a)
 
-        irsk = 1/rsk
-        efs = l*(irsk/a)/(1+irsk/a)
+        if z == 0:
+            return efl
+        else:
+            if sr <= 0:
+                return 0
+            else:
+                irsk = 1/rsk
+                efs = l*(irsk/a)/(1+irsk/a)
+                return (1-z)*efl+z*efs
 
-        return (1-z)*efl+z*efs
-
-    elif il == 3:
-        rsk = (sr/si)*dir*idii
-        return l*(rsk**a)/(1+rsk**a)
-
-    elif il == 4:
-        if sr <= 0: return 0
-
+    elif il == 2:
         rsk = (sr/si)*dir*idii
         efl = l*(rsk**a)/(1+rsk**a)
 
-        irsk = 1/rsk
-        efs = l*(irsk**a)/(1+irsk**a)
-
-        return (1-z)*efl+z*efs
-
-    elif il == 5:
-        rsk = (sr/si)*dir*idii
-        return l*(rsk/(1+rsk))**a
+        if z == 0:
+            return efl
+        else:
+            if sr <= 0:
+                return 0
+            else:
+                irsk = 1/rsk
+                efs = l*(irsk**a)/(1+irsk**a)
+                return (1-z)*efl+z*efs
 
     else:
-        if sr <= 0: return 0
-
         rsk = (sr/si)*dir*idii
         efl = l*(rsk/(1+rsk))**a
 
-        irsk = 1/rsk
-        efs = l*(irsk/(1+irsk))**a
-
-        return (1-z)*efl+z*efs
+        if z == 0:
+            return efl
+        else:
+            if sr <= 0:
+                return 0
+            else:
+                irsk = 1/rsk
+                efs = l*(irsk/(1+irsk))**a
+                return (1-z)*efl+z*efs
 
         # rsk = (sr/si)*(dr*idi)  # Relative population*degree ratio
         # irsk = (si/sr)*(di*idr) # Inverse relative population*degree ratio
         # efl                     # Actual emigration rate for the lumping fraction
         # efs                     # Actual emigration rate for the separation fraction
 
-    # Numba does not officially support the match structure, hence, even if it appears to work, it's better to use an «if/elif/else» one the sake of performance and stability
+    # Numba does not officially support the match structure, hence, even if it appears to work, it's better to use an «if/elif/else» one for the sake of performance and stability
 
 @njit(cache=True)
 def StochasticFluctuations(sigma,E):
     alpha = ((1-E)**2)/(sigma**2)
-    theta = (sigma**2)/(1-E)
+    beta  = (sigma**2)/(1-E)
 
     # if alpha<=1:
     #     raise ValueError("α must be >1 to have a non-degenerate gamma distribution, and thus always admissible fluctuations")
 
-    ga = np.random.gamma(alpha,theta) # Initial sampling
+    ga = np.random.gamma(alpha,beta) # Initial sampling
 
     return ga+E-1 # Final left translation
 

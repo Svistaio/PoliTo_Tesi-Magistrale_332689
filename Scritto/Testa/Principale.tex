@@ -15,6 +15,7 @@
     cleardoublepage=empty,
     tablecaptionabove
 ]{scrreprt}
+% La dimensione del testo è di base 11pt
 
 \input{../Corpo/Pacchetti.tex}
 \input{../Corpo/Definizioni.tex}
@@ -56,6 +57,14 @@
     \addcontentsline{toc}{chapter}{\listtablename}
     \listoftables
 
-    \printbibliography
+    \cleardoublepage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{\lstlistlistingname}
+    \lstlistoflistings
+
+    \printbibliography[
+        heading=bibintoc,
+        title=\bibname
+    ]
 
 \end{document}

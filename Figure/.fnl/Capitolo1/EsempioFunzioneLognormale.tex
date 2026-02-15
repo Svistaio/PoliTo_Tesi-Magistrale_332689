@@ -13,14 +13,14 @@
         \pgfmathparse{1/(#1*\sigmaPrm*sqrt(2*pi))*exp(-((ln(#1)-\muPrm)^2)/(2*\sigmaPrm*\sigmaPrm))}%
     }
 
-    \newcommand\captionSize{12}
-    \newcommand\labelSize{10}
-    \newcommand\tickSize{10}
+    % \renewcommand\subCaptionSize{10}
+    % \renewcommand\labelSize{10}
+    % \renewcommand\tickSize{9}
 
     \pgfmathsetmacro\hsep{1cm}
-    % \pgfmathsetmacro\widthPlot{(\linewidth-\hsep)/2}
-    \pgfmathsetmacro\widthPlot{7cm}
-    \pgfmathsetmacro\heightPlot{.75*\widthPlot}
+    % \pgfmathsetmacro\plotWidth{(\linewidth-\hsep)/2}
+    \pgfmathsetmacro\plotWidth{4.8cm}
+    \pgfmathsetmacro\plotHeight{.618*\plotWidth}
 
     \begin{groupplot}[
         group style={
@@ -32,14 +32,15 @@
             x descriptions at=edge bottom,
             y descriptions at=edge left
         },
-        width=\widthPlot,
-        height=\heightPlot,
+        width=\plotWidth,
+        height=\plotHeight,
+        scale only axis,
         axis x line*=bottom,
         axis y line*=left,
         xlabel={$x$},
         ylabel={$f_X(x)$},
-        xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
-        ylabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+        xlabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+        ylabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
         xticklabel style={font=\dimTesto{\tickSize}},
         yticklabel style={font=\dimTesto{\tickSize}},
         grid=major,
@@ -79,15 +80,15 @@
     \end{groupplot}
 
     \tikzset{SubCaption/.style={
-        text width=\widthPlot,
+        text width=\plotWidth,
         anchor=north,
         align=center,
         yshift=-2.5em
     }}
     \node[SubCaption] at (lgnrml c1r1.south)
-        {\dimTesto{\captionSize}\sottoDidascalia{Scala lineare.\label{figLognormaleScalaLineare}}};
+        {\dimTesto{\subCaptionSize}\sottoDidascalia{Scala lineare.\label{figLognormaleScalaLineare}}};
     \node[SubCaption] at (lgnrml c2r1.south)
-        {\dimTesto{\captionSize}\sottoDidascalia{Scala semilogaritmica.\label{figLognormaleScalaSemiLogaritmica}}};
+        {\dimTesto{\subCaptionSize}\sottoDidascalia{Scala semilogaritmica.\label{figLognormaleScalaSemiLogaritmica}}};
 
     \redefineTikZbounds{lgnrml c1r1}{lgnrml c2r1}
 \end{tikzpicture}%

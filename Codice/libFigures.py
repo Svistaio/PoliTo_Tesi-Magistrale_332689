@@ -158,18 +158,20 @@ def CreateFunctionPlot(
         if yErr:
             avrFunc, err95Func = EvaluateConfidenceInterval(y,ta,Ni)
 
-            # To avoid [a possible] lower negative confidence interva, the error has to be clipped
+            # To avoid [a possible] lower negative confidence interval, the error has to be clipped
             lowerEstimate = np.maximum(avrFunc-err95Func,0)
             yerr95 = np.array([
                 avrFunc-lowerEstimate,
                 err95Func
             ]); xerr95 = None; y = avrFunc
 
+            if (y-yerr95[0]).min()<0: raise("Negative values")
+            if (y+yerr95[1]).min()<0: raise("Negative values")
+
         else:
             avrFunc, err95Func = EvaluateConfidenceInterval(x,ta,Ni)
-            x = avrFunc; xerr95 = err95Func; yerr95 = None
 
-            # To avoid [a possible] lower negative confidence interva, the error has to be clipped
+            # To avoid [a possible] lower negative confidence interval, the error has to be clipped
             lowerEstimate = np.maximum(avrFunc-err95Func,0)
             xerr95 = np.array([
                 avrFunc-lowerEstimate,
@@ -256,7 +258,7 @@ def CreateScatterPlot(
             )
             figData['plots'][f'scatterPlot{idx}'] = {
                 't':'scatter','x':x,'y':avrSct,
-                'l':label,'c':color,'a':alpha
+                'l':label,'c':color,'a':alpha[0]
             }
 
             CreateConfidenceIntervalPlot(
@@ -266,7 +268,7 @@ def CreateScatterPlot(
                 typ='errorbar',
                 yerr95=np.array([err95Sct,err95Sct]),
                 color=color,
-                alpha=alpha[0],
+                alpha=alpha[1],
                 ax=ax,
                 idx=idx
             )
@@ -286,7 +288,7 @@ def CreateScatterPlot(
             )
             figData['plots'][f'scatterPlot{idx}'] = {
                 't':'scatter','x':avrSct,'y':y,
-                'l':label,'c':color,'a':alpha
+                'l':label,'c':color,'a':alpha[0]
             }
 
             CreateConfidenceIntervalPlot(
@@ -523,64 +525,6 @@ def CreateLognormalFitPlot(
     )
 
     return xi
-
-    """ Old implementation with the average drawn over the lognormal fit as a vertical line
-        # In the function arguments
-        label=(
-            'Lognormal fit (ML)',
-            'Average value'
-        ), # Minimum likelihood
-        color=(
-            'blue',
-            'black'
-        ),
-
-        # In the function body
-        if Ni == 1:
-            vAvr = np.mean(v)
-            xM = np.array([vAvr,vAvr])
-            yM = np.array([0,stats.lognorm.pdf(vAvr,shape,loc=loc,scale=scale)])
-        else:
-            avrData = [None]*Ni
-            yM = 0
-
-            for r in range(Ni):
-                avrData[r] = np.mean(v[r,:])
-                shape, loc, scale = stats.lognorm.fit(v[r,:],floc=0)
-                yM += stats.lognorm.pdf(avrData[r],shape,loc=loc,scale=scale)/Ni
-
-            xM = np.transpose(np.array([np.array(avrData)]*2))
-            yM = np.array([0,yM])
-
-        # Lognormal fit plot
-        CreateFunctionPlot(
-            xF,yF,
-            figData,
-            Ni=Ni,
-            ta=ta,
-            label=label[0],
-            # linewidth=1,
-            color=color[0],
-            alpha=alpha,
-            idx=idx,
-            ax=ax
-        )
-
-        # Average value plot
-        CreateFunctionPlot(
-            xM,yM,
-            figData,
-            Ni=Ni,
-            ta=ta,
-            yErr=False,
-            label=label[1],
-            # linewidth=1,
-            linestyle="--",
-            color=color[1],
-            idx=idx,
-            ax=ax
-        )
-    """
 
 def CreateParetoFitPlot(
     v,
@@ -878,6 +822,7 @@ def CreateConfidenceIntervalPlot(
                     't':typ,'x':x,'y':y,
                     'e':'y','ye':yerr95,
                     'l':'','c':color,'a':alpha,
+                    'h':'None' if hatch is None else hatch,
                 }
             else:
                 ax.fill_betweenx(
@@ -893,6 +838,7 @@ def CreateConfidenceIntervalPlot(
                     't':typ,'x':x,'y':y,
                     'e':'x','xe':xerr95,
                     'l':'','c':color,'a':alpha,
+                    'h':'None' if hatch is None else hatch,
                 }
 
 def FitLognormalData(v,bimodal):
@@ -1038,4 +984,73 @@ def TextBlock(
         plt.savefig(pngFigPath,dpi=300,bbox_inches='tight')
         mpld3.save_html(fig,str(htmlFigPath))
     """
+#endregion
+
+#region Old implementation of «CreateLognormalFitPlot» where the average was drawn over the lognormal fit as a vertical line
+    """
+        # In the function arguments
+        label=(
+            'Lognormal fit (ML)',
+            'Average value'
+        ), # Minimum likelihood
+        color=(
+            'blue',
+            'black'
+        ),
+
+        # In the function body
+        if Ni == 1:
+            vAvr = np.mean(v)
+            xM = np.array([vAvr,vAvr])
+            yM = np.array([0,stats.lognorm.pdf(vAvr,shape,loc=loc,scale=scale)])
+        else:
+            avrData = [None]*Ni
+            yM = 0
+
+            for r in range(Ni):
+                avrData[r] = np.mean(v[r,:])
+                shape, loc, scale = stats.lognorm.fit(v[r,:],floc=0)
+                yM += stats.lognorm.pdf(avrData[r],shape,loc=loc,scale=scale)/Ni
+
+            xM = np.transpose(np.array([np.array(avrData)]*2))
+            yM = np.array([0,yM])
+
+        # Lognormal fit plot
+        CreateFunctionPlot(
+            xF,yF,
+            figData,
+            Ni=Ni,
+            ta=ta,
+            label=label[0],
+            # linewidth=1,
+            color=color[0],
+            alpha=alpha,
+            idx=idx,
+            ax=ax
+        )
+
+        # Average value plot
+        CreateFunctionPlot(
+            xM,yM,
+            figData,
+            Ni=Ni,
+            ta=ta,
+            yErr=False,
+            label=label[1],
+            # linewidth=1,
+            linestyle="--",
+            color=color[1],
+            idx=idx,
+            ax=ax
+        )
+    """
+    # In such a case the label would need to be a tuple
+    # (
+    #     fr'{lbl[t]} mean value $\langle k\rangle$',
+    #     f'{lbl[t]} lognormal fit (ML)'
+    # ),
+    # (
+    #     fr'{lbl[2]} mean value $\langle k\rangle$',
+    #     f'{lbl[2]} lognormal fit (ML)'
+    # ),
 #endregion

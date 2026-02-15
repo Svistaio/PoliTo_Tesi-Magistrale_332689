@@ -12,11 +12,12 @@
 
 \usepackage[italian]{babel}
 
+\usepackage{csquotes}
 \usepackage[
     backend=biber,
     style=numeric-comp
 ]{biblatex}
-\usepackage{csquotes}
+\DeclareDelimFormat{finalnamedelim}{\addspace\&\space}
 \addbibresource{../Corpo/Bibliografia.bib}
 \nocite{*}
 
@@ -39,13 +40,15 @@
     arrows.meta,
     calc,
     decorations.pathreplacing,
-    backgrounds
-}
+    backgrounds,
+    patterns.meta
+} 
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
 \usepgfplotslibrary{
     patchplots,
-    groupplots
+    groupplots,
+    colorbrewer
 }
 \usepackage{grffile}
 \usepackage{nicematrix}
@@ -78,18 +81,21 @@
     vlined,
     linesnumbered
 ]{algorithm2e}
+\usepackage{listings}
 
 \usepackage{enumitem}
 \usepackage{ragged2e} 
 
 % \usepackage{hyperref} % Già caricato da «classicthesis» colle impostazioni
+\PassOptionsToPackage{hyphens}{url}
 \hypersetup{
     colorlinks=true,
     linktocpage=true,
     breaklinks=true,
     urlcolor=CTurl,
     linkcolor=CTlink,
-    citecolor=CTcitation
+    citecolor=CTcitation,
+    % destlabel=true % Migliora la precisione dei nessi ipertestuali
 } % Si v. la linea 732 di «classicthesis.sty»
 % \hypersetup{
 %     colorlinks=false,
@@ -100,6 +106,8 @@
 %     breaklinks=true,
 %     pdfborder={1 1 1},
 % }
+% \usepackage[all]{hypcap}
+\usepackage{xurl}
 
 \usepackage[italian]{cleveref}
 
@@ -107,4 +115,3 @@
 
 \usepackage[normalem]{ulem}
 \usepackage{circledsteps}
-\usepackage[framemethod=TikZ]{mdframed}

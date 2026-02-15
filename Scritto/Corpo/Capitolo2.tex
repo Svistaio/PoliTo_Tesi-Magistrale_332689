@@ -23,27 +23,27 @@
         \end{dfn}
         
         La trascurabilità della direzione sarà discussa poco dopo nella \cref{secRetiECittà}, anche se è facilmente intuibile dalla \cref{figEsempioGrafoInDiretto}.
-        
-        \tikzfigure{H}{.8\linewidth}
-            {\input{../../Figure/Scelte/Altro/EsempioGrafo[In]Diretto.tex}}
-            {Esempio di un grafo indiretto, della sua equivalente forma diretta [simmetrica] e della loro [identica] matrice d'adiacenza.}
-            {1.2\linewidth}{figEsempioGrafoInDiretto}
 
+        \tikzfigure{H}
+            {\input{../../Figure/.fnl/Capitolo2/EsempioGrafo[In]Diretto.tex}}
+            {Esempio di un grafo indiretto, della sua equivalente forma diretta [simmetrica] e della loro [identica] matrice d'adiacenza.}
+            {.9\linewidth}{figEsempioGrafoInDiretto}
+        
         \begin{dfn}[Matrice d'adiacenza]
             \label{defMatriceAdiacenzaUnitariaPesata}
             \newcommand\hspz{\hspace{1em}}
-            Sia \(N\equiv\vert\mathcal I\vert\in\NPlus\) la cardinalità dell'insieme degl'indici, ossia il numero di vertici totali, si definisce la matrice d'adiacenza \(\mathbf W\in\mathbb R^{N\times N}\) pesata come:
+            Sia \(N\equiv\vert\mathcal I\vert\in\NPlus\) la cardinalità dell'insieme degl'indici, ossia il numero di vertici totali, si definisce la matrice d'adiacenza \(\mathbf M\in\mathbb R^{N\times N}\) pesata come:
             %
             \begin{equation}
                 \label{eqMatriceAdiacenzaPesata}
-                w_{i,j}\equiv
+                m_{i,j}\equiv
                 \left\{\begin{aligned}
                     q_{i,j}&\hspz\text{ se }(i,j)\in\mathcal E,\\
                     0&\hspz\text{ altrimenti},
                 \end{aligned}\right.
             \end{equation}
             %
-            ove \(q_{i,j}\) è il peso associato al lato \((i,j)\); nel caso in cui \(q_{i,j}\equiv1\) \(\forall i,j\in\mathcal I\) si ha la matrice d'adiacenza unitaria \(\mathbf A\in\mathbb R^{N\times N}\):
+            ove \(q_{i,j}\in\mathbb R\) è il peso associato al lato \((i,j)\); nel caso in cui \(q_{i,j}\equiv1\) \(\forall i,j\in\mathcal I\) si ha la matrice d'adiacenza unitaria \(\mathbf A\in\mathbb R^{N\times N}\):
             %
             \begin{equation}
                 \label{eqMatriceAdiacenzaUnitaria}
@@ -54,57 +54,58 @@
                 \end{aligned}\right.
             \end{equation}
             %
-            Si osserva che, se non altrimenti detto, scrivendo solo «matrice d'adiacenza» si sottintende sempre l'unitarietà.
+            Si osserva che, se non altrimenti detto, scrivendo solo «matrice d'adiacenza» si sottintende sempre quella unitaria.
         \end{dfn}
 
         \begin{dfn}[Matrice trasposta]
-            Data \(\mathbf A\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), allora s'indica \(\mathbf A^\top\) la matrice trasposta cosí definita:
+            Data \(\mathbf M\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), allora s'indica \(\mathbf M^\top\) la matrice trasposta cosí definita:
             %
             \begin{equation*}
-                a^\top_{i,j}=a_{j,i}\quad\forall i,j\in\{1,2,\ldots,N\}.
+                m^\top_{i,j}=m_{j,i}\quad\forall i,j\in\{1,2,\ldots,N\}.
             \end{equation*}
         \end{dfn}
 
         \begin{dfn}[Matrice simmetrica]
-            Data \(\mathbf A\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), allora
+            Data \(\mathbf M\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), allora
             %
             \begin{equation}
                 \label{eqMatriceAdiacenzaSimmetrica}
-                \mathbf A\text{ è simmetrica}
+                \mathbf M\text{ è simmetrica}
                 \ \ \iff\ \ 
-                a_{i,j}=a_{j,i}=a^\top_{i,j}
+                m_{i,j}=m_{j,i}=m^\top_{i,j}
                 \ \ \iff\ \ 
-                \mathbf A=\mathbf A^\top.
+                \mathbf M=\mathbf M^\top.
             \end{equation}
         \end{dfn}
 
         \begin{oss}
-            Per i grafi indiretti sia \(\mathbf W\) che \(\mathbf A\) sono simmetriche mentre per quelli diretti non è detto che sia cosí.
+            Nei grafi indiretti sia \(\mathbf M\) che \(\mathbf A\) sono simmetriche mentre per quelli diretti non è detto lo siano.
         \end{oss}
 
-        \begin{dfn}[Grado e Forza \textnormal{[entrate/uscente]}]
-            \label{defGradoEntranteUscente}
-            Dato un indice \(i\in\mathcal I\), in un grafo indiretto non pesato si definisce grado la somma
+        \begin{dfn}[Gradi e Forze]
+            \label{defForzaGradoEntranteUscente}
+            In un grafo diretto e pesato si definiscono la forza entrante e uscente come rispettivamente le quantità
             %
             \begin{equation}
-                \label{eqGradoForzaGrafoIndiretto}
-                k_i\equiv
-                \sum_{j=1}^{\vert\mathcal I\vert}a_{i,j}=
-                \sum_{j=1}^{\vert\mathcal I\vert}a_{j,i};
-            \end{equation}
-            %
-            d'altra parte in un grafo diretto non pesato la seconda equivalenza non è piú [necessariamente] valida, ragion per cui è necessario specializzare il grado entrante e uscente 
-            %
-            \begin{equation}
-                \label{eqGradoForzaGrafoDiretto}
-                k^-_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{j,i}
+                \label{eqForzaGrafoDiretto}
+                w^-_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}m_{j,i}%=(\mathbf M^\top\mathbf 1)_i
                 \quad\text{e}\quad
-                k^+_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{i,j},
+                w^+_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}m_{i,j},%=(\mathbf M\mathbf 1)_i,
+                \quad\forall i\in\mathcal I,
             \end{equation}
             %
-            rispettivamente.
-           
-            Se il grafo è invece pesato le definizioni sono le stesse di \cref{eqGradoForzaGrafoIndiretto,eqGradoForzaGrafoDiretto} ma con \(w_{i,j}/w_{j,i}\) in luogo di \(a_{i,j}/a_{j,i}\).
+            % dove \(\mathbf 1\equiv(1,1,\ldots,1)\in\mathbb R^N\);
+            le quali se il grafo è simmetrico queste coincidono: \(\mathbf w=\mathbf w^-=\mathbf w^+\). Nel caso unitario \(\mathbf M\equiv\mathbf A\) si è soliti denominare le forze come gradi uscenti ed entranti:
+            %
+            \begin{equation}
+                \label{eqGradoGrafoDiretto}
+                k^-_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{j,i}%=(\mathbf A^\top\mathbf 1)_i
+                \quad\text{e}\quad
+                k^+_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{i,j},%=(\mathbf A\mathbf 1)_i,
+                \quad\forall i\in\mathcal I,
+            \end{equation}
+            %
+            che, come prima, in una rete simmetrica coincidono: \(\mathbf k=\mathbf k^-=\mathbf k^+\).
         \end{dfn}
 
     \section{Reti e città}\label{secRetiECittà}
@@ -171,12 +172,11 @@
 
         Infine si osserva che questo tipo di grafo è spaziale \cite{Barthelemy2011,DeMontis2007}, ovvero i suoi nodi occupano un punto nello spazio euclideo, seppure, al momento, sia una caratteristica alquanto formale; tuttavia servirà tenerlo a mente quando si definiranno alcune regole d'interazione nel \cref{secSimulazioni}. Perdipiú, contrariamente a quanto si possa pensare di primo acchito, tale grafo non è a invarianza di scala \cite{Barabasi1999} a causa del tipo di grafo \cite{Broido2019,Barthelemy2011}; ciò non esclude l'esistenza di nodi piú centrali di altri, ma solo che il massimo grado di un nodo è limitato superiormente proprio dalla natura spaziale del grafo.
 
-
     \section{Cenni sui dati}\label{secCenniSuiDati}
 
-        La matrice di pendolarismo costruita è quella fornita dall'ISTAT del 1999 \cite{ISTATPendolarismo1999} seguendo l'esempio di \cite{DeMontis2007}. I dati sono di fatto un \textit{file} di testo formato da una serie di righe di 29 numeri il cui significato è spiegato dalla Tab. \ref{tabStrutturaDatiPendolarismo}.
+        La matrice di pendolarismo costruita è quella fornita dall'ISTAT del 1991 \cite{ISTATPendolarismo1991} seguendo l'esempio di \cite{DeMontis2007}. I dati sono di fatto un \textit{file} di testo formato da una serie di righe di 29 numeri il cui significato è spiegato dalla \cref{tabStrutturaDatiPendolarismo}.
 
-        \begin{table}[htbp]
+        \begin{table}[htb]
             \centering
             \begin{NiceTabular}{ccc}
                 % \CodeBefore
@@ -205,7 +205,24 @@
         \end{table}
         \footnotetext{si v. il documento \texttt{trapen91.txt} per maggiori informazioni.}
 
-        I comuni considerati sono tutt'i quell'italiani (8100) nel 1999, quindi è necessario estrapolare da essi le matrici di pendolarismo delle singole regioni e parallelamente quella complessiva dell'Italia. 
+        I comuni considerati sono tutt'i quell'italiani (8100) nel 1991, quindi è necessario estrapolare da essi le matrici di pendolarismo delle singole regioni e parallelamente quella complessiva dell'Italia. Si possono definire due tipi di matrici:
+
+        \begin{enumerate}[
+            label=\arabic*.,
+            topsep=0.5em,
+            parsep=0em,
+            itemsep=0.25em,
+            leftmargin=2em,
+            rightmargin=1.5em,
+            % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %itemindent=!,
+            %labelindent=3em,
+            %labelwidth=!,
+            %labelsep=!,
+        ]
+            \item quella d'adiacenza unitaria in cui un lato esiste se almeno un pendolare (cioè il «[n]umero di persone» nella \cref{tabStrutturaDatiPendolarismo}) si muove tra i due comuni e
+            \item quella d'adiacenza pesata che è analoga alla precedente ma con peso \(q_{i,j}\) uguale alla somma totale dei pendolari tra due comuni.
+        \end{enumerate}
 
         Si notano tuttavia due principali difetti dei dati contenuti nel documento \texttt{Pen\_91It.txt}:
 
@@ -232,14 +249,16 @@
             \texttt{00200714212215\_\_\_\_\_\_\_\_\_\_\_\_\_\_1},
         \end{center}
         %
-        ove \_ indica uno spazio, per la quale, tralasciando il fatto che vi sono in totale 6 città italiane collo stesso codice comunale, se ci si limita alla regione del Piemonte (vale a dire la stessa del comune di partenza «002007») esistono in realtà ben due città condividenti lo stesso codice: «001215» e «004215», eppure entrambe non hanno lo stesso codice provinciale («002») del comune di partenza. Da questo piccolo estratto, quindi, non si può nemmeno ipotizzare che il codice provinciale sia lo stesso tra il comune di partenza e d'arrivo; è allora chiaro che sia impossibile scegliere la prima metà per completare il codice del comune di destinazione\footnotemark{}.
+        ove \_ indica uno spazio, per la quale, tralasciando il fatto che vi sono in totale 6 città italiane collo stesso codice comunale, se ci si limita alla regione del Piemonte (vale a dire la stessa del comune di partenza «002007») esistono in realtà ben due città condividenti lo stesso codice: «001215» e «004215», eppure entrambe non hanno lo stesso codice provinciale («002») del comune di partenza. Da questo piccolo estratto, quindi, non si può nemmeno ipotizzare che il codice provinciale sia lo stesso tra il comune di partenza e d'arrivo; è allora chiaro che sia impossibile scegliere la prima metà per completare il codice del comune di destinazione.
 
-        \footnotetext{Si potrebbe scegliere, tra tutt'i comuni collo stesso codice comunale, quello che minimizza la distanza geografica (ossia euleriana) siccome le coordinate dei punti rappresentativi di ogni comune sono disponibili nell'ISTAT; in ogni caso, come si vedrà nella \cref{secSimulazioni}, sono correzioni del tutto innecessarie.}
+        \begin{oss}
+            A dire il vero si potrebbe scegliere, tra tutt'i comuni collo stesso codice comunale, quello che minimizza la distanza geografica (ossia euleriana) siccome le coordinate dei punti rappresentativi di ogni comune sono disponibili nell'ISTAT \cite{ISTATLimiti1991}. In ogni caso il numero cosí esiguo d'eccezioni rendono una tale "correzione" del tutto innecessaria, oltre che irrilevante come il \cref{secSimulazioni} mostrerà.
+        \end{oss}
 
-        \tikzfigure{H}{0.5\linewidth}
-            {\input{../../Figure/Scelte/20/NA/SVsD.tex}}
-            {Forza contro grado \(s(k)\) per la Sardegna.}
-            {1.5\linewidth}{figForzaVsGrado20}
+        \tikzfigure{H}
+            {\input{../../Figure/.fnl/Capitolo2/AnalisiRete20/SVsD.tex}}
+            {Forza contro grado per la Sardegna.}
+            {.75\linewidth}{figForzaVsGrado20}
 
         Infine nelle \cref{figForzaVsGrado20,figDeMontisRiproduzione} sono stati anche riprodotti i risultati di \cite{DeMontis2007} colle seguenti osservazioni:
 
@@ -306,8 +325,9 @@
             \label{tabConfrontoPesiDeMontis}
         \end{table}
        
-        Come si vedrà tra qualche capitolo, ma soprattutto perché sono davvero lievi, queste discrepanze sono irrilevanti per quanto concerne questo elaborato. Inoltre, l'unico risultato importante recuperato è la correlazione positiva tra la forza e il grado già mostrato nella \cref{figForzaVsGrado20}.
+        Queste discrepanze sono perché sono lievi e, per quanto concerne questo elaborato, irrilevanti. Inoltre, l'unico risultato di rilievo è la correlazione positiva tra la forza e il grado nella \cref{figForzaVsGrado20}.
 
-        \tikzfigure{p}{1.2\linewidth}
-            {\input{../../Figure/Scelte/20/NA/Infopagina.tex}}
-            {Riproduzione dei principali grafici di \cite{DeMontis2007} [a cui si rimanda per maggiori dettagli sui vari coefficienti] relativi alla topologia della rete del pendolarismo sarda.}{\linewidth}{figDeMontisRiproduzione}
+        \tikzfigure{p}
+            {\input{../../Figure/.fnl/Capitolo2/AnalisiRete20/Infopagina.tex}}
+            {Riproduzione dei principali grafici di \cite{DeMontis2007} [a cui si rimanda per maggiori dettagli sui vari coefficienti] relativi alla topologia della rete del pendolarismo sarda.}
+            {.69\linewidth}{figDeMontisRiproduzione}
