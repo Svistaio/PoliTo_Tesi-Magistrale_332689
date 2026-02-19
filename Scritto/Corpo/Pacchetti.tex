@@ -1,13 +1,17 @@
 
 % !TEX root = ../Testa/Principale.tex
 
+\newcommand\bozza{true}
+% \newcommand\bozza{false}
+
 \usepackage[
     pass,
-    showframe
+    showframe=\bozza
 ]{geometry}
 
 \usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+% \usepackage[utf8]{inputenc}
+\usepackage[utf8]{inputenx}
 \usepackage{microtype}
 
 \usepackage[italian]{babel}
@@ -22,7 +26,7 @@
 \nocite{*}
 
 \usepackage[
-    drafting=true,
+    drafting=\bozza,
     eulerchapternumbers,
     % subfig,
     beramono,
@@ -31,9 +35,11 @@
     dottedtoc=true
 ]{classicthesis}
 \usepackage{arsclassica}
+\usepackage{scrhack}
 
 \usepackage{tikz}
 \usetikzlibrary{
+    % external,
     positioning,
     shapes.geometric,
     plotmarks,
@@ -43,6 +49,8 @@
     backgrounds,
     patterns.meta
 } 
+% \immediate\write18{if not exist "../../Figure/.fnl/TikZpdf" mkdir "../../Figure/.fnl/TikZpdf"}
+% \tikzexternalize[prefix={../../Figure/.fnl/TikZpdf/}]
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
 \usepgfplotslibrary{
@@ -81,7 +89,14 @@
     vlined,
     linesnumbered
 ]{algorithm2e}
-\usepackage{listings}
+% \usepackage{listings}
+
+\usepackage[left]{lineno}
+\usepackage[
+    section,
+    newfloat
+]{minted}
+\usepackage{newunicodechar}
 
 \usepackage{enumitem}
 \usepackage{ragged2e} 
@@ -111,7 +126,15 @@
 
 \usepackage[italian]{cleveref}
 
-\usepackage[left]{lineno}
+\usepackage{siunitx}
+\sisetup{
+    exponent-mode=threshold,
+    exponent-thresholds=-3:3,
+    round-mode=figures,
+    round-precision=3,
+    round-pad=false,
+    separate-uncertainty=true
+}
 
 \usepackage[normalem]{ulem}
 \usepackage{circledsteps}

@@ -13,13 +13,96 @@
     \renewcommand\thesection{\Alph{section}}
     \renewcommand\thesubsection{\thesection.\arabic{subsection}}
 
-    \numberwithin{equation}{section}
-    \renewcommand\theequation{\thesection.\arabic{equation}}
+    % \numberwithin{equation}{section}
+    % \renewcommand\theequation{\thesection.\arabic{equation}}
 
     \section{Codice}\label{apnCodice}
 
-        \lstinputlisting[
-            language=Python,
-            caption={Codice «main.py»},
-            label={lstMain}
-        ]{../../Codice/main.py}
+        \begin{code}
+            \captionof{listing}{Codice «main.py».}
+            \inputminted[
+                firstline=2,
+                firstnumber=1,
+            ]{python}{../../Codice/main.py}
+            \label{lstMain}
+        \end{code}
+
+        \begin{code}
+            \captionof{listing}{Codice «libParameters.py».}
+            \inputminted[
+                firstline=2,
+                firstnumber=1,
+                lastline=369
+            ]{python}{../../Codice/libParameters.py}
+            \label{lstParameters}
+        \end{code}
+
+        \begin{code}
+            \captionof{listing}{Codice «libData.py».}
+            \inputminted[
+                firstline=2,
+                firstnumber=1,
+                lastline=395
+            ]{python}{../../Codice/libData.py}
+            \label{lstData}
+        \end{code}
+
+        \begin{code}
+            \captionof{listing}{Codice «libFigures.py».}
+            \inputminted[
+                firstline=2,
+                firstnumber=1,
+                lastline=956
+            ]{python}{../../Codice/libFigures.py}
+            \label{lstNelibFigures}
+        \end{code}
+
+        \begin{code}
+            \captionof{listing}{Codice «libNetworks.py».}
+            \inputminted[
+                firstline=2,
+                firstnumber=1,
+                lastline=539
+            ]{python}{../../Codice/libNetworks.py}
+            \label{lstNelibNetworks}
+        \end{code}
+
+        \begin{code}
+            \captionof{listing}{Codice «libKTMAS.py».}
+            \inputminted[
+                firstline=2,
+                firstnumber=1,
+                lastline=1389
+            ]{python}{../../Codice/libKTMAS.py}
+            \label{lstNelibKTMAS}
+        \end{code}
+
+        \begin{code}
+            \captionof{listing}{Codice «mat2tex.mat».}
+            \inputminted[
+                firstline=2,
+                firstnumber=1,
+                lastline=175
+            ]{matlab}{../../Codice/mat2tex.m}
+            \label{lstNemat2tex}
+        \end{code}
+
+        % \lstinputlisting[
+        %     language=Python,
+        %     caption={Codice «main.py».},
+        %     label={lstMain}
+        % ]{../../Codice/main.py}
+
+        % \lstinputlisting[
+        %     language=Python,
+        %     caption={Codice «libParameters.py».},
+        %     label={lstParameters},
+        %     linerange={1-369}
+        % ]{../../Codice/libParameters.py}
+
+        % \lstinputlisting[
+        %     language=Python,
+        %     caption={Codice «libGUIs.py».},
+        %     label={lstGUIs},
+        %     linerange={1-958}
+        % ]{../../Codice/libGUIs.py}

@@ -37,7 +37,11 @@
     \cleardoublepage
     \pagenumbering{arabic}
 
-    \linenumbers
+    \makeatletter
+    \ifct@drafting
+        \linenumbers
+    \fi
+    \makeatother
 
     \input{../Corpo/Capitolo1.tex}
     \input{../Corpo/Capitolo2.tex}
@@ -58,9 +62,25 @@
     \listoftables
 
     \cleardoublepage
-    \phantomsection
-    \addcontentsline{toc}{chapter}{\lstlistlistingname}
-    \lstlistoflistings
+    \begingroup
+        \let\clearpage\relax
+        \let\cleardoublepage\relax
+        
+        \phantomsection
+        % \addcontentsline{toc}{chapter}{\listoflistingscaption} % Senza l'opzione «newfloat» di «minted»
+        \addcontentsline{toc}{chapter}{\listlistingname} % Con l'opzione «newfloat» di «minted»
+        \listoflistings
+        % \addcontentsline{toc}{chapter}{\lstlistlistingname}
+        % \lstlistoflistings
+        
+        \vfill
+
+        \phantomsection
+        \addcontentsline{toc}{chapter}{\listalgorithmcfname}
+        \listofalgorithms
+        
+        \vfill
+    \endgroup
 
     \printbibliography[
         heading=bibintoc,
