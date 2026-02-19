@@ -1092,14 +1092,14 @@
                 %
                 \begin{equation*}
                     % \label{eqProcessoStocasticoUrbano}
-                    \{\mathbf X_t\}\equiv\{I,S_t\}_{t\in\RPlus},
+                    \{\mathbf X_t\}\equiv\{(I,S_t)\}_{t\in\RPlus},
                 \end{equation*}
                 %
                 in cui \(S_t\in\RPlus\) è la variabile aleatoria relativa alla popolazione dell'agente rappresentativo al tempo \(t\) ed è l'unica componente del processo stocastico a variare nel tempo per l'\cref{ipGrafoStatico}.
 
                 \begin{oss}[Sulla natura numerica della popolazione]
                     \label{ossNaturaNumericaPopolazione}
-                    È naturale che non esistano frazioni di persone e che quindi rigorosamente \(S_t\in\mathbb N\) ma non sempre la scelta piú realistica è quella che modellisticamente è piú agevole; infatti trattare \(S_t\) come una variabile aleatoria discreta impone un codominio, appunto, discreto che è in genere piú difficile da manipolare matematicamente rispetto a un intervallo continuo. Tal'è la ragione nel scegliere \(S_t\) reale: dopo aver fatto i conti normalmente si può poi approssimare per eccesso o difetto ricavando la taglia intera effettiva; l'errore cosí commesso è di al piú una persona.
+                    È naturale che non esistano frazioni di persone e che quindi rigorosamente \(S_t\in\mathbb N\) ma non sempre la scelta piú realistica è piú modellisticamente agevole; infatti trattare \(S_t\) come una variabile aleatoria discreta impone un codominio, appunto, discreto che è in genere piú difficile da manipolare matematicamente rispetto a un intervallo continuo. Tal'è la ragione nel scegliere \(S_t\) reale: dopo aver fatto i conti normalmente si può poi approssimare per eccesso o difetto ricavando la taglia intera effettiva; l'errore cosí commesso è di al piú una persona.
                 \end{oss}
 
                 Cosí ragionando si può nel complesso descrivere statisticamente lo stato microscopico \(\mathbf X_t\equiv(I,S_t)\) dell'agente rappresentativo colla densità congiunta
@@ -1143,16 +1143,16 @@
                 %
                 \eqtag{\([\text{Ber}]^{\mathbf A}_S\)}{
                     \label{eqBernoulliInterazioneUrbana}
-                    \Theta\sim\DstrBernoulli(A(I,I^*)\Delta t),
+                    \Theta\sim\DstrBernoulli(A(I,I_*)\Delta t),
                 }%
-                ove \(A\colon\mathcal I\times\mathcal I\to\mathbb R\) è una funzione che a ogni coppia d'indici \((I,I^*)\) associa la relativa entrata nella matrice d'adiacenza
+                ove \(A\colon\mathcal I\times\mathcal I\to\mathbb R\) è una funzione che a ogni coppia d'indici \((I,I_*)\) associa la relativa entrata nella matrice d'adiacenza
                 %
                 \begin{equation*}
                     \newcommand\hspz{\hspace{1em}}
-                    A(I,I^*)\equiv a_{I,I^*}=
+                    A(I,I_*)\equiv a_{I,I_*}=
                     \left\{\begin{aligned}
-                        1&\hspz\text{se }(I,I^*)\in\mathcal E,\\
-                        0&\hspz\text{ altrimenti},%(I,I^*)\notin\mathcal E,
+                        1&\hspz\text{se }(I,I_*)\in\mathcal E,\\
+                        0&\hspz\text{ altrimenti},%(I,I_*)\notin\mathcal E,
                     \end{aligned}\right.
                 \end{equation*}
                 %
@@ -1164,7 +1164,7 @@
                     %
                     \begin{equation}
                         \label{eqTassoInterazioneUrbano}
-                        % \mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,t)\equiv A(I,I^*),
+                        % \mu(\mathbf X_t,\mathbf X^*_t,\mathbf w,t)\equiv A(I,I_*),
                         \mu(i,i_*)\equiv A(i,i_*),
                     \end{equation}
                     %
@@ -1389,8 +1389,8 @@
                     \ \ \forall E\in[0,\lambda],
                 \end{equation}
                 %
-                La scelta di \(>\) anziché \(\geq\) nella \eqref{eqVincoloPositivitàFluttuazioni} è ben fondata: di fatto si sta supponendo che le fluttuazioni non possono annullare la popolazione di una città\footnotemark{}.%
-                \footnotetext{Ciò non significa che il modello non possa prevedere lo spopolamento di una città, poiché la sua taglia può arbitrariamente avvicinarsi a zero [ma mai esserne uguale], raggiungendolo solo \textit{a posteriori} dopo l'approssimazione dai numeri reali a quelli interi (\cref{ossNaturaNumericaPopolazione}).}%
+                La scelta di \(>\) anziché \(\geq\) nella \eqref{eqVincoloPositivitàFluttuazioni} è ben fondata: di fatto si sta supponendo che le fluttuazioni non possano spopolare una città\footnotemark{}; tale condizione discende dal rapporto \(s_*/s\) contenuto nelle regole d'emigrazione proposte nel \cref{secRegoleEmigrazione}.%
+                \footnotetext{Ciò non significa che il modello non possa prevedere un tale fenomeno, poiché la taglia può arbitrariamente avvicinarsi a zero ma mai esserne uguale, raggiungendolo solo \textit{a posteriori} dopo l'approssimazione dai numeri reali a quelli interi (\cref{ossNaturaNumericaPopolazione}).}%
 
                 Perdipiú, le fluttuazioni rappresentano a grandi linee quei fenomeni complessivi di nascita e di morte che vengono considerati ma non direttamente modellati; pertanto valgono le seguenti ipotesi:
 

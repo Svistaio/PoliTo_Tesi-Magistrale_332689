@@ -129,7 +129,7 @@ def CreateFunctionPlot(
     linestyle='-',
     linewidth=1,
     marker='None',
-    hatch=None,
+    hatch='None',
     color='black',
     alpha=1,
     idx='',
@@ -239,8 +239,8 @@ def CreateScatterPlot(
             alpha=alpha
         )
         figData['plots'][f'scatterPlot{idx}'] = {
-            't':'scatter','x':x,'y':y,
-            'l':label,'c':color,'a':alpha
+            't':'scatter','x':x,'y':y,'l':label,
+            'c':color,'a':alpha,'s':size
         }
     else:
         if yErr:
@@ -257,8 +257,8 @@ def CreateScatterPlot(
                 zorder=5
             )
             figData['plots'][f'scatterPlot{idx}'] = {
-                't':'scatter','x':x,'y':avrSct,
-                'l':label,'c':color,'a':alpha[0]
+                't':'scatter','x':x,'y':avrSct,'l':label,
+                'c':color,'a':alpha[0],'s':size
             }
 
             CreateConfidenceIntervalPlot(
@@ -287,8 +287,8 @@ def CreateScatterPlot(
                 zorder=5
             )
             figData['plots'][f'scatterPlot{idx}'] = {
-                't':'scatter','x':avrSct,'y':y,
-                'l':label,'c':color,'a':alpha[0]
+                't':'scatter','x':avrSct,'y':y,'l':label,
+                'c':color,'a':alpha[0],'s':size
             }
 
             CreateConfidenceIntervalPlot(
@@ -767,7 +767,7 @@ def CreateConfidenceIntervalPlot(
     xerr95=None,
     color='black',
     fmt='none',
-    hatch=None,
+    hatch='None',
     alpha=0.5,
     ax=None,
     idx=''
@@ -814,15 +814,15 @@ def CreateConfidenceIntervalPlot(
                     facecolor=color,
                     alpha=alpha,
                     linewidth=0,
-                    hatch=hatch,
-                    edgecolor=color,
+                    hatch= None if hatch=='None' else hatch,
+                    edgecolor= None if hatch=='None' else color,
                     zorder=2
                 )
                 figData['plots'][f'{typ}{idx}'] = {
                     't':typ,'x':x,'y':y,
                     'e':'y','ye':yerr95,
-                    'l':'','c':color,'a':alpha,
-                    'h':'None' if hatch is None else hatch,
+                    'l':'','c':color,
+                    'a':alpha,'h':hatch,
                 }
             else:
                 ax.fill_betweenx(
@@ -830,15 +830,15 @@ def CreateConfidenceIntervalPlot(
                     facecolor=color,
                     alpha=alpha,
                     linewidth=0,
-                    hatch=hatch,
-                    edgecolor=color,
+                    hatch= None if hatch=='None' else hatch,
+                    edgecolor= None if hatch=='None' else color,
                     zorder=2
                 )
                 figData['plots'][f'{typ}{idx}'] = {
                     't':typ,'x':x,'y':y,
                     'e':'x','xe':xerr95,
-                    'l':'','c':color,'a':alpha,
-                    'h':'None' if hatch is None else hatch,
+                    'l':'','c':color,
+                    'a':alpha,'h':hatch,
                 }
 
 def FitLognormalData(v,bimodal):

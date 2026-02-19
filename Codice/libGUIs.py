@@ -34,9 +34,9 @@ class ParametersGUI(tk.Tk):
             self.region,
             libP.regionList
         )
-        self.intLawList = libP.ComboBoxList(
-            self.interactingLaw,
-            libP.intLawList
+        self.intRuleList = libP.ComboBoxList(
+            self.interactingRule,
+            libP.intRuleList
         )
         self.studiedPrmList = libP.ComboBoxList(
             self.studiedParameter,
@@ -93,7 +93,7 @@ class ParametersGUI(tk.Tk):
 
         #region Population parameters
         popPrmFrame.LabelSlider(
-            self.attractivity,1e-3,(1e-3,1-1e-3),
+            self.attractivity,1e-3,(0,1),
             extremes=(False,False)
         )
         popPrmFrame.LabelSlider(
@@ -121,8 +121,8 @@ class ParametersGUI(tk.Tk):
         self.zetaFraction.var.trace_add('write',self.SetZetaFractionState)
         self.fluctuations.var.trace_add('write',self.SetDeviationState)
 
-        simPrmFrame.LabelComboBox(self.interactingLaw)
-        self.interactingLaw.var.trace_add('write',self.InteractingLawCallBack)
+        simPrmFrame.LabelComboBox(self.interactingRule)
+        self.interactingRule.var.trace_add('write',self.InteractingRuleCallBack)
         #endregion
 
         #region Time parameters
@@ -233,7 +233,7 @@ class ParametersGUI(tk.Tk):
         self.population.var.set(popReg)
 
     def SetConvincibility(self,*args):
-        if self.intLawList.code[self.interactingLaw.var.get()] == 1:
+        if self.intRuleList.code[self.interactingRule.var.get()] == 1:
             l = self.attractivity.var.get()
             self.convincibility.var.set(np.round(l/.01-1,decimals=2))
         else:
@@ -246,8 +246,8 @@ class ParametersGUI(tk.Tk):
         self.simFlag.var.set(state)
         self.destroy() # Close the window after any button is pressed
 
-    def InteractingLawCallBack(self,*args):
-        if self.intLawList.code[self.interactingLaw.var.get()] in (1,3):
+    def InteractingRuleCallBack(self,*args):
+        if self.intRuleList.code[self.interactingRule.var.get()] in (1,3):
             self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
             self.DisableCallBack(self.attractivity)
@@ -310,8 +310,8 @@ class ParametersGUI(tk.Tk):
         for prm,val in self.dictCS[caseStudy].items():
             prm.var.set(val)
 
-        self.InteractingLawCallBack()
-        if self.intLawList.code[self.interactingLaw.var.get()] == 1:
+        self.InteractingRuleCallBack()
+        if self.intRuleList.code[self.interactingRule.var.get()] == 1:
             self.SetConvincibility()
         self.ShowParametricStudyFrame()
         self.SetStudiedParameterState()
@@ -331,8 +331,8 @@ class ParametersGUI(tk.Tk):
         parameters.region = self.regionList.code[
             parameters.region
         ]+1
-        parameters.interactingLaw = self.intLawList.code[
-            parameters.interactingLaw
+        parameters.interactingRule = self.intRuleList.code[
+            parameters.interactingRule
         ]
         parameters.studiedParameter = self.studiedPrmList.code[
             parameters.studiedParameter

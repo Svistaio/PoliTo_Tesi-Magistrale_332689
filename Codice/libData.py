@@ -385,7 +385,7 @@ def LoadCaseStudies(cls):
         # After all parameters have been loaded the external lists are saved as well
         for (prmName,prmlist) in [
             ('region','regionList'),
-            ('interactingLaw','intLawList'),
+            ('interactingRule','intRuleList'),
             ('studiedParameter','studiedPrmList')
         ]:
             prm = getattr(cls,prmName)

@@ -268,7 +268,7 @@
                 Per la maggior parte dei grafici si considera esclusivamente la distribuzione al tempo finale \(T\) \textit{senza} convoluzione, cosicché,  per leggerezza di notazione, si può impropriamente denotare con \(\mathbf s^T\in\RPlus^{2\times N\times R}\) il tensore del terz'ordine tale che \(\mathbf s^T\equiv\undertilde{\mathbf s}^{N_s}\).
             \end{oss}
 
-        \subsection{Definizione dei grafici}
+        \subsection{Definizione dei grafici}\label{secDefinizioneGrafici}
 
             \subsubsection{Istogrammi}
 
@@ -625,12 +625,46 @@
                 {Confronto di una simulazione con e senza fluttuazioni; la regola d'emigrazione è la \cref{eqVarianteRegolaTagliaForzaFrazionata} mentre i parametri sono illustrati nella \cref{tabParametriConEsenzaGamma}.}
                 {.6\linewidth}{figConfrontoConESenzaFluttuazioni}
 
-
     \section{Regole d'emigrazione}\label{secRegoleEmigrazione}
 
-        La scelta di \(E\) dipende da come si vuole modellizzare il fenomeno dell'immigrazione. In tutte le regole a venire \(s\) e \(s_*\) vanno intese come rispettivamente la città interagente e ricevente
-               
-        Infine si avvisa che per tutte le regioni italiane, Italia inclusa, sono stati ottenuti analoghi risultati a quelli venturi della Sardegna; questa è la ragione per cui in questo paragrafo ci si concentrerà solo su quella regione, sebbene alcuni sono analizzati anche per l'Italia alla fine.
+        In questo paragrafo si specializza la regola d'emigrazione \(E\) definita nelle \ref{eqRegoleInterazioneUrbaneEsplicite} per completare le \ref{eqRegoleInterazioneUrbane}; tutte le forme qui presenti condividono comunque tre aspetti: sono simmetriche, non lineari e associano i microstati \((i,s)\) e \((i_*,s_*)\) rispettivamente alla città interagente e ricevente.
+
+        Per brevità si limita lo studio a venire su tre aspetti:
+
+        \begin{enumerate}[
+            label=\arabic*.,
+            %topsep=0.5em,
+            %parsep=0em,
+            %itemsep=0.25em,
+            %leftmargin=2em,
+            %rightmargin=1.5em,
+            % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %itemindent=!,
+            %labelindent=3em,
+            %labelwidth=!,
+            %labelsep=!,
+        ]
+            \item si considera solo la regione della Sardegna sia perché molti risultati di \cite{DeMontis2007} sono già stati riprodotti nel \cref{secCenniSuiDati}, sia poiché per le altre 19 regioni sono stati trovati risultati analoghi;
+            \item si analizza esclusivamente la configurazione che meglio fitta i dati reali, almeno tra quelle esplorate dall'autore, e
+            \item si approfondiscono, vista la loro lunghezza, due soli studi parametrici per l'ultima regola d'emigrazione proposta.
+        \end{enumerate}
+       
+        Pertanto, data l'importanza della Sardegna, si elencano nella \cref{tabDatiParametriSardegna} i dati principali della regione assieme ai parametri adattati dell'indice di Pareto e della lognormale bimodale.
+
+        \begin{table}[htb]
+            \centering
+            \begin{tabular}{cccc}
+                \hline
+                \(N\)&\(P\)&\(\beta\)&\(\xi\)\\
+                \hline
+                \(\num{375}\)&\(\approx\num{1648248}\)&\(\num{1.27}\)&\(\num{0.93}\)\\
+                \hline
+            \end{tabular}
+            \caption{Dati e parametri della Sardegna.}
+            \label{tabDatiParametriSardegna}
+        \end{table}
+
+        Cionnonostante, nei \cref{secCasoItalia,secValleDAosta} si studiano comunque la Valle d'Aosta e l'Italia essendo casi estremi rispetto al numero di nodi.
 
         \subsection{Regola taglia}
 
@@ -640,18 +674,27 @@
                 \label{eqLeggeEmigrazioneTaglia}
                 E(s,s_*)\equiv\lambda\frac{(s_*/s)^\alpha}{1+(s_*/s)^\alpha},
             }%
-            che in essenza è la \cite[(2.2), § 2, p. 223]{Gualandi2019SDC} modificata mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019SDC}, ossia è una funzione di Hill di ordine \(\alpha\), in cui v'è un tasso di emigrazione maggiore verso città con popolazione relativa, data dal rapporto \(s_*/s\), maggiore; gli unici due parametri presenti, invece, presentano il seguente significato:
+            in cui \(\lambda\in(0,1)\) e \(\alpha\in\mathbb R^+\); in essenza è la \cite[(2.2), § 2, p. 223]{Gualandi2019SDC} modificata mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019SDC}, ossia è una funzione di Hill di ordine \(\alpha\), in cui v'è un tasso di emigrazione maggiore verso città con popolazione relativa, data dal rapporto \(s_*/s\), maggiore.
 
-            \begin{itemize}[label=\(\diamond\)]
-                \item \(\lambda\in(0,1)\) rappresenta l'attrattività dei poli, ossia la frazione che le città piú popolose riescono al massimo ad attrarre in un'interazione;
-                \item \(\alpha\in\mathbb R^+\) indica la rapidità d'emigrazione e influenza quanto rapidamente il rapporto \(s_*/s\) raggiunge la massima attrattività \(\lambda\).
-            \end{itemize}
+            % \tikzfigure{p}
+            % {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Infopagina.tex}}
+            % {Studio della configurazione di riferimento della \ref{eqLeggeEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+            % {.7\linewidth}{figProva}
 
-            In questo caso si hanno quindi interazioni non simmetriche e non lineari, a causa della \eqref{eqLeggeEmigrazione}.
+            I risultati nella \daRivedere{}, ottenuti tramite i parametri nella \cref{tabParametriRegolaEmigrazioneTaglia}, non sono purtroppo corretti dato che non solo mostrano dei centri abitati spopolarsi, ma che questi sono piú per la maggior parte i le città piú popolate.
 
-            Si vuole evitare lo spopolamento delle città a causa delle fluttuazioni nella \cref{eqVincoloPositivitàFluttuazioni} dato che nella \eqref{eqLeggeEmigrazione} compare il rapporto tra popolazioni delle città interagenti
-            
-            % Mediante la conservazione di popolazione ho rifatto molto velocemente i conti della formula prima del Teorema 5.1 a p. 16 di [1], confermando che d⟨s⟩/dt=0, come ci si aspetta da questo tipo d'interazione.
+            \begin{table}[htb]
+                \centering
+                \begin{tabular}{ccc}
+                    \hline
+                    \(\lambda\)&\(\alpha\)&\(N_t\)\\
+                    \hline
+                    \(\num{1}\)&\(\num{1}\)&\(\num{1}\)\\
+                    \hline
+                \end{tabular}
+                \caption{Dati e parametri della \ref{eqLeggeEmigrazioneTaglia}.}
+                \label{tabParametriRegolaEmigrazioneTaglia}
+            \end{table}
 
         \subsection{Regola taglia-gradi}
 
@@ -660,6 +703,19 @@
                 E_{TD}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(k_{i_*}/k_i)]^\alpha}{1+[(s_*/s)(k_{i_*}/k_i)]^\alpha},
             }%
 
+            \begin{table}[htb]
+                \centering
+                \begin{tabular}{ccc}
+                    \hline
+                    \(\lambda\)&\(\alpha\)&\(N_t\)\\
+                    \hline
+                    \(\num{1}\)&\(\num{1}\)&\(\num{1}\)\\
+                    \hline
+                \end{tabular}
+                \caption{Dati e parametri della \ref{eqLeggeEmigrazioneTagliaGradi}.}
+                \label{tabParametriRegolaEmigrazioneTagliaGradi}
+            \end{table}
+
         \subsection{Regola frazionata}
             
             \eqtag{\([\text{RE}]^f_{TD}\)}{
@@ -667,21 +723,59 @@
                 E^f_{TD}(s,s_*,i,i_*)\equiv (1-\zeta)E_{TD}(s,s_*,k_i,k_{i_*})+\zeta E_{TD}(s_*,s,k_{i_*},k_i)
             }%
 
+            \begin{table}[htb]
+                \centering
+                \begin{tabular}{cccc}
+                    \hline
+                    \(\lambda\)&\(\alpha\)&\(\zeta\)&\(N_t\)\\
+                    \hline
+                    \(\num{1}\)&\(\num{1}\)&\(\num{1e-1}\)&\(\num{1}\)\\
+                    \hline
+                \end{tabular}
+                \caption{Dati e parametri della \ref{eqLeggeEmigrazioneTagliaGradiFrazionata}.}
+                \label{tabParametriRegolaEmigrazioneTagliaFrazionata}
+            \end{table}
+
         \subsection{Regola taglia-forza}
 
             \eqtag{\([\text{RE}]_{TF}\)}{
                 \label{eqLeggeEmigrazioneTagliaForza}
                 E_{TD}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(w_{i_*}/w_i)]^\alpha}{1+[(s_*/s)(w_{i_*}/w_i)]^\alpha},
             }%
+            
+            \begin{table}[htb]
+                \centering
+                \begin{tabular}{ccc}
+                    \hline
+                    \(\lambda\)&\(\alpha\)&\(N_t\)\\
+                    \hline
+                    \(\num{1}\)&\(\num{1}\)&\(\num{1}\)\\
+                    \hline
+                \end{tabular}
+                \caption{Dati e parametri della \ref{eqLeggeEmigrazioneTagliaForza}.}
+                \label{tabParametriRegolaEmigrazioneTagliaForza}
+            \end{table}
+
+            \tikzfigure{p}
+            {\input{../../Figure/.fnl/Capitolo4/RETFConfigurazioneRiferimento/Infopagina.tex}}
+            {Studio della configurazione di riferimento della \ref{eqLeggeEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+            {.575\linewidth}{figStudioConfigurazioneRiferimentoRETF}
 
         \subsection{Interpretazioni}
 
             In poche parole la \eqref{eqLeggeEmigrazioneTaglia} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
+
+            I due principali parametri del modello possono quindi essere cosí interpretati:
+
+            \begin{itemize}[label=\(\diamond\)]
+                \item \(\lambda\in(0,1)\) rappresenta l'attrattività dei poli, ossia la frazione che le città piú popolose riescono al massimo ad attrarre in un'interazione;
+                \item \(\alpha\in\mathbb R^+\) indica la rapidità d'emigrazione e influenza quanto rapidamente il rapporto \(s_*/s\) raggiunge la massima attrattività \(\lambda\).
+            \end{itemize}
         
     \section{Altri casi notevoli}
 
         \subsection{Varianti delle regole d'interazione}\label{secVariantiRegoleInterazione}
 
-        \subsection{Il caso dell'Italia}
+        \subsection{Il caso dell'Italia}\label{secCasoItalia}
 
-        \subsection{Il caso della Valle d'Aosta}
+        \subsection{Il caso della Valle d'Aosta}\label{secValleDAosta}

@@ -26,7 +26,7 @@ import libFigures as libF
 
 class KineticSimulation():
     def __init__(self,clsPrm,clsReg):
-        self.il = int(clsPrm.interactingLaw)
+        self.il = int(clsPrm.interactingRule)
 
         self.l = float(clsPrm.attractivity)
         self.a = float(clsPrm.convincibility)
@@ -771,6 +771,7 @@ class KineticSimulation():
                 # label=lbl[t],
                 label=f'Dispersione {lbl[1][t]}',
                 color=clr[t],
+                alpha=0.7,
                 idx=t+1,
                 ax=ax[0]
             )
@@ -781,6 +782,7 @@ class KineticSimulation():
                 # label=lbl[t],
                 label=f'Dispersione {lbl[1][t]}',
                 color=clr[t],
+                alpha=0.6,
                 idx=1,
                 ax=ax[t+1]
             )
@@ -791,13 +793,14 @@ class KineticSimulation():
                 # label=lbl[2],
                 label=f'Dispersione {lbl[1][2]}',
                 color=clr[2],
+                alpha=0.6,
                 idx=2,
                 ax=ax[t+1]
             )
 
         for f in range(3):
             libF.SetFigStyle(
-                r'$k$',r'$cs(k)$',
+                r'$k$',r'$s(k)$',
                 yScale='log',xScale='log',
                 data=getattr(figData,f'fig{f+idx}'),
                 ax=ax[f]
@@ -915,7 +918,7 @@ class KineticSimulation():
         # colours = [clrmap(i/(Nc-1)) for i in range(Nc)]
 
         labels = ['']*Nk
-        classes = np.linspace(0,Nk-1,6,dtype=np.int64)
+        classes = np.linspace(0,Nk-1,4,dtype=np.int64)
         for i in classes:
             # labels[i] = f'Class k={dk[i]}'
             labels[i] = f'Classe k={dk[i]}'
