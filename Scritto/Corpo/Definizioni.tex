@@ -437,20 +437,23 @@
 %\endgroup
 
 %\begingroup TikZ
-    \newcommand\didascalia[2]{%
-        \captionsetup{width=#2} % aboveskip=-.2cm,
-        \caption{#1}%
-    }
+    %\begingroup Didascalie
+        \newcommand\didascalia[2]{%
+            \captionsetup{width=#2} % aboveskip=-.2cm,
+            \caption{#1}%
+        }
+        
+        \newcommand\sottoDidascalia[2][ ]{%
+            \refstepcounter{subfigure}%
+            (\thesubfigure)#1#2%
+        }
+    %\endgroup
     
-    \newcommand\sottoDidascalia[2][ ]{%
-        \refstepcounter{subfigure}%
-        (\thesubfigure)#1#2%
-    }
-    
-    \makeatletter
+    %\begingroup TikZFigure
+        \makeatletter
         \newcommand\tikzfigure{\@ifstar{\tikzfigure@star}{\tikzfigure@nostar}}
         
-        \newcommand\tikzfigure@nostar[6][0pt]{%
+        \newcommand\tikzfigure@nostar[6][-1em]{%
             \begin{figure}[#2]%
                 \centering%
                 \IfSubStr{#2}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
@@ -532,29 +535,268 @@
                 }% Cosa che non richiede l'uso del pacchetto «zref»
             \end{figure}%
         }
-    \makeatother
+        \makeatother
+    %\endgroup
 
-    \newcommand\redefineTikZbounds[2]{
-        % Salva le coordinate della cima e del fondo della figura corrente (cosí da mantenere i titoli e le didascalie)
-        \coordinate (Cima) at (current bounding box.north);
-        \coordinate (Fondo) at (current bounding box.south);
+    %\begingroup RedefineTikZbounds
+        \newcommand\redefineTikZbounds[2]{
+            % Salva le coordinate della cima e del fondo della figura corrente (cosí da mantenere i titoli e le didascalie)
+            \coordinate (Cima) at (current bounding box.north);
+            \coordinate (Fondo) at (current bounding box.south);
 
-        \pgfresetboundingbox % Resetta la scatola dei limiti
+            \pgfresetboundingbox % Resetta la scatola dei limiti
 
-        \useasboundingbox % Definisce la nuova scatola come un rettangolo
-            (#1.west |- Cima)   % con ascissa sinistra data da «Col1 c1r1.west», 
-            rectangle           % ascissa destra data da «Col2 c1r1.east»
-            (#2.east |- Fondo); % ordinate date dalla cima e fondo originali
-            % L'operatore «|-» in «(A |- B)» prende come ascissa quella del punto A mentre come coordinata quella del punto B
-    }
+            \useasboundingbox % Definisce la nuova scatola come un rettangolo
+                (#1.west |- Cima)   % con ascissa sinistra data da «Col1 c1r1.west», 
+                rectangle           % ascissa destra data da «Col2 c1r1.east»
+                (#2.east |- Fondo); % ordinate date dalla cima e fondo originali
+                % L'operatore «|-» in «(A |- B)» prende come ascissa quella del punto A mentre come coordinata quella del punto B
+        }
+    %\endgroup
 
-    % La dimensione del testo di base è 11pt
-    \newcommand\titleSize{11}
-    \newcommand\subCaptionSize{10}
-    \newcommand\ParameterSize9
-    \newcommand\labelSize{10}
-    \newcommand\tickSize9
-    \newcommand\legendSize9
+    %\begingroup TikZBox
+        % Parzialmente ispirato da https://gist.github.com/Caramdir/899107
+
+        \makeatletter
+        \newsavebox\tikzBufferBox
+        \xdef\offsetX{0pt}
+        \xdef\offsetY{0pt}
+        
+        % \tikzbox[#1]{#2}{#3}[#4]{#5}
+        % #1 -> Ancora rispetto cui posizionare l'intera scatola
+        % #2 -> Nodo dove posizionare l'origine (per la natura di come LaTeX riceve gli argomenti è buon pratica passare questo circondato da parentesi graffe); di base è «south west» (angolo in basso a sinistra)
+        % #3 -> Nome della scatola limitante definita dall'ambiente «scope»
+        % #4 -> Argomenti opzionali da passare all'ambiente «scope»; di base sono vuoti
+        % #5 -> Contenuto della scatola circondato dall'ambiente «scope»
+        % Es. \tikzbox{{(0,0)}}{figuraTikZ}{blocco TikZ}
+
+        % Macro di apertura che controlla se v'è l'argomento facoltativo dell'ancora
+        \def\tikzbox{\pgfutil@ifnextchar[{\tikzbox@anchor}{\tikzbox@anchor[south west]}}
+        % La funzione «\pgfutil@ifnextchar» serve per controllare se il prossimo carattere è l'apertura di una paretensi graffa «[»
+        
+        % Macro intermedia per cogliere gli argomenti obbligatori e controllare quelli successivi facoltativi
+        \def\tikzbox@anchor[#1]#2#3{\pgfutil@ifnextchar[{\tikzbox@opt[#1]#2#3}{\tikzbox@opt[#1]#2#3[]}}
+
+        % Macro degli argomenti obbligatori
+        \long\def\tikzbox@opt[#1]#2#3[#4]#5{%
+            \node[ % Misurazione della scatola in un nodo invisibile
+                overlay,%
+                opacity=0,%
+                inner sep=0pt,%
+                outer sep=0pt%
+            ] {%
+                \sbox{\tikzBufferBox}{%
+                    \begin{tikzpicture}%
+                        \begin{scope}[local bounding box=measuringTikZBox]%
+                            #5%
+                        \end{scope}%
+                        \pgfpointanchor{measuringTikZBox}{#1}%
+                        \pgfgetlastxy{\tempX}{\tempY}% 
+                        \xdef\offsetX{\tempX}%
+                        \xdef\offsetY{\tempY}%
+                    \end{tikzpicture}%
+                }%
+            };%
+            %
+            % Disegno reale traslato
+            \begin{scope}[%
+                local bounding box=#3,%
+                shift={#2},%
+                xshift=-\offsetX,%
+                yshift=-\offsetY,%
+                #4%
+            ]%
+                #5%
+            \end{scope}%
+        }%
+        \makeatother
+    %\endgroup
+
+    %\begingroup Impostazioni
+        %\begingroup Testo
+            %\begingroup Normale
+                % La dimensione del testo di base è 11pt
+                \newcommand\titleSize{11}
+                \newcommand\subCaptionSize{10}
+                \newcommand\ParameterSize{9}
+                \newcommand\labelSize{10}
+                \newcommand\tickSize{9}
+                \newcommand\legendSize{9}
+            %\endgroup
+
+            %\begingroup Infopagine
+                \newcommand\fontSizeInfopage{
+                    % \renewcommand\titleSize{12}
+                    \renewcommand\subCaptionSize8
+                    \renewcommand\ParameterSize7
+                    \renewcommand\labelSize7
+                    \renewcommand\tickSize6
+                    \renewcommand\legendSize6
+                }
+            %\endgroup
+        %\endgroup
+
+        %\begingroup Dimensioni
+            \pgfmathsetmacro\plotWidth7
+            \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+            %
+            \pgfmathparse{0.825*\plotWidth}
+            \pgfmathsetmacro\plotWidth\pgfmathresult
+            \pgfmathsetmacro\halfWidth{\plotWidth/2}
+            \pgfmathsetmacro\plotLastWidth{1.25*\plotWidth}
+
+            \pgfmathsetmacro\xPlotSep{1}
+            \pgfmathsetmacro\yPlotSep{1.25}
+            \pgfmathsetmacro\yGroupSep{2.75}
+        %\endgroup
+
+        %\begingroup Gruppi
+            \newcommand\rectoGroupOptions{\pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}}
+            \newcommand\versoGroupOptions{\pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}}
+            % \Ifthispageodd{%
+            %     \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
+            % }{%
+            %     \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
+            % }
+            \pgfplotsset{
+                /pgfplots/group/plotGroup/.style={
+                    horizontal sep=\xPlotSep em,
+                    vertical sep=\yPlotSep em,
+                    yDescPos,
+                    group size=3 by 1,
+                },
+                /pgfplots/group/plotLastGroup/.style={
+                    plotGroup,
+                    x descriptions at=edge bottom,
+                },
+            }
+        %\endgroup
+
+        %\begingroup Stili
+            %\begingroup Selezione «recto»/«verso»
+            \newcommand\rectoPlotOptions{%
+                \pgfplotsset{%
+                    yLineAxis/.style={axis y line*=right},
+                    /tikz/yLabelShift/.style={%
+                        yshift=-2.5em,
+                        at={(axis description cs:1,0.5)},
+                        anchor=south,
+                        % rotate=180,
+                    },
+                    /tikz/yScaleLabelShift/.style={%
+                        yshift=.25em,
+                        at={(1,1)},
+                        anchor=south east,
+                    },
+                    /tikz/yTickLabelShift/.style={xshift=-0.15em},
+                }
+            }
+            \newcommand\versoPlotOptions{%
+                \pgfplotsset{%
+                    yLineAxis/.style={axis y line*=left},
+                    /tikz/yLabelShift/.style={%
+                        yshift=1.25em,
+                        at={(axis description cs:0,0.5)},
+                        anchor=south,
+                        % rotate=180,
+                    },
+                    /tikz/yScaleLabelShift/.style={%
+                        yshift=.25em,
+                        at={(0,1)},
+                        anchor=south west,
+                    },
+                    /tikz/yTickLabelShift/.style={xshift=+0.15em},
+                }
+            }
+            %\endgroup
+            %
+            %\begingroup Gruppi
+            \pgfplotsset{
+                plotRow/.style={
+                    scale only axis,
+                    width=\plotWidth cm,height=\plotHeight cm,
+                    xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                    ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
+                    xticklabel style={font=\dimTesto{\tickSize}},
+                    yticklabel style={font=\dimTesto{\tickSize},yTickLabelShift},
+                    xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+                    % axis x line*=bottom,yLineAxis,
+                    enlarge x limits=0.1,enlarge y limits=0.1,
+                    xmajorgrids,ymajorgrids,
+                    xminorticks=true,yminorticks=true,
+                    axis background/.style={fill=white},
+                    grid style={dashed}
+                },
+            }
+            %\endgroup
+            %
+            %\begingroup Estetica
+            \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
+            \pgfplotsset{
+                /pgfplots/log number format basis/.code 2 args={%
+                    \pgfmathsetmacro\exponent{#2}%
+                    \pgfmathparse{sign(\exponent)}%
+                    \ifnum\pgfmathresult<0%
+                        \pgfmathparse{abs(\exponent)}%
+                        $#1^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                    \else%
+                        $#1^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                    \fi%
+                },
+                ytick scale label code/.code={%
+                    \pgfmathsetmacro\exponent{#1}%
+                    \pgfmathparse{sign(\exponent)}%
+                    \ifnum\pgfmathresult<0
+                        \pgfmathparse{abs(\exponent)}%
+                        $\cdot 10^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                    \else
+                        $\cdot 10^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                    \fi
+                },
+            }
+            %\endgroup
+        %\endgroup
+
+        %\begingroup Legende
+        \pgfplotsset{
+            plotLegend/.style={
+                font=\dimTesto{\legendSize},
+                legend cell align=left,
+                align=left,
+                % draw=white!15!black,
+                draw=none, % Bordo invisibile
+                fill=white,
+                fill opacity=0.5,
+                text opacity=1,
+                % text width=2cm,
+            },
+            plotLegendNW/.style={legend style={plotLegend,legend pos=north west}},
+            plotLegendNE/.style={legend style={plotLegend,legend pos=north east}},
+            plotLegendSW/.style={legend style={plotLegend,legend pos=south west}},
+            plotLegendSE/.style={legend style={plotLegend,legend pos=south east}},
+        }
+        \pgfmathsetmacro\lineLegendLength{1}
+        \pgfmathsetmacro\areaLegendHeigth{.25}
+        \pgfplotsset{
+            legend image code/.code={
+                \draw [mark repeat=2,mark phase=2,#1]
+                    plot coordinates {
+                        (0em,0em)
+                        (.5*\lineLegendLength em,0em)
+                        (\lineLegendLength em,0em)
+                    };
+            },
+            /pgfplots/area legend/.style={
+                legend image code/.code={
+                    \draw [#1,fill,draw=none] 
+                        (0em,-\areaLegendHeigth em) 
+                        rectangle 
+                        (\lineLegendLength em,\areaLegendHeigth em);
+                },
+            },
+        }
+        %\endgroup
+    %\endgroup
 %\endgroup
 
 %\begingroup Liste

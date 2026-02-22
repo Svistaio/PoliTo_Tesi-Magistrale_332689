@@ -1,0 +1,431 @@
+
+% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+%\begingroup Impostazioni
+    %\begingroup Parametri
+        \pgfmathsetmacro\xPlotSep{4}
+        \pgfmathsetmacro\yPlotSep{4}
+        \pgfmathsetmacro\plotScale{.8}
+
+        \pgfmathsetmacro\titleSize{11}
+        \pgfmathsetmacro\commentSize{10}
+
+        \pgfmathsetmacro\nodeSize{20pt} % Diametro del nodo
+        \pgfmathsetmacro\starSize{2.25*\nodeSize}
+        \pgfmathsetmacro\numberSize{.53*\nodeSize}
+    %\endgroup
+
+    %\begingroup Colori
+        \definecolor{cRed}{HTML}{D68490}
+        \definecolor{cPurple}{HTML}{7E6EAC}
+        \definecolor{cTeal}{HTML}{87BDB1}
+        \definecolor{cOrange}{HTML}{F2D0A4}
+        \definecolor{cEdgeLight}{HTML}{EEE8D5} 
+        \definecolor{cEdgeDark}{HTML}{998888}
+        \definecolor{cStar}{HTML}{FDF6E3}
+        %
+        \definecolor{color1}{HTML}{800000} % Deep Red
+        \definecolor{color2}{HTML}{4682B4} % Steel Blue
+        \definecolor{color3}{HTML}{6B8E23} % Olive Green
+        \definecolor{color4}{HTML}{708090} % Slate Gray
+        \definecolor{color5}{HTML}{BC8F8F} % Rosy Brown
+        \definecolor{color6}{HTML}{008B8B} % Dark Cyan
+        \definecolor{color7}{HTML}{B8860B} % Dark Goldenrod
+    %\endgroup
+
+    %\begingroup Frecce
+    \tikzset{
+        transformingArrow/.style={
+            % >=Latex,
+            >=Stealth,
+            ->,
+            dashed,
+            line width=.8pt,
+            black!90,
+            shorten >=5pt,
+            shorten <=10pt
+        },
+        nodeArrowExact/.style={
+            % ->,
+            % -{Stealth[scale=1.2]},
+            -{Triangle[scale=.75]},
+            % draw=cEdgeLight,
+            % draw=red!50,
+            draw=black!95,
+            line width=.5pt,
+            % shorten >=2pt,
+            % shorten <=2pt
+        },
+        nodeArrowApprox/.style={
+            -,
+            draw=black!95,
+            line width=.5pt,
+            dashed,
+        },
+        transparentNodeArrow/.style={
+            nodeArrowApprox,
+            opacity=.4,
+        },
+    }
+    %\endgroup
+
+    %\begingroup Nodi
+        \tikzset{
+            nodeStyle/.style={
+                circle,
+                minimum size=\nodeSize,
+                % draw=black!80,
+                draw=black,
+                line width=.5pt,
+                inner sep=0pt,
+            },
+            starStyle/.style={
+                star,
+                star points=5,
+                star point ratio=2,
+                % fill=cStar,
+                fill=black!50,
+                fill opacity=.25,
+                minimum size=\starSize,
+                draw=none
+            },
+        }
+    %\endgroup
+
+    %\begingroup Testo
+    \tikzset{
+        titleStyle/.style={
+            font=\dimTesto{\titleSize},
+            align=center,
+            anchor=south,
+        },
+        commentStyle/.style={font=\dimTesto{\commentSize}},
+        arrowCommentStyle/.style={
+            midway,
+            commentStyle,
+            left,
+            sloped,
+            below
+        },
+        numberStyle/.style={font=\dimTesto{\numberSize}}
+    }
+    %\endgroup
+
+    %\begingroup Altro
+        % %\begingroup Selezione «recto»/«verso»
+        % \Ifthispageodd{%
+        %     \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
+        % }{%
+        %     \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
+        % }
+        % %
+        % \Ifthispageodd{%
+        %     \pgfplotsset{
+        %         yLineAxis/.style={axis y line*=right},
+        %         /tikz/yLabelShift/.style={
+        %             yshift=-2.5em,
+        %             at={(axis description cs:1,0.5)},
+        %             anchor=south,
+        %             % rotate=180,
+        %         },
+        %         /tikz/yScaleLabelShift/.style={
+        %             yshift=.25em,
+        %             at={(1,1)},
+        %             anchor=south east,
+        %         },
+        %         /tikz/yTickLabelShift/.style={xshift=-0.15em},
+        %     }
+        % }{%
+        %     \pgfplotsset{
+        %         yLineAxis/.style={axis y line*=left},
+        %         /tikz/yLabelShift/.style={
+        %             yshift=1.25em,
+        %             at={(axis description cs:0,0.5)},
+        %             anchor=south,
+        %             % rotate=180,
+        %         },
+        %         /tikz/yScaleLabelShift/.style={
+        %             yshift=.25em,
+        %             at={(0,1)},
+        %             anchor=south west,
+        %         },
+        %         /tikz/yTickLabelShift/.style={xshift=+0.15em},
+        %     }
+        % }
+        % %\endgroup
+        % %
+        % %\begingroup Gruppi
+        % \pgfplotsset{
+        %     plotRow/.style={
+        %         scale only axis,
+        %         width=\plotWidth cm,height=\plotHeight cm,
+        %         xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+        %         ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
+        %         xticklabel style={font=\dimTesto{\tickSize}},
+        %         yticklabel style={font=\dimTesto{\tickSize},yTickLabelShift},
+        %         xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+        %         % axis x line*=bottom,yLineAxis,
+        %         enlarge x limits=0.1,enlarge y limits=0.1,
+        %         xmajorgrids,ymajorgrids,
+        %         xminorticks=true,yminorticks=true,
+        %         axis background/.style={fill=white},
+        %         grid style={dashed}
+        %     },
+        % }
+        % %\endgroup
+        % %
+        % %\begingroup Estetica
+        % \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
+        % \pgfplotsset{
+        %     /pgfplots/log number format basis/.code 2 args={%
+        %         \pgfmathsetmacro\exponent{#2}%
+        %         \pgfmathparse{sign(\exponent)}%
+        %         \ifnum\pgfmathresult<0%
+        %             \pgfmathparse{abs(\exponent)}%
+        %             $#1^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+        %         \else%
+        %             $#1^{\smash{\pgfmathprintnumber{\exponent}}}$%
+        %         \fi%
+        %     },
+        %     ytick scale label code/.code={%
+        %         \pgfmathsetmacro\exponent{#1}%
+        %         \pgfmathparse{sign(\exponent)}%
+        %         \ifnum\pgfmathresult<0
+        %             \pgfmathparse{abs(\exponent)}%
+        %             $\cdot 10^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+        %         \else
+        %             $\cdot 10^{\smash{\pgfmathprintnumber{\exponent}}}$%
+        %         \fi
+        %     },
+        % }
+        % %\endgroup
+    %\endgroup
+%\endgroup
+
+\begin{tikzpicture}%
+    %\begingroup Coordinate dei vertici
+        \coordinate (O) at (0,0);
+
+        \newcommand\vertexCoordinates{
+            \coordinate (v1) at (0,0);
+            \coordinate (v2) at (2,2);
+            \coordinate (v3) at (-1,2.5);
+            \coordinate (v4) at (1.5,4.0);
+            \coordinate (v5) at (3.0,-0.5);
+            \coordinate (v6) at (4,3);
+            \coordinate (v7) at (5.0,0.5);
+        }
+
+        % \newcommand\vertexCoordinates{
+        %     \coordinate (v1) at (0,0);
+        %     \coordinate (v2) at (2.5,1.5);
+        %     \coordinate (v3) at (-1,2.5);
+        %     \coordinate (v4) at (1.5,4.0);
+        %     \coordinate (v5) at (3.0,-0.5);
+        %     \coordinate (v6) at (4.5,2.8);
+        %     \coordinate (v7) at (5.0,0.5);
+        % }
+
+        \newcommand\drawEmptyNodes[1]{\vertexCoordinates
+            \foreach \i in {1,2,...,7}
+                \node[
+                    nodeStyle,
+                    numberStyle,
+                    fill=white
+                ] (#1\i) at (v\i) {\i};
+
+            \foreach \i in {1,2}
+                \node[starStyle,rotate=\i*45] at (v\i) {};
+        }
+
+        \newcommand\drawUniformedNodes[2]{\vertexCoordinates
+            \foreach \i in {1,2,...,7}
+                \node[nodeStyle,fill=#2] (#1\i) at (v\i) {};
+
+            \begin{scope}[on background layer]
+                \foreach \i in {1,2}
+                    \node[
+                        starStyle,
+                        % fill=cStar,
+                        % fill opacity=0.9,
+                        rotate=\i*45
+                    ] at (v\i) {};
+            \end{scope}
+        }
+
+        \newcommand\drawColoredNodes[1]{\vertexCoordinates
+            \foreach \i in {1,2,...,7}
+                \node[nodeStyle,fill=color\i] (#1\i) at (v\i) {};
+
+            \begin{scope}[on background layer]
+                \foreach \i in {1,2}
+                    \node[
+                        starStyle,
+                        fill=cStar,
+                        % fill opacity=0.9,
+                        rotate=\i*45
+                    ] at (v\i) {};
+            \end{scope}
+        }
+
+        % \newcommand\drawColoredNodes[1]{\vertexCoordinates
+        %     \node[nodeStyle,fill=cTeal] (#11) at (v1) {};
+        %     \node[nodeStyle,fill=cPurple] (#12) at (v2) {};
+        %     \node[nodeStyle,fill=cRed] (#13) at (v3) {};
+        %     \node[nodeStyle,fill=cOrange] (#14) at (v4) {};
+        %     \node[nodeStyle,fill=cRed] (#15) at (v5) {};
+        %     \node[nodeStyle,fill=cTeal] (#16) at (v6) {};
+        %     \node[nodeStyle,fill=cPurple] (#17) at (v7) {};
+        % }
+    %\endgroup
+
+    %\begingroup Lati del grafo completo
+        \newcommand\drawCompleteEdges[1]{
+            \begin{scope}[on background layer]
+                \foreach \i [evaluate=\j as \s using int(\i+1)] in {1,...,6}
+                    \foreach \j in {\s,...,7}{
+                        \ifcase\i % Caso 0
+                        \or % Caso 1
+                            \ifnum\j=2\def\b{15}
+                            \else\ifnum\j=5\def\b{-20}
+                            \else\ifnum\j=6\def\b{-10}
+                            \else\ifnum\j=7\def\b{-10}
+                            \else\def\b{20}
+                            \fi\fi\fi\fi
+                        \or % Caso 2
+                            \ifnum\j=3\def\b{-10}
+                            \else\ifnum\j=4\def\b{0}
+                            \else\ifnum\j=5\def\b{-15}
+                            \else\ifnum\j=6\def\b{0}
+                            \else\ifnum\j=7\def\b{10}
+                            \else\def\b{20}
+                            \fi\fi\fi\fi\fi
+                        \or % Caso 3
+                            \ifnum\j=5\def\b{-20}
+                            \else\ifnum\j=7\def\b{-10}
+                            \else\def\b{20}
+                            \fi\fi
+                        \or % Caso 4
+                            \def\b{20}
+                        \or % Caso 5
+                            \def\b{-20}
+                        \or % Caso 6
+                            \def\b{20}
+                        \else % Caso 7
+                            \def\b{20}
+                        \fi
+                        \ifnum\i=1
+                            \draw[nodeArrowApprox] (#1\i) to[bend left=\b] (#1\j);
+                        \else
+                            \draw[nodeArrowApprox,transparentNodeArrow] (#1\i) to[bend left=\b] (#1\j);
+                        \fi
+                    }
+            \end{scope}
+        }
+    %\endgroup
+
+    \begin{scope}[
+        local bounding box=tikZFigure,
+        scale=\plotScale,
+        transform shape,
+    ]
+        %\begingroup Grafo esatto
+            \tikzbox{{(0,0)}}{ExactGraph}{
+                % \drawColoredNodes{e}
+                % \drawUniformedNodes{e}{none}
+                \drawEmptyNodes{e}
+
+                \begin{scope}[on background layer]
+                    \foreach \i/\j/\bi/\bo/\t in {
+                        1/2/20/20/0,
+                        2/4/20/20/1,
+                        2/5/20/20/1,
+                        2/6/20/20/1,
+                        3/4/20/20/1,
+                        % 3/6/20/15/1,
+                        5/7/20/20/1,
+                        6/7/20/20/1
+                    }{
+                        \ifnum\t=0
+                            \draw[nodeArrowExact] (e\i) to[bend left=\bi] (e\j);
+                            \draw[nodeArrowExact] (e\j) to[bend left=\bo] (e\i);
+                        \else
+                            \draw[nodeArrowExact,transparentNodeArrow] (e\i) to[bend left=\bi] (e\j);
+                            \draw[nodeArrowExact,transparentNodeArrow] (e\j) to[bend left=\bo] (e\i);
+                        \fi
+                    }
+                \end{scope}
+            }
+        %\endgroup
+
+        %\begingroup Grafo approssimato
+            \tikzbox[north]{{
+                ($(ExactGraph.south east)
+                +(.5*\xPlotSep em,-\yPlotSep em)$)
+            }}{ApproxGraph}{
+                % \drawColoredNodes{a}
+                % \drawUniformedNodes{a}{none}
+                \drawEmptyNodes{a}
+                \drawCompleteEdges{a}
+            }
+        %\endgroup
+
+        %\begingroup Grafo rilassato
+            \tikzbox{{
+                ($(ExactGraph.south east)
+                +(\xPlotSep em,0)$)
+            }}{RelaxedGraph}{
+                % \drawColoredNodes{r}
+                \drawUniformedNodes{r}{none}
+                % \drawEmptyNodes{r}
+                \drawCompleteEdges{r}
+            }
+        %\endgroup
+
+        % %\begingroup Testo
+            \node[titleStyle] at (ExactGraph.north) {Topologia esatta};
+            \node[titleStyle] at (ApproxGraph.north) {Topologia approssimata};
+            \node[titleStyle] at (RelaxedGraph.north) {Topologia rilassata};
+            
+            \node[commentStyle,below=0.5em of e1] {$(i_1,s_1)$};
+            \node[commentStyle,below=0.5em of a1] {$(i_1,s_1)$};
+            \node[commentStyle,below=0.5em of r1] {$(k,s)$};
+        % %\endgroup
+
+        %\begingroup Frecce
+            \draw[transformingArrow] 
+                ($(ExactGraph.south west)!0.2!(ExactGraph.south east)$) 
+                to[bend right=40] node[arrowCommentStyle] {\cref{defMatriceGradi}} (ApproxGraph.west);
+
+            \draw[transformingArrow]
+                (ApproxGraph.east) to[bend right=40] node[arrowCommentStyle] {\cref{teoRilassamentoTopologia}}
+                ($(RelaxedGraph.south west)!0.8!(RelaxedGraph.south east)$);
+
+            % \draw[transformingArrow] (ExactGraph.south) to[bend right=40] (ApproxGraph.west);
+            % \draw[transformingArrow] (ApproxGraph.east) to[bend right=40] (RelaxedGraph.south);
+
+            % \draw[transformingArrow] (ExactGraph.south) |- (ApproxGraph.west);
+            % \draw[transformingArrow] (ApproxGraph.east) -| (RelaxedGraph.south);
+        %\endgroup
+
+        %\begingroup Scatole di delimitazione
+            % \draw[red,dashed] (ExactGraph.south west) rectangle (ExactGraph.north east);
+            % \draw[blue,dashed] (ApproxGraph.south west) rectangle (ApproxGraph.north east);
+            % \draw[green,dashed] (RelaxedGraph.south west) rectangle (RelaxedGraph.north east);
+        %\endgroup
+    \end{scope}
+
+    %\begingroup Riferimento
+        % \begin{pgfonlayer}{foreground}
+        %     \node[commentStyle] (origine) at (0,0) {origine};
+    
+        %     \node[commentStyle] (NW) at (ExactGraph.north west) {NW};
+        %     \node[commentStyle] (NE) at (ExactGraph.north east) {NE};
+        %     \node[commentStyle] (SW) at (ExactGraph.south west) {SW};
+        %     \node[commentStyle] (SE) at (ExactGraph.south east) {SE};
+        % \end{pgfonlayer}
+    
+        % \draw[style=help lines] (tikZFigure.north west) grid[step=1em] (tikZFigure.south east);
+    %\endgroup
+\end{tikzpicture}

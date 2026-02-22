@@ -162,30 +162,30 @@ caseStudies = {
     "selected": "Default",
     "list": {
         "Default": {
-            "attractivity": .001, # .18
-            "convincibility": 1, # .44
+            "attractivity": .18, #.18,
+            "convincibility": .44, #.44,
             "deviation": 0.05,
             "region": 19,
-            "zetaValue": 0.1,
+            "zetaValue": 0.01,
             "timestep": 0.01,
-            "timesteps": int(2e8),
-            "iterations": 1,
+            "timesteps": int(1e6),
+            "iterations": 100,
             "progressBar": False,
             "extraction": False,
             "analysis": False,
-            "edgeWeights": False,
+            "edgeWeights": True,
             "fluctuations": False,
-            "zetaFraction": False,
-            "interactingRule": 0,
+            "zetaFraction": True,
+            "interactingRule": 2,
             "PdfPopUp": False,
             "LaTeXConversion": False,
             "snapshots": 1000,
             "smoothingFactor": 50,
             "studiedParameter": 1,
-            "startValuePrmStudy": 4e0,
-            "endValuePrmStudy": 1e1,
+            "startValuePrmStudy": 6.5e-1,
+            "endValuePrmStudy": 7.5e-1,
             "numberPrmStudy": 10,
-            "parametricStudy": False
+            "parametricStudy": False 
         },
         "λ(rsk/α)/(1+rsk/α)": {
             "attractivity": 0.05,

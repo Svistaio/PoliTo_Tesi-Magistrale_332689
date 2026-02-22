@@ -3,146 +3,156 @@
 % LTeX: language=it
 
 \begin{tikzpicture}%
+    %\begingroup Impostazioni
+        %\begingroup Testo
+            \fontSizeInfopage
+            % % \renewcommand\titleSize{12}
+            % \renewcommand\subCaptionSize8
+            % \renewcommand\ParameterSize7
+            % \renewcommand\labelSize7
+            % \renewcommand\tickSize6
+            % \renewcommand\legendSize6
+        %\endgroup
 
-    %\begingroup Comandi
-        % \renewcommand\titleSize{12}
-        \renewcommand\subCaptionSize8
-        \renewcommand\ParameterSize7
-        \renewcommand\labelSize7
-        \renewcommand\tickSize6
-        \renewcommand\legendSize6
+        %\begingroup Dimensioni
+            \pgfmathsetmacro\plotWidth7
+            \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+            %
+            \pgfmathparse{0.825*\plotWidth}
+            \pgfmathsetmacro\plotWidth\pgfmathresult
+            \pgfmathsetmacro\halfWidth{\plotWidth/2}
+            \pgfmathsetmacro\plotLastWidth{1.25*\plotWidth}
 
-        \pgfmathsetmacro\plotWidth7
-        \pgfmathsetmacro\plotHeight{.618*\plotWidth}
-        %
-        \pgfmathparse{0.825*\plotWidth}
-        \pgfmathsetmacro\plotWidth\pgfmathresult
-        \pgfmathsetmacro\halfWidth{\plotWidth/2}
-        \pgfmathsetmacro\plotLastWidth{1.25*\plotWidth}
+            \pgfmathsetmacro\xPlotSep{1}
+            \pgfmathsetmacro\yPlotSep{1.25}
+            \pgfmathsetmacro\yGroupSep{2.75}
+        %\endgroup
 
-        \pgfmathsetmacro\xPlotSep{1}
-        \pgfmathsetmacro\yPlotSep{1.25}
-        \pgfmathsetmacro\yGroupSep{2.75}
-    %\endgroup
-
-    %\begingroup Impostazioni pgfplots
         %\begingroup Gruppi
-        \Ifthispageodd{%
-            \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
-        }{%
-            \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
-        }
-        \pgfplotsset{
-            /pgfplots/group/plotGroup/.style={
-                horizontal sep=\xPlotSep em,
-                vertical sep=\yPlotSep em,
-                yDescPos,
-                group size=3 by 1,
-            },
-            /pgfplots/group/plotLastGroup/.style={
-                plotGroup,
-                x descriptions at=edge bottom,
-            },
-        }
+            \Ifthispageodd{%
+                \rectoGroupOptions
+                % \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
+            }{%
+                \versoGroupOptions
+                % \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
+            }
+            % \pgfplotsset{
+            %     /pgfplots/group/plotGroup/.style={
+            %         horizontal sep=\xPlotSep em,
+            %         vertical sep=\yPlotSep em,
+            %         yDescPos,
+            %         group size=3 by 1,
+            %     },
+            %     /pgfplots/group/plotLastGroup/.style={
+            %         plotGroup,
+            %         x descriptions at=edge bottom,
+            %     },
+            % }
         %\endgroup
 
         %\begingroup Stili
-        \Ifthispageodd{%
-            \pgfplotsset{
-                yLineAxis/.style={axis y line*=right},
-                /tikz/yLabelShift/.style={
-                    yshift=-2.5em,
-                    at={(axis description cs:1,0.5)},
-                    anchor=south,
-                    % rotate=180,
-                },
-                /tikz/yScaleLabelShift/.style={
-                    yshift=0em,
-                    xshift=1em,
-                    at={(1,1)},
-                    anchor=south west,
-                },
-                /tikz/yTickLabelShift/.style={xshift=-0.15em},
-            }
-        }{%
-            \pgfplotsset{
-                yLineAxis/.style={axis y line*=left},
-                /tikz/yLabelShift/.style={
-                    yshift=1.25em,
-                    at={(axis description cs:0,0.5)},
-                    anchor=south,
-                    % rotate=180,
-                },
-                /tikz/yScaleLabelShift/.style={
-                    yshift=0em,
-                    xshift=-1em,
-                    at={(0,1)},
-                    anchor=south east,
-                },
-                /tikz/yTickLabelShift/.style={xshift=+0.15em},
-            }
-        }
-        %
-        \pgfplotsset{
-            plotRow/.style={
-                scale only axis,
-                width=\plotWidth cm,height=\plotHeight cm,
-                xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
-                ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
-                xticklabel style={font=\dimTesto{\tickSize}},
-                yticklabel style={font=\dimTesto{\tickSize},yTickLabelShift},
-                xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
-                % axis x line*=bottom,yLineAxis,
-                enlarge x limits=0.1,enlarge y limits=0.1,
-                xmajorgrids,ymajorgrids,
-                xminorticks=true,yminorticks=true,
-                axis background/.style={fill=white},
-                grid style={dashed}
-            },
-        }
-        %
-        \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
-        \pgfplotsset{
-            /pgfplots/log number format basis/.code 2 args={%
-                \pgfmathsetmacro\exponent{#2}%
-                \pgfmathparse{sign(\exponent)}%
-                \ifnum\pgfmathresult<0%
-                    \pgfmathparse{abs(\exponent)}%
-                    $#1^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
-                \else%
-                    $#1^{\smash{\pgfmathprintnumber{\exponent}}}$%
-                \fi%
-            },
-            ytick scale label code/.code={%
-                \pgfmathsetmacro\exponent{#1}%
-                \pgfmathparse{sign(\exponent)}%
-                \ifnum\pgfmathresult<0
-                    \pgfmathparse{abs(\exponent)}%
-                    $\cdot 10^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
-                \else
-                    $\cdot 10^{\smash{\pgfmathprintnumber{\exponent}}}$%
-                \fi
-            },
-        }
+            %\begingroup Selezione «recto»/«verso»
+                \Ifthispageodd{%
+                    \rectoPlotOptions
+                    % \pgfplotsset{
+                    %     yLineAxis/.style={axis y line*=right},
+                    %     /tikz/yLabelShift/.style={
+                    %         yshift=-2.5em,
+                    %         at={(axis description cs:1,0.5)},
+                    %         anchor=south,
+                    %         % rotate=180,
+                    %     },
+                    %     /tikz/yScaleLabelShift/.style={
+                    %         yshift=.25em,
+                    %         at={(1,1)},
+                    %         anchor=south east,
+                    %     },
+                    %     /tikz/yTickLabelShift/.style={xshift=-0.15em},
+                    % }
+                }{%
+                    \versoPlotOptions
+                    % \pgfplotsset{
+                    %     yLineAxis/.style={axis y line*=left},
+                    %     /tikz/yLabelShift/.style={
+                    %         yshift=1.25em,
+                    %         at={(axis description cs:0,0.5)},
+                    %         anchor=south,
+                    %         % rotate=180,
+                    %     },
+                    %     /tikz/yScaleLabelShift/.style={
+                    %         yshift=.25em,
+                    %         at={(0,1)},
+                    %         anchor=south west,
+                    %     },
+                    %     /tikz/yTickLabelShift/.style={xshift=+0.15em},
+                    % }
+                }
+            %\endgroup
+            %
+            %\begingroup Gruppi
+                % \pgfplotsset{
+                %     plotRow/.style={
+                %         scale only axis,
+                %         width=\plotWidth cm,height=\plotHeight cm,
+                %         xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                %         ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
+                %         xticklabel style={font=\dimTesto{\tickSize}},
+                %         yticklabel style={font=\dimTesto{\tickSize},yTickLabelShift},
+                %         xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+                %         % axis x line*=bottom,yLineAxis,
+                %         enlarge x limits=0.1,enlarge y limits=0.1,
+                %         xmajorgrids,ymajorgrids,
+                %         xminorticks=true,yminorticks=true,
+                %         axis background/.style={fill=white},
+                %         grid style={dashed}
+                %     },
+                % }
+            %\endgroup
+            %
+            %\begingroup Estetica
+                % \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
+                % \pgfplotsset{
+                %     /pgfplots/log number format basis/.code 2 args={%
+                %         \pgfmathsetmacro\exponent{#2}%
+                %         \pgfmathparse{sign(\exponent)}%
+                %         \ifnum\pgfmathresult<0%
+                %             \pgfmathparse{abs(\exponent)}%
+                %             $#1^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                %         \else%
+                %             $#1^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                %         \fi%
+                %     },
+                %     ytick scale label code/.code={%
+                %         \pgfmathsetmacro\exponent{#1}%
+                %         \pgfmathparse{sign(\exponent)}%
+                %         \ifnum\pgfmathresult<0
+                %             \pgfmathparse{abs(\exponent)}%
+                %             $\cdot 10^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                %         \else
+                %             $\cdot 10^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                %         \fi
+                %     },
+                % }
+            %\endgroup
         %\endgroup
 
         %\begingroup Legende
-        \pgfplotsset{
-            plotLegend/.style={
-                font=\dimTesto{\legendSize},
-                legend cell align=left,
-                align=left,
-                % draw=white!15!black,
-                draw=none, % Bordo invisibile
-                fill=white,
-                fill opacity=0.5,
-                text opacity=1,
-            },
-            plotLegendNW/.style={legend style={plotLegend},legend pos=north west},
-            plotLegendNE/.style={legend style={plotLegend},legend pos=north east},
-            plotLegendSW/.style={legend style={plotLegend},legend pos=south west},
-            plotLegendSE/.style={legend style={plotLegend},legend pos=south east},
-        }
+            % \pgfplotsset{
+            %     plotLegend/.style={
+            %         font=\dimTesto{\legendSize},
+            %         legend cell align=left,
+            %         align=left,
+            %         % draw=white!15!black,
+            %         draw=none, % Bordo invisibile
+            %         fill=white,
+            %         fill opacity=0.5,
+            %         text opacity=1,
+            %     },
+            %     plotLegendNW/.style={legend style={plotLegend,legend pos=north west}},
+            %     plotLegendNE/.style={legend style={plotLegend,legend pos=north east}},
+            %     plotLegendSW/.style={legend style={plotLegend,legend pos=south west}},
+            %     plotLegendSE/.style={legend style={plotLegend,legend pos=south east}},
+            % }
         %\endgroup
     %\endgroup
 
@@ -322,9 +332,9 @@
 
     %\begingroup Parametri
         \newcommand\betaExact{\num{1.25+-0.01}}
-        \newcommand\xiExact{\num{.70+-.04}}
-        
         \newcommand\betaAprx{\num{1.27+-0.01}}
+        
+        \newcommand\xiExact{\num{.70+-.04}}
         \newcommand\xiAprx{\num{.67+-.04}}
 
         \newcommand\betaReal{\num{1.27}}
@@ -337,23 +347,24 @@
             Parametri/.style={
                 align=center,
                 font=\dimTesto{\ParameterSize},
-                anchor=center
+                anchor=north east
             }
         }
+        \newcommand\nodeAnchor{north east}
 
-        \newcommand\xShift{-4.5em}
-        \newcommand\yShift{-2em}
+        \newcommand\xShift{-1em}
+        \newcommand\yShift{-1em}
         \newcommand\yLineShift{-0.5em}
 
 
-        \coordinate (EA) at (Row2 c1r1.north east);
-        \coordinate (RE) at (Row2 c2r1.north east);
-        \coordinate (RA) at (Row2 c3r1.north east);
+        \coordinate (EA) at (Row2 c1r1.\nodeAnchor);
+        \coordinate (RE) at (Row2 c2r1.\nodeAnchor);
+        \coordinate (RA) at (Row2 c3r1.\nodeAnchor);
 
         \node[Parametri] at ([shift={(\xShift,\yShift)}]EA) {
             \(\begin{aligned}
-                \textcolor{blueish}{\beta}&\textcolor{blueish}{=\betaAprx}\\[\yLineShift]
-                \textcolor{reddish}{\beta}&\textcolor{reddish}{=\betaExact}
+                \textcolor{blueish}{\beta}&\textcolor{blueish}{=\betaExact}\\[\yLineShift]
+                \textcolor{reddish}{\beta}&\textcolor{reddish}{=\betaAprx}
             \end{aligned}\)
         };
         \node[Parametri] at ([shift={(\xShift,\yShift)}]RE) {
@@ -370,9 +381,9 @@
         };
 
 
-        \coordinate (R) at (Row3 c1r1.north east);
-        \coordinate (E) at (Row3 c2r1.north east);
-        \coordinate (A) at (Row3 c3r1.north east);
+        \coordinate (R) at (Row3 c1r1.\nodeAnchor);
+        \coordinate (E) at (Row3 c2r1.\nodeAnchor);
+        \coordinate (A) at (Row3 c3r1.\nodeAnchor);
 
         \node[Parametri] at ([shift={(\xShift,\yShift)}]R) {
             \textcolor{black}{

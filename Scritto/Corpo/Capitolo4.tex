@@ -610,8 +610,8 @@
                     \hline
                     &\(\lambda\)&\(\alpha\)&\(\zeta\)&\(\sigma\)&\(N_t\)\\
                     \hline
-                    Senza \(\gamma\)&\(0.1\)&\(1\)&\(0.1\)&--&\(10^6\)\\
-                    Con \(\gamma\)&\(0.1\)&\(1\)&\(0.1\)&\(0.05\)&\(10^6\)\\
+                    Senza \(\gamma\)&\(\num{0.1}\)&\(\num{1}\)&\(\num{0.1}\)&--&\(\num{1e6}\)\\
+                    Con \(\gamma\)&\(\num{0.1}\)&\(\num{1}\)&\(\num{0.1}\)&\(\num{0.05}\)&\(\num{1e6}\)\\
                     \hline
                 \end{tabular}
                 \caption{Parametri della \cref{figConfrontoConESenzaFluttuazioni}.}
@@ -670,37 +670,48 @@
 
             Una prima possibilità consiste nella
             %
-            \eqtag{\([\text{RE}]_T\)}{
-                \label{eqLeggeEmigrazioneTaglia}
+            \eqtag{\([\text{RE}]_S\)}{
+                \label{eqRegolaEmigrazioneTaglia}
                 E(s,s_*)\equiv\lambda\frac{(s_*/s)^\alpha}{1+(s_*/s)^\alpha},
             }%
             in cui \(\lambda\in(0,1)\) e \(\alpha\in\mathbb R^+\); in essenza è la \cite[(2.2), § 2, p. 223]{Gualandi2019SDC} modificata mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019SDC}, ossia è una funzione di Hill di ordine \(\alpha\), in cui v'è un tasso di emigrazione maggiore verso città con popolazione relativa, data dal rapporto \(s_*/s\), maggiore.
 
             % \tikzfigure{p}
             % {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Infopagina.tex}}
-            % {Studio della configurazione di riferimento della \ref{eqLeggeEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+            % {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
             % {.7\linewidth}{figProva}
 
             I risultati nella \daRivedere{}, ottenuti tramite i parametri nella \cref{tabParametriRegolaEmigrazioneTaglia}, non sono purtroppo corretti dato che non solo mostrano dei centri abitati spopolarsi, ma che questi sono piú per la maggior parte i le città piú popolate.
 
             \begin{table}[htb]
                 \centering
-                \begin{tabular}{ccc}
+                \begin{tabular}{ccccc}
                     \hline
-                    \(\lambda\)&\(\alpha\)&\(N_t\)\\
+                    &\(\lambda\)&\(\alpha\)&\(N_t\)&\(R\)\\
                     \hline
-                    \(\num{1}\)&\(\num{1}\)&\(\num{1}\)\\
+                    Stabile&\(\num{.1}\)&\(\num{.5}\)&\(\num{1e7}\)&\(\num{100}\)\\
+                    Instabile&\(\num{.1}\)&\(\num{1.5}\)&\(\num{1e5}\)&\(\num{10}\)\\
                     \hline
                 \end{tabular}
-                \caption{Dati e parametri della \ref{eqLeggeEmigrazioneTaglia}.}
+                \caption{Dati e parametri della \ref{eqRegolaEmigrazioneTaglia}.}
                 \label{tabParametriRegolaEmigrazioneTaglia}
             \end{table}
 
+            \tikzfigure{p}
+            {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Stabile/Infopagina.tex}}
+            {Studio della configurazione di riferimento stabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+            {.6\linewidth}{figStudioConfigurazioneRiferimentoStabileRET}
+
+            \tikzfigure{p}
+            {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Instabile/Infopagina.tex}}
+            {Studio della configurazione di riferimento instabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+            {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRET}
+
         \subsection{Regola taglia-gradi}
 
-            \eqtag{\([\text{RE}]_{TD}\)}{
-                \label{eqLeggeEmigrazioneTagliaGradi}
-                E_{TD}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(k_{i_*}/k_i)]^\alpha}{1+[(s_*/s)(k_{i_*}/k_i)]^\alpha},
+            \eqtag{\([\text{RE}]_{SK}\)}{
+                \label{eqRegolaEmigrazioneTagliaGradi}
+                E_{SK}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(k_{i_*}/k_i)]^\alpha}{1+[(s_*/s)(k_{i_*}/k_i)]^\alpha},
             }%
 
             \begin{table}[htb]
@@ -709,18 +720,23 @@
                     \hline
                     \(\lambda\)&\(\alpha\)&\(N_t\)\\
                     \hline
-                    \(\num{1}\)&\(\num{1}\)&\(\num{1}\)\\
+                    \(\num{.15}\)&\(\num{.63}\)&\(\num{2e6}\)\\
                     \hline
                 \end{tabular}
-                \caption{Dati e parametri della \ref{eqLeggeEmigrazioneTagliaGradi}.}
+                \caption{Dati e parametri della \ref{eqRegolaEmigrazioneTagliaGradi}.}
                 \label{tabParametriRegolaEmigrazioneTagliaGradi}
             \end{table}
 
+            \tikzfigure{p}
+            {\input{../../Figure/.fnl/Capitolo4/RETGConfigurazioneRiferimento/Infopagina.tex}}
+            {Studio della configurazione di riferimento della \cref{eqRegolaEmigrazioneTagliaGradi} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaGradi}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+            {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRETG}
+
         \subsection{Regola frazionata}
             
-            \eqtag{\([\text{RE}]^f_{TD}\)}{
-                \label{eqLeggeEmigrazioneTagliaGradiFrazionata}
-                E^f_{TD}(s,s_*,i,i_*)\equiv (1-\zeta)E_{TD}(s,s_*,k_i,k_{i_*})+\zeta E_{TD}(s_*,s,k_{i_*},k_i)
+            \eqtag{\([\text{RE}]^f_{SK}\)}{
+                \label{eqRegolaEmigrazioneTagliaGradiFrazionata}
+                E^f_{SK}(s,s_*,i,i_*)\equiv (1-\zeta)E_{SK}(s,s_*,k_i,k_{i_*})+\zeta E_{SK}(s_*,s,k_{i_*},k_i)
             }%
 
             \begin{table}[htb]
@@ -729,18 +745,23 @@
                     \hline
                     \(\lambda\)&\(\alpha\)&\(\zeta\)&\(N_t\)\\
                     \hline
-                    \(\num{1}\)&\(\num{1}\)&\(\num{1e-1}\)&\(\num{1}\)\\
+                    \(\num{.15}\)&\(\num{.67}\)&\(\num{1e-2}\)&\(\num{1e6}\)\\
                     \hline
                 \end{tabular}
-                \caption{Dati e parametri della \ref{eqLeggeEmigrazioneTagliaGradiFrazionata}.}
-                \label{tabParametriRegolaEmigrazioneTagliaFrazionata}
+                \caption{Dati e parametri della \ref{eqRegolaEmigrazioneTagliaGradiFrazionata}.}
+                \label{tabParametriRegolaEmigrazioneTagliaGradiFrazionata}
             \end{table}
+
+            \tikzfigure{p}
+            {\input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/Infopagina.tex}}
+            {Studio della configurazione di riferimento della \cref{eqRegolaEmigrazioneTagliaGradiFrazionata} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaGradiFrazionata}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+            {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRETGf}
 
         \subsection{Regola taglia-forza}
 
-            \eqtag{\([\text{RE}]_{TF}\)}{
-                \label{eqLeggeEmigrazioneTagliaForza}
-                E_{TD}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(w_{i_*}/w_i)]^\alpha}{1+[(s_*/s)(w_{i_*}/w_i)]^\alpha},
+            \eqtag{\([\text{RE}]_{SW}\)}{
+                \label{eqRegolaEmigrazioneTagliaForza}
+                E_{SW}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(w_{i_*}/w_i)]^\alpha}{1+[(s_*/s)(w_{i_*}/w_i)]^\alpha},
             }%
             
             \begin{table}[htb]
@@ -752,18 +773,18 @@
                     \(\num{1}\)&\(\num{1}\)&\(\num{1}\)\\
                     \hline
                 \end{tabular}
-                \caption{Dati e parametri della \ref{eqLeggeEmigrazioneTagliaForza}.}
+                \caption{Dati e parametri della \ref{eqRegolaEmigrazioneTagliaForza}.}
                 \label{tabParametriRegolaEmigrazioneTagliaForza}
             \end{table}
 
             \tikzfigure{p}
             {\input{../../Figure/.fnl/Capitolo4/RETFConfigurazioneRiferimento/Infopagina.tex}}
-            {Studio della configurazione di riferimento della \ref{eqLeggeEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+            {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
             {.575\linewidth}{figStudioConfigurazioneRiferimentoRETF}
 
         \subsection{Interpretazioni}
 
-            In poche parole la \eqref{eqLeggeEmigrazioneTaglia} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
+            In poche parole la \eqref{eqRegolaEmigrazioneTaglia} descrive la tendenza degl'individui di aggregarsi per i piú svariati motivi: lavoro, sicurezza, famiglia, eccetera.
 
             I due principali parametri del modello possono quindi essere cosí interpretati:
 

@@ -1,0 +1,47 @@
+"attractivity": .1,
+"convincibility": 1.5,
+"deviation": 0.05,
+"region": 19,
+"zetaValue": 0.1,
+"timestep": 0.01,
+"timesteps": int(1e6),
+"iterations": 10,
+"progressBar": False,
+"extraction": False,
+"analysis": False,
+"edgeWeights": False,
+"fluctuations": False,
+"zetaFraction": False,
+"interactingRule": 0,
+"PdfPopUp": False,
+"LaTeXConversion": True,
+"snapshots": 1000,
+"smoothingFactor": 50,
+"studiedParameter": 1,
+"startValuePrmStudy": 4e0,
+"endValuePrmStudy": 1e1,
+"numberPrmStudy": 10,
+"parametricStudy": False
+
+- Macro q -
+Gdkgg/begin
+V/xmin
+kd/xmax
+jV/ymin
+kd/ymax
+jV/]
+dkV?xmin
+d
+
+- - -
+
+- Macro s -
+?xmin
+VjpJxjJx>k>j..
+- - -
+
+- Macro c -
+/xmin
+gcj/xmin
+ngcjnngcj
+---
