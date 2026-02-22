@@ -3,26 +3,30 @@
 % LTeX: language=it
 
 \begin{tikzpicture}%
-    %\begingroup Comandi
-        \definecolor{colore}{rgb}{0.50196,0.50196,0.50196}%
+    %\begingroup Impostazioni
+        %\begingroup Colori
+            \definecolor{colore}{rgb}{0.50196,0.50196,0.50196}%
+        %\endgroup
     
-        % \renewcommand\titleSize{12}
-        \renewcommand\subCaptionSize{9}
-        \renewcommand\labelSize{8}
-        \renewcommand\tickSize{7}
-        \renewcommand\legendSize{6}
+        %\begingroup Testo
+            % \renewcommand\titleSize{12}
+            \renewcommand\subCaptionSize{9}
+            \renewcommand\labelSize{8}
+            \renewcommand\tickSize{7}
+            \renewcommand\legendSize{6}
+        %\endgroup
 
-        \pgfmathsetmacro\plotWidth{7}
-        \pgfmathsetmacro\plotHeight{.618*\plotWidth}
-        \pgfmathsetmacro\halfHeightPlot{\plotHeight/2}
-        
-        \pgfmathsetmacro\xPlotSep{2.25}
-        \pgfmathsetmacro\yPlotSepI{1.5}
-        \pgfmathsetmacro\yPlotSepII{3}
-        \pgfmathsetmacro\xLegendSep{.25cm}
-    %\endgroup
+        %\begingroup Dimensioni
+            \pgfmathsetmacro\plotWidth{7}
+            \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+            \pgfmathsetmacro\halfHeightPlot{\plotHeight/2}
+            
+            \pgfmathsetmacro\xPlotSep{2.25}
+            \pgfmathsetmacro\yPlotSepI{1.5}
+            \pgfmathsetmacro\yPlotSepII{3}
+            \pgfmathsetmacro\xLegendSep{.25cm}
+        %\endgroup
 
-    %\begingroup Impostazioni pgfplots
         %\begingroup Gruppi
         \pgfplotsset{
             /pgfplots/group/plotGroup/.style={
@@ -64,9 +68,9 @@
                 axis y line*=left,
                 ylabel={\(\underhat{\bar f}_N(s)\)},
                 y tick scale label style={
-                    xshift=-.4cm,
+                    yshift=.25cm,
                     at={(0,1)},
-                    anchor=south east,
+                    anchor=south west,
                 },
             },
             plotColumn2/.style={
@@ -74,9 +78,9 @@
                 axis y line*=right,
                 ylabel={\(\underhat{\bar f}_N(s)\)},
                 y tick scale label style={
-                    xshift=.4cm,
+                    yshift=.25cm,
                     at={(1,1)},
-                    anchor=south west,
+                    anchor=south east,
                 },
             },
         }

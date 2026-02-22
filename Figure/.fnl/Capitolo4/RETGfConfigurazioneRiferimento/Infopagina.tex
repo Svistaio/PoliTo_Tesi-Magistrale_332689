@@ -1,0 +1,727 @@
+
+% !TEX root = ../../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\begin{tikzpicture}%
+    %\begingroup Impostazioni
+        %\begingroup Testo
+            \fontSizeInfopage
+            % % \renewcommand\titleSize{12}
+            % \renewcommand\subCaptionSize8
+            % \renewcommand\ParameterSize7
+            % \renewcommand\labelSize7
+            % \renewcommand\tickSize6
+            % \renewcommand\legendSize6
+        %\endgroup
+
+        %\begingroup Dimensioni
+            \pgfmathsetmacro\plotWidth7
+            \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+            %
+            \pgfmathparse{0.825*\plotWidth}
+            \pgfmathsetmacro\plotWidth\pgfmathresult
+            \pgfmathsetmacro\halfWidth{\plotWidth/2}
+            \pgfmathsetmacro\plotLastWidth{1.25*\plotWidth}
+
+            \pgfmathsetmacro\xPlotSep{1}
+            \pgfmathsetmacro\yPlotSep{1.25}
+            \pgfmathsetmacro\yGroupSep{2.75}
+        %\endgroup
+
+        %\begingroup Gruppi
+            \Ifthispageodd{%
+                \rectoGroupOptions
+                % \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
+            }{%
+                \versoGroupOptions
+                % \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
+            }
+            % \pgfplotsset{
+            %     /pgfplots/group/plotGroup/.style={
+            %         horizontal sep=\xPlotSep em,
+            %         vertical sep=\yPlotSep em,
+            %         yDescPos,
+            %         group size=3 by 1,
+            %     },
+            %     /pgfplots/group/plotLastGroup/.style={
+            %         plotGroup,
+            %         x descriptions at=edge bottom,
+            %     },
+            % }
+        %\endgroup
+
+        %\begingroup Stili
+            %\begingroup Selezione «recto»/«verso»
+                \Ifthispageodd{%
+                    \rectoPlotOptions
+                    % \pgfplotsset{
+                    %     yLineAxis/.style={axis y line*=right},
+                    %     /tikz/yLabelShift/.style={
+                    %         yshift=-2.5em,
+                    %         at={(axis description cs:1,0.5)},
+                    %         anchor=south,
+                    %         % rotate=180,
+                    %     },
+                    %     /tikz/yScaleLabelShift/.style={
+                    %         yshift=.25em,
+                    %         at={(1,1)},
+                    %         anchor=south east,
+                    %     },
+                    %     /tikz/yTickLabelShift/.style={xshift=-0.15em},
+                    % }
+                }{%
+                    \versoPlotOptions
+                    % \pgfplotsset{
+                    %     yLineAxis/.style={axis y line*=left},
+                    %     /tikz/yLabelShift/.style={
+                    %         yshift=1.25em,
+                    %         at={(axis description cs:0,0.5)},
+                    %         anchor=south,
+                    %         % rotate=180,
+                    %     },
+                    %     /tikz/yScaleLabelShift/.style={
+                    %         yshift=.25em,
+                    %         at={(0,1)},
+                    %         anchor=south west,
+                    %     },
+                    %     /tikz/yTickLabelShift/.style={xshift=+0.15em},
+                    % }
+                }
+            %\endgroup
+            %
+            %\begingroup Gruppi
+                % \pgfplotsset{
+                %     plotRow/.style={
+                %         scale only axis,
+                %         width=\plotWidth cm,height=\plotHeight cm,
+                %         xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                %         ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
+                %         xticklabel style={font=\dimTesto{\tickSize}},
+                %         yticklabel style={font=\dimTesto{\tickSize},yTickLabelShift},
+                %         xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+                %         % axis x line*=bottom,yLineAxis,
+                %         enlarge x limits=0.1,enlarge y limits=0.1,
+                %         xmajorgrids,ymajorgrids,
+                %         xminorticks=true,yminorticks=true,
+                %         axis background/.style={fill=white},
+                %         grid style={dashed}
+                %     },
+                % }
+            %\endgroup
+            %
+            %\begingroup Estetica
+                % \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
+                % \pgfplotsset{
+                %     /pgfplots/log number format basis/.code 2 args={%
+                %         \pgfmathsetmacro\exponent{#2}%
+                %         \pgfmathparse{sign(\exponent)}%
+                %         \ifnum\pgfmathresult<0%
+                %             \pgfmathparse{abs(\exponent)}%
+                %             $#1^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                %         \else%
+                %             $#1^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                %         \fi%
+                %     },
+                %     ytick scale label code/.code={%
+                %         \pgfmathsetmacro\exponent{#1}%
+                %         \pgfmathparse{sign(\exponent)}%
+                %         \ifnum\pgfmathresult<0
+                %             \pgfmathparse{abs(\exponent)}%
+                %             $\cdot 10^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                %         \else
+                %             $\cdot 10^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                %         \fi
+                %     },
+                % }
+            %\endgroup
+        %\endgroup
+
+        %\begingroup Legende
+            % \pgfplotsset{
+            %     plotLegend/.style={
+            %         font=\dimTesto{\legendSize},
+            %         legend cell align=left,
+            %         align=left,
+            %         % draw=white!15!black,
+            %         draw=none, % Bordo invisibile
+            %         fill=white,
+            %         fill opacity=0.5,
+            %         text opacity=1,
+            %         % text width=2cm,
+            %     },
+            %     plotLegendNW/.style={legend style={plotLegend,legend pos=north west}},
+            %     plotLegendNE/.style={legend style={plotLegend,legend pos=north east}},
+            %     plotLegendSW/.style={legend style={plotLegend,legend pos=south west}},
+            %     plotLegendSE/.style={legend style={plotLegend,legend pos=south east}},
+            % }
+            % \pgfmathsetmacro\lineLegendLength{1}
+            % \pgfmathsetmacro\areaLegendHeigth{.25}
+            % \pgfplotsset{
+            %     legend image code/.code={
+            %         \draw [mark repeat=2,mark phase=2,#1]
+            %             plot coordinates {
+            %                 (0em,0em)
+            %                 (.5*\lineLegendLength em,0em)
+            %                 (\lineLegendLength em,0em)
+            %             };
+            %     },
+            %     /pgfplots/area legend/.style={
+            %         legend image code/.code={
+            %             \draw [#1,fill,draw=none] 
+            %                 (0em,-\areaLegendHeigth em) 
+            %                 rectangle 
+            %                 (\lineLegendLength em,\areaLegendHeigth em);
+            %         },
+            %     },
+            % }
+        %\endgroup
+    %\endgroup
+
+    %\begingroup Righe
+        \begin{groupplot}[
+            group style={
+                group name=Row1,
+                plotGroup,
+            },
+            plotRow,
+            plotLegendNE,
+            % legend style={
+            %     at={(1,1)},
+            %     anchor=north east
+            % },
+            %
+            enlarge x limits={lower,value=0.05},
+            enlarge y limits={upper,value=.025},
+            xmode=log,
+            y tick scale label style={yScaleLabelShift},
+            log origin=infty,
+            % xmin=10, xmax=1e+06,
+            ymin=0,ymax=0.0004,
+        ]
+            \nextgroupplot[%
+                % xmin=10,xmax=1e+06,
+                % ymin=0,ymax=0.00035,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig1.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig1.tex}
+    
+            \nextgroupplot[%
+                % xmin=10,xmax=1e+06,
+                % ymin=0,ymax=0.0004,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig2.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig2.tex}
+    
+            \nextgroupplot[%
+                % xmin=10,xmax=1e+06,
+                % ymin=0,ymax=0.0004,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig3.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig3.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={
+                group name=Row2,
+                plotGroup,
+            },
+            plotRow,
+            plotLegendSW,
+            %
+            xticklabels={},
+            xmode=log,ymode=log,
+            % xmin=3637.5,xmax=2.5003e+05,
+            ymin=0.0053191,ymax=1,
+        ]
+            \nextgroupplot[%
+                at={($(Row1 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                xmin=3637.5,xmax=2.0424e+05,
+                % xmin=4240.6,xmax=1.3056e+05,
+                % ymin=0.0053191,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig8.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig8.tex}
+    
+            \nextgroupplot[%
+                xmin=3637.5,xmax=2.0424e+05,
+                % ymin=0.0053191,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig9.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig9.tex}
+    
+            \nextgroupplot[%
+                xmin=3637.5,xmax=2.0424e+05,
+                % ymin=0.0053191,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig10.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig10.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={
+                group name=Row3,
+                plotLastGroup,
+            },
+            plotRow,
+            plotLegendSW,
+            %
+            xmode=log,ymode=log,
+            % xmin=3637.5,xmax=2.5003e+05,
+            ymin=0.001,ymax=1.0176,,
+        ]
+            \nextgroupplot[%
+                at={($(Row2 c1r1.south west)-(0,.5*\yPlotSep em)-(0,\plotHeight cm)$)},
+                xmin=3637.5,xmax=2.0424e+05,
+                % ymin=0.0041301,ymax=1.0005,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig5.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig5.tex}
+    
+            \nextgroupplot[%
+                xmin=3637.5,xmax=2.0424e+05,
+                % xmin=4300.6,xmax=1.3056e+05,
+                % ymin=0.001,ymax=1.0176,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig6.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig6.tex}
+    
+            \nextgroupplot[%
+                xmin=3637.5,xmax=2.0424e+05,
+                % xmin=4240.6,xmax=1.3056e+05,
+                % ymin=0.001,ymax=1.0145,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig7.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig7.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={
+                group name=Row4,
+                plotLastGroup
+            },
+            plotRow,
+            plotLegendNW,
+            %
+            xlabel={\(k\)},ylabel={\(s(k)\)},
+            xmode=log,ymode=log,
+            xmin=10,xmax=283,
+            ymin=100,ymax=2.0424e+05,%1.5403e+05,
+        ]
+            \nextgroupplot[%
+                at={($(Row3 c1r1.south west)-(0,\yGroupSep em)-(0,\plotHeight cm)$)},
+                % xmin=10,xmax=283,
+                % ymin=100,ymax=1e+05,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SVsDfig1.tex}
+            % \input{../../../.tex/20/KS/SizeVsDegreefig1.tex}
+    
+            \nextgroupplot[%
+                % xmin=10,xmax=283,
+                % ymin=100,ymax=1e+06,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SVsDfig2.tex}
+            % \input{../../../.tex/20/KS/SizeVsDegreefig2.tex}
+    
+            \nextgroupplot[%
+                % xmin=10,xmax=283,
+                % ymin=100,ymax=1e+06,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SVsDfig3.tex}
+            % \input{../../../.tex/20/KS/SizeVsDegreefig3.tex}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row5,
+                plotLastGroup,
+                group size=2 by 1,
+            },
+            plotRow,
+            plotLegendSE,
+            width=\plotLastWidth cm,
+            xlabel={\(t\)},ylabel={\(s(t)\)},
+            enlarge x limits=0,
+            enlarge y limits=0.05,
+            ymode=log,
+            x tick scale label style={
+                yshift=-1em,
+                at={(.95,0)},
+                anchor=north,
+            },
+            xmin=0,xmax=10000,
+            ymin=311.72,ymax=1e+05,
+        ]
+            \nextgroupplot[%
+                at={($
+                    (Row4 c2r1.south west)+(\halfWidth cm,0)
+                    -(0,\yGroupSep em)-(0,\plotHeight cm)
+                    -(\xPlotSep em,0)-(\plotLastWidth cm,0)
+                $)},
+                % xmin=0,xmax=10000,
+                % ymin=435.19,ymax=1e+05,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SEfig1.tex}
+            % \input{../../../.tex/20/KS/SizeEvolutionsfig1.tex}
+
+            \nextgroupplot[%
+                % xmin=0,xmax=10000,
+                % ymin=100,ymax=1e+05,
+            ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SEfig2.tex}
+            % \input{../../../.tex/20/KS/SizeEvolutionsfig2.tex}
+        \end{groupplot}
+    %\endgroup
+
+    %\begingroup Parametri
+        \newcommand\betaExact{\num{1.26+-0.02}}
+        \newcommand\betaAprx{\num{1.25+-0.01}}
+        
+        \newcommand\xiExact{\num{.56+-.05}}
+        \newcommand\xiAprx{\num{.61+-.05}}
+
+        \newcommand\betaReal{\num{1.27}}
+        \newcommand\xiReal{.93}
+
+        \definecolor{blueish}{rgb}{0.00000,0.44700,0.74100}%
+        \definecolor{reddish}{rgb}{0.83529,0.36863,0.00000}%
+
+        \tikzset{
+            Parametri/.style={
+                align=center,
+                font=\dimTesto{\ParameterSize},
+                anchor=north east
+            }
+        }
+        \newcommand\nodeAnchor{north east}
+
+        \newcommand\xShift{-1em}
+        \newcommand\yShift{-1em}
+        \newcommand\yLineShift{-0.5em}
+
+
+        \coordinate (EA) at (Row2 c1r1.\nodeAnchor);
+        \coordinate (RE) at (Row2 c2r1.\nodeAnchor);
+        \coordinate (RA) at (Row2 c3r1.\nodeAnchor);
+
+        \node[Parametri] at ([shift={(\xShift,\yShift)}]EA) {
+            \(\begin{aligned}
+                \textcolor{blueish}{\beta}&\textcolor{blueish}{=\betaExact}\\[\yLineShift]
+                \textcolor{reddish}{\beta}&\textcolor{reddish}{=\betaAprx}
+            \end{aligned}\)
+        };
+        \node[Parametri] at ([shift={(\xShift,\yShift)}]RE) {
+            \(\begin{aligned}
+                \textcolor{blueish}{\beta}&\textcolor{blueish}{=\betaExact}\\[\yLineShift]
+                \textcolor{black}{\beta}&\textcolor{black}{=\betaReal}
+            \end{aligned}\)
+        };
+        \node[Parametri] at ([shift={(\xShift,\yShift)}]RA) {
+            \(\begin{aligned}
+                \textcolor{reddish}{\beta}&\textcolor{reddish}{=\betaAprx}\\[\yLineShift]
+                \textcolor{black}{\beta}&\textcolor{black}{=\betaReal}
+            \end{aligned}\)
+        };
+
+
+        \coordinate (R) at (Row3 c1r1.\nodeAnchor);
+        \coordinate (E) at (Row3 c2r1.\nodeAnchor);
+        \coordinate (A) at (Row3 c3r1.\nodeAnchor);
+
+        \node[Parametri] at ([shift={(\xShift,\yShift)}]R) {
+            \textcolor{black}{
+                \(\begin{aligned}
+                    \beta&=\betaReal\\[\yLineShift]
+                    \xi&=\xiReal
+                \end{aligned}\)
+            }
+        };
+
+        \node[Parametri] at ([shift={(\xShift,\yShift)}]E) {
+            \textcolor{blueish}{
+                \(\begin{aligned}
+                    \beta&=\betaExact\\[\yLineShift]
+                    \xi&=\xiExact
+                \end{aligned}\)
+            }
+        };
+
+        \node[Parametri] at ([shift={(\xShift,\yShift)}]A) {
+            \textcolor{reddish}{
+                \(\begin{aligned}
+                    \beta&=\betaAprx\\[\yLineShift]
+                    \xi&=\xiAprx
+                \end{aligned}\)
+            }
+        };
+    %\endgroup
+
+    %\begingroup Didascalie
+        \tikzset{
+            SubCaption/.style={
+                % text width=\plotWidth cm,
+                align=center,
+                font=\dimTesto{\subCaptionSize},
+            },
+            SubCaptionNW/.style={SubCaption,anchor=north west},
+            SubCaptionNE/.style={SubCaption,anchor=north east},
+            SubCaptionSW/.style={SubCaption,anchor=south west},
+            SubCaptionSE/.style={SubCaption,anchor=south east},
+        }
+
+        \node[SubCaptionSE] at (Row1 c1r1.south east) {\sottoDidascalia[]{}};
+        \node[SubCaptionSE] at (Row1 c2r1.south east) {\sottoDidascalia[]{}};
+        \node[SubCaptionSE] at (Row1 c3r1.south east) {\sottoDidascalia[]{}};
+    
+        \node[SubCaptionNE] at (Row2 c1r1.north east) {\sottoDidascalia[]{}};
+        \node[SubCaptionNE] at (Row2 c2r1.north east) {\sottoDidascalia[]{}};
+        \node[SubCaptionNE] at (Row2 c3r1.north east) {\sottoDidascalia[]{}};
+
+        \node[SubCaptionNE] at (Row3 c1r1.north east) {\sottoDidascalia[]{}};
+        \node[SubCaptionNE] at (Row3 c2r1.north east) {\sottoDidascalia[]{}};
+        \node[SubCaptionNE] at (Row3 c3r1.north east) {\sottoDidascalia[]{}};
+
+        \node[SubCaptionSE] at (Row4 c1r1.south east) {\sottoDidascalia[]{}};
+        \node[SubCaptionSE] at (Row4 c2r1.south east) {\sottoDidascalia[]{}};
+        \node[SubCaptionSE] at (Row4 c3r1.south east) {\sottoDidascalia[]{}};
+    
+        \node[SubCaptionSW] at (Row5 c1r1.south west) {\sottoDidascalia[]{}};
+        \node[SubCaptionSW] at (Row5 c2r1.south west) {\sottoDidascalia[]{}};
+    
+        % https://tex.stackexchange.com/questions/632045/get-subcaption-for-every-plot-using-groupplot-pgf-tikz-after-2020-update
+    %\endgroup
+
+    \redefineTikZbounds{Row1 c1r1}{Row4 c3r1}
+\end{tikzpicture}%
+
+%\begingroup Vecchia implementazione a due colonne
+    %\begingroup Comandi
+        % % \renewcommand\titleSize{12}
+        % \renewcommand\subCaptionSize{9}
+        % \renewcommand\labelSize{8}
+        % \renewcommand\tickSize{7}
+        % \renewcommand\legendSize{6}
+    
+        % \pgfmathsetmacro\plotWidth{7}
+        % \pgfmathsetmacro\plotHeightI{.618*\plotWidth}
+        % \pgfmathsetmacro\plotHeightII{.5*\plotWidth}
+        % % \pgfmathsetmacro\halfHeightPlot{\plotHeightI/2}
+        % % \pgfmathsetmacro\halfWidthPlot{\plotWidth/2}
+    
+        % \pgfmathsetmacro\xPlotSep{2}
+        % \pgfmathsetmacro\yPlotSep{0.6}
+        % \pgfmathsetmacro\yGroupSep{2.5}
+        % % \pgfmathsetmacro\halfxPlotSep{\xPlotSep/2}
+    %\endgroup
+    
+    %\begingroup Impostazioni pgfplots
+        % %\begingroup Gruppi
+        % \pgfplotsset{
+        %     /pgfplots/group/plotGroup/.style={
+        %         horizontal sep=\xPlotSep em,
+        %         vertical sep=\yPlotSep em,
+        %         x descriptions at=edge bottom,
+        %     },
+        %     /pgfplots/group/plotLeftGroup/.style={
+        %         plotGroup,
+        %         group size=1 by 3,
+        %         y descriptions at=edge left,
+        %     },
+        %     /pgfplots/group/plotRightGroup/.style={
+        %         plotGroup,
+        %         group size=1 by 3,
+        %         y descriptions at=edge right,
+        %     },
+        % }
+        % %\endgroup
+    
+        % %\begingroup Stili
+        % \pgfplotsset{
+        %     plotShared/.style={
+        %         width=\plotWidth cm,
+        %         scale only axis,
+        %         xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+        %         ylabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+        %         xticklabel style={font=\dimTesto{\tickSize}},
+        %         yticklabel style={font=\dimTesto{\tickSize}},
+        %         xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+        %         axis x line*=bottom,
+        %         xmajorgrids,ymajorgrids,
+        %         xminorticks=true,yminorticks=true,
+        %         axis background/.style={fill=white},
+        %         grid style={dashed}
+        %     },
+        %     plotTop/.style={
+        %         height=\plotHeightI cm,
+        %     },
+        %     plotBottom/.style={
+        %         height=\plotHeightII cm,
+        %     },
+        %     %
+        %     plotLeftCol/.style={
+        %         plotShared,
+        %         axis y line*=left,
+        %         y tick scale label style={
+        %             xshift=-.4cm,
+        %             at={(0,1)},
+        %             anchor=south east,
+        %         },
+        %         xlabel={\(s\)},
+        %         ylabel={\(\underhat{\bar f}_N(s)\)},
+        %     },
+        %     %
+        %     plotRightCol/.style={
+        %         plotShared,
+        %         axis y line*=right,
+        %         y tick scale label style={
+        %             xshift=.4cm,
+        %             at={(1,1)},
+        %             anchor=south west,
+        %         },
+        %         enlarge x limits=0.1,
+        %         enlarge y limits=0.1,
+        %     },
+        %     %
+        %     plotRow/.style={
+        %         plotShared,
+        %         ylabel={\(\underhat{\bar f}_N(s)\)},
+        %         y tick scale label style={
+        %             xshift=.4cm,
+        %             at={(1,1)},
+        %             anchor=south west,
+        %         },
+        %     },
+        % }
+        % %\endgroup
+    
+        % %\begingroup Legende
+        % \pgfplotsset{
+        %     plotLegend/.style={
+        %         font=\dimTesto{\legendSize},
+        %         legend cell align=left,
+        %         align=left,
+        %         % draw=white!15!black,
+        %         draw=none, % Bordo invisibile
+        %         fill=white,
+        %         fill opacity=0.5,
+        %         text opacity=1,
+        %     },
+        %     plotLegendNE/.style={legend style={plotLegend},legend pos=north east},
+        %     plotLegendSW/.style={legend style={plotLegend},legend pos=south west},
+        %     plotLegendNW/.style={legend style={plotLegend},legend pos=north west},
+        % }
+        % %\endgroup
+    %\endgroup
+    
+    %\begingroup 2 Colonne
+        % % Left column
+        % \begin{groupplot}[
+        %     group style={
+        %         group name=ColL1,
+        %         plotLeftGroup
+        %     },
+        %     plotLeftCol,
+        %     plotTop,
+        %     plotLegendNE,
+        %     %
+        %     enlarge x limits=0.01,
+        %     xmode=log,
+        %     xmin=78.6017269745556,xmax=1000000,
+        % ]
+        %     \nextgroupplot[%
+        %         % xmin=78.6017269745556,xmax=1000000,
+        %         ymin=0,ymax=0.0004,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig1.tex}
+    
+        %     \nextgroupplot[%
+        %         % xmin=100,xmax=1000000,
+        %         ymin=0,ymax=0.0004,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig2.tex}
+    
+        %     \nextgroupplot[%
+        %         % xmin=78.6017269745556,xmax=1000000,
+        %         ymin=0,ymax=0.0004,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig3.tex}
+        % \end{groupplot}
+    
+        % \begin{groupplot}[
+        %     group style={
+        %         group name=ColL2,
+        %         plotLeftGroup
+        %     },
+        %     plotLeftCol,
+        %     plotBottom,
+        %     plotLegendSW,
+        %     %
+        %     enlarge x limits=0.1,
+        %     enlarge y limits=0.1,
+        %     xmode=log,ymode=log,
+        %     xmin=3637.5,xmax=204237,
+        % ]
+        %     \nextgroupplot[%
+        %         at={($(ColL1 c1r3.south west)-(0,\yGroupSep em)-(0,\plotHeightII cm)$)},
+        %         % xmin=3825.04007879312,xmax=181881.391659954,
+        %         % ymin=0.00531914893617021,ymax=1,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig8.tex}
+    
+        %     \nextgroupplot[%
+        %         % xmin=3637.5,xmax=204237,
+        %         % ymin=0.00531914893617021,ymax=1,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig9.tex}
+    
+        %     \nextgroupplot[%
+        %         % xmin=3637.5,xmax=204237,
+        %         % ymin=0.00531914893617021,ymax=1
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig10.tex}
+        % \end{groupplot}
+    
+        % % Right column
+        % \begin{groupplot}[
+        %     group style={
+        %         group name=ColR1,
+        %         plotRightGroup
+        %     },
+        %     plotRightCol,
+        %     plotTop,
+        %     plotLegendNW,
+        %     %
+        %     xlabel={\(k\)},ylabel={\(s(k)\)},
+        %     xmin=10,xmax=283,
+        % ]
+        %     \nextgroupplot[%
+        %         at={($(ColL1 c1r1.south east)+(\xPlotSep em,0)$)},
+        %         xmode=log,ymode=log,
+        %         % xmin=10,xmax=283,
+        %         % ymin=100,ymax=149878.932518743,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SVsDfig1.tex}
+    
+        %     \nextgroupplot[%
+        %         xmode=log,ymode=log,
+        %         % xmin=10,xmax=283,
+        %         % ymin=100,ymax=1000000,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SVsDfig2.tex}
+    
+        %     \nextgroupplot[%
+        %         xmode=log,ymode=log,
+        %         % xmin=10,xmax=283,
+        %         % ymin=100,ymax=1000000,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SVsDfig3.tex}
+        % \end{groupplot}
+    
+        % \begin{groupplot}[
+        %     group style={
+        %         group name=ColR2,
+        %         plotRightGroup
+        %     },
+        %     plotRightCol,
+        %     plotBottom,
+        %     plotLegendSW,
+        %     %
+        %     xmin=3637.5,xmax=204237,
+        % ]
+        %     \nextgroupplot[%
+        %         at={($(ColL2 c1r1.south east)+(\xPlotSep em,0)$)},
+        %         xmode=log,ymode=log,
+        %         % xmin=3637.5,xmax=204237,
+        %         % ymin=0.00413009047051692,ymax=1.0004869525303,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig5.tex}
+    
+        %     \nextgroupplot[%
+        %         xmode=log,ymode=log,
+        %         % xmin=3925.51066195196,xmax=181881.391659954,
+        %         % ymin=0.000929039723010346,ymax=1.01784721007988,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig6.tex}
+    
+        %     \nextgroupplot[%
+        %         xmode=log,ymode=log,
+        %         % xmin=3825.04007879312,xmax=181881.391659954,
+        %         % ymin=0.000887211268178068,ymax=1.04178769427766,
+        %     ] \input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/SDFfig7.tex}
+        % \end{groupplot}
+    %\endgroup
+%\endgroup

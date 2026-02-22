@@ -56,13 +56,6 @@ class KineticSimulation():
         self.p0 = float(self.P/self.Nc)
         self.realSizeDistr = clsReg.sizeDistr
 
-        if clsPrm.edgeWeights:
-            self.di = np.sum(clsReg.W/np.max(clsReg.W),axis=1,dtype=np.float64)
-        else:
-            self.di = np.sum(clsReg.A,axis=1,dtype=np.int32)
-        self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
-        # self.D = di@invdi.T
-
         # Exact unitary adjacency matrix
         M = clsReg.A
         self.dk = np.sum(M,axis=1,dtype=np.int32)
@@ -74,6 +67,14 @@ class KineticSimulation():
         self.wI = np.sum(M[:,:],axis=0)
         # M[:,:,1]  = wO@wI/Mn
         # In this case wO=wI but it's better to define them rigorously
+
+        self.ew = clsPrm.edgeWeights
+        if clsPrm.edgeWeights:
+            self.di = np.sum(clsReg.W/np.max(clsReg.W),axis=1,dtype=np.float64)
+        else:
+            self.di = np.sum(clsReg.A,axis=1,dtype=np.int32)
+        self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
+        # self.D = di@invdi.T
 
         self.typ = np.array([0,1],dtype=np.int64)
         self.lblEn = ('Ext.','Apx.','Real')
@@ -329,7 +330,7 @@ class KineticSimulation():
                 Ni=Ni,
                 ta=ta,
                 # label=f'{lbl[t]} lognormal fit (ML)',
-                label=fr"Adatt. BLN {lbl[0][t]} ($\mathit{{ML}}$)",
+                label=fr"Adatt. BLN {lbl[0][t]}",# ($\mathit{{ML}}$)
                 # (
                 #     fr'{lbl[t]} mean value $\langle k\rangle$',
                 #     f'{lbl[t]} lognormal fit (ML)'
@@ -365,7 +366,7 @@ class KineticSimulation():
                 Ni=Ni,
                 ta=ta,
                 # label=f'{lbl[t]} lognormal fit (ML)',
-                label=fr"Adatt. BLN {lbl[0][t]} ($\mathit{{ML}}$)",
+                label=fr"Adatt. BLN {lbl[0][t]}",# ($\mathit{{ML}}$)
                 color=clr[t],#(clr[t],clr[t]),
                 alpha=(1,0.15) if Ni>1 else 1,
                 bimodal=True,
@@ -392,7 +393,7 @@ class KineticSimulation():
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
                 xScale='log',
                 # label=f'{lbl[2]} lognormal fit (ML)',
-                label=fr"Adatt. BLN {lbl[0][2]} ($\mathit{{ML}}$)",
+                label=fr"Adatt. BLN {lbl[0][2]}",# ($\mathit{{ML}}$)
                 color=clr[2],
                 alpha=1,
                 bimodal=True,
@@ -421,7 +422,7 @@ class KineticSimulation():
                     limits=(sMinR,sMaxR),
                     xScale='log',
                     # label=f'{lbl[2]} lognormal fit (ML)',
-                    label=fr'Adatt. BLN {lbl[0][2]} ($\mathit{{ML}}$)',
+                    label=fr'Adatt. BLN {lbl[0][2]}',# ($\mathit{{ML}}$)
                     color=clr[2],
                     alpha=1,
                     bimodal=True,
@@ -443,8 +444,8 @@ class KineticSimulation():
                 # ),
                 label=(
                     f'FRC empirica {lbl[1][2]}',
-                    fr"Adatt. Pareto {lbl[0][2]} ($\mathit{{ML}}$)",
-                    fr"Adatt. BLN {lbl[0][2]} ($\mathit{{ML}}$)"
+                    fr"Adatt. Pareto {lbl[0][2]}",# ($\mathit{{ML}}$)
+                    fr"Adatt. BLN {lbl[0][2]}"# ($\mathit{{ML}}$)
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
@@ -466,8 +467,8 @@ class KineticSimulation():
                 # ),
                 label=(
                     f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)",
-                    fr"Adatt. BLN {lbl[0][t]} ($\mathit{{ML}}$)"
+                    fr"Adatt. Pareto {lbl[0][t]}",# ($\mathit{{ML}}$)
+                    fr"Adatt. BLN {lbl[0][t]}"# ($\mathit{{ML}}$)
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -493,7 +494,7 @@ class KineticSimulation():
                 # ),
                 label=(
                     f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
+                    fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -515,7 +516,7 @@ class KineticSimulation():
                 # ),
                 label=(
                     f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
+                    fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -532,8 +533,8 @@ class KineticSimulation():
                 #     f'{lbl[2]} Pareto fit (ML)'
                 # ),
                 label=(
-                    f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
+                    f'FRC empirica {lbl[1][2]}',
+                    fr"Adatt. Pareto {lbl[0][2]}"# ($\mathit{{ML}}$)
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
@@ -558,7 +559,7 @@ class KineticSimulation():
                 # ),
                 label=(
                     f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
+                    fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -580,7 +581,7 @@ class KineticSimulation():
                 # ),
                 label=(
                     f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]} ($\mathit{{ML}}$)"
+                    fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
                 ),
                 color=(clr[t],clr[t]),
                 alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
@@ -598,7 +599,7 @@ class KineticSimulation():
                 # ),
                 label=(
                     f'FRC empirica {lbl[1][2]}',
-                    fr"Adatt. Pareto {lbl[0][2]} ($\mathit{{ML}}$)",
+                    fr"Adatt. Pareto {lbl[0][2]}",# ($\mathit{{ML}}$)
                 ),
                 color=(clr[2],clr[2]),
                 alpha=(0.6,1),
@@ -636,27 +637,23 @@ class KineticSimulation():
                 dp=(dp[0]/1.5,dp[1])
             )
 
-            offset = 0 if self.z>0 else 1
             p = (.5,p[1])
-            dp = (1-.3*offset,dp[1])
+            dp = (.8,dp[1])
             libF.TextBlock(
-                ax[-1],[[ '',
+                ax[-1],[[
                     fr'$\lambda={self.l}$',
                     fr'$\sigma={self.s}$',
+                    fr'$ζ={self.z}$',
                     fr'$Ni={Ni}$',
                     fr'$Ns={self.Ns}$',
-                ],[
-                    fr'$ζ={self.z}$',
-                    '','','',''
                 ],[ 
-                    '',
                     fr'$\alpha={self.a}$',
                     fr'$il={self.il+1}$',
+                    fr'$d_i={'w_i' if self.ew else 'k_i'}$',
                     fr'$\Delta t={self.dt}$',
                     fr'$Nw={self.Nw}$',
                 ]],
-                p=p,dp=dp,
-                offset=offset
+                p=p,dp=dp
             )
 
         for f in range(Nf):
