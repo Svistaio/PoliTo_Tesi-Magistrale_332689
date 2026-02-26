@@ -1,0 +1,75 @@
+
+% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\nodeDiagramSettings
+\pgfmathsetmacro\xPlotSep{10}
+
+\begin{tikzpicture}%
+    %\begingroup Coordinate dei vertici
+        \newcommand\vertexCoordinates{
+            \coordinate (v1) at (0,0);
+            \coordinate (v2) at (2,.75);
+        }
+
+        \newcommand\drawEmptyNodes[2]{
+            \vertexCoordinates
+            \foreach \i/\s in #2
+                \node[
+                    nodeStyle,
+                    numberStyle,
+                    fill=white
+                ] (#1\i) at (v\i) {\(\s\)};
+        }
+
+        \newcommand\drawStarNodes{
+            \foreach \i in {1,2}{
+                % \begin{scope}[on background layer]
+                    \node[starStyle,rotate=\i*45] at (v\i) {};
+                % \end{scope}
+            }
+        }
+    %\endgroup
+
+    \begin{scope}[
+        local bounding box=tikZFigure,
+        scale=\plotScale,
+        transform shape,
+    ]
+        %\begingroup Vertici con prestati
+            \tikzbox{{(0,0)}}{PreInteractingStates}{\drawEmptyNodes{b}{{1/\mathbf x,2/\mathbf x_*}}}
+            \drawStarNodes
+            \draw[nodeArrowExact] (b1) to (b2);
+        %\endgroup
+
+        %\begingroup Vertici con postati
+            \tikzbox{{($(PreInteractingStates.south east)+(\xPlotSep em,0em)$)}}
+                {PostInteractingStates}{\drawEmptyNodes{a}{{1/\mathbf x',2/\mathbf x'_*}}}
+            \draw[nodeArrowExact] (a1) to (a2);
+        %\endgroup
+
+        %\begingroup Frecce
+            \draw[transformingArrow] (PreInteractingStates.east) to (PostInteractingStates.west);
+        %\endgroup
+
+        %\begingroup Scatole di delimitazione
+            % \draw[red,dashed] (PreInteractingStates.south west) rectangle (PreInteractingStates.north east);
+            % \draw[blue,dashed] (PostInteractingStates.south west) rectangle (PostInteractingStates.north east);
+        %\endgroup
+    \end{scope}
+
+    %\begingroup Riferimento
+        % \begin{pgfonlayer}{foreground}
+        %     \node[commentStyle] (origine) at (0,0) {origine};
+    
+        %     \node[commentStyle] (NW) at (ExactGraph.north west) {NW};
+        %     \node[commentStyle] (NE) at (ExactGraph.north east) {NE};
+        %     \node[commentStyle] (SW) at (ExactGraph.south west) {SW};
+        %     \node[commentStyle] (SE) at (ExactGraph.south east) {SE};
+        % \end{pgfonlayer}
+    
+        % \begin{scope}[on background layer]
+        %     \draw[style=help lines] (tikZFigure.north west) grid[step=1em] (tikZFigure.south east);
+        % \end{scope}
+    %\endgroup
+\end{tikzpicture}

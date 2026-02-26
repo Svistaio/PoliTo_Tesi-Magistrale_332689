@@ -1,0 +1,49 @@
+
+\newcommand\varyingParameterSymbol\lambda
+\newcommand\varyingParameterList[1]{
+    \ifcase#1\relax%
+    \or\num{1e-2}% Caso 1
+    \or\num{8.2e-2}% Caso 2
+    \or\num{1.55e-1}% Caso 3
+    \or\num{2.27e-1}% Caso 4
+    \else\num{3e-1}% Caso 5
+    \fi
+}
+
+\newcommand\betaExactList[1]{
+    \ifcase#1\relax%
+    \or\num{1.27+-0.01}% Caso 1
+    \or\num{1.29+-0.01}% Caso 2
+    \or\num{1.27+-0.01}% Caso 3
+    \or\num{1.24+-0.02}% Caso 4
+    \else\num{1.22+-0.01}% Caso 5
+    \fi
+}
+\newcommand\betaAprxList[1]{
+    \ifcase#1\relax%
+    \or\num{1.26+-0.01}% Caso 1
+    \or\num{1.28+-0.01}% Caso 2
+    \or\num{1.27+-0.01}% Caso 3
+    \or\num{1.24+-0.02}% Caso 4
+    \else\num{1.22+-0.01}% Caso 5
+    \fi
+}
+
+\newcommand\xiExactList[1]{
+    \ifcase#1\relax%
+    \or\num{.75+-.00}% Caso 1
+    \or\num{.74+-.02}% Caso 2
+    \or\num{.70+-.03}% Caso 3
+    \or\num{.59+-.05}% Caso 4
+    \else\num{.56+-.06}% Caso 5
+    \fi
+}
+\newcommand\xiAprxList[1]{
+    \ifcase#1\relax%
+    \or\num{.75+-.00}% Caso 1
+    \or\num{.74+-.02}% Caso 2
+    \or\num{.66+-.04}% Caso 3
+    \or\num{.60+-.05}% Caso 4
+    \else\num{.61+-.06}% Caso 5
+    \fi
+}

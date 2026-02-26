@@ -1,5 +1,6 @@
 
 % !LW recipe=pdfLaTeX ➞ biber ➞ pdfLaTeX
+% !LW recipe=LuaLaTeX ➞ biber ➞ LuaLaTeX
 % !TEX root = Principale.tex
 % LTeX: language=it
 
@@ -17,8 +18,17 @@
 ]{scrreprt}
 % La dimensione del testo è di base 11pt
 
+\newcommand\bozza{true}
+% \newcommand\bozza{false}
+\newif\ifInCompiler
+
 \input{../Corpo/Pacchetti.tex}
 \input{../Corpo/Definizioni.tex}
+\input{../Compilatore/tikzextfigure.tex}
+
+\setbool{forcecompile}{false}
+
+\immediate\ShellEscape{copy /Y "Principale.aux" "../Compilatore/CopiaPrincipale.aux"}
 
 \begin{document}
 

@@ -85,8 +85,8 @@ parameters = {
         "text": "Fraction",
         "val": False
     },
-    "interactingRule": {
-        "text": "Interacting law",
+    "interactionRule": {
+        "text": "Interaction rule",
         "val": "law"
     },
     "PdfPopUp": {
@@ -165,7 +165,7 @@ caseStudies = {
             "attractivity": .18, #.18,
             "convincibility": .44, #.44,
             "deviation": 0.05,
-            "region": 19,
+            "region": 1, #19
             "zetaValue": 0.01,
             "timestep": 0.01,
             "timesteps": int(1e6),
@@ -175,16 +175,16 @@ caseStudies = {
             "analysis": False,
             "edgeWeights": True,
             "fluctuations": False,
-            "zetaFraction": True,
-            "interactingRule": 2,
+            "zetaFraction": False,
+            "interactionRule": 2,
             "PdfPopUp": False,
             "LaTeXConversion": False,
             "snapshots": 1000,
             "smoothingFactor": 50,
             "studiedParameter": 1,
-            "startValuePrmStudy": 6.5e-1,
-            "endValuePrmStudy": 7.5e-1,
-            "numberPrmStudy": 10,
+            "startValuePrmStudy": .3,
+            "endValuePrmStudy": .6,
+            "numberPrmStudy": 5,
             "parametricStudy": False 
         },
         "λ(rsk/α)/(1+rsk/α)": {
@@ -201,7 +201,7 @@ caseStudies = {
             "edgeWeights": False,
             "fluctuations": True,
             "zetaFraction": False,
-            "interactingRule": 1,
+            "interactionRule": 1,
             "PdfPopUp": False,
             "LaTeXConversion": False,
             "snapshots": 100,
@@ -226,7 +226,7 @@ caseStudies = {
             "edgeWeights": False,
             "fluctuations": True,
             "zetaFraction": True,
-            "interactingRule": 1,
+            "interactionRule": 1,
             "PdfPopUp": False,
             "LaTeXConversion": False,
             "snapshots": 100,
@@ -252,7 +252,7 @@ caseStudies = {
             "edgeWeights": True,
             "fluctuations": True,
             "zetaFraction": False,
-            "interactingRule": 2,
+            "interactionRule": 2,
             "PdfPopUp": False,
             "LaTeXConversion": False,
             "snapshots": 1000,
@@ -278,7 +278,7 @@ caseStudies = {
             "edgeWeights": False,
             "fluctuations": True,
             "zetaFraction": False,
-            "interactingRule": 3,
+            "interactionRule": 3,
             "PdfPopUp": False,
             "LaTeXConversion": False,
             "snapshots": 100,
@@ -427,7 +427,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                 "text":"Edge weights",
                 "val":false
             },
-            "interactingRule": {
+            "interactionRule": {
                 "text":"Interacting law",
                 "val":"law"
             },
@@ -484,7 +484,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "extraction": false,
                     "analysis": false,
                     "edgeWeights": false,
-                    "interactingRule": 3,
+                    "interactionRule": 3,
                     "PdfPopUp": false,
                     "LaTeXConversion": false,
                     "studiedParameter": 1,
@@ -506,7 +506,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "extraction": false,
                     "analysis": false,
                     "edgeWeights": false,
-                    "interactingRule": 1,
+                    "interactionRule": 1,
                     "PdfPopUp": false,
                     "LaTeXConversion": false,
                     "snapshots": 100,
@@ -528,7 +528,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "extraction": false,
                     "analysis": false,
                     "edgeWeights": false,
-                    "interactingRule": 2,
+                    "interactionRule": 2,
                     "PdfPopUp": false,
                     "LaTeXConversion": false,
                     "studiedParameter": 0,
@@ -552,7 +552,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "extraction": false,
                     "analysis": false,
                     "edgeWeights": false,
-                    "interactingRule": 3,
+                    "interactionRule": 3,
                     "PdfPopUp": false,
                     "LaTeXConversion": false,
                     "studiedParameter": 0,
@@ -576,7 +576,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "extraction": false,
                     "analysis": false,
                     "edgeWeights": false,
-                    "interactingRule": 5,
+                    "interactionRule": 5,
                     "PdfPopUp": false,
                     "LaTeXConversion": false,
                     "studiedParameter": 0,
@@ -620,7 +620,7 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
 
             for (prmName,prmlist) in [
                 ('region','regList'),
-                ('interactingRule','intLawList'),
+                ('interactionRule','intLawList'),
                 ('studiedParameter','studiedPrmList')
             ]:
                 prm = getattr(cls,prmName)

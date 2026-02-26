@@ -4,7 +4,7 @@
 %\begingroup Tipografia
     \newcommand\dimTesto[1]{%
         \pgfmathparse{#1*1.2}%
-        \fontsize{#1 pt}{\pgfmathresult pt}\selectfont%
+        \fontsize{#1pt}{\pgfmathresult pt}\selectfont%
     }
 
     \newcommand\daRivedere{{\color[HTML]{DC143C}\{§\}}}
@@ -450,108 +450,249 @@
     %\endgroup
     
     %\begingroup TikZFigure
-        \makeatletter
-        \newcommand\tikzfigure{\@ifstar{\tikzfigure@star}{\tikzfigure@nostar}}
-        
-        \newcommand\tikzfigure@nostar[6][-1em]{%
-            \begin{figure}[#2]%
-                \centering%
-                \IfSubStr{#2}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
-                    \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
-                    \stepcounter{figposcount}%
-                    \zsaveposx{figpos-\thefigposcount}%
-                    \makebox[0pt][l]{%
-                        % Muove indietro il cursore del testo fino al lato sinistro del foglio
-                        \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
-                        % Muove avanti il cursore del testo fino al centro del foglio
-                        \hspace*{0.5\paperwidth}%
-                        % Centra la figura TikZ riseptto a questo punto
-                        \makebox[0pt][c]{%
-                            \begin{minipage}{\paperwidth}%
-                                \vspace*{#1}
+        %\begingroup Esternalizzata
+            % \newcommand\compilerpath{../Compilatore/tikz2pdf.tex}
+            % \newcommand\pdfdirectory{../../Figure/.fnl/TikZpdf/}
+            % \newcommand\tikzexternalizedfigure[6][0em]{%
+            %     \begin{figure}[#2]%
+            %         \centering%
+            %         % Recupera la pagina dall'etichetta (default a 1 se non esiste)
+            %         \checkoddpage
+            %         \Ifthispageodd{\def\pagetype{odd}}{\def\pagetype{even}}
+            %         %
+            %         % Alternativa con «\getpagerefnumber»
+            %         % \edef\currentfigpage{\getpagerefnumber{#6}}
+            %         % \ifx\currentfigpage\relax\def\currentfigpage{1} \fi
+            %         % \pgfmathparse{int(mod(\currentfigpage,2) == 1 ? 1 : 0)}
+            %         % \ifnum\pgfmathresult=1\def\pagetype{odd}
+            %         % \else\def\pagetype{even}\fi
+            %         %
+            %         \edef\shlcmd{
+            %             \immediate\ShellEscape{%
+            %                 pdflatex %
+            %                 -shell-escape %
+            %                 -interaction=batchmode %
+            %                 -output-directory="\pdfdirectory" %
+            %                 -jobname="#6" %
+            %                 "\string\def\string\isodd{\pagetype}%
+            %                 \string\def\string\sourcefile{#3}%
+            %                 \string\input{\compilerpath}"%
+            %             }
+            %         }
+            %         \IfSubStr{#2}{p}{% 
+            %             \leavevmode\stepcounter{figposcount}\zsaveposx{figpos-\thefigposcount}%
+            %             \makebox[0pt][l]{%
+            %                 \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+            %                 \hspace*{0.5\paperwidth}%
+            %                 \makebox[0pt][c]{%
+            %                     \begin{minipage}{\paperwidth}%
+            %                         \vspace*{#1}\centering
+            %                         \addtocounter{figure}{1}
+            %                         \setcounter{subfigure}{0}%
+            %                         \IfFileExists{\pdfdirectory#6.pdf}{%
+            %                             \ifbool{forcecompile}{\shlcmd}{\relax}
+            %                         }{\shlcmd}%
+            %                         \includegraphics{\pdfdirectory#6.pdf}%
+            %                         \addtocounter{figure}{-1}
+            %                         \didascalia{#4}{#5}
+            %                         \protect\label{#6}
+            %                     \end{minipage}
+            %                 }%
+            %             }%
+            %         }{%
+            %             \makebox[\textwidth][c]{
+            %                 \begin{minipage}{\linewidth}
+            %                     \centering
+            %                     \addtocounter{figure}{1}\setcounter{subfigure}{0}
+            %                     \IfFileExists{\pdfdirectory#6.pdf}{%
+            %                         \ifbool{forcecompile}{\shlcmd}{\relax}
+            %                     }{\shlcmd}%
+            %                     \includegraphics{\pdfdirectory#6.pdf}%
+            %                     \addtocounter{figure}{-1}
+            %                     \didascalia{#4}{#5}
+            %                     \protect\label{#6}
+            %                 \end{minipage}%
+            %             }%
+            %         }%
+            %     \end{figure}%
+            % }
+        %\endgroup
+
+        %\begingroup Compilata
+            \newcommand\tikzfigure[6][0em]{
+                \begin{figure}[#2]%
+                    \newif\ifpageisodd\checkoddpage
+                    \Ifthispageodd{\pageisoddtrue}{\pageisoddfalse}
+                    \centering%
+                    \IfSubStr{#2}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
+                        \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
+                        \stepcounter{figposcount}%
+                        \zsaveposx{figpos-\thefigposcount}%
+                        \makebox[0pt][l]{%
+                            % Muove indietro il cursore del testo fino al lato sinistro del foglio
+                            \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+                            % Muove avanti il cursore del testo fino al centro del foglio
+                            \hspace*{0.5\paperwidth}%
+                            % Centra la figura TikZ riseptto a questo punto
+                            \makebox[0pt][c]{%
+                                \begin{minipage}{\paperwidth}%
+                                    \vspace*{#1}
+                                    \centering
+                                    \addtocounter{figure}{1}%
+                                    \setcounter{subfigure}{0}%
+                                    #3%
+                                    \addtocounter{figure}{-1}%
+                                    \didascalia{#4}{#5}%
+                                    \protect\label{#6}%
+                                \end{minipage}%
+                            }%
+                        }%
+                    }{% Altrimenti centra la figura rispetto al corpo del testo
+                        \makebox[\textwidth][c]{%
+                            \begin{minipage}{\linewidth}%
                                 \centering
                                 \addtocounter{figure}{1}%
                                 \setcounter{subfigure}{0}%
                                 #3%
                                 \addtocounter{figure}{-1}%
                                 \didascalia{#4}{#5}%
-                                \label{#6}%
+                                \protect\label{#6}%
                             \end{minipage}%
                         }%
-                    }%
-                }{% Altrimenti centra la figura rispetto al corpo del testo
-                    \makebox[\textwidth][c]{%
-                        \begin{minipage}{\linewidth}%
-                            \centering
-                            \addtocounter{figure}{1}%
-                            \setcounter{subfigure}{0}%
-                            #3%
-                            \addtocounter{figure}{-1}%
-                            \didascalia{#4}{#5}%
-                            \label{#6}%
-                        \end{minipage}%
-                    }%
-                }% Cosa che non richiede l'uso del pacchetto «zref»
-            \end{figure}%
-        }
-        \newcommand\tikzfigure@star[6]{%
-            \begin{figure}[#1]%
-                \centering%
-                \IfSubStr{#1}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
-                    \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
-                    \stepcounter{figposcount}%
-                    \zsaveposx{figpos-\thefigposcount}%
-                    \makebox[0pt][l]{%
-                        % Muove indietro il cursore del testo fino al lato sinistro del foglio
-                        \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
-                        % Muove avanti il cursore del testo fino al centro del foglio
-                        \hspace*{0.5\paperwidth}%
-                        % Centra la figura TikZ riseptto a questo punto
-                        \makebox[0pt][c]{%
-                            \begin{minipage}{#2}%
-                                \vspace*{-0.5em}
-                                \centering
-                                \addtocounter{figure}{1}%
-                                \setcounter{subfigure}{0}%
-                                \resizebox{\linewidth}{!}{#3}%
-                                \addtocounter{figure}{-1}%
-                                \didascalia{#4}{#5}%
-                                \label{#6}%
-                            \end{minipage}%
-                        }%
-                    }%
-                }{% Altrimenti centra la figura rispetto al corpo del testo
-                    \makebox[\textwidth][c]{%
-                        \begin{minipage}{#2}%
-                            \centering
-                            \addtocounter{figure}{1}%
-                            \setcounter{subfigure}{0}%
-                            \resizebox{\linewidth}{!}{#3}%
-                            \addtocounter{figure}{-1}%
-                            \didascalia{#4}{#5}%
-                            \label{#6}%
-                        \end{minipage}%
-                    }%
-                }% Cosa che non richiede l'uso del pacchetto «zref»
-            \end{figure}%
-        }
-        \makeatother
+                    }% Cosa che non richiede l'uso del pacchetto «zref»
+                \end{figure}%
+            }
+        %\endgroup
+
+        %\begingroup Vecchia versione incompatibile colla libreria «externalize» di TikZ e contenente una versione stellata per riscalare il contenuto (operazione non gradevole se si ha del testo perché non permette di controllarne facilmente le dimensioni)
+            % \makeatletter
+            % \newcommand\tikzfigure{\@ifstar{\tikzfigure@star}{\tikzfigure@nostar}}
+            
+            % \newcommand\tikzfigure@nostar[6][0em]{%
+            %     \begin{figure}[#2]%
+            %         \centering%
+            %         \IfSubStr{#2}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
+            %             \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
+            %             \stepcounter{figposcount}%
+            %             \zsaveposx{figpos-\thefigposcount}%
+            %             \makebox[0pt][l]{%
+            %                 % Muove indietro il cursore del testo fino al lato sinistro del foglio
+            %                 \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+            %                 % Muove avanti il cursore del testo fino al centro del foglio
+            %                 \hspace*{0.5\paperwidth}%
+            %                 % Centra la figura TikZ riseptto a questo punto
+            %                 \makebox[0pt][c]{%
+            %                     \begin{minipage}{\paperwidth}%
+            %                         \vspace*{#1}
+            %                         \centering
+            %                         \addtocounter{figure}{1}%
+            %                         \setcounter{subfigure}{0}%
+            %                         #3%
+            %                         \addtocounter{figure}{-1}%
+            %                         \didascalia{#4}{#5}%
+            %                         \protect\label{#6}%
+            %                     \end{minipage}%
+            %                 }%
+            %             }%
+            %         }{% Altrimenti centra la figura rispetto al corpo del testo
+            %             \makebox[\textwidth][c]{%
+            %                 \begin{minipage}{\linewidth}%
+            %                     \centering
+            %                     \addtocounter{figure}{1}%
+            %                     \setcounter{subfigure}{0}%
+            %                     #3%
+            %                     \addtocounter{figure}{-1}%
+            %                     \didascalia{#4}{#5}%
+            %                     \protect\label{#6}%
+            %                 \end{minipage}%
+            %             }%
+            %         }% Cosa che non richiede l'uso del pacchetto «zref»
+            %     \end{figure}%
+            % }
+            % \newcommand\tikzfigure@star[6]{%
+            %     \tikzsetnextfilename{#6}
+            %     \begin{figure}[#1]%
+            %         \centering%
+            %         \IfSubStr{#1}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
+            %             \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
+            %             \stepcounter{figposcount}%
+            %             \zsaveposx{figpos-\thefigposcount}%
+            %             \makebox[0pt][l]{%
+            %                 % Muove indietro il cursore del testo fino al lato sinistro del foglio
+            %                 \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+            %                 % Muove avanti il cursore del testo fino al centro del foglio
+            %                 \hspace*{0.5\paperwidth}%
+            %                 % Centra la figura TikZ riseptto a questo punto
+            %                 \makebox[0pt][c]{%
+            %                     \begin{minipage}{#2}%
+            %                         \vspace*{-0.5em}
+            %                         \centering
+            %                         \addtocounter{figure}{1}%
+            %                         \setcounter{subfigure}{0}%
+            %                         \resizebox{\linewidth}{!}{#3}%
+            %                         \addtocounter{figure}{-1}%
+            %                         \didascalia{#4}{#5}%
+            %                         \label{#6}%
+            %                     \end{minipage}%
+            %                 }%
+            %             }%
+            %         }{% Altrimenti centra la figura rispetto al corpo del testo
+            %             \makebox[\textwidth][c]{%
+            %                 \begin{minipage}{#2}%
+            %                     \centering
+            %                     \addtocounter{figure}{1}%
+            %                     \setcounter{subfigure}{0}%
+            %                     \resizebox{\linewidth}{!}{#3}%
+            %                     \addtocounter{figure}{-1}%
+            %                     \didascalia{#4}{#5}%
+            %                     \label{#6}%
+            %                 \end{minipage}%
+            %             }%
+            %         }% Cosa che non richiede l'uso del pacchetto «zref»
+            %     \end{figure}%
+            % }
+            % \makeatother
+        %\endgroup
     %\endgroup
 
     %\begingroup RedefineTikZbounds
-        \newcommand\redefineTikZbounds[2]{
-            % Salva le coordinate della cima e del fondo della figura corrente (cosí da mantenere i titoli e le didascalie)
-            \coordinate (Cima) at (current bounding box.north);
-            \coordinate (Fondo) at (current bounding box.south);
+        % La differenza è che colla prima bisogna catturare anche le etichette perché si crea un pdf isolato mentre colla non è importante perché viene tutto compilato sul momento
 
-            \pgfresetboundingbox % Resetta la scatola dei limiti
+        %\begingroup Versione valida con esternalizzazione
+            \newcommand\redefineTikZbounds[2]{
+                \coordinate (RealSW) at (current bounding box.south west);
+                \coordinate (RealNE) at (current bounding box.north east);
+                \coordinate (Center) at ($(#1.west)!0.5!(#2.east)$);
+    
+                \pgfresetboundingbox 
 
-            \useasboundingbox % Definisce la nuova scatola come un rettangolo
-                (#1.west |- Cima)   % con ascissa sinistra data da «Col1 c1r1.west», 
-                rectangle           % ascissa destra data da «Col2 c1r1.east»
-                (#2.east |- Fondo); % ordinate date dalla cima e fondo originali
-                % L'operatore «|-» in «(A |- B)» prende come ascissa quella del punto A mentre come coordinata quella del punto B
-        }
+                \useasboundingbox 
+                    let \p1=(RealSW),\p2=(RealNE),\p3=(Center),
+                    \n1={max(\x3-\x1,\x2-\x3)} in
+                    (\x3-\n1,\y1) rectangle (\x3+\n1,\y2+.25em);
+                % \path[use as bounding box] 
+                %     let \p1=(RealSW),\p2=(RealNE),\p3=(Center),
+                %     \n1={max(\x3-\x1,\x2-\x3)} in
+                %     (\x3-\n1,\y1) rectangle (\x3+\n1,\y2+.25em);
+                % Lo «.25em» discende dalla traslazione imposta all'etichetta della scala verticale mediante «yScaleLabelShift»
+            } % Scatola delimitante simmetrica
+        %\endgroup
+
+        %\begingroup Versione valida senza esternalizzazione
+            % \newcommand\redefineTikZbounds[2]{
+            %     % Salva le coordinate della cima e del fondo della figura corrente (cosí da mantenere i titoli e le didascalie)
+            %     \coordinate (Cima) at (current bounding box.north);
+            %     \coordinate (Fondo) at (current bounding box.south);
+    
+            %     \pgfresetboundingbox % Resetta la scatola dei limiti
+    
+            %     \useasboundingbox % Definisce la nuova scatola come un rettangolo
+            %         (#1.west |- Cima)   % con ascissa sinistra data da «Col1 c1r1.west», 
+            %         rectangle           % ascissa destra data da «Col2 c1r1.east»
+            %         (#2.east |- Fondo); % ordinate date dalla cima e fondo originali
+            %         % L'operatore «|-» in «(A |- B)» prende come ascissa quella del punto A mentre come coordinata quella del punto B
+            % }
+        %\endgroup
     %\endgroup
 
     %\begingroup TikZBox
@@ -614,188 +755,632 @@
 
     %\begingroup Impostazioni
         %\begingroup Testo
-            %\begingroup Normale
-                % La dimensione del testo di base è 11pt
-                \newcommand\titleSize{11}
-                \newcommand\subCaptionSize{10}
-                \newcommand\ParameterSize{9}
-                \newcommand\labelSize{10}
-                \newcommand\tickSize{9}
-                \newcommand\legendSize{9}
-            %\endgroup
-
-            %\begingroup Infopagine
-                \newcommand\fontSizeInfopage{
+            % La dimensione del testo di base è 11pt
+            \newcommand\titleSize{11}
+            \newcommand\subCaptionSize{10}
+            \newcommand\ParameterSize{9}
+            \newcommand\labelSize{10}
+            \newcommand\tickSize{9}
+            \newcommand\legendSize{9}
+        %\endgroup
+    
+        %\begingroup Infopagine
+            %\begingroup Chiavi condivise
+            \newcommand\infopageSharedKeys{
+                %\begingroup Testo
                     % \renewcommand\titleSize{12}
                     \renewcommand\subCaptionSize8
                     \renewcommand\ParameterSize7
                     \renewcommand\labelSize7
                     \renewcommand\tickSize6
-                    \renewcommand\legendSize6
-                }
+                    \renewcommand\legendSize7
+                %\endgroup
+    
+                %\begingroup Dimensioni
+                    \pgfmathsetmacro\plotWidth7
+                    \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+                    %
+                    \pgfmathparse{0.825*\plotWidth}
+                    \pgfmathsetmacro\plotWidth\pgfmathresult
+                    \pgfmathsetmacro\halfWidth{\plotWidth/2}
+                    \pgfmathsetmacro\plotLastWidth{1.25*\plotWidth}
+    
+                    \pgfmathsetmacro\xPlotSep{1}
+                    \pgfmathsetmacro\yPlotSep{1.25}
+                    \pgfmathsetmacro\yGroupSep{2.75}
+                %\endgroup
+    
+                %\begingroup Legende
+                    \pgfplotsset{%
+                        plotLegend/.style={%
+                            font=\dimTesto{\legendSize},
+                            legend cell align=left,
+                            align=left,
+                            % draw=white!15!black,
+                            draw=none, % Bordo invisibile
+                            fill=white,
+                            fill opacity=0.5,
+                            text opacity=1,
+                            % text width=2cm,
+                        },
+                        plotLegendW/.style={legend style={%
+                            plotLegend,
+                            at={(0,.5)},
+                            anchor=west,
+                        }},
+                        plotLegendNW/.style={legend style={plotLegend,legend pos=north west}},
+                        plotLegendNWcloser/.style={legend style={
+                            plotLegend,
+                            at={(0,1)},
+                            anchor=north west,
+                        }},
+                        plotLegendNE/.style={legend style={plotLegend,legend pos=north east}},
+                        plotLegendNEcloser/.style={legend style={
+                            plotLegend,
+                            at={(1,1)},
+                            anchor=north east,
+                        }},
+                        plotLegendSW/.style={legend style={plotLegend,legend pos=south west}},
+                        plotLegendSE/.style={legend style={plotLegend,legend pos=south east}},
+                    }
+                    \pgfmathsetmacro\lineLegendLength{1}
+                    \pgfmathsetmacro\areaLegendHeigth{.25}
+                    \pgfplotsset{
+                        legend image code/.code={
+                            \draw [mark repeat=2,mark phase=2,##1]
+                                plot coordinates {
+                                    (0em,0em)
+                                    (.5*\lineLegendLength em,0em)
+                                    (\lineLegendLength em,0em)
+                                };
+                        },
+                        /pgfplots/area legend/.style={
+                            legend image code/.code={
+                                \draw [##1,fill,draw=none] 
+                                    (0em,-\areaLegendHeigth em) 
+                                    rectangle 
+                                    (\lineLegendLength em,\areaLegendHeigth em);
+                            },
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Etichette vuote
+                    \pgfplotsset{
+                        yLabelEmpty/.style={ylabel={}},
+                        yTickLabelsEmpty/.style={yticklabels={}},
+                        yTickScaleLabelEmpty/.style={ytick scale label code/.code={}},
+                        xTickScaleLabelEmpty/.style={xtick scale label code/.code={}},
+                        emptyLeged/.style={
+                            legend style={draw=none,fill=none,nodes={draw=none}},
+                            legend image post style={opacity=0},
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Estetica
+                    \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
+                    \pgfplotsset{
+                        /pgfplots/log number format basis/.code 2 args={%
+                            \pgfmathsetmacro\exponent{##2}%
+                            \pgfmathparse{sign(\exponent)}%
+                            \ifnum\pgfmathresult<0%
+                                \pgfmathparse{abs(\exponent)}%
+                                $##1^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                            \else%
+                                $##1^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                            \fi%
+                        },
+                        ytick scale label code/.code={%
+                            \pgfmathsetmacro\exponent{##1}%
+                            \pgfmathparse{sign(\exponent)}%
+                            \ifnum\pgfmathresult<0
+                                \pgfmathparse{abs(\exponent)}%
+                                $\cdot 10^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                            \else
+                                $\cdot 10^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                            \fi
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Colori
+                    \definecolor{blueish}{rgb}{0.00000,0.44700,0.74100}%
+                    \definecolor{reddish}{rgb}{0.83529,0.36863,0.00000}%
+                %\endgroup
+    
+                %\begingroup Commenti
+                    \newcommand\betaReal{\num{1.27}}
+                    \newcommand\xiReal{\num{.93}}
+    
+                    \tikzset{
+                        fittedParameters/.style={
+                            align=center,
+                            font=\dimTesto{\ParameterSize},
+                        },
+                        varyingParameter/.style={
+                            align=center,
+                            % rotate=90,
+                            font=\dimTesto{\subCaptionSize},
+                        },
+                        title/.style={
+                            anchor=south,
+                            font=\bfseries\dimTesto{\titleSize},
+                        }
+                    }
+    
+                    \newcommand\codetocolor[1]{\ifcase##1blueish\or reddish\else black\fi}
+                    \newcommand\codetoparameter[1]{\ifcase##1\beta\else\xi\fi}
+                    \newcommand\codetovalue[2][0]{
+                        \ifcase##1\ifcase##2\betaExact\or\betaAprx\else\betaReal\fi
+                        \else\ifcase##2\xiExact\or\xiAprx\else\xiReal\fi\fi
+                    }
+    
+                    \newcommand\writeParameters[8][center]{
+                        \node[fittedParameters,anchor=##1] at ([shift={(##6,##7)}]##5) {%
+                            \(\begin{aligned}
+                                \color{\codetocolor{##2}}\codetoparameter{0}
+                                &\color{\codetocolor{##2}}=\codetovalue{##2}\\[##8]
+                                \color{\codetocolor{##3}}\codetoparameter{##4}
+                                &\color{\codetocolor{##3}}=\codetovalue[##4]{##3}
+                            \end{aligned}\)
+                        };
+                    }
+    
+                    \newcommand\writeSizeEvolutionDescriptions[1][5]{
+                        \foreach \col/\clr/\txt in {
+                            1/blueish/Esatto,
+                            2/reddish/Approssimato
+                        }{
+                            \node[
+                                fittedParameters,
+                                anchor=south,
+                                yshift=.1em,
+                            ] at (Row##1 c\col r1.south) {\color{\clr}\txt};
+                        }
+                    }
+    
+                    %\begingroup % Vecchia versione in cui si scrivevano esplicitamente tutte le 9 combinazioni possibili
+                    % \newcommand\writeParameters[6]{%
+                    %     \node[parameter] at ([shift={(##4,##5)}]##1) {%
+                    %         \ifcase##2% Caso 0
+                    %             \ifcase##3% Caso 0
+                    %                 \(\begin{aligned}
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact\\[##6]
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact
+                    %                 \end{aligned}\)
+                    %             \or% Caso 1
+                    %                 \(\begin{aligned}
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact\\[##6]
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx% Caso 1
+                    %                 \end{aligned}\)
+                    %             \else% Caso 2
+                    %                 \(\begin{aligned}
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact\\[##6]
+                    %                     \color{black}\beta&\color{black}=\betaReal% Caso 2
+                    %                 \end{aligned}\)
+                    %             \fi
+                    %         \or% Caso 1
+                    %             \ifcase##3% Caso 0
+                    %                 \(\begin{aligned}
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx\\[##6]
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact
+                    %                 \end{aligned}\)
+                    %             \or% Caso 1
+                    %                 \(\begin{aligned}
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx\\[##6]
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx
+                    %                 \end{aligned}\)
+                    %             \else% Caso 2
+                    %                 \(\begin{aligned}
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx\\[##6]
+                    %                     \color{black}\beta&\color{black}=\betaReal
+                    %                 \end{aligned}\)
+                    %             \fi
+                    %         \else% Caso 2
+                    %             \ifcase##3% Caso 0
+                    %                 \(\begin{aligned}
+                    %                     \color{black}\beta&\color{black}=\betaReal\\[##6]
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact
+                    %                 \end{aligned}\)
+                    %             \or% Caso 1
+                    %                 \(\begin{aligned}
+                    %                     \color{black}\beta&\color{black}=\betaReal\\[##6]
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx
+                    %                 \end{aligned}\)
+                    %             \else% Caso 2
+                    %                 \(\begin{aligned}
+                    %                     \color{black}\beta&\color{black}=\betaReal\\[##6]
+                    %                     \color{black}\beta&\color{black}=\betaReal
+                    %                 \end{aligned}\)
+                    %             \fi
+                    %         \fi
+                    %     };
+                    % }
+                    %\endgroup
+    
+                    \newcommand\writeVaryingParameter[5]{
+                        \foreach \r in {1,...,5}{
+                            \node[
+                                varyingParameter,
+                                anchor=##3,
+                            ] at ([shift={(##4,##5)}]Row\r\space c##1r1.##2)
+                            {\(\varyingParameterSymbol=\varyingParameterList{\r}\)};
+                        }
+                    }
+                %\endgroup
+    
+                %\begingroup Sottodidascalie
+                    \tikzset{
+                        subCaption/.style={
+                            % text width=\plotWidth cm,
+                            align=center,
+                            font=\dimTesto{\subCaptionSize},
+                        },
+                        subCaptionNW/.style={subCaption,anchor=north west},
+                        subCaptionNE/.style={subCaption,anchor=north east},
+                        subCaptionSW/.style={subCaption,anchor=south west},
+                        subCaptionSE/.style={subCaption,anchor=south east},
+                    }
+                %\endgroup
+            }
             %\endgroup
-        %\endgroup
-
-        %\begingroup Dimensioni
-            \pgfmathsetmacro\plotWidth7
-            \pgfmathsetmacro\plotHeight{.618*\plotWidth}
-            %
-            \pgfmathparse{0.825*\plotWidth}
-            \pgfmathsetmacro\plotWidth\pgfmathresult
-            \pgfmathsetmacro\halfWidth{\plotWidth/2}
-            \pgfmathsetmacro\plotLastWidth{1.25*\plotWidth}
-
-            \pgfmathsetmacro\xPlotSep{1}
-            \pgfmathsetmacro\yPlotSep{1.25}
-            \pgfmathsetmacro\yGroupSep{2.75}
-        %\endgroup
-
-        %\begingroup Gruppi
-            \newcommand\rectoGroupOptions{\pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}}
-            \newcommand\versoGroupOptions{\pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}}
-            % \Ifthispageodd{%
-            %     \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
-            % }{%
-            %     \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
-            % }
-            \pgfplotsset{
-                /pgfplots/group/plotGroup/.style={
-                    horizontal sep=\xPlotSep em,
-                    vertical sep=\yPlotSep em,
-                    yDescPos,
-                    group size=3 by 1,
-                },
-                /pgfplots/group/plotLastGroup/.style={
-                    plotGroup,
-                    x descriptions at=edge bottom,
-                },
-            }
-        %\endgroup
-
-        %\begingroup Stili
-            %\begingroup Selezione «recto»/«verso»
-            \newcommand\rectoPlotOptions{%
-                \pgfplotsset{%
-                    yLineAxis/.style={axis y line*=right},
-                    /tikz/yLabelShift/.style={%
-                        yshift=-2.5em,
-                        at={(axis description cs:1,0.5)},
-                        anchor=south,
-                        % rotate=180,
-                    },
-                    /tikz/yScaleLabelShift/.style={%
-                        yshift=.25em,
-                        at={(1,1)},
-                        anchor=south east,
-                    },
-                    /tikz/yTickLabelShift/.style={xshift=-0.15em},
-                }
-            }
-            \newcommand\versoPlotOptions{%
-                \pgfplotsset{%
-                    yLineAxis/.style={axis y line*=left},
-                    /tikz/yLabelShift/.style={%
-                        yshift=1.25em,
-                        at={(axis description cs:0,0.5)},
-                        anchor=south,
-                        % rotate=180,
-                    },
-                    /tikz/yScaleLabelShift/.style={%
-                        yshift=.25em,
-                        at={(0,1)},
-                        anchor=south west,
-                    },
-                    /tikz/yTickLabelShift/.style={xshift=+0.15em},
-                }
-            }
-            %\endgroup
-            %
-            %\begingroup Gruppi
-            \pgfplotsset{
-                plotRow/.style={
-                    scale only axis,
-                    width=\plotWidth cm,height=\plotHeight cm,
-                    xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
-                    ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
-                    xticklabel style={font=\dimTesto{\tickSize}},
-                    yticklabel style={font=\dimTesto{\tickSize},yTickLabelShift},
-                    xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
-                    % axis x line*=bottom,yLineAxis,
-                    enlarge x limits=0.1,enlarge y limits=0.1,
-                    xmajorgrids,ymajorgrids,
-                    xminorticks=true,yminorticks=true,
-                    axis background/.style={fill=white},
-                    grid style={dashed}
-                },
-            }
-            %\endgroup
-            %
-            %\begingroup Estetica
-            \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
-            \pgfplotsset{
-                /pgfplots/log number format basis/.code 2 args={%
-                    \pgfmathsetmacro\exponent{#2}%
-                    \pgfmathparse{sign(\exponent)}%
-                    \ifnum\pgfmathresult<0%
-                        \pgfmathparse{abs(\exponent)}%
-                        $#1^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
-                    \else%
-                        $#1^{\smash{\pgfmathprintnumber{\exponent}}}$%
-                    \fi%
-                },
-                ytick scale label code/.code={%
-                    \pgfmathsetmacro\exponent{#1}%
-                    \pgfmathparse{sign(\exponent)}%
-                    \ifnum\pgfmathresult<0
-                        \pgfmathparse{abs(\exponent)}%
-                        $\cdot 10^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+    
+            %\begingroup Chiavi del primo tipo d'infopagina
+            \newcommand\infopageKeysI{
+                \infopageSharedKeys
+    
+                %\begingroup Gruppi
+                    \ifpageisodd
+                        \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
                     \else
-                        $\cdot 10^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                        \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
                     \fi
-                },
+                    \pgfplotsset{
+                        /pgfplots/group/plotGroup/.style={
+                            horizontal sep=\xPlotSep em,
+                            vertical sep=\yPlotSep em,
+                            yDescPos,
+                            group size=3 by 1,
+                        },
+                        /pgfplots/group/plotLastGroup/.style={
+                            plotGroup,
+                            x descriptions at=edge bottom,
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Stili
+                    %\begingroup Selezione «recto»/«verso»
+                    \ifpageisodd
+                        \pgfplotsset{%
+                            yLineAxis/.style={axis y line*=right},
+                            /tikz/yLabelShift/.style={%
+                                yshift=-2.5em,
+                                at={(axis description cs:1,0.5)},
+                                anchor=south,
+                                % rotate=180,
+                            },
+                            /tikz/yScaleLabelShift/.style={%
+                                yshift=.25em,
+                                at={(1,1)},
+                                anchor=south east,
+                            },
+                            /tikz/yTickLabelShift/.style={xshift=-0.15em},
+                        }
+                    \else
+                        \pgfplotsset{%
+                            yLineAxis/.style={axis y line*=left},
+                            /tikz/yLabelShift/.style={%
+                                yshift=1.25em,
+                                at={(axis description cs:0,0.5)},
+                                anchor=south,
+                                % rotate=180,
+                            },
+                            /tikz/yScaleLabelShift/.style={%
+                                yshift=.25em,
+                                at={(0,1)},
+                                anchor=south west,
+                            },
+                            /tikz/yTickLabelShift/.style={xshift=+0.15em},
+                        }
+                    \fi
+                    %\endgroup
+                    %
+                    %\begingroup Grafici
+                    \pgfplotsset{
+                        plotRow/.style={
+                            scale only axis,
+                            width=\plotWidth cm,height=\plotHeight cm,
+                            xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+                            xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                            ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
+                            xticklabel style={font=\dimTesto{\tickSize}},
+                            yticklabel style={font=\dimTesto{\tickSize},yTickLabelShift},
+                            y tick scale label style={yScaleLabelShift},
+                            % axis x line*=bottom,yLineAxis,
+                            enlarge x limits=0.1,enlarge y limits=0.1,
+                            xmajorgrids,ymajorgrids,
+                            xminorticks=true,yminorticks=true,
+                            axis background/.style={fill=white},
+                            grid style={dashed}
+                        },
+                        row1Keys/.style={
+                            enlarge x limits={lower,value=.05},
+                            enlarge y limits={upper,value=.025},
+                            xmode=log,
+                            log origin=infty,
+                        },
+                        row2Keys/.style={xmode=log,ymode=log},
+                        row3Keys/.style={xmode=log,ymode=log},
+                        row4Keys/.style={
+                            xlabel={\(k\)},ylabel={\(s(k)\)},
+                            xmode=log,ymode=log
+                        },
+                        row5Keys/.style={
+                            width=\plotLastWidth cm,
+                            xlabel={\(t\)},ylabel={\(s(t)\)},
+                            ymode=log,
+                            enlarge x limits=0,
+                            enlarge y limits=0.05,
+                            x tick scale label style={
+                                yshift=-1em,
+                                at={(.95,0)},
+                                anchor=north,
+                            },
+                        },
+                    }
+                    %\endgroup
+                %\endgroup
+            }
+            %\endgroup
+    
+            %\begingroup Chiavi del secondo tipo d'infopagina
+            \newcommand\infopageKeysII{
+                \infopageSharedKeys
+    
+                %\begingroup Gruppi
+                    \ifpageisodd
+                        \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
+                    \else
+                        \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
+                    \fi
+                    \pgfplotsset{
+                        /pgfplots/group/plotGroup/.style={
+                            horizontal sep=\xPlotSep em,
+                            vertical sep=\yPlotSep em,
+                            y descriptions at=all,
+                            group size=3 by 1,
+                        },
+                        /pgfplots/group/plotLastGroup/.style={
+                            plotGroup,
+                            x descriptions at=edge bottom,
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Stili
+                    %\begingroup Selezione «recto»/«verso»
+                    \ifpageisodd
+                        \pgfplotsset{
+                            yLabel/.style={
+                                ylabel style={
+                                    font=\color{white!15!black}\dimTesto{\labelSize},
+                                    yshift=-2.5em,
+                                    at={(axis description cs:1,0.5)},
+                                    anchor=south,
+                                    % rotate=180,
+                                },
+                            },
+                            yLabelInv/.style={yLabelEmpty},
+                            yScaleLabelShift/.style={
+                                y tick scale label style={
+                                    yshift=.25em,
+                                    % xshift=1em,
+                                    at={(1,1)},
+                                    anchor=south east,
+                                },
+                            },
+                            yScaleLabelShiftInv/.style={
+                                y tick scale label style={
+                                    yshift=.25em,
+                                    % xshift=-1em,
+                                    at={(0,1)},
+                                    anchor=south west,
+                                },
+                            },
+                            % yLineAxis/.style={axis y line*=right},
+                        }
+                    \else
+                        \pgfplotsset{
+                            yLabel/.style={yLabelEmpty},
+                            yLabelInv/.style={
+                                ylabel style={
+                                    font=\color{white!15!black}\dimTesto{\labelSize},
+                                    yshift=1.25em,
+                                    at={(axis description cs:0,0.5)},
+                                    anchor=south,
+                                    % rotate=180,
+                                },
+                            },
+                            yScaleLabelShift/.style={
+                                y tick scale label style={
+                                    yshift=.25em,
+                                    % xshift=1em,
+                                    at={(1,1)},
+                                    anchor=south east,
+                                },
+                            },
+                            yScaleLabelShiftInv/.style={
+                                y tick scale label style={
+                                    yshift=.25em,
+                                    % xshift=-1em,
+                                    at={(0,1)},
+                                    anchor=south west,
+                                },
+                            },
+                            % yLineAxis/.style={axis y line*=left},
+                        }
+                    \fi
+                    %\endgroup
+                    %
+                    %\begingroup Grafici
+                    \pgfplotsset{
+                        plotRow/.style={
+                            scale only axis,
+                            width=\plotWidth cm,height=\plotHeight cm,
+                            xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                            % ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
+                            xticklabel style={font=\dimTesto{\tickSize}},
+                            xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+                            % axis x line*=bottom,yLineAxis,
+                            enlarge x limits=0.1,enlarge y limits=0.1,
+                            xmajorgrids,ymajorgrids,
+                            xminorticks=true,yminorticks=true,
+                            scale ticks above exponent=2,
+                            axis background/.style={fill=white},
+                            grid style={dashed},
+                        },
+                        plotLeftCol/.style={
+                            yLabelInv,
+                            yticklabel style={font=\dimTesto{\tickSize},xshift=0.15em},
+                            yticklabel pos=left,
+                            yScaleLabelShiftInv,
+                        },
+                        plotMiddleCol/.style={
+                            yLabelEmpty,
+                            yTickLabelsEmpty,
+                            yTickScaleLabelEmpty,
+                        },
+                        plotRightCol/.style={
+                            yLabel,
+                            yticklabel style={font=\dimTesto{\tickSize},xshift=-0.15em},
+                            yticklabel pos=right,
+                            yScaleLabelShift,
+                        },
+                    }
+                    %\endgroup
+                %\endgroup
             }
             %\endgroup
         %\endgroup
+    %\endgroup
 
-        %\begingroup Legende
-        \pgfplotsset{
-            plotLegend/.style={
-                font=\dimTesto{\legendSize},
-                legend cell align=left,
-                align=left,
-                % draw=white!15!black,
-                draw=none, % Bordo invisibile
-                fill=white,
-                fill opacity=0.5,
-                text opacity=1,
-                % text width=2cm,
-            },
-            plotLegendNW/.style={legend style={plotLegend,legend pos=north west}},
-            plotLegendNE/.style={legend style={plotLegend,legend pos=north east}},
-            plotLegendSW/.style={legend style={plotLegend,legend pos=south west}},
-            plotLegendSE/.style={legend style={plotLegend,legend pos=south east}},
-        }
-        \pgfmathsetmacro\lineLegendLength{1}
-        \pgfmathsetmacro\areaLegendHeigth{.25}
-        \pgfplotsset{
-            legend image code/.code={
-                \draw [mark repeat=2,mark phase=2,#1]
-                    plot coordinates {
-                        (0em,0em)
-                        (.5*\lineLegendLength em,0em)
-                        (\lineLegendLength em,0em)
-                    };
-            },
-            /pgfplots/area legend/.style={
-                legend image code/.code={
-                    \draw [#1,fill,draw=none] 
-                        (0em,-\areaLegendHeigth em) 
-                        rectangle 
-                        (\lineLegendLength em,\areaLegendHeigth em);
-                },
-            },
-        }
+    %\begingroup Diagrammi dei nodi
+    \newcommand\nodeDiagramSettings{
+        %\begingroup Dimensioni
+            \pgfmathsetmacro\xPlotSep{4}
+            \pgfmathsetmacro\yPlotSep{4}
+            \pgfmathsetmacro\plotScale{.8}
+
+            \pgfmathsetmacro\titleSize{11}
+            \pgfmathsetmacro\commentSize{10}
+
+            \pgfmathsetmacro\nodeSize{20pt} % Diametro del nodo
+            \pgfmathsetmacro\starSize{2.25*\nodeSize}
+            \pgfmathsetmacro\numberSize{.53*\nodeSize}
         %\endgroup
+
+        %\begingroup Colori
+            % \definecolor{cRed}{HTML}{D68490}
+            % \definecolor{cPurple}{HTML}{7E6EAC}
+            % \definecolor{cTeal}{HTML}{87BDB1}
+            % \definecolor{cOrange}{HTML}{F2D0A4}
+            % \definecolor{cEdgeLight}{HTML}{EEE8D5} 
+            % \definecolor{cEdgeDark}{HTML}{998888}
+            % \definecolor{cStar}{HTML}{FDF6E3}
+            %
+            \definecolor{color1}{HTML}{800000} % Deep Red
+            \definecolor{color2}{HTML}{4682B4} % Steel Blue
+            \definecolor{color3}{HTML}{6B8E23} % Olive Green
+            \definecolor{color4}{HTML}{708090} % Slate Gray
+            \definecolor{color5}{HTML}{BC8F8F} % Rosy Brown
+            \definecolor{color6}{HTML}{008B8B} % Dark Cyan
+            \definecolor{color7}{HTML}{B8860B} % Dark Goldenrod
+        %\endgroup
+
+        %\begingroup Testo
+            \tikzset{
+                titleStyle/.style={
+                    font=\dimTesto{\titleSize},
+                    align=center,
+                    anchor=south,
+                },
+                commentStyle/.style={font=\dimTesto{\commentSize}},
+                arrowCommentStyle/.style={
+                    midway,
+                    commentStyle,
+                    left,
+                    sloped,
+                    below
+                },
+                numberStyle/.style={font=\dimTesto{\numberSize}}
+            }
+        %\endgroup
+
+        %\begingroup Frecce
+            \tikzset{
+                transformingArrow/.style={
+                    % >=Latex,
+                    ->,
+                    >=Stealth,
+                    dashed,
+                    line width=.8pt,
+                    black!90,
+                    shorten >=5pt,
+                    shorten <=10pt
+                },
+                nodeArrowExact/.style={
+                    % ->,
+                    % -{Stealth[scale=1.2]},
+                    -{Triangle[scale=.75]},
+                    % draw=cEdgeLight,
+                    % draw=red!50,
+                    draw=black!95,
+                    line width=.5pt,
+                    % shorten >=2pt,
+                    % shorten <=2pt
+                },
+                nodeArrowApprox/.style={
+                    -,
+                    draw=black!95,
+                    line width=.5pt,
+                    dashed,
+                },
+                transparentNodeArrow/.style={
+                    opacity=.4,
+                },
+                arrowAxis/.style={
+                    ->,
+                    line width=.3pt,
+                    >=Latex,
+                },
+            }
+        %\endgroup
+
+        %\begingroup Nodi
+            \tikzset{
+                nodeStyle/.style={
+                    circle,
+                    minimum size=\nodeSize,
+                    % draw=black!80,
+                    draw=black,
+                    line width=.5pt,
+                    inner sep=0pt,
+                },
+                starStyle/.style={
+                    star,
+                    star points=5,
+                    star point ratio=2,
+                    % fill=cStar,
+                    fill=black!50,
+                    fill opacity=.25,
+                    minimum size=\starSize,
+                    draw=none
+                },
+            }
+        %\endgroup
+    }
     %\endgroup
 %\endgroup
 

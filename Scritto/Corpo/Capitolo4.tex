@@ -620,8 +620,10 @@
 
             Dunque \(\gamma\) introduce solo del lieve rumore che, sebbene abbia il nobile scopo di rendere piú realistico il modello, non aiuta a interpretare i risultati rispetto a quelli reali.
 
-            \tikzfigure{p}
-                {\input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}}
+            % \tikzfigure{p}
+            %     {\input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}
                 {Confronto di una simulazione con e senza fluttuazioni; la regola d'emigrazione è la \cref{eqVarianteRegolaTagliaForzaFrazionata} mentre i parametri sono illustrati nella \cref{tabParametriConEsenzaGamma}.}
                 {.6\linewidth}{figConfrontoConESenzaFluttuazioni}
 
@@ -676,11 +678,6 @@
             }%
             in cui \(\lambda\in(0,1)\) e \(\alpha\in\mathbb R^+\); in essenza è la \cite[(2.2), § 2, p. 223]{Gualandi2019SDC} modificata mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019SDC}, ossia è una funzione di Hill di ordine \(\alpha\), in cui v'è un tasso di emigrazione maggiore verso città con popolazione relativa, data dal rapporto \(s_*/s\), maggiore.
 
-            % \tikzfigure{p}
-            % {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Infopagina.tex}}
-            % {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-            % {.7\linewidth}{figProva}
-
             I risultati nella \daRivedere{}, ottenuti tramite i parametri nella \cref{tabParametriRegolaEmigrazioneTaglia}, non sono purtroppo corretti dato che non solo mostrano dei centri abitati spopolarsi, ma che questi sono piú per la maggior parte i le città piú popolate.
 
             \begin{table}[htb]
@@ -693,19 +690,23 @@
                     Instabile&\(\num{.1}\)&\(\num{1.5}\)&\(\num{1e5}\)&\(\num{10}\)\\
                     \hline
                 \end{tabular}
-                \caption{Dati e parametri della \ref{eqRegolaEmigrazioneTaglia}.}
+                \caption{Parametri della \ref{eqRegolaEmigrazioneTaglia}.}
                 \label{tabParametriRegolaEmigrazioneTaglia}
             \end{table}
 
-            \tikzfigure{p}
-            {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Stabile/Infopagina.tex}}
-            {Studio della configurazione di riferimento stabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-            {.6\linewidth}{figStudioConfigurazioneRiferimentoStabileRET}
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Stabile/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Stabile/Infopagina.tex}
+                {Studio della configurazione di riferimento stabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figStudioConfigurazioneRiferimentoStabileRET}
 
-            \tikzfigure{p}
-            {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Instabile/Infopagina.tex}}
-            {Studio della configurazione di riferimento instabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-            {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRET}
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Instabile/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/RETConfigurazioneRiferimento/Instabile/Infopagina.tex}
+                {Studio della configurazione di riferimento instabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRET}
 
         \subsection{Regola taglia-gradi}
 
@@ -723,14 +724,16 @@
                     \(\num{.15}\)&\(\num{.63}\)&\(\num{2e6}\)\\
                     \hline
                 \end{tabular}
-                \caption{Dati e parametri della \ref{eqRegolaEmigrazioneTagliaGradi}.}
+                \caption{Parametri della \ref{eqRegolaEmigrazioneTagliaGradi}.}
                 \label{tabParametriRegolaEmigrazioneTagliaGradi}
             \end{table}
 
-            \tikzfigure{p}
-            {\input{../../Figure/.fnl/Capitolo4/RETGConfigurazioneRiferimento/Infopagina.tex}}
-            {Studio della configurazione di riferimento della \cref{eqRegolaEmigrazioneTagliaGradi} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaGradi}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-            {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRETG}
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/RETGConfigurazioneRiferimento/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/RETGConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGradi} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaGradi}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRETG}
 
         \subsection{Regola frazionata}
             
@@ -748,14 +751,16 @@
                     \(\num{.15}\)&\(\num{.67}\)&\(\num{1e-2}\)&\(\num{1e6}\)\\
                     \hline
                 \end{tabular}
-                \caption{Dati e parametri della \ref{eqRegolaEmigrazioneTagliaGradiFrazionata}.}
+                \caption{Parametri della \ref{eqRegolaEmigrazioneTagliaGradiFrazionata}.}
                 \label{tabParametriRegolaEmigrazioneTagliaGradiFrazionata}
             \end{table}
 
-            \tikzfigure{p}
-            {\input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/Infopagina.tex}}
-            {Studio della configurazione di riferimento della \cref{eqRegolaEmigrazioneTagliaGradiFrazionata} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaGradiFrazionata}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-            {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRETGf}
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/RETGfConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGradiFrazionata} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaGradiFrazionata}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figStudioConfigurazioneRiferimentoInstabileRETGf}
 
         \subsection{Regola taglia-forza}
 
@@ -770,17 +775,119 @@
                     \hline
                     \(\lambda\)&\(\alpha\)&\(N_t\)\\
                     \hline
-                    \(\num{1}\)&\(\num{1}\)&\(\num{1}\)\\
+                    \(\num{.18}\)&\(\num{.44}\)&\(\num{3e6}\)\\
                     \hline
                 \end{tabular}
-                \caption{Dati e parametri della \ref{eqRegolaEmigrazioneTagliaForza}.}
+                \caption{Parametri della \ref{eqRegolaEmigrazioneTagliaForza}.}
                 \label{tabParametriRegolaEmigrazioneTagliaForza}
             \end{table}
 
-            \tikzfigure{p}
-            {\input{../../Figure/.fnl/Capitolo4/RETFConfigurazioneRiferimento/Infopagina.tex}}
-            {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-            {.575\linewidth}{figStudioConfigurazioneRiferimentoRETF}
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/RETFConfigurazioneRiferimento/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/RETFConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.575\linewidth}{figStudioConfigurazioneRiferimentoRETF}
+
+            \begin{table}[htb]
+                \centering
+                \begin{tabular}{cccc}
+                    \hline
+                    \(\lambda\)&\(N_p\)&\(\alpha\)&\(N_t\)\\
+                    \hline
+                    \([\num{.01},\num{.3}]\)&5&\(\num{.44}\)&\(\num{3e6}\)\\
+                    \hline
+                \end{tabular}
+                \caption{Parametri dello studio parametrico \(\lambda\).}
+                \label{tabStudioParametricolRegolaEmigrazioneTagliaForza}
+            \end{table}
+
+            \begin{table}[htb]
+                \centering
+                \begin{tabular}{cccc}
+                    \hline
+                    \(\lambda\)&\(\alpha\)&\(N_p\)&\(N_t\)\\
+                    \hline
+                    \(\num{.18}\)&\([\num{.3},\num{.6}]\)&5&\(\num{3e6}\)\\
+                    \hline
+                \end{tabular}
+                \caption{Parametri dello studio parametrico \(\alpha\).}
+                \label{tabStudioParametricoaRegolaEmigrazioneTagliaForza}
+            \end{table}
+
+            %\begingroup Inizio studio parametrico l
+                % \tikzfigure{p}
+                    % {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF1/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF1/Infopagina.tex}
+                    {Distribuzioni dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricolRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricolRETFSDF1}
+
+                % \tikzfigure{p}
+                    % {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF2/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF2/Infopagina.tex}
+                    {Adattamenti di Pareto dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricolRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricolRETFSDF2}
+
+                % \tikzfigure{p}
+                    % {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/Infopagina.tex}
+                    {Adattamenti di Pareto e lognormali bimodali dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricolRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricolRETFSDF3}
+
+                % \tikzfigure{p}
+                    % {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SVsD/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SVsD/Infopagina.tex}
+                    {Taglie contro gradi dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricolRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricolRETFSVsD}
+
+                % \tikzfigure{p}
+                    % {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SE/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SE/Infopagina.tex}
+                    {Evoluzioni delle taglie medie delle classi dei gradi dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricolRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricolRETFSE}
+            %\endgroup
+
+            %\begingroup Studio parametrico a
+                % \tikzfigure{p}
+                %     {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SDF1/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SDF1/Infopagina.tex}
+                    {Distribuzioni dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricoaRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricoaRETFSDF1}
+    
+                % \tikzfigure{p}
+                %     {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SDF2/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SDF2/Infopagina.tex}
+                    {Adattamenti di Pareto dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricoaRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricoaRETFSDF2}
+    
+                % \tikzfigure{p}
+                %     {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SDF3/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SDF3/Infopagina.tex}
+                    {Adattamenti di Pareto e lognormali bimodali dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricoaRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricoaRETFSDF3}
+    
+                % \tikzfigure{p}
+                %     {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SVsD/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SVsD/Infopagina.tex}
+                    {Taglie contro gradi dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricoaRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricoaRETFSVsD}
+                    
+                % \tikzfigure{p}
+                %     {\input{../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SE/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/RETFStudioParametricoa/SE/Infopagina.tex}
+                    {Evoluzioni delle taglie medie delle classi dei gradi dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudioParametricoaRegolaEmigrazioneTagliaForza}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.7\linewidth}{figStudioParametricoaRETFSE}
+            %\endgroup
 
         \subsection{Interpretazioni}
 
