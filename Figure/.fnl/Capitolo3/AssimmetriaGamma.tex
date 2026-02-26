@@ -51,7 +51,7 @@
                 thick, 
                 no marks,
             ] gnuplot [raw gnuplot] {
-                set samples 300;
+                set samples 1000;
                 f(x,a,b)=(1/(b**a * gamma(a))) * x**(a-1) * exp(-x/b);
                 mi = \mi; a = \a; b = mi/a;
                 plot [x=0:3] f(x,a,b);

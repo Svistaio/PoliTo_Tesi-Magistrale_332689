@@ -35,7 +35,7 @@ class ParametersGUI(tk.Tk):
             libP.regionList
         )
         self.intRuleList = libP.ComboBoxList(
-            self.interactingRule,
+            self.interactionRule,
             libP.intRuleList
         )
         self.studiedPrmList = libP.ComboBoxList(
@@ -121,8 +121,8 @@ class ParametersGUI(tk.Tk):
         self.zetaFraction.var.trace_add('write',self.SetZetaFractionState)
         self.fluctuations.var.trace_add('write',self.SetDeviationState)
 
-        simPrmFrame.LabelComboBox(self.interactingRule)
-        self.interactingRule.var.trace_add('write',self.InteractingRuleCallBack)
+        simPrmFrame.LabelComboBox(self.interactionRule)
+        self.interactionRule.var.trace_add('write',self.InteractingRuleCallBack)
         #endregion
 
         #region Time parameters
@@ -233,7 +233,7 @@ class ParametersGUI(tk.Tk):
         self.population.var.set(popReg)
 
     def SetConvincibility(self,*args):
-        if self.intRuleList.code[self.interactingRule.var.get()] == 1:
+        if self.intRuleList.code[self.interactionRule.var.get()] == 1:
             l = self.attractivity.var.get()
             self.convincibility.var.set(np.round(l/.01-1,decimals=2))
         else:
@@ -247,7 +247,7 @@ class ParametersGUI(tk.Tk):
         self.destroy() # Close the window after any button is pressed
 
     def InteractingRuleCallBack(self,*args):
-        if self.intRuleList.code[self.interactingRule.var.get()] in (1,3):
+        if self.intRuleList.code[self.interactionRule.var.get()] in (1,3):
             self.EnableCallBack(self.attractivity,self.SetConvincibility)
         else:
             self.DisableCallBack(self.attractivity)
@@ -311,7 +311,7 @@ class ParametersGUI(tk.Tk):
             prm.var.set(val)
 
         self.InteractingRuleCallBack()
-        if self.intRuleList.code[self.interactingRule.var.get()] == 1:
+        if self.intRuleList.code[self.interactionRule.var.get()] == 1:
             self.SetConvincibility()
         self.ShowParametricStudyFrame()
         self.SetStudiedParameterState()
@@ -331,8 +331,8 @@ class ParametersGUI(tk.Tk):
         parameters.region = self.regionList.code[
             parameters.region
         ]+1
-        parameters.interactingRule = self.intRuleList.code[
-            parameters.interactingRule
+        parameters.interactionRule = self.intRuleList.code[
+            parameters.interactionRule
         ]
         parameters.studiedParameter = self.studiedPrmList.code[
             parameters.studiedParameter

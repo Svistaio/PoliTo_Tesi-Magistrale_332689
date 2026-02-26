@@ -1,0 +1,224 @@
+
+% !TEX root = ../../../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\infopageKeysI
+
+\begin{tikzpicture}%
+    %\begingroup Righe
+        \begin{groupplot}[
+            group style={
+                group name=Row1,
+                plotGroup,
+            },
+            plotRow,
+            plotLegendSW,
+            row3Keys,
+            %
+            % xmin=3637.5,xmax=2.5003e+05,
+            ymin=0.00088565,ymax=1.0326,
+        ]
+            \nextgroupplot[%
+                xmin=3637.5,xmax=2.0424e+05,
+                % ymin=0.0041301,ymax=1.0005,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig5.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig5.tex}
+    
+            \nextgroupplot[%
+                xmin=3888.4,xmax=2.5091e+05,
+                % xmin=3888.4,xmax=1.5947e+05,
+                % ymin=0.00088565,ymax=1.0326,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig6.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig6.tex}
+    
+            \nextgroupplot[%
+                xmin=3861.6,xmax=2.5091e+05,
+                % xmin=3861.6,xmax=1.5947e+05,
+                % ymin=0.00089756,ymax=1.0345,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig7.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig7.tex}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row2,
+                plotGroup,
+            },
+            plotRow,
+            plotLegendSW,
+            row3Keys,
+            %
+            % xmin=3637.5,xmax=2.5003e+05,
+            ymin=0.00079708,ymax=1.0178,
+        ]
+            \nextgroupplot[%
+                at={($(Row1 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                xmin=3637.5,xmax=2.0424e+05,
+                % ymin=0.0041301,ymax=1.0005,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig18.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig18.tex}
+            \legend{}
+    
+            \nextgroupplot[%
+                xmin=3888.4,xmax=2.5091e+05,
+                % xmin=3991.5,xmax=1.9105e+05,
+                % ymin=0.00085548,ymax=1.0077,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig19.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig19.tex}
+            \legend{}
+    
+            \nextgroupplot[%
+                xmin=3861.6,xmax=2.5091e+05,
+                % xmin=3968.9,xmax=1.9105e+05,
+                % ymin=0.00079708,ymax=1.0178,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig20.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig20.tex}
+            \legend{}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row3,
+                plotGroup,
+            },
+            plotRow,
+            plotLegendSW,
+            row3Keys,
+            %
+            % xmin=3637.5,xmax=2.5003e+05,
+            ymin=0.00075947,ymax=1.0195,
+        ]
+            \nextgroupplot[%
+                at={($(Row2 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                xmin=3637.5,xmax=2.0424e+05,
+                % ymin=0.0041301,ymax=1.0005,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig31.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig31.tex}
+            \legend{}
+    
+            \nextgroupplot[%
+                xmin=3888.4,xmax=2.5091e+05,
+                % xmin=3984.5,xmax=2.1853e+05,
+                % ymin=0.00080002,ymax=1.0195,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig32.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig32.tex}
+            \legend{}
+    
+            \nextgroupplot[%
+                xmin=3861.6,xmax=2.5091e+05,
+                % xmin=3986.2,xmax=2.1853e+05,
+                % ymin=0.00075947,ymax=1.0155,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig33.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig33.tex}
+            \legend{}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row4,
+                plotGroup,
+            },
+            plotRow,
+            plotLegendSW,
+            row3Keys,
+            %
+            % xmin=3637.5,xmax=2.5003e+05,
+            ymin=0.00067872,ymax=1.0146,
+        ]
+            \nextgroupplot[%
+                at={($(Row3 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                xmin=3637.5,xmax=2.0424e+05,
+                % ymin=0.0041301,ymax=1.0005,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig44.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig44.tex}
+            \legend{}
+    
+            \nextgroupplot[%
+                xmin=3888.4,xmax=2.5091e+05,
+                % xmin=3989.7,xmax=2.5091e+05,
+                % ymin=0.00067872,ymax=1.0146,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig45.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig45.tex}
+            \legend{}
+    
+            \nextgroupplot[%
+                xmin=3861.6,xmax=2.5091e+05,
+                % xmin=3963.6,xmax=2.5091e+05,
+                % ymin=0.00078345,ymax=1.0134,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig46.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig46.tex}
+            \legend{}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row5,
+                plotLastGroup,
+            },
+            plotRow,
+            plotLegendSW,
+            row3Keys,
+            %
+            % xmin=3637.5,xmax=2.5003e+05,
+            ymin=0.001,ymax=1.0154,
+        ]
+            \nextgroupplot[%
+                at={($(Row4 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                xmin=3637.5,xmax=2.0424e+05,
+                % ymin=0.0041301,ymax=1.0005,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig57.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig57.tex}
+            \legend{}
+    
+            \nextgroupplot[%
+                xmin=3888.4,xmax=2.5091e+05,
+                % xmin=3966.9,xmax=2.3788e+05,
+                % ymin=0.001,ymax=1.0139,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig58.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig58.tex}
+            \legend{}
+    
+            \nextgroupplot[%
+                xmin=3861.6,xmax=2.5091e+05,
+                % xmin=3952.3,xmax=2.3788e+05,
+                % ymin=0.001,ymax=1.0154,
+            ] \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/SDF3/SDFfig59.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig59.tex}
+            \legend{}
+        \end{groupplot}
+    %\endgroup
+
+    %\begingroup Parametri
+        \input{../../Figure/.fnl/Capitolo4/RETFStudioParametricol/Adattamenti.tex}
+
+        \foreach \r/\t/\a/\p/\xS/\yS/\yLS in {
+            1/1/north east/north east/-1em/-1em/-.5em, % beta
+            2/1/north east/north east/-1em/-1em/-.5em, % beta
+            3/1/north east/north east/-1em/-1em/-.5em, % beta
+            4/1/north east/north east/-1em/-1em/-.5em, % beta
+            5/1/north east/north east/-1em/-1em/-.5em % beta
+        }{
+            \def\betaExact{\betaExactList{\r}}
+            \def\xiExact{\xiExactList{\r}}
+            
+            \def\betaAprx{\betaAprxList{\r}}
+            \def\xiAprx{\xiAprxList{\r}}
+
+            \foreach \c/\fl/\sl in {1/2/2,2/0/0,3/1/1}{
+                \writeParameters[\a]\fl\sl\t{Row\r\space c\c r1.\p}\xS\yS\yLS
+            }% «\xS=\xShift», «\yS=\yShift» e «\yLS=\yLineShift»
+        }
+
+        \ifpageisodd\writeVaryingParameter{1}{west}{west}{0em}{0em}
+        \else\writeVaryingParameter{3}{east}{east}{0em}{0em}\fi
+    %\endgroup
+
+    %\begingroup Didascalie
+        \foreach \r in {1,...,5}
+            \foreach \c in {1,2,3}
+                \node[subCaptionNE] at (Row\r\space c\c r1.north east) {\sottoDidascalia[]{}};
+        % https://tex.stackexchange.com/questions/632045/get-subcaption-for-every-plot-using-groupplot-pgf-tikz-after-2020-update
+    %\endgroup
+
+    \redefineTikZbounds{Row1 c1r1}{Row4 c3r1}
+\end{tikzpicture}%

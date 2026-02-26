@@ -1,0 +1,138 @@
+
+% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\nodeDiagramSettings
+\pgfmathsetmacro\lengthAxis{1.5}
+\pgfmathsetmacro\lengthPlot{\lengthAxis-.25}
+\tikzset{/pgf/fpu/install only={reciprocal,exp,ln}}
+
+\tikzset{
+    distributionStyle/.style={
+        color=black!50,
+        opacity=.7,
+        % color=black,
+        % draw=none,
+        % line width=.5pt,
+    },
+    plotDomain/.style={
+        domain=-\lengthPlot:\lengthPlot,
+        samples=300,
+        smooth,
+    }
+}
+
+\begin{tikzpicture}[
+    declare function={
+        gauss(\x,\m,\s,\a)=\a*exp(-((\x-\m)^2)/(2*\s^2)); % Funzione gaussiana
+        beta(\x,\l,\a,\b,\c)=\c*((\x+\l)/(2*\l))^(\a-1)*(1-(\x+\l)/(2*\l))^(\b-1); % Funzione beta nell'intervallo [-\l,\l]
+    },
+]%
+    %\begingroup Coordinate dei vertici
+        \newcommand\vertexCoordinates{
+            % Punti interni visibili
+            \coordinate (i) at (-4,0);
+            \coordinate (k) at (-.5,1);
+            \coordinate (j) at (2,-2);
+
+            \coordinate (ai) at ([xshift=-2cm,yshift=-1cm]i);
+            \coordinate (ak) at ([xshift=-.5cm,yshift=-2cm]k);
+            \coordinate (aj) at ([xshift=2cm,yshift=1cm]j);
+        }
+
+        \newcommand\drawNodes{
+            \foreach \i in {i,k,j}
+                \node[
+                    nodeStyle,
+                    numberStyle,
+                    fill=white
+                ] (n\i) at (\i) {\i};
+        }
+
+        \newcommand\drawEdges[6]{
+            % #1 -> Primo nodo
+            % #2 -> Punto medio dei lati entranti e uscenti del primo nodo
+            % #1 -> Secondo nodo
+            % #4 -> Punto medio dei lati entranti e uscenti del secondo nodo
+            % #5 -> Distanza del punto di contatto dei lati rispetto a quello medio
+            % Tutt'i punti sono posizionati lungo la circonferenza per cui i loro valori vanno da 0 a 360
+            %
+            \draw[nodeArrowExact] (#1) to[out=#2+#5,in=#4-#6] (#3);
+            \draw[nodeArrowExact] (#3) to[out=#4+#5,in=#2-#6] (#1);
+        }
+
+        \newcommand\drawAxes{
+            \foreach \i in {i,k,j}{
+                \draw[arrowAxis] 
+                    ([xshift=-\lengthAxis cm]a\i) -- ([xshift=\lengthAxis cm]a\i)
+                    node[commentStyle,below right=0pt] {\(s\)};
+            }
+        }
+
+        \newcommand\DrawDistributions{
+            % % La chiave «domain» può accettare unità di misura (tipo «cm», «pt» o «em») ma le tratta in genere molto male trasformandole in una quantità molto piú grande di quanto scritto; pertanto è meglio usare numeri «senza» unità di misura che verranno interpretati rispetto all'unità di base del gruppo considerato (di solito è in centrimetri)
+ 
+            \begin{scope}[shift={(ai)}]
+                \fill[distributionStyle] plot[plotDomain]
+                    (\x,{.5*beta(\x,\lengthPlot,2,8,45)+.5*beta(\x,\lengthPlot,3.5,3,4)}) -- 
+                    % (\x,{gauss(\x,0,.4,1)}) -- 
+                    (\lengthAxis cm,0) -- (-\lengthAxis cm,0) -- cycle;
+                \node[commentStyle,above] at (.5,.75) {$f_i(s,t)$};
+            \end{scope} % Distribuzione i: Gaussiana singola centrata
+
+            \begin{scope}[shift={(ak)}]
+                \fill[distributionStyle] plot[plotDomain]
+                    % (\x,{.5*beta(\x,\lengthPlot,2,6,0.8)+.5*beta(\x,\lengthPlot,6,2,0.4)}) --
+                    (\x,{gauss(\x,-.5*\lengthPlot,.2,1.2) + gauss(\x,.25*\lengthPlot,.3,.75)}) -- 
+                    (\lengthAxis cm,0) -- (-\lengthAxis cm,0) -- cycle;
+                \node[commentStyle,above] at (.25,.75) {$f_k(s,t)$};
+            \end{scope} % Distribuzione i: Gaussiana singola centrata
+
+            \begin{scope}[shift={(aj)}]
+                \fill[distributionStyle] plot[plotDomain]
+                    (\x,{beta(\x,\lengthPlot,2,2,3)}) --
+                    % (\x,{gauss(\x,.3,.35,.8)}) -- 
+                    (\lengthAxis cm,0) -- (-\lengthAxis cm,0) -- cycle;
+                \node[commentStyle,above] at (-1,.75) {$f_j(s,t)$};
+            \end{scope} % Distribuzione i: Gaussiana singola centrata
+        }
+    %\endgroup
+
+    \begin{scope}[
+        local bounding box=tikZFigure,
+        scale=\plotScale,
+        transform shape,
+    ]
+        \vertexCoordinates % Coordinate
+        \drawNodes{n} % Nodi
+
+        % Lati
+        \drawEdges{ni}{-65}{nj}{175}{10}{10}
+        \drawEdges{nj}{90}{nk}{-45}{20}{10}
+        \drawEdges{nk}{190}{ni}{45}{10}{10}
+
+        \DrawDistributions % Distribuzioni della taglia
+        \drawAxes % Assi della taglia
+
+        %\begingroup Frecce
+            % \draw[transformingArrow] 
+            %     ($(ExactGraph.south west)!0.2!(ExactGraph.south east)$) 
+            %     to[bend right=40] node[arrowCommentStyle] {\cref{defMatriceGradi}} (ApproxGraph.west);
+
+            % \draw[transformingArrow]
+            %     (ApproxGraph.east) to[bend right=40] node[arrowCommentStyle] {\cref{teoRilassamentoTopologia}}
+            %     ($(RelaxedGraph.south west)!0.8!(RelaxedGraph.south east)$);
+
+            % % \draw[transformingArrow] (ExactGraph.south) to[bend right=40] (ApproxGraph.west);
+            % % \draw[transformingArrow] (ApproxGraph.east) to[bend right=40] (RelaxedGraph.south);
+
+            % % \draw[transformingArrow] (ExactGraph.south) |- (ApproxGraph.west);
+            % % \draw[transformingArrow] (ApproxGraph.east) -| (RelaxedGraph.south);
+        %\endgroup
+    \end{scope}
+
+    % \begin{scope}[on background layer]
+    %     \draw[style=help lines] (tikZFigure.north west) grid[step=1em] (tikZFigure.south east);
+    %     \node at (0,0) {O};
+    % \end{scope}
+\end{tikzpicture}

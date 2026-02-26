@@ -831,6 +831,13 @@
                     l'acronimo \ref{eqAlgoritmoInterazione} sta per «Azione-Reazione» poiché si suppone che ogn'interazione (azione), ossia \(\Theta=1\), necessariamente modifica entrambi gli stati degli agenti coinvolti (reazione); in alcuni contesti \cite{Nurisso2024} questa regola può essere alterata dimodoché solo l'agente interagente sia modificato portando alle interazioni «Azione-Azione».
                 \end{oss}
 
+                % \tikzfigure{htb}
+                %     {\input{../../Figure/.fnl/Capitolo3/RappresentazioneGraficaAzioneReazione.tex}}
+                \tikzexternalizedfigure{htb}
+                    {../../Figure/.fnl/Capitolo3/RappresentazioneGraficaAzioneReazione.tex}
+                    {Rappresentazione grafica dell'\ref{eqAlgoritmoInterazione}.}
+                    {.8\linewidth}{figRappresentazioneGraficaAzioneReazione}
+
                 Infine, riapplicando un ragionamento analogo a quello svolto nel \cref{secBoltzmannOmogeno} colla quantità osservabile \(\varphi\colon\mathbb R^n\to\mathbb R\), si perviene all'equazione di tipo Boltzmann omogenea generale
                 %
                 \eqtag{\([\text{EtB}]_{\mathbf X}\)}{
@@ -888,7 +895,6 @@
                         \mathbf X^{*\prime}_t=\psi(\mathbf X^*_t,\mathbf X_t,\mathbf y_*).
                     \]
                 \end{dfn}
-
 
             \subsubsection{Notazione}
 
@@ -1096,6 +1102,13 @@
                 \end{equation*}
                 %
                 in cui \(S_t\in\RPlus\) è la variabile aleatoria relativa alla popolazione dell'agente rappresentativo al tempo \(t\) ed è l'unica componente del processo stocastico a variare nel tempo per l'\cref{ipGrafoStatico}.
+
+                % \tikzfigure{htb}
+                %     {\input{../../Figure/.fnl/Capitolo3/RappresentazioneGraficaTCSMAReti.tex}}
+                \tikzexternalizedfigure{htb}
+                    {../../Figure/.fnl/Capitolo3/RappresentazioneGraficaTCSMAReti.tex}
+                    {Rappresentazione grafica dell'impostazione teorica della \protect\TCSMA{} su reti.}
+                    {.8\linewidth}{figRappresentazioneGraficaTCSMAReti}
 
                 \begin{oss}[Sulla natura numerica della popolazione]
                     \label{ossNaturaNumericaPopolazione}
@@ -1502,8 +1515,10 @@
 
                 In realtà la \(\sigma\) non può davvero assumere valori arbitrari tra \(0\) e \(1-\lambda\): difatti se \(\sigma\to1-\lambda\) vale \(\alpha\to1\) e dunque la distribuzione gamma tende a un'esponenziale; questo ha l'effetto d'introdurre una pericolosa asimmetria nella densità, come si può notare nella la \cref{figTransizioneAsimmetria}: una volta centrata rispetto alla media la moda (il valore piú frequente) ha valore negativo portando, in un orizzonte temporale finito, le perturbazioni negative a essere quelle piú frequenti.
 
-                \tikzfigure{htb}
-                    {\input{../../Figure/.fnl/Capitolo3/AssimmetriaGamma.tex}}
+                % \tikzfigure{htb}
+                %     {\input{../../Figure/.fnl/Capitolo3/AssimmetriaGamma.tex}}
+                \tikzexternalizedfigure{htb}
+                    {../../Figure/.fnl/Capitolo3/AssimmetriaGamma.tex}
                     {Transizione della densità gamma verso l'asimmetria con \(\lambda=0.1\) ed \(E=\lambda\), da cui \(\langle\hat\gamma\rangle=0.9\) e \(\beta=\langle\hat\gamma\rangle/\alpha\).}
                     {.775\linewidth}{figTransizioneAsimmetria}
 
@@ -1876,13 +1891,17 @@
                 Il \cref{teoRilassamentoTopologia} motiva anche il perché non si possa considerare una generica matrice \(\mathbf C\) che approssima la \(\mathbf A\): non è detto che rilassi la topologia portando a un'equazione analoga alla \ref{eqTipoBoltzmannGrafoRilassato}.
             \end{oss}
 
-            \tikzfigure{htb}
-                {\input{../../Figure/.fnl/Capitolo3/SchemaRiassuntivoApprossimazione.tex}}
-                {Schema riassuntivo del \cref{secApprossimazione}.}
+            % \tikzfigure{htb}
+            %     {\input{../../Figure/.fnl/Capitolo3/SchemaRiassuntivoApprossimazione.tex}}
+            \tikzexternalizedfigure{htb}
+                {../../Figure/.fnl/Capitolo3/SchemaRiassuntivoApprossimazione.tex}
+                {Schema riassuntivo del \cref{secApprossimazione}.} 
                 {\linewidth}{figSchemaRiassuntivoApprosimazione}
 
-            \tikzfigure{htb}
-                {\input{../../Figure/.fnl/Capitolo4/RappresentazioneGraficaApprossimazione.tex}}
+            % \tikzfigure{htb}
+            %     {\input{../../Figure/.fnl/Capitolo3/RappresentazioneGraficaApprossimazione.tex}}
+            \tikzexternalizedfigure{htb}
+                {../../Figure/.fnl/Capitolo3/RappresentazioneGraficaApprossimazione.tex}
                 {Rappresentazione grafica dell'approssimazione.}
                 {.8\linewidth}{figRappresentazioneGraficaApprossimazione}
             

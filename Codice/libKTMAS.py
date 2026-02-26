@@ -26,7 +26,7 @@ import libFigures as libF
 
 class KineticSimulation():
     def __init__(self,clsPrm,clsReg):
-        self.il = int(clsPrm.interactingRule)
+        self.il = int(clsPrm.interactionRule)
 
         self.l = float(clsPrm.attractivity)
         self.a = float(clsPrm.convincibility)
