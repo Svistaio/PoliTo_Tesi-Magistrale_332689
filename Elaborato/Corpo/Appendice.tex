@@ -1,0 +1,97 @@
+
+% !TEX root = ../Testa/Principale.tex
+% LTeX: language=it
+
+\appendix
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Appendice}
+\chapter*{Appendice}
+
+    \setcounter{section}{0}
+    \renewcommand\thesection{\Alph{section}}
+    \renewcommand\thesubsection{\thesection.\arabic{subsection}}
+
+    % \numberwithin{equation}{section}
+    % \renewcommand\theequation{\thesection.\arabic{equation}}
+
+    \section{Codice}\label{apnCodice}
+
+        \printListing{%
+                firstline=2,
+                firstnumber=1,
+            }{../../Codice/main.py}
+            {Codice «main.py».}{lstMain}
+
+        \printListing{%
+                firstline=2,
+                firstnumber=1,
+                lastline=369,
+            }{../../Codice/libParameters.py}
+            {Codice «libParameters.py».}{lstParameters}
+
+        \printListing{%
+                firstline=2,
+                firstnumber=1,
+                lastline=958,
+            }{../../Codice/libGUIs.py}
+            {Codice «libGUIs.py».}{lstGUIs}
+
+        \printListing{%
+                firstline=2,
+                firstnumber=1,
+                lastline=395
+            }{../../Codice/libData.py}
+            {Codice «libData.py».}{lstData}
+
+        \printListing{%
+                firstline=2,
+                firstnumber=1,
+                lastline=965
+            }{../../Codice/libFigures.py}
+            {Codice «libFigures.py».}{lstFigures}
+
+        \printListing{%
+                firstline=2,
+                firstnumber=1,
+                lastline=539
+            }{../../Codice/libNetworks.py}
+            {Codice «libNetworks.py».}{lstNetworks}
+
+        \printListing{%
+                firstline=2,
+                firstnumber=1,
+                lastline=1389
+            }{../../Codice/libKTMAS.py}
+            {Codice «libKTMAS.py».}{lstKTMAS}
+
+        % \printListing[matlab]{%
+        %         firstline=2,
+        %         firstnumber=1,
+        %         lastline=175
+        %     }{../../Codice/mat2tex.m}
+        %     {Codice «mat2tex.m».}{lstmat2tex}
+
+
+        %\begingroup Vecchia versione con «listings»
+            % \lstinputlisting[
+            %     language=Python,
+            %     caption={Codice «main.py».},
+            %     label={lstMain}
+            % ]{../../Codice/main.py}
+    
+            % \lstinputlisting[
+            %     language=Python,
+            %     caption={Codice «libParameters.py».},
+            %     label={lstParameters},
+            %     linerange={1-369}
+            % ]{../../Codice/libParameters.py}
+    
+            % \lstinputlisting[
+            %     language=Python,
+            %     caption={Codice «libGUIs.py».},
+            %     label={lstGUIs},
+            %     linerange={1-958}
+            % ]{../../Codice/libGUIs.py}
+        %\endgroup

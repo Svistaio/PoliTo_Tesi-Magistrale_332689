@@ -1,0 +1,174 @@
+
+% !TEX root = ../../../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\begin{tikzpicture}%
+    \infopageKeysI
+
+    %\begingroup Righe
+        \begin{groupplot}[
+            group style={
+                group name=Row1,
+                plotGroup,
+                group size=2 by 1,
+            },
+            plotRow,
+            row5Keys,
+            xTickScaleLabelEmpty,
+            plotLegendSE,
+            %
+            xmin=0,xmax=2e+04,
+            ymin=900,ymax=36819,%ymin=1139.2
+        ]
+            \nextgroupplot[%
+                % xmin=0,xmax=20000,
+                % ymin=1000,ymax=36819,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig1.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig1.tex}
+
+            \nextgroupplot[%
+                % xmin=0,xmax=20000,
+                % ymin=1000,ymax=36803,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig2.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig2.tex}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row2,
+                plotGroup,
+                group size=2 by 1,
+            },
+            plotRow,
+            row5Keys,
+            xTickScaleLabelEmpty,
+            plotLegendSE,
+            %
+            xmin=0,xmax=2e+04,
+            ymin=633.16,ymax=76513,
+        ]
+            \nextgroupplot[%
+                at={($(Row1 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                % xmin=0,xmax=20000,
+                % ymin=633.16,ymax=1e+05,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig3.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig3.tex}
+            \legend{}
+
+            \nextgroupplot[%
+                % xmin=0,xmax=20000,
+                % ymin=624.06,ymax=1e+05,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig4.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig4.tex}
+            \legend{}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row3,
+                plotGroup,
+                group size=2 by 1,
+            },
+            plotRow,
+            row5Keys,
+            xTickScaleLabelEmpty,
+            plotLegendSE,
+            %
+            xmin=0,xmax=2e+04,
+            ymin=243.16,ymax=170030,
+        ]
+            \nextgroupplot[%
+                at={($(Row2 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                % xmin=0,xmax=20000,
+                % ymin=100,ymax=1.7003e+05,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig5.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig5.tex}
+            \legend{}
+
+            \nextgroupplot[%
+                % xmin=0,xmax=20000,
+                % ymin=100,ymax=1.7538e+05,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig6.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig6.tex}
+            \legend{}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row4,
+                plotGroup,
+                group size=2 by 1,
+            },
+            plotRow,
+            row5Keys,
+            xTickScaleLabelEmpty,
+            plotLegendSE,
+            %
+            xmin=0,xmax=2e+04,
+            ymin=56.993,ymax=391970,
+        ]
+            \nextgroupplot[%
+                at={($(Row3 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                % xmin=0,xmax=20000,
+                % ymin=10,ymax=1e+06,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig7.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig7.tex}
+            \legend{}
+
+            \nextgroupplot[%
+                % xmin=0,xmax=20000,
+                % ymin=10,ymax=1e+06,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig8.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig8.tex}
+            \legend{}
+        \end{groupplot}
+
+        \begin{groupplot}[
+            group style={
+                group name=Row5,
+                plotLastGroup,
+                group size=2 by 1,
+            },
+            plotRow,
+            row5Keys,
+            plotLegendSE,
+            %
+            xmin=0,xmax=2e+04,
+            ymin=6.1001,ymax=761150,
+        ]
+            \nextgroupplot[%
+                at={($(Row4 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                % xmin=0,xmax=20000,
+                % ymin=1,ymax=1e+06,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig9.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig9.tex}
+            \legend{}
+
+            \nextgroupplot[%
+                % xmin=0,xmax=20000,
+                % ymin=1,ymax=1e+06,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/SEfig10.tex}
+            % \input{../../../../.tex/20/KS/SizeEvolutionsfig10.tex}
+            \legend{}
+        \end{groupplot}
+    %\endgroup
+
+    %\begingroup Parametri
+        \input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/Adattamenti.tex}
+        \ifpageisodd\writeVaryingParameter{1}{west}{east}{-.25em}{0em}
+        \else\writeVaryingParameter{2}{east}{west}{+.25em}{0em}\fi
+    %\endgroup
+
+    %\begingroup Didascalie
+        \writeSubCaptions[2]{south west}{south west}{0em}{0em}
+        % https://tex.stackexchange.com/questions/632045/get-subcaption-for-every-plot-using-groupplot-pgf-tikz-after-2020-update
+        \writeSizeEvolutionDescriptions[1]
+    %\endgroup
+
+    %\begingroup Titoli
+        % \node[title,overlay] at (Row1 c1r1.north) {Esatto};
+        % \node[title,overlay] at (Row1 c2r1.north) {Approssimato};
+    %\endgroup
+
+    \redefineTikZbounds{Row1 c1r1}{Row5 c2r1}
+\end{tikzpicture}%

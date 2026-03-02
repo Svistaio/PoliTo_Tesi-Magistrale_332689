@@ -2,93 +2,202 @@
 % !TEX root = ../../../Esperimenti/.tex/MEF.tex
 % LTeX: language=it
 
-\begin{tikzpicture}%
-    % La lognormale è «f(x)=(1/(x*sigma*sqrt(2*pi)))*exp(-(ln(x)-mu)^2/(2*sigma^2))»
+\begin{tikzpicture}
+    %\begingroup Parametri
+        % \renewcommand\labelSize{10}
+        % \renewcommand\tickSize{9}
+        % \renewcommand\legendSize{9}
+    
+        \newcommand\width{10cm}
+        \pgfmathsetlengthmacro\height{0.618*\width}
+    %\endgroup
 
-    \newcommand\muPrm{0}    % Media della normale sottostante
-    \newcommand\sigmaPrm{1} % Deviazione standard della normale sottostante
+    %\begingroup Funzione lognormale
+        \pgfmathsetmacro\mi{1}
+        \newcommand\plotLognormal[1]{
+            \foreach \s in {2.5,2,1.5,1,0.5,0.3,0.2,0.13,0.1}{%
+                \addplot+ [thick,no marks] gnuplot [raw gnuplot] {%
+                    set samples 5000;
+                    m=1; s=\s;
+                    f(x,m,s)=(1/(x*s*sqrt(2*pi)))*exp(-(log(x)-m)**2/(2*s**2));
+                    #1
+                };
 
-    % Definizione della funzione matematica pgf
-    \pgfmathdeclarefunction{lognormalpdf}{1}{%
-        \pgfmathparse{1/(#1*\sigmaPrm*sqrt(2*pi))*exp(-((ln(#1)-\muPrm)^2)/(2*\sigmaPrm*\sigmaPrm))}%
-    }
+                \addlegendentryexpanded{\(\sigma=\s\)}
+            }
 
-    % \renewcommand\subCaptionSize{10}
-    % \renewcommand\labelSize{10}
-    % \renewcommand\tickSize{9}
+            \addplot [draw=none,forget plot] gnuplot [raw gnuplot] {%
+                f(x,m,s)=(1/(x*s*sqrt(2*pi)))*exp(-(log(x)-m)**2/(2*s**2));
+                m=1; s=0.1; plot[x=exp(\mi):exp(\mi)] (f(x,m,s));
+            } coordinate (media); 
+            \draw [thick,dashed,black] (axis cs:{exp(\mi)},0) -- (media);
+        }
+    %\endgroup
 
-    \pgfmathsetmacro\hsep{1cm}
-    % \pgfmathsetmacro\plotWidth{(\linewidth-\hsep)/2}
-    \pgfmathsetmacro\plotWidth{4.8cm}
-    \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+    %\begingroup Impostazioni
+        \pgfplotsset{
+            /pgfplots/group/goupStyle/.style={
+                group name=Lognormale,
+                vertical sep=2em,
+                % x descriptions at=edge bottom,
+                y descriptions at=edge left,
+                group size=1 by 2,
+            },
+            plotStyle/.style={
+                width=\width,
+                height=\height,
+                % x post scale=0.7,
+                % y post scale=0.8,
+                scale only axis,
+                axis lines=left,
+                ymin=0,ymax=1.5,
+                xlabel={\(x\)},ylabel={\(f_X(x)\)},
+                xlabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+                ylabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+                xticklabel style={font=\dimTesto{\tickSize}},
+                yticklabel style={font=\dimTesto{\tickSize}},
+                legend style={
+                    legend pos=north east,
+                    legend cell align=left,
+                    font=\dimTesto{\legendSize},
+                    draw=none,
+                    fill=white,
+                    fill opacity=.5,
+                    text opacity=1,
+                    % nodes={
+                    %     scale=0.8,
+                    %     transform shape
+                    % }
+                },
+                grid=major,
+                grid style={
+                    dashed,
+                    gray!20
+                },
+                colormap/viridis,
+                cycle list={[samples of colormap={9} of viridis]},
+            }
+        }
+    %\endgroup
 
-    \begin{groupplot}[
-        group style={
-            group name=lgnrml,
-            group size=2 by 1,
-            horizontal sep=\hsep,
-            xlabels at=edge bottom,
-            ylabels at=edge left,
-            x descriptions at=edge bottom,
-            y descriptions at=edge left
-        },
-        width=\plotWidth,
-        height=\plotHeight,
-        scale only axis,
-        axis x line*=bottom,
-        axis y line*=left,
-        xlabel={$x$},
-        ylabel={$f_X(x)$},
-        xlabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
-        ylabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
-        xticklabel style={font=\dimTesto{\tickSize}},
-        yticklabel style={font=\dimTesto{\tickSize}},
-        grid=major,
-        grid style={dashed},
-        every axis plot/.append style={
-            % ultra thick,
-            thick,
-            smooth
-        },
-        ymin=0,
-    ]
-        % Scala lineare
-        \nextgroupplot[
-            xmin=0,
-            xmax=10, %5
-            minor tick num=1,
-        ]
-        \addplot[
-            % color=blue,
-            domain=0.01:20,
-            samples=400
-        ] {lognormalpdf(x)};
+    \begin{groupplot}[group style={goupStyle},plotStyle]
+        %\begingroup
+            \gdef\xmin{1e-10}
+            \gdef\xmax{6}
+            \nextgroupplot[
+                xmin=\xmin,xmax=\xmax,
+                xmode=linear,xlabel={},
+            ]\plotLognormal{plot [x=\xmin:\xmax] f(x,m,s);}
+            %\legend{}
+        %\endgroup
 
-        % Scala semilogaritmica
-        \nextgroupplot[
-            xmode=log,
-            xmin=0.01,
-            xmax=20,
-            % log ticks with fixed point, % Mostra i numeri (0.1,1,10) invece di (10^-1,10^0,10^1)
-        ]
-        % Nota: il dominio è molto più ampio qui per mostrare le code
-        \addplot[
-            % color=red,
-            domain=0.005:25,
-            samples=500
-        ] {lognormalpdf(x)};
+        %\begingroup
+            \gdef\xmin{1e-5}\gdef\xmax{10}
+            \nextgroupplot[
+                xmin=1e-5,xmax=\xmax,
+                xmode=log,legend style={
+                    legend pos=north west,
+                },
+            ]\plotLognormal{
+                set parametric;
+                plot [x=log(\xmin):log(\xmax)] exp(x), f(exp(x),m,s);
+            }
+            %\legend{}
+        %\endgroup
     \end{groupplot}
 
-    \tikzset{SubCaption/.style={
-        text width=\plotWidth,
-        anchor=north,
-        align=center,
-        yshift=-2.5em
-    }}
-    \node[SubCaption] at (lgnrml c1r1.south)
-        {\dimTesto{\subCaptionSize}\sottoDidascalia{Scala lineare.\label{figLognormaleScalaLineare}}};
-    \node[SubCaption] at (lgnrml c2r1.south)
-        {\dimTesto{\subCaptionSize}\sottoDidascalia{Scala semilogaritmica.\label{figLognormaleScalaSemiLogaritmica}}};
+    % \redefineTikZbounds{Lognormale c1r1}{Lognormale c1r2}
+\end{tikzpicture}
 
-    \redefineTikZbounds{lgnrml c1r1}{lgnrml c2r1}
-\end{tikzpicture}%
+%\begingroup Vecchia versione
+    % \begin{tikzpicture}%
+    %     % La lognormale è «f(x)=(1/(x*sigma*sqrt(2*pi)))*exp(-(ln(x)-mu)^2/(2*sigma^2))»
+    
+    %     \newcommand\muPrm{0}    % Media della normale sottostante
+    %     \newcommand\sigmaPrm{1} % Deviazione standard della normale sottostante
+    
+    %     % Definizione della funzione matematica pgf
+    %     \pgfmathdeclarefunction{lognormalpdf}{1}{%
+    %         \pgfmathparse{1/(#1*\sigmaPrm*sqrt(2*pi))*exp(-((ln(#1)-\muPrm)^2)/(2*\sigmaPrm*\sigmaPrm))}%
+    %     }
+    
+    %     % \renewcommand\subCaptionSize{10}
+    %     % \renewcommand\labelSize{10}
+    %     % \renewcommand\tickSize{9}
+    
+    %     \pgfmathsetmacro\hsep{1cm}
+    %     % \pgfmathsetmacro\plotWidth{(\linewidth-\hsep)/2}
+    %     \pgfmathsetmacro\plotWidth{4.8cm}
+    %     \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+    
+    %     \begin{groupplot}[
+    %         group style={
+    %             group name=lgnrml,
+    %             group size=2 by 1,
+    %             horizontal sep=\hsep,
+    %             xlabels at=edge bottom,
+    %             ylabels at=edge left,
+    %             x descriptions at=edge bottom,
+    %             y descriptions at=edge left
+    %         },
+    %         width=\plotWidth,
+    %         height=\plotHeight,
+    %         scale only axis,
+    %         axis x line*=bottom,
+    %         axis y line*=left,
+    %         xlabel={$x$},
+    %         ylabel={$f_X(x)$},
+    %         xlabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+    %         ylabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+    %         xticklabel style={font=\dimTesto{\tickSize}},
+    %         yticklabel style={font=\dimTesto{\tickSize}},
+    %         grid=major,
+    %         grid style={dashed},
+    %         every axis plot/.append style={
+    %             % ultra thick,
+    %             thick,
+    %             smooth
+    %         },
+    %         ymin=0,
+    %     ]
+    %         % Scala lineare
+    %         \nextgroupplot[
+    %             xmin=0,
+    %             xmax=10, %5
+    %             minor tick num=1,
+    %         ]
+    %         \addplot[
+    %             % color=blue,
+    %             domain=0.01:20,
+    %             samples=400
+    %         ] {lognormalpdf(x)};
+    
+    %         % Scala semilogaritmica
+    %         \nextgroupplot[
+    %             xmode=log,
+    %             xmin=0.01,
+    %             xmax=20,
+    %             % log ticks with fixed point, % Mostra i numeri (0.1,1,10) invece di (10^-1,10^0,10^1)
+    %         ]
+    %         % Nota: il dominio è molto più ampio qui per mostrare le code
+    %         \addplot[
+    %             % color=red,
+    %             domain=0.005:25,
+    %             samples=500
+    %         ] {lognormalpdf(x)};
+    %     \end{groupplot}
+    
+    %     \tikzset{SubCaption/.style={
+    %         text width=\plotWidth,
+    %         anchor=north,
+    %         align=center,
+    %         yshift=-2.5em
+    %     }}
+    %     \node[SubCaption] at (lgnrml c1r1.south)
+    %         {\dimTesto{\subCaptionSize}\sottoDidascalia{Scala lineare.\label{figLognormaleScalaLineare}}};
+    %     \node[SubCaption] at (lgnrml c2r1.south)
+    %         {\dimTesto{\subCaptionSize}\sottoDidascalia{Scala semilogaritmica.\label{figLognormaleScalaSemiLogaritmica}}};
+    
+    %     \redefineTikZbounds{lgnrml c1r1}{lgnrml c2r1}
+    % \end{tikzpicture}%
+%\endgroup
