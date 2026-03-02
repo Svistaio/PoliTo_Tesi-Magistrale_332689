@@ -1,0 +1,33 @@
+
+% !TEX root = ../Testa/Principale.tex
+% LTeX: language=it
+
+\chapter{Conclusioni}\label{secConclusioni}
+
+    Tutt'i grafici illustrati nel precedente capitolo corroborano che la prospettiva nodo-agente è applicabile anche in un contesto urbano per descrivere la distribuzione della taglia tra città.
+
+    L'approssimazione di rango unitario dalla \cref{defMatriceGradi} produce dei risultati corrispondenti quasi perfettamente ai quelli ottenuti esattamente sia con \(N\) limitato (Valle d'Aosta) che elevato (Italia), confermando \cite{Nurisso2024}; nel caso dell'Italia l'approssimazione è lievemente peggiore di quelli precedenti minando cosí la validità dell'\cref{ossBontaApprossimazione}.
+
+    Tutte le regole d'interazione, vale a dire d'emigrazione (\cref{ossUguaglianzaInterazioneEmigrazione}), riescono a riprodurre fedelmente l'indice di Pareto della coda della distribuzione reale, mentre la restante porzione è stata riprodotta solo parzialmente a seconda della regola considerata. In ogni caso la lognormale bimodale segue meglio, in generale, la coda della distribuzione confermando \cite{Gualandi2019SDC,Gualandi2019HBLD}.
+
+    Ovviamente il lavoro qui presentato non è esaustivo e conduce a molteplici sviluppi futuri:
+
+    \begin{enumerate}[
+        label=\arabic*.,
+        % topsep=0.5em,
+        % parsep=0em,
+        % itemsep=0.25em,
+        % leftmargin=2em,
+        % rightmargin=1.5em,
+        % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+        %itemindent=!,
+        %labelindent=3em,
+        %labelwidth=!,
+        %labelsep=!,
+    ]
+        \item sperimentare con regole d'interazione contenenti altri coefficienti della teoria dei grafi come, per esempio, la centralità per intermediazione o il coefficiente di aggregazione;
+        \item ricavare l'equazione di Fokker-Planck della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano} per studiare analiticamente la distribuzione stazionaria, sebbene la natura non lineare e simmetrica delle regole d'emigrazione qui proposte rendano tale obbiettivo alquanto difficile da raggiungere;
+        \item abbandonare l'ipotesi semplificativa della rete statica per descrivere una rete dinamica che vari assieme alla popolazione con un possibile confronto con dati reali [se esistenti];
+        \item applicare la presente teoria anche a reti europee o internazionali per confermare la sua validità sia in altri contesti che a scale superiori.
+    \end{enumerate}
+    

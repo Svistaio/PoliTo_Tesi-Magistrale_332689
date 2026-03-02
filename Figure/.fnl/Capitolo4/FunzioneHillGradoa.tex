@@ -1,0 +1,67 @@
+
+% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\newcommand\width{10cm}
+\pgfmathsetlengthmacro\height{0.618*\width}
+\begin{tikzpicture}
+    % \renewcommand\labelSize{10}
+    % \renewcommand\tickSize{9}
+    % \renewcommand\legendSize{9}
+
+    \pgfmathsetmacro\xmax{4}
+
+    \begin{axis}[
+        name=HillA,
+        width=\width,height=\height,
+        scale only axis,
+        axis lines=left,
+        domain=0:3,
+        ymin=0,ymax=1.1,
+        xmin=0,xmax=\xmax,
+        xlabel={\(r\)},ylabel={\(H^\alpha(r)\)},
+        xlabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+        ylabel style={font=\dimTesto{\labelSize}\color{white!15!black}},
+        xticklabel style={font=\dimTesto{\tickSize}},
+        yticklabel style={font=\dimTesto{\tickSize}},
+        colormap/viridis,
+        cycle list={[samples of colormap={10} of viridis]},
+        legend pos=north east,
+        legend cell align=left,
+        legend style={
+            font=\dimTesto{\legendSize},
+            draw=none,
+            fill=white,
+            fill opacity=.5,
+            text opacity=1,
+            legend pos=south east
+            % nodes={
+            %     scale=0.8,
+            %     transform shape
+            % }
+        },
+        grid=major,
+        grid style={
+            dashed,
+            gray!20
+        }
+    ]
+
+        \foreach \a in {100,30,10,5,2.5,1,0.5,0.25,0.1,0.01}{
+            \addplot+[
+                thick, 
+                no marks,
+            ] gnuplot [raw gnuplot] {
+                set samples 1000;
+                f(x,a)=x**a/(1+x**a);
+                a = \a; plot [x=0:\xmax] f(x,a);
+            };
+            \addlegendentryexpanded{$\alpha=\a$}
+        }
+
+        \node[anchor=center,font=\dimTesto{\ParameterSize}] at (axis cs:2,0.25)
+            {\(H^\alpha(r)\equiv\frac{r^\alpha}{1+r^\alpha}\)};
+    \end{axis}
+
+    \redefineTikZbounds{HillA}{HillA}
+\end{tikzpicture}

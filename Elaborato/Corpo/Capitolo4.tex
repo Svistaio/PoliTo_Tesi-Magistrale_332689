@@ -1,0 +1,1242 @@
+
+% !TEX root = ../Testa/Principale.tex
+% LTeX: language=it
+
+\chapter{Simulazioni}\label{secSimulazioni}
+
+    In questo capitolo si applica tutta la teoria affrontata in quello precedente. Innanzitutto si descrive l'algoritmo con cui sono stati svolte le simulazioni; quindi si spiegano le formule che definiscono i grafici per analizzare i risultati per poi motivare rapidamente il perché le fluttuazioni possono [anzi devono] essere trascurate. Per le simulazioni si propongono varie leggi d'emigrazione che studiate tramite dei studi parametrici, cercando successivamente d'interpretare cosa queste dicono sul fenomeno della migrazione in sé. Infine si mostra brevemente una simulazione per l'Italia, confermando che i risultati migliorano col numero d'agenti.
+
+    \section{Metodo Monte Carlo}\label{secMetodoMonteCarlo}
+
+        Nel contesto delle \TCSMA{} l'obbiettivo, com'è chiaro dal \cref{secTCSM}, è quello di ricavare la densità \(f(\mathbf x,t)\) nella \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico} al variare del tempo. Si potrebbe allora pensare di discretizzare quest'ultima equazione mediante il Metodo delle Differenze Finite, degli Elementi Finiti o dei Volumi Finiti; tuttavia, vi sono due principali problemi:
+        
+        \begin{enumerate}[
+            label=\arabic*.,
+            % topsep=0.5em,
+            % parsep=0em,
+            % itemsep=0.25em,
+            % leftmargin=2em,
+            % rightmargin=1.5em,
+            % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %itemindent=!,
+            %labelindent=3em,
+            %labelwidth=!,
+            %labelsep=!,
+        ]
+            \item l'impossibilità, in generale, di ricavare la forma forte della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetrico}, specie nel caso di \ref{eqRegoleInterazione} non lineari;
+            \item anche ipotizzando di trovare la forma forte a cui applicare i precedenti metodi, la sua natura integro differenziale la rende complessa da manipolare dato che l'operatore collisionale\footnotemark{}, come%
+            \footnotetext{Vale a dire la parte integrale della forma forte dell'equazione di tipo Boltzmann, in genere scritta a secondo membro.}%
+            \[
+                Q(f,f)(v,t)\equiv
+                \frac1{4\pi}\int_{\mathbb R^3}\int_{\mathbb S^2}
+                B(\mathbf v,\mathbf v_*,n)
+                \left(f(v',t)f(v'_*,t)-f(v,t)f(v_*,t)\right)
+                \de n\de\mathbf v_*
+            \]
+            nella \cref{eqFormaForteBoltzmannDisomogeneoSimmetrico}, dipende dalla densità medesima.
+        \end{enumerate}
+
+        Per tali ragioni si procede in maniera piú semplice: conoscendo \ref{eqAlgoritmoInterazione}, che governa le interazioni binarie tra agenti, si possono quindi direttamente simulare tutte le molteplici collisioni mediante un metodo di Monte Carlo di tipo Nanbu-Babovsky, descritto nel dettaglio nell'\cref{algMonteCarlo} nel quale \(T>0\) è il tempo finale di simulazione, mentre \(P\) è la popolazione totale.
+        
+        \begin{algorithm}[htb]
+            \caption{Algoritmo \ref{eqAlgoritmoInterazioneUrbano} di tipo Nanbu-Babovsky}
+            \label{algMonteCarlo}
+            \KwDati{%
+                \justifying
+                \(N\in\NPlus\), %(numero d'agenti), %
+                \(\Delta t\leq 1\), %(passo temporale), %
+                \(\sigma\), %(fluttuazione), %
+                \(T>0\), %(tempo finale), %
+                \(P\), %(Popolazione totale), %
+                \(\mathbf A\) %(matrice d'adiacenza) %
+                e \(\mathbf B\) %(matrice d'adiacenza approssimata)%
+                ;%
+            }%
+            \(\pazocal S^0\gets(s_1^0,s_2^0,\dots,s_N^0)\equiv(P/N)\mathbf 1\in\RPlus^N\)\;\label{algMonteCarloDistribuzioneIniziale}
+            \Per{\(n=0,1,2,\dots,\left\lfloor T/\Delta t\right\rfloor-1\)}{
+                %
+                \(P\gets\) permutazione indipendente di \(\{1,2,\ldots,N\}\)\;
+                %
+                \Per{\(i=1,2,\dots,\left\lfloor N/2\right\rfloor\)}{
+                    %
+                    \(j\gets\left\lfloor N/2\right\rfloor+i\), \(s_i^n\gets P(i)\) e \(s_j^n\gets P(j)\)\;
+                    %
+                    % Si campiona \(\Theta\sim\DstrBernoulli(A(i,j)(\Delta t))\)\;
+                    \uSea{esatto}{
+                        \(\Theta\gets\DstrBernoulli(A(i,j)(\Delta t))\)\;
+                    }
+                    \Altrimenti(\tcp*[h]{è approssimato}){
+                        \(\Theta\gets\DstrBernoulli(B(i,j)(\Delta t))\)\;
+                    }
+                    %
+                    \uSea{\(\Theta=1\)}{
+                        \(E\gets E(s_i^n,i,s_j^n,j)\)\;
+                        \(\gamma\gets\DstrGamma((1-E)^2/\sigma^2,\sigma^2/(1-E))\)\;
+                        %
+                        \(s_i^{n+1}\gets s_i^n(1-E+\gamma)\)\tcp*[r]{città interangente}
+                        \(s_j^{n+1}\gets s_j^n+s_i^nE\)\tcp*[r]{città ricevente}
+                    }
+                    \Altrimenti{
+                        \(s_i^{n+1}\gets s_i^n\) e \(s_j^{n+1}\gets s_j^n\)\;
+                    }
+                    %
+                    % \(s_i^{n+1}\gets s_i^n(1-\Theta)+\Theta\psi(s_i^n,i,s_j^n,j,\gamma)\)\;
+                    % \(s_j^{n+1}\gets s_j^n(1-\Theta)+\Theta\psi_*(s_i^n,i,s_j^n,j)\)\;
+                }
+                %
+                \(\pazocal S^{n+1}\gets(s_1^{n+1},s_2^{n+1},\dots,s_N^{n+1})\)\;
+                \(\bar l(s,(n+1)\Delta{t})\gets\) istogramma di \(\pazocal S^{n+1}\)\;\label{algMonteCarloDistribuzioneNesima}
+            }
+        \end{algorithm}
+
+        \begin{oss}
+            Nella linea \ref{algMonteCarloDistribuzioneNesima}, \(\bar l\) è una densità arbitraria: va intesa come \(\bar f\) se l'approccio è esatto e come \(\bar g\) se è approssimato.
+        \end{oss}
+
+        \begin{oss}
+            Piú in generale, nella linea \ref{algMonteCarloDistribuzioneIniziale}, \(\pazocal S_0\) si può campionare da una densità \(\bar l_0\) iniziale; tuttavia non conoscendone alcuna per la distribuzione della popolazione, si è deciso di definire \(\pazocal S^0\) come un vettore uniforme rispetto a una popolazione totale \(P\) iniziale.
+        \end{oss}
+
+    \section{Rappresentazione dei risultati}
+
+        Per analizzare i risultati delle simulazioni è opportuno descrivere nel dettaglio le funzioni usate per descriverli; per farlo, però, si devono prima approfondire le conseguenze della natura stocastica dell'\cref{algMonteCarlo} e la struttura dei risultati. Verso la fine, si motiva anche l'omissione delle fluttuazioni \(\gamma\).
+        
+        \subsection{Intervalli di confidenza}
+
+            Innanzitutto simulando la \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano} mediante \cref{algMonteCarlo}, e quindi l'algoritmo \ref{eqAlgoritmoInterazione}, si sta introducendo nei risultati un rumore di natura stocastica: piú simulazioni daranno risultati diversi per cui la singola non ha rilevanza statistica; bisogna cioè calcolarne molteplici e valutare gl'intervalli di confidenza per conoscere l'incertezza sulla stima della media.
+
+            Sia \(R\in\NPlus\) il numero di simulazioni eseguite e \(\mathbf S\in\RPlus^R\) il vettore aleatorio della popolazione di una città relativa a ciascuna simulazione.
+
+            \begin{ipo}[Numero di simulazioni]
+                In questo elaborato si assume \(R=100\) per avere un numero statisticamente significativo di dati.
+            \end{ipo}
+           
+            Per l'\cref{algMonteCarlo} le componenti \((S_1,S_2,\ldots,S_R)\) di \(\mathbf S\) sono indipendenti e identicamente distribuite dalla densità \(q\), proprietà che permette di definire
+            %
+            \begin{equation*}
+                \bar S\equiv\frac1R\sum_{r=1}^RS_r
+                \hspace{1em}\text{e}\hspace{1em}
+                V\equiv\frac1{R-1}\sum_{r=1}^R(S_r-\bar S)^2,
+            \end{equation*}
+            %
+            rispettivamente la media e la varianza campionarie. Allora, data \(\mu\) la \textit{vera}\footnotemark{} media della densità \(l\), la distribuzione \(T\) di Student con parametro \(R-1\) si scrive%
+            \footnotetext{Vale a dire \(\mu\) \textit{non} è una variabile aleatoria ma l'esatto parametro della media di \(l\).}%
+            %
+            \begin{equation*}
+                T=\frac{\bar S-\mu}{\sqrt{V/R}}\sim\DstrStudent(R-1).
+            \end{equation*}
+            %
+            Da questa si può definire l'intervallo di confidenza [simmetrico] con livello di confidenza \(\alpha\) ponendo
+            %
+            \begin{equation}
+                \label{eqCondizioneIntervalloConfindenza}
+                \mathbb P\left(-t_{R-1}^{\alpha/2}\leq T\leq t_{R-1}^{\alpha/2}\right)=1-\alpha
+            \end{equation}
+            %
+            ove \(t_{R-1}^{\alpha/2}\in\mathbb R\) è quel valore reale tale che
+            %
+            \begin{equation*}
+                \mathbb P\left(T<t_{R-1}^{\alpha/2}\right)=1-\frac\alpha2.
+            \end{equation*}
+            %
+            Esplicitando la \(T\) nella \cref{eqCondizioneIntervalloConfindenza} e isolando la media \(\mu\) si ha
+            %
+            \begin{equation*}
+                \mathbb P\left(
+                    \bar S-t_{R-1}^{\alpha/2}\sqrt{\frac VR}
+                    \leq\mu\leq
+                    \bar S+t_{R-1}^{\alpha/2}\sqrt{\frac VR}
+                \right)=1-\alpha,
+            \end{equation*}
+            %
+            da cui
+            %
+            \begin{equation*}
+                \IC^\alpha_R(\mathbf S)\equiv\left[
+                    \bar S-t_{R-1}^{\alpha/2}\sqrt{\frac VR},
+                    \bar S+t_{R-1}^{\alpha/2}\sqrt{\frac VR}
+                \right]
+            \end{equation*}
+            %
+            è la stima intervallare che definisce l'intervallo di confidenza ricercato, esprimibile anche piú compattamente come
+            %
+            \begin{equation}
+                \label{eqIntervalloConfidenza}
+                \IC^\alpha_R(\mathbf S)\equiv\bar S\pm t_{R-1}^{\alpha/2}\sqrt{V/R}.
+            \end{equation}
+            %
+            \begin{ipo}[livello di confidenza]
+                Si sceglie \(\alpha=0.05\) cosí d'avere un intervallo con livello di confidenza \(0.95\).   
+            \end{ipo}
+            %
+            Il significato dell'intervallo di confidenza in essenza è l'errore statistico commesso: esso valuta quanto è probabile che la stima intervallare \cref{eqIntervalloConfidenza} contenga il parametro \(\mu\); in altre parole \(\IC^\alpha_R\) misura l'incertezza sulla stima della media: preso un campione \(\mathbf s\), piú l'intervallo di confidenza è esteso piú la media campionaria \(\bar s\) è una stima incerta dell'effettiva media \(\mu\); viceversa piú è stretto, piú la stima \(\bar s\) è precisa nel senso che \(\mu\) si trova in un intorno piccolo della media campionaria. Sotto questo punto di vista è concettualmente analogo alla precisione di uno strumento di misura.
+            %
+            \begin{oss}
+                La stima intervallare \cref{eqIntervalloConfidenza} appena ricavata vale tanto per il vettore aleatorio \(\mathbf S\) che per le sue realizzazioni \(\mathbf s\), le quali sono, appunto, il risultato delle \(R\) simulazioni.
+            \end{oss}
+
+        \subsection{Struttura dei dati}
+
+            I dati presentano una struttura di un tensore del quart'ordine \(\mathbf s\in\RPlus^{N_f\times2\times N\times R}\) i cui indici hanno il seguente significato
+            %
+            \begin{equation*}
+                s^{n,a}_{i,r}
+                \left\{\begin{aligned}
+                    n\ &=\text{ istante temporale},&\ 
+                    a\ &=\text{ tipo di simulazione},\\
+                    i\ &=\text{ indice della città},&\ 
+                    r\ &=\text{ numero della simulazione}.
+                \end{aligned}\right.
+            \end{equation*}
+            % 
+            L'istante temporale è definito tramite tre parametri in \(\NPlus\):
+
+            \begin{itemize}[
+                label=\(\diamond\),
+                topsep=0.5em,
+                parsep=0em,
+                itemsep=0.25em,
+                leftmargin=2em,
+                rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                labelindent=30pt,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item \(N_t\equiv\left\lfloor T/\Delta t\right\rfloor\) è il numero totale di tempi simulati;
+                \item \(N_s\ll N_t\) è il numero di catture dai tempi simulati;
+                \item \(N_f<N_s\) è il numero di tempi ridotti dalle catture.
+            \end{itemize}
+
+            Sia le catture che la riduzione sono campinate in intervalli equispaziati con passi
+            %
+            \begin{equation*}
+                \Delta s=N_t/N_s
+                \quad\text{e}\quad
+                \Delta f=N_s/N_f
+            \end{equation*}
+            %
+            ove si suppone, per semplicità, che \(N_s\) e \(N_f\) siano divisori ordinatamente di \(N_t\) e \(N_s\), da cui
+            %
+            \begin{equation*}
+                N_t/N_s-\left\lfloor N_t/N_s\right\rfloor=0
+                \quad\text{e}\quad
+                N_s/N_f-\left\lfloor N_s/N_f\right\rfloor=0,
+            \end{equation*}
+            %
+            e ugualmente si assume per \(\Delta t\) e \(T\).
+            
+            Tramite l'\cref{algMonteCarlo} si simulano in totale \(N_t\) tempi con passo \(\Delta t\) di cui \(N_s\) sono salvati nel tensore \(\undertilde{\mathbf s}\in\RPlus^{N_s\times2\times N\times R}\) delle catture:
+            %
+            \begin{equation*}
+                \undertilde s^{n,a}_{\cdot,r}\equiv\pazocal S^{n\Delta s,a}_{\cdot,r}
+                \quad\forall n,\ \forall a,\ \forall r,
+            \end{equation*}
+            %
+            dove \(\pazocal S^{n\Delta s,a}_{\cdot,r}\) va intesa come il vettore delle popolazioni predette nell'\(r\)-esima simulazione esatta, se \(a=1\), o approssimata, se \(a=2\); successivamente si convolve \(\undertilde{\mathbf s}\) rispetto all'indice del tempo:
+            %
+            \begin{equation*}
+                s^{n,a}_{i,r}\equiv\frac1{N_f}\sum_{j=1}^{N_f}\undertilde s^{(n-1)N_f+j,a}_ir{,}
+                \quad\forall n,\ \forall a,\ \forall i,\ \forall r,
+            \end{equation*}
+            %
+            vale a dire si mediano ogni \(\Delta f\) elementi delle \(N_s\) catture. Tale mollificazione è necessaria per rendere \(\mathbf s\) meno rumoroso rispetto a \(\undertilde{\mathbf s}\) e quindi piú leggibile una volta raffigurato.
+
+            Per quanto riguarda gl'istanti temporali considerati, si hanno tre forme a seconda di come s'intende l'indice \(n\):
+            %
+            \begin{equation*}
+                \newcommand\hsep{\hspace{1em}}
+                \begin{aligned}
+                    t_n&=n\Delta t,&\hsep&\forall n\in\{1,2,\ldots,N_t\},\\
+                    t^s_n&=t_n\Delta s,&\hsep&\forall n\in\{1,2,\ldots,N_s\},\\
+                    t^f_n&=t^s_n\Delta f,&\hsep&\forall n\in\{1,2,\ldots,N_f\},
+                \end{aligned}
+            \end{equation*}
+            %
+            rispettivamente per i tempi discretizzati, campionanti e ridotti; a prescindere vale comunque \(t_{N_t}=t^s_{N_s}=t^f_{N_f}=T\).
+
+            \begin{oss}
+                I parametri temporali \(N_t\), \(N_s\) ed \(N_f\) non contano il tempo iniziale perché fa riferimento alla distribuzione iniziale \(\mathbf s_0\in\RPlus^N\).
+            \end{oss}
+
+            \begin{ipo}
+                In questa trattazione si considerano \(\Delta t=0.01\), \(N_s=1000\), \(N_f=50\) mentre \(N_t\) viene scelto per essere poco superiore al tempo di convergenza della simulazione, se i risultati convergono, ma sicuramente è un multiplo di \(10\) per garantire che \(N_s\) sia un suo divisore.
+            \end{ipo}
+
+            \begin{oss}
+                Per la maggior parte dei grafici si considera esclusivamente la distribuzione al tempo finale \(T\) \textit{senza} convoluzione, cosicché,  per leggerezza di notazione, si può impropriamente denotare con \(\mathbf s^T\in\RPlus^{2\times N\times R}\) il tensore del terz'ordine tale che \(\mathbf s^T\equiv\undertilde{\mathbf s}^{N_s}\).
+            \end{oss}
+
+        \subsection{Definizione dei grafici}\label{secDefinizioneGrafici}
+
+            \subsubsection{Istogrammi}
+
+                I primi grafici considerano gl'istogrammi [normalizzati] della distribuzione al tempo finale \(T\).
+                
+                Si inizia considerando il massimo e il minimo elemento del tensore \(\mathbf s^T\),
+                %
+                \begin{equation*}
+                    s_{\max}\equiv\max_{a,i,r}\ s^{T,a}_{i,r}
+                    \quad\text{e}\quad
+                    s_{\min}\equiv\min_{a,i,r}\ s^{T,a}_{i,r},
+                \end{equation*}
+                %
+                coi quali si può definire una griglia comune equispaziata su cui costruire gl'istogrammi. Siano \(N_c\) il numero di intervalli della griglia, ossia il numero di classi, allora definita \(\Histogram\colon\mathbb R^N\to\mathbb R^{N_c}\) come la funzione che restituisce i valori [normalizzati] delle classi dell'istogramma, il tensore \(\mathbf h\in\RPlus^{2\times N_c\times R}\) si scrive
+                %
+                \begin{equation*}
+                    \mathbf h^a_{\cdot,r}\equiv\Histogram(\mathbf s^{T,a}_{\cdot,r}),
+                    \ \ \forall a\text{ e }\forall r,
+                \end{equation*}
+                %
+                Valutati gl'intervalli di confidenza
+                %
+                \begin{equation*}
+                    \IC_R^{0.05}(\mathbf h^a_c)=
+                    \bar h^a_c\pm t^{0.025}_{R-1}\sqrt{\frac{v^a_c}R},
+                    \ \ \forall a\text{ e }\forall c,
+                \end{equation*}
+                %
+                si possono rappresentare con \(\bar{\mathbf h}^a\) l'istogramma medio della simulazione esatta e approssimata, e con \(\pm t^{0.025}_{R-1}\sqrt{v^a_c/R}\) l'errore stocastico sulle stime dei valori medi delle classi.
+
+            \subsubsection{Lognormale bimodale}
+
+                Per quanto riguarda i fittaggi lognormali bimodali la logica è simile agl'istogrammi: sia
+                %
+                \begin{equation*}
+                    \mathcal L(x;\mathbf s^{T,a}_{\cdot,r})\colon\RPlus\to\RPlus,
+                    \ \ \forall a\text{ e }\forall r,
+                \end{equation*}
+                %
+                la densità di una distribuzione lognormale bimodale, con densità \cref{eqDistribuzioneLognormaleBimodale}, fittata dal vettore \(\mathbf s^{T,a}_{\cdot,r}\) e sia
+                %
+                \begin{equation*}
+                    \mathcal L(x;\mathbf s^{T,a})\colon\RPlus\to\RPlus^R
+                \end{equation*}
+                %
+                la funzione vettoriale tale che
+                %
+                \begin{equation*}
+                    \mathcal L(x;\mathbf s^{T,a})\equiv
+                    \begin{bmatrix}
+                        \mathcal L(x;\mathbf s^{T,a}_{\cdot,1})&
+                        \mathcal L(x;\mathbf s^{T,a}_{\cdot,2})&
+                        \cdots&
+                        \mathcal L(x;\mathbf s^{T,a}_{\cdot,R})
+                    \end{bmatrix}^\top,
+                \end{equation*}
+                %
+                che in essenza raccoglie puntualmente tutt'i fittaggi in un unico vettore. Allora gl'intervalli di confidenza hanno forma
+                %
+                \begin{equation*}
+                    \IC_R^{0.05}(\mathcal L(x;\mathbf s^{T,a}))=
+                    \bar{\mathcal L}^a(x)\pm t^{0.025}_{R-1}\sqrt{\frac{v^a(x)}R},
+                    \ \ \forall x\in[s_{\min},s_{\max}]\text{ e }\forall a,
+                \end{equation*}
+                %
+                in cui, come prima, \(\bar{\mathcal L}^a(x)\) è la funzione media mentre \(\pm t^{0.025}_{R-1}\sqrt{v^a(x)/R}\) la sua incertezza stocastica.
+
+                \begin{oss}
+                    Essendo \(x\) continuo, l'insieme degl'intervalli di confidenza forma per le funzioni un fascio di confidenza.
+                \end{oss}
+
+                Si nota, in conclusione, che i tre grafici sono in scala semilogaritmica per far emergere la distribuzione normale dalla lognormale bimodale.
+
+            \subsubsection{Funzione di ripartizione empirica}\label{secFRCEmpirica}
+
+                La distribuzione di Pareto è fittata a partire dalla funzione di ripartizione complementare (FRC) empirica che quindi va prima analizzata, ma solo nella coda della distribuzione della popolazione.
+                
+                Il dominio in questo caso viene definito mediante l'ultimo quartile, ossia quel valore \(s_\TreQuarti\) tale che \(\mathbb P(S\leq s_\TreQuarti)=3/4\), data una qualunque variabile aleatoria \(S\); ciò corrisponde nella pratica a trovare quell'elemento di \(\mathbf s^{T,a}_{\cdot,r}\) tale che
+                %
+                \begin{equation*}
+                    \left\vert\left\{
+                        s^{T,a}_{i,r}\geq s_\TreQuarti\ |\ i\in\{1,2,\ldots,N\}
+                    \right\}\right\vert=\left\lceil\frac N4\right\rceil,
+                    \ \ \forall a\text{ e }\forall r,
+                \end{equation*}
+                %
+                che a parole vuol dire che \textit{almeno} \(1/4\) di tutti gli elementi di \(\mathbf s^{T,a}_{\cdot,r}\) sono superiori a \(s_\TreQuarti\). % Infatti se si considerasse la parte intera si troverebbe un valore soglia minore, e quindi un insieme con cardinalità piú piccola di N/4; ecco allora il perché dell'«almeno» che copre perfettamente i casi in cui N non sia divisibile da 4 nei quali, non potendo scegliere perfettamente 1/4 degli elementi, si può solo scegliere per eccesso (piú di N/4) o per difetto (meno di N/4)
+                Allora l'intervallo \([s_\TreQuarti,s_{\max}]\) caratterizza la coda.
+
+                La FRC empirica, che approssima la FRC \(\mathbb P(S>x)\), si scrive
+                %
+                \begin{equation}
+                    \label{eqFunzioneRipartizioneComplementare}
+                    \mathcal F(x;\mathbf s^a_{\cdot,r})\equiv
+                    1-\frac1N\sum_{i=1}^N\chi_{[0,x]}
+                    \left(s^{T,a}_{i,r}\right),
+                    \ \ \forall a\text{ e }\forall r,
+                \end{equation}
+                %
+                dove \(\chi_{[0,x]}\colon\mathbb R\to\{0,1\}\) è la funzione indicatrice dell'insieme \([0,x]\):
+                %
+                \begin{equation*}
+                    \newcommand\hsep{\hspace{0.5em}}
+                    \chi_{[0,x]}(w)\equiv
+                    \left\{\begin{aligned}
+                        1&\hsep\text{se }w\in[0,x],\\
+                        0&\hsep\text{altrimenti}.
+                    \end{aligned}\right.
+                \end{equation*}
+                %
+                Tuttavia, siccome la \cref{eqFunzioneRipartizioneComplementare} dev'essere valutata in \(x\in[s_\TreQuarti,s_{\max}]\), e in particolare nel tensore \(\mathbf p\in\mathbb R^{2\times N_\UnQuarto\times R}\) di \(\mathbf s\) ristretto alla coda
+                %
+                \begin{equation*}
+                    p^a_{i,r}\equiv s^{T,a}_{N-N_\UnQuarto+i,r}\ \ \forall a,\ \forall i\in\{1,2,\ldots,N_\UnQuarto\}\text{ e }\forall r
+                \end{equation*}
+                %
+                nel quale \(N_\UnQuarto\equiv\left\lceil N/4\right\rceil\), vale il seguente riscalamento:
+                %
+                \begin{equation*}
+                    \begin{aligned}
+                        \mathcal F(x;\mathbf s^{T,a}_{\cdot,r})&=1-\frac{N-N_\UnQuarto}N-\frac1N\sum_{i=1}^{N_\UnQuarto}
+                        \chi_{[0,x]}\left(s^{T,a}_{N-N_\UnQuarto+i,r}\right)\\&
+                        % =\frac1N\left(
+                        %     N_\UnQuarto-\sum_{i=1}^{N_\UnQuarto}
+                        %     \chi_{[0,x]}\left(p^{T,a}_{i,r}\right)
+                        % \right)%\\&
+                        =\frac{N_\UnQuarto}N\left[
+                            1-\frac1{N_\UnQuarto}\smash{\sum_{i=1}^{N_\UnQuarto}}
+                            \chi_{[0,x]}\left(p^{T,a}_{i,r}\right)
+                        \right]%\\&
+                        =\frac{N_\UnQuarto}N\mathcal F(x;\mathbf p^a_{\cdot,r}),
+                        \ \ \forall a\text{ e }\forall r,
+                    \end{aligned}
+                \end{equation*}
+                %
+                Vale a dire che \(\mathcal F(x;\mathbf p^a_{\cdot,r})\) è uguale a \(\mathcal F(x;\mathbf s^{T,a}_{\cdot,r})\) a meno di un riscalamento \(N_\UnQuarto/N\). Tuttavia l'indice di Pareto è invariante rispetto ai riscalamenti:
+                
+                \begin{oss}
+                    In scala logaritmica la \cref{eqFunzioneRipartizioneComplementarePareto} si scrive
+                    %
+                    \begin{equation*}
+                        \log(R)=\log(c)-\beta\log(s),
+                    \end{equation*}
+                    %
+                    che equivale a una retta traslata di \(\log(c)\); indicando con \(R'\) il rapporto \(R/c\) segue
+                    %
+                    \begin{equation*}
+                        \log(R')\equiv\log(R)-\log(c)=-\beta\log(s),
+                    \end{equation*}
+                    %
+                    per la quale il coefficiente di Pareto \(\beta\) è invariato.
+                \end{oss}
+
+                Da quest'osservazione si può pertanto scegliere \(\mathcal F(x;\mathbf s^{T,a}_{\cdot,r})\) in scala logaritmica per una maggiore leggibilità dei valori i quali altrimenti, con \(\mathcal F(x;\mathbf p^a_{\cdot,r})\), sarebbero bassi. L'uso di tale scala introduce però un lieve problema: l'ultimo elemento \(p^a_{N_\UnQuarto,r}\) ha ordinata nulla ed è dunque non visibile; per ovviare il problema si può traslare la FRC empirica in scala lineare
+                %
+                \begin{equation}
+                    \label{eqFRCEmpiricaFinale}
+                    \mathcal F(x;\mathbf p^a_{\cdot,r})+\frac1{2N_\UnQuarto},
+                    \ \ \forall a\text{ e }\forall r,
+                \end{equation}
+                %
+                ciò corrisponde in scala logaritmica a una traslazione non uniforme dei valori che quindi vengono falsati, seppure di poco essendo \(1/2N_\UnQuarto\) una quantità piccola; per tale ragione tale modifica è valida \textit{solo graficamente} e non per il calcolo dell'indice di Pareto.
+
+                Di conseguenza, nel complesso, la FRC empirica è raffigurata in scala logaritmica dal diagramma a dispersione delle coppie
+                %
+                \begin{equation*}
+                    \left(
+                        \frac N{N_\UnQuarto}\mathcal F(\bar p^a_i;\mathbf s^{T,a}_{\cdot,r})
+                        +\frac1{2N_\UnQuarto},\bar p^a_i
+                    \right)
+                    =\left(
+                        \mathcal F(\bar p^a_i;\mathbf p^a_{\cdot,r})
+                        +\frac1{2N_\UnQuarto},\bar p^a_i
+                    \right)
+                    \ \ \forall a\text{ e }\forall i,
+                \end{equation*}
+                %
+                ove \(\bar p^a_i\) viene dagl'intervalli di confidenza
+                %
+                \begin{equation*}
+                    \IC_R^{0.05}(\mathbf p^a_i)=
+                    \bar p^a_i\pm t^{0.025}_{R-1}\sqrt{\frac{v^a_i}R},
+                    \ \ \forall a\text{ e }\forall i.
+                \end{equation*}
+                %
+                \begin{oss}
+                    Si noti che, contrariamente ai casi precedenti, l'intervallo di confidenza è orizzontale e non verticale; difatti l'immagine della FRC empirica è invariata rispetto alle simulazioni che modificano solo le popolazioni dei centri maggiori, ossia l'ascissa della FRC empirica.
+                \end{oss}
+
+            \subsubsection{Pareto e relativo indice}
+
+                Per quanto riguarda il fittaggio della distribuzione di Pareto il ragionamento è analogo a quello visto per la lognormale bimodale: sia
+                %
+                \begin{equation*}
+                    \mathcal P(x;\mathbf p^a_{\cdot,r})\colon\RPlus\to\RPlus,
+                    \ \ \forall a\text{ e }\forall r,
+                \end{equation*}
+                %
+                la densità di distribuzione di Pareto, con FRC \cref{eqFunzioneRipartizioneComplementarePareto}, fittata dal vettore \(\mathbf p^a_{\cdot,r}\) e sia
+                %
+                \begin{equation*}
+                    \mathcal P(x;\mathbf p^a)\colon\RPlus\to\RPlus^R
+                \end{equation*}
+                %
+                la funzione vettoriale tale che
+                %
+                \begin{equation*}
+                    \mathcal P(x;\mathbf p^a)\equiv
+                    \begin{bmatrix}
+                        \mathcal P(x;\mathbf p^a_{\cdot,1})&
+                        \mathcal P(x;\mathbf p^a_{\cdot,2})&
+                        \cdots&
+                        \mathcal P(x;\mathbf p^a_{\cdot,R})
+                    \end{bmatrix}^\top.
+                \end{equation*}
+                %
+                Allora gl'intervalli di confidenza hanno forma
+                %
+                \begin{equation*}
+                    \IC_R^{0.05}\left(\frac N{N_\UnQuarto}\mathcal P(x;\mathbf p^a)\right)
+                    =\bar{\mathcal P}^a(x)\pm t^{0.025}_{R-1}\sqrt{\frac{v^a(x)}R},
+                    \ \ \forall x\in[s_\TreQuarti,s_{\max}]\text{ e }\forall a,
+                \end{equation*}
+                %
+                ove \(N/N_\UnQuarto\) è il fattore di riscalamento descritto nel \cref{secFRCEmpirica} necessario per confrontare l'adattamento colla FRC empirica.
+
+                \begin{oss}
+                    È fittando i dati \(\mathbf p\) alla distribuzione di Pareto che si ricava il relativo indice \(\beta\), non dalla FRC empirica: ecco perché,  essendo puramente grafiche, le modifiche nella \cref{eqFRCEmpiricaFinale} sono tollerabili.
+                \end{oss}
+        
+            \subsubsection{Evoluzione della taglia media}
+
+                Si esprima con \(\bar{\mathbf s}\in\RPlus^{N_f\times2\times R}\) il tensore delle taglie medie rispetto ai nodi
+                %
+                \begin{equation*}
+                    \bar s^{n,a}_r\equiv
+                    \frac1N\sum_{i=1}^Ns^{n,a}_{i,r}
+                    ,\ \ \forall n,\ \forall a\text{ e }\forall r,
+                \end{equation*}
+                %
+                allora gl'intervallo di confidenza di \(\bar{\mathbf s}\) sono
+                %
+                \begin{equation*}
+                    \IC_R^{0.05}(\bar{\mathbf s}^{n,a})=
+                    \bar{\bar s}^{n,a}\pm t^{0.025}_{R-1}\sqrt{\frac{v^{n,a}}R},
+                    \ \ \forall n\text{ e }\forall a.
+                \end{equation*}
+                %
+                L'andamento della taglia media totale è raffigurato interpolando linearmente le coppie
+                %
+                \begin{equation*}
+                    \left(t^f_n,\bar{\bar s}^{n,a}\right),
+                    \ \ \forall n\text{ e }\forall a,
+                \end{equation*}
+                %
+                a istanti temporali contingui; lo stesso vale per gli estremi degl'intervalli di confidenza \(\pm t^{0.025}_{R-1}\sqrt{v^{n,a}/R}\), che quindi diventano un fascio di confidenza.
+        
+            \subsubsection{Taglie medie \textit{vs} gradi}
+            
+                S'indichi ora con \(\bar{\mathbf s}\in\RPlus^{2\times R}\) il tensore delle taglie medie rispetto alle simulazioni
+                %
+                \begin{equation*}
+                    \bar s^a_i\equiv
+                    \frac1R\sum_{r=1}^Rs^{T,a}_{i,r}
+                    ,\ \ \forall a\text{ e }\forall i,
+                \end{equation*}
+                %
+                allora dalle coppie
+                %
+                \begin{equation*}
+                    \left(k_i,\bar s^a_i\right),
+                    \ \ \forall a\text{ e }\forall i,
+                \end{equation*}
+                %
+                si può definire il grafico a dispersione che lega la taglia media tra tutte le simulazioni di un nodo al suo grado.
+
+                \begin{oss}
+                    \label{ossMancanzaICDensità}
+                    In questo caso non si disegnano gl'intervalli di confidenza erché il grafico è già molto denso e aggiungere ulteriori barre verticali/orizzontali lo renderebbe difficilmente leggibile.
+                \end{oss}
+        
+            \subsubsection{Evoluzioni delle taglie medie delle classi dei gradi}
+
+                Sia \(\pazocal K\subset\{1,2,\ldots,N\}\) l'insieme dei gradi distinti di \(\mathbf k\), si denoti con \(\bar s\in\mathbb R^{N_f\times2\times\vert\pazocal K\vert}\) il tensore
+                %
+                \begin{equation*}
+                    \bar s^{n,a}_k\equiv
+                    \frac1{\vert\mathcal I_k\vert}\sum_{i\in\mathcal I_k}
+                    \frac1R\sum_{r=1}^Rs^{n,a}_{i,r},
+                    \ \ \forall n,\ \forall a\text{ e }\forall k,
+                \end{equation*}
+                %
+                ove \(\mathcal I_k\) viene dalla \cref{eqInsiemeNodiGradok} e rappresenta l'insieme degl'indici con grado \(k\). Pertanto interpolando linearmente le coppie
+                %
+                \begin{equation*}
+                    \left(t^f_n,\bar s^{n,a}_k\right),
+                    \ \ \forall n,\ \forall a\text{ e }\forall k,
+                \end{equation*}
+                %
+                a istanti temporali contigui, si può rappresentare l'andamento temporale della popolazione media della classe \(k\)-esima tra tutte le simulazioni. Questo grafico viene quindi usato per accertarsi di non essere piú nel transitorio e di aver quindi raggiunto uno stato stazionario.
+               
+                Si conclude notando che non si disegnano gl'intervalli di confidenza per la medesima ragione chiarita nell'\cref{ossMancanzaICDensità}.
+        
+        \subsection{Sulle fluttuazioni \texorpdfstring{\(\gamma\)}{γ}}
+
+            Nelle \ref{eqRegoleInterazioneUrbaneEsplicite} è stato introdotto per completezza il termine \(\gamma\) legato alle fluttuazioni, ossia a quei fenomeni di morte e nascita che caratterizzano la naturale variazione di una popolazione intorno a una media. Si argomenta adesso che è possibile trascurarle per due ragioni:
+
+            \begin{enumerate}[
+                label=\arabic*.,
+                % topsep=0.5em,
+                % parsep=0em,
+                % itemsep=0.25em,
+                % leftmargin=2em,
+                % rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=3em,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item si è interessati solo alla predizione della distribuzione stazionaria da confrontare con quella reale del 1991 e
+                \item dal vincolo \cref{eqVincoloSimmetricoTraParametri} le uniche perturbazioni simmetriche sono per loro natura piccole, essendo concentrate in un intorno dell'origine.
+            \end{enumerate}
+
+            In effetti la \cref{figConfrontoConESenzaFluttuazioni} conferma che \(\gamma\) introduce solo una lieve incertezza sui risultati, simulati coi parametri nella \cref{tabParametriConEsenzaGamma} e colla regola d'interazione
+            %
+            \begin{equation}
+                \label{eqVarianteRegolaEmigrazioneTagliaForzaFrazionata}
+                E(s,s_*,i,i_*)\equiv
+                (1-\zeta)\lambda\frac{(s_*/s)(w_{i_*}/w_i)}{\alpha+(s_*/s)(w_{i_*}/w_i)}
+                +\zeta\lambda\frac{(s/s_*)(w_i/w_{i_*})}{\alpha+(s/s_*)(w_i/w_{i_*})},
+            \end{equation}
+            %
+            che è spiegata implicitamente nel corso del \cref{secRegoleEmigrazione} ed è brevemente discussa piú nel dettaglio nel \cref{secVariantiRegoleInterazione}.
+
+            \begin{table}[htb]
+                \centering
+                \caption{Parametri della \cref{figConfrontoConESenzaFluttuazioni}.}
+                \begin{tabular}{cccccc}
+                    \hline
+                    &\(\lambda\)&\(\alpha\)&\(\zeta\)&\(\sigma\)&\(N_t\)\\
+                    \hline
+                    Senza \(\gamma\)&\(\num{0.1}\)&\(\num{1}\)&\(\num{0.1}\)&--&\(\num{1e6}\)\\
+                    Con \(\gamma\)&\(\num{0.1}\)&\(\num{1}\)&\(\num{0.1}\)&\(\num{0.05}\)&\(\num{1e6}\)\\
+                    \hline
+                \end{tabular}
+                \label{tabParametriConEsenzaGamma}
+            \end{table}
+
+            Dunque \(\gamma\) introduce solo del lieve rumore che, sebbene abbia il nobile scopo di rendere piú realistico il modello, non aiuta a interpretare i risultati rispetto a quelli reali.
+
+            % \tikzfigure{p}
+            %     {\input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}
+                {Confronto di una simulazione con e senza fluttuazioni; la regola d'emigrazione è la \cref{eqVarianteRegolaEmigrazioneTagliaForzaFrazionata} mentre i parametri sono illustrati nella \cref{tabParametriConEsenzaGamma}.}
+                {.6\linewidth}{figConfrontoConESenzaFluttuazioni}
+
+    \section{Regole d'emigrazione}\label{secRegoleEmigrazione}
+
+        In questo paragrafo si specializza la regola d'emigrazione \(E\) definita nelle \ref{eqRegoleInterazioneUrbaneEsplicite} per completare le \ref{eqRegoleInterazioneUrbane}; tutte le forme qui presenti condividono comunque tre aspetti: sono simmetriche, non lineari e associano i microstati \((i,s)\) e \((i_*,s_*)\) rispettivamente alla città interagente e ricevente.
+
+        Per brevità si limita lo studio a venire su tre aspetti:
+
+        \begin{enumerate}[
+            label=\arabic*.,
+            %topsep=0.5em,
+            %parsep=0em,
+            %itemsep=0.25em,
+            %leftmargin=2em,
+            %rightmargin=1.5em,
+            % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %itemindent=!,
+            %labelindent=3em,
+            %labelwidth=!,
+            %labelsep=!,
+        ]
+            \item si considera solo la regione della Sardegna sia perché molti risultati di \cite{DeMontis2007} sono già stati riprodotti nel \cref{secCenniSuiDati}, sia poiché per le altre 19 regioni sono stati trovati risultati analoghi;
+            \item si analizza esclusivamente la configurazione che meglio fitta i dati reali, almeno tra quelle esplorate dall'autore, e
+            \item si approfondiscono, vista la loro lunghezza, due soli studi parametrici per l'ultima regola d'emigrazione proposta.
+        \end{enumerate}
+       
+        Pertanto, data l'importanza della Sardegna, si elencano nella \cref{tabDatiParametriSardegna} i dati principali della regione assieme ai parametri adattati dell'indice di Pareto e della lognormale bimodale.
+
+        \begin{table}[htb]
+            \centering
+            % \captionsetup{width=6.5cm}
+            \caption{Dati \cite{ISTATCensimento1991,ISTATPendolarismo1991} e parametri della Sardegna nel 1991.}
+            \begin{tabular}{cccccccc}
+                \hline
+                \(N\)&\(P\)&\(\beta\)&\(\xi\)&
+                \(\mu_1\)&\(\sigma_1\)&\(\mu_2\)&\(\sigma_2\)\\
+                \hline
+                \(\num{375}\)&\(\approx\num{1648248}\)&\(\num{1.271}\)&\(\num{0.931}\)&
+                \(\num{2.483}\)&\(\num{.445}\)&\(\num{2.990}\)&\(\num{.445}\)\\
+                \hline
+            \end{tabular}
+            \label{tabDatiParametriSardegna}
+        \end{table}
+
+        Cionnonostante, nei \cref{secItaliaValleDAosta} si studiano comunque la Valle d'Aosta e l'Italia essendo casi estremi rispetto al numero di nodi.
+
+        \subsection{Regola taglia}
+
+            Una prima possibilità\footnotemark{} consiste nella%
+            \footnotetext{È stata ispirata dalla \cite[(2.2), § 2, p. 223]{Gualandi2019SDC} modificata mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019SDC}, ossia è una funzione di Hill di ordine \(\alpha\).}%
+            %
+            \eqtag{\([\text{RE}]_S\)}{
+                \label{eqRegolaEmigrazioneTaglia}
+                E(s,s_*)\equiv\lambda\frac{(s_*/s)^\alpha}{1+(s_*/s)^\alpha},
+            }%
+            in cui \(\lambda\in(0,1)\) (\cref{ipLimitiTassoEmigrazione}) e \(\alpha\in\mathbb R^+\). La logica è che il tasso d'emigrazione verso la città ricevente è tanto maggiore quanto piú grande è la sua popolazione relativa, data dal rapporto \(s_*/s\), rispetto alla città interagente.
+
+            \begin{table}[htb]
+                \centering
+                \caption{Parametri delle \cref{figRiferimentoStabileRET,figRiferimentoInstabileRET}.}
+                \begin{tabular}{ccccc}
+                    \hline
+                    &\(\lambda\)&\(\alpha\)&\(N_t\)&\(R\)\\
+                    \hline
+                    Stabile&\(\num{.1}\)&\(\num{.5}\)&\(\num{1e7}\)&\(\num{100}\)\\
+                    Instabile&\(\num{.1}\)&\(\num{1.5}\)&\(\num{1e5}\)&\(\num{10}\)\\
+                    \hline
+                \end{tabular}
+                \label{tabParametriRegolaEmigrazioneTaglia}
+            \end{table}
+
+            In totale sono state studiate due configurazioni di riferimento descritte dai parametri nella \cref{tabParametriRegolaEmigrazioneTaglia}, mentre i risultati sono illustrati nelle \cref{figRiferimentoStabileRET,figRiferimentoInstabileRET}; quest'ultimi descrivono due comportamenti:
+
+            \begin{enumerate}[
+                label=\(\diamond\),
+                %topsep=0.5em,
+                %parsep=0em,
+                %itemsep=0.25em,
+                %leftmargin=2em,
+                %rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                % labelindent=30pt,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item uno stabile ma non distante dalla distribuzione iniziale uniforme e
+                \item uno instabile in cui \textit{in media} si spopolano i centri medi.
+            \end{enumerate}
+           
+            Si sottolinea in media poiché nelle singole realizzazioni è molto piú probabile che si spopolino i centri maggiori mentre su piú realizzazioni si manifesta almeno una con taglia elevata, bilanciando cosí la media; questa è anche la ragione per cui si sono considerate solo 10 iterazioni anziché le usuali 100 nella \cref{tabParametriRegolaEmigrazioneTaglia} visto che la media tende a mascherare lo spopolamento, il quale però è inevitabile ma semplicemente piú lento. Gl'istogrammi nelle \crefsubfigInt{figRiferimentoInstabileRET}{a}{c} confermano anche questa tendenza: mostrano di fatto che la distribuzione empirica approssima una delta di Dirac centrata nell'origine essendo molto concentrata intorno alle città che si spopolano.
+
+            Piú in generale si è verificato empiricamente che per ogni \(\lambda\) esiste un \(\bar\alpha\in\RPlus\) tale che \(\alpha<\bar\alpha\) risulta nella configurazione stabile nella \cref{figRiferimentoStabileRET} mentre \(\alpha\geq\bar\alpha\) restituisce quella instabile nella \cref{figRiferimentoInstabileRET}.
+
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Stabile/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Stabile/Infopagina.tex}
+                {Studio della configurazione di riferimento stabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figRiferimentoStabileRET}
+
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/Infopagina.tex}
+                {Studio della configurazione di riferimento instabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figRiferimentoInstabileRET}
+
+        \subsection{Regola taglia-grado}
+
+            Al fine di correggere la \ref{eqRegolaEmigrazioneTaglia} si può introdurre anche il rapporto relativo dei gradi:
+            %
+            \eqtag{\([\text{RE}]_{SK}\)}{
+                \label{eqRegolaEmigrazioneTagliaGrado}
+                E_{SK}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(k_{i_*}/k_i)]^\alpha}{1+[(s_*/s)(k_{i_*}/k_i)]^\alpha}.
+            }%
+            In tal modo la logica è che il tasso d'emigrazione verso la città ricevente è tanto maggiore quanto piú popolosa e connessa è rispetto alla città interagente.
+
+            \begin{table}[htb]
+                \centering
+                \caption{Parametri della \cref{figRiferimentoRETG}.}
+                \begin{tabular}{ccc}
+                    \hline
+                    \(\lambda\)&\(\alpha\)&\(N_t\)\\
+                    \hline
+                    \(\num{.15}\)&\(\num{.63}\)&\(\num{2e6}\)\\
+                    \hline
+                \end{tabular}
+                \label{tabParametriRETG}
+            \end{table}
+
+            La configurazione di riferimento studiata è descritta dai parametri nella \cref{tabParametriRETG}, mentre i risultati sono illustrati nella \cref{figRiferimentoRETG}. Nel complesso sono migliori di quelli ottenuti mediante la \ref{eqRegolaEmigrazioneTaglia}: 
+
+            \begin{itemize}[
+                label=\(\diamond\),
+                %topsep=0.5em,
+                %parsep=0em,
+                %itemsep=0.25em,
+                %leftmargin=2em,
+                %rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=30pt,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item le \crefsubfigSep{figRiferimentoRETG}{a}{{d}}{j} illustrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{b}{c} le distribuzioni simulate sono piú larghe di quella reale, seppure nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{e}{f} gll'indici di Pareto siano ragionevolmente simili;
+                \item a eccezione del caso reale in cui coincidono, nelle \crefsubfigInt{figRiferimentoRETG}{g}{i} la lognormale bimodale segue meglio la coda verso la fine, sebbene coincida colla Pareto nella prima metà;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{k}{l} le dispersioni presentano un'analoga correlazione positiva ma piú stretta rispetto alla reale.
+            \end{itemize}
+
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/20RETGConfigurazioneRiferimento/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/20RETGConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGrado} con parametri dalla \cref{tabParametriRETG}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figRiferimentoRETG}
+
+        \subsection{Regola frazionata}
+
+            La \ref{eqRegolaEmigrazioneTagliaGrado} può essere poi modificata introducendo un ulteriore parametro \(\zeta\)
+            %
+            \eqtag{\([\text{RE}]^f_{SK}\)}{
+                \label{eqRegolaEmigrazioneTagliaGradiFrazionata}
+                E^f_{SK}(s,s_*,i,i_*)\equiv
+                (1-\zeta)E_{SK}(s,s_*,k_i,k_{i_*})
+                +\zeta E_{SK}(s_*,s,k_{i_*},k_i),
+            }%
+            con \(\zeta\in(0,1)\), che in essenza descrive la frazione di popolazione che si comporta seguendo una regola inversa alla \ref{eqRegolaEmigrazioneTagliaGrado}, vale a dire che manifesta un tasso d'emigrazione verso la città ricevente tanto maggiore quanto piú piccola e sconnessa è rispetto alla città interagente.
+
+            \begin{table}[htb]
+                \centering
+                \caption{Parametri della \cref{figRiferimentoRETGf}.}
+                \begin{tabular}{cccc}
+                    \hline
+                    \(\lambda\)&\(\alpha\)&\(\zeta\)&\(N_t\)\\
+                    \hline
+                    \(\num{.15}\)&\(\num{.67}\)&\(\num{1e-2}\)&\(\num{1e6}\)\\
+                    \hline
+                \end{tabular}
+                \label{tabParametriRETGf}
+            \end{table}
+
+            La configurazione di riferimento analizzata è descritta dai parametri nella \cref{tabParametriRETGf}, mentre i relativi risultati sono mostrati nella \cref{figRiferimentoRETG}. Questi migliorano sotto alcuni aspetti la \ref{eqRegolaEmigrazioneTagliaGrado}: 
+
+            \begin{itemize}[
+                label=\(\diamond\),
+                %topsep=0.5em,
+                %parsep=0em,
+                %itemsep=0.25em,
+                %leftmargin=2em,
+                %rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=30pt,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item le \crefsubfigSep{figRiferimentoRETGf}{a}{{d}}{j} confermano di nuovo come l'approssimazione corrisponda quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETGf}{b}{c} le distribuzioni simulate si adattano meglio a quella reale, non alterando la buona corrispondenza degl'indici di Pareto nelle \crefsubfigInt[ e ]{figRiferimentoRETGf}{e}{f};
+                \item le \crefsubfigInt[ e ]{figRiferimentoRETGf}{k}{i} non si discosatno in modo significativo dai precedenti risultati;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETGf}{k}{l} le dispersioni sono compatte quanto prima e manifestano ora un lieve assestamento per taglie piccole.
+            \end{itemize}
+
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/20RETGfConfigurazioneRiferimento/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/20RETGfConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGradiFrazionata} con parametri dalla \cref{tabParametriRETGf}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figRiferimentoRETGf}
+
+        \subsection{Regola taglia-forza}
+
+            Siccome dai dati nella \cref{tabStrutturaDatiPendolarismo} si potrebbe anche pensare di sostituire nella \ref{eqRegolaEmigrazioneTagliaGrado} le forze in luogo dei gradi:
+            %
+            \eqtag{\([\text{RE}]_{SW}\)}{
+                \label{eqRegolaEmigrazioneTagliaForza}
+                E_{SW}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(w_{i_*}/w_i)]^\alpha}{1+[(s_*/s)(w_{i_*}/w_i)]^\alpha},
+            }%
+            sottintendendo cosí che si ha un tasso d'emigrazione verso la città ricevente tanto maggiore quanto piú popolosa e trafficata è rispetto alla città interagente.
+
+            \begin{table}[htb]
+                \centering
+                \caption{Parametri della \cref{figRiferimentoRETF}.}
+                \begin{tabular}{ccc}
+                    \hline
+                    \(\lambda\)&\(\alpha\)&\(N_t\)\\
+                    \hline
+                    \(\num{.18}\)&\(\num{.44}\)&\(\num{3e6}\)\\
+                    \hline
+                \end{tabular}
+                \label{tabParametriRETF}
+            \end{table}
+
+            La configurazione di riferimento analizzata è descritta dai parametri nella \cref{tabParametriRETF}, mentre i relativi risultati sono mostrati nella \cref{figRiferimentoRETF}. Essi sono di fatto i migliori: 
+
+            \begin{itemize}[
+                label=\(\diamond\),
+                %topsep=0.5em,
+                %parsep=0em,
+                %itemsep=0.25em,
+                %leftmargin=2em,
+                %rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=30pt,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item le \crefsubfigSep{figRiferimentoRETF}{a}{{d}}{j} confermano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{b}{c} le distribuzioni simulate sono lievemente inferiori a quella reale e i relativi indici di Pareto nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{e}{f} corrispondono a quelli reali;
+                \item nelle \crefsubfigInt{figRiferimentoRETF}{g}{i} le lognormale bimodale sono leggermente piú vicine verso la fine della coda alle distribuzioni di Pareto;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{k}{l} le dispersioni, oltre ad avere la stessa correlazione positiva rispetto alla reale, manifestano maggiore respiro cogliendo la differenziazione di taglia a parità di grado.
+            \end{itemize}
+
+            L'unico aspetto negativo si trova nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{k}{l}: il modello non riesce a prevedere correttamente in media le taglie della porzione inferiore della dispersione reale; in altre parole la previsione sovrastima la taglia per gradi medio-bassi mentre è abbastanza precisa per gradi elevati.
+
+            \afterpage{
+                \clearpage
+                % \tikzfigure{p}
+                    % {\input{../../Figure/.fnl/Capitolo4/20RETFConfigurazioneRiferimento/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/20RETFConfigurazioneRiferimento/Infopagina.tex}
+                    {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.575\linewidth}{figRiferimentoRETF}
+            }
+
+        \subsection{Interpretazioni}
+
+            Innanzitutto bisogna delucidare una caratteristica che accomuna tutte le regole d'emigrazioni precedenti: esse sono da un punto di vista interpretative miope, vale a dire non vede i dettagli ma solo i fattori comuni che governano il fenomeno delle migrazioni. Pertanto il modello non dice il perché una città piú popolata, connessa o trafficata è piú attraente ma solo che quella misura viene presa in considerazione nei movimenti migratori; certamente, però, si può \textit{a posteriori} motivare queste scelte: per esempio, i precedenti fattori possono essere legati a piú opportunità di lavoro, a maggiore vicinanza coi propri familiari, minor costo della vita, eccetera. Poi, sempre \textit{a posteriori}, si può decidere quale fattore sia il piú realistico e da li trarre le proprie conclusioni. Detto ciò si possono ora analizzare le singole leggi, dopo una piccola osservazione linguistica:
+
+            \begin{oss}
+                In questo sottoparagrafo con minori, medi e maggiori si fa riferimento ai centri rispettivamente con grado piccolo, medio e alto, come mostrato nelle sottofigure (j)-(l) delle \cref{figRiferimentoStabileRET,figRiferimentoInstabileRET,figRiferimentoRETG,figRiferimentoRETGf,figRiferimentoRETF}.
+            \end{oss}
+            
+            \subsubsection{Regola taglia \ref{eqRegolaEmigrazioneTaglia}}
+
+                Dai risultati della \ref{eqRegolaEmigrazioneTaglia} è chiaro che considerare solo la popolazione relativa non è sufficiente a descrivere la distribuzione delle taglie tra città. La ragione della sua degenerazione si può attribuire a un comportamento binario: se \(s≤s_*\) allora \(s_*\) sarà sempre un polo attraente per \(s\) [e viceversa]; quindi non appena una città perde anche solo un po' di popolazione rispetto a tutt'i loro nodi vicini, il loro destino è segnato a spopolarsi. Con tale logica si può motivare lo spopolamento \textit{in media} dei centri medi:
+
+                \begin{enumerate}[
+                    label=\arabic*.,
+                    %topsep=0.5em,
+                    %parsep=0em,
+                    %itemsep=0.25em,
+                    %leftmargin=2em,
+                    %rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    %labelindent=3em,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item i centri maggiori abbattono le popolazioni dei centri medi rendendoli relativamente poli repellenti sin dall'inizio della simulazione;
+                    \item nel breve termine i centri medi si spopolano a tal punto da diventare repellenti anche rispetto ai centri minori;
+                    \item i centri minori non s'interfacciano mai direttamente con quelli maggiori per cui non si spopolano inizialmente come i quelli medi.
+                \end{enumerate}
+            
+                Il risultato di questa dinamica è quello mostrato nelle \crefsubfigInt[ e ]{figRiferimentoInstabileRET}{k}{l} almeno nel caso instabile. Invece, in quello stabile \(\alpha\) sufficientemente basso da rendere la funzione di Hill nella \ref{eqRegolaEmigrazioneTaglia} una costante e uguale a \(\lambda/2\) per qualunque rapporto \(s_*/s\), \cref{figFunzioneHillGradoa},da cui si deduce la sua stabilità intorno alla distribuzione iniziale.
+
+                % \tikzfigure{htb}
+                %     {\input{../../Figure/.fnl/Capitolo4/FunzioneHillGradoa.tex}}
+                \tikzexternalizedfigure{htb}
+                    {../../Figure/.fnl/Capitolo4/FunzioneHillGradoa.tex}
+                    {Funzione di Hill al variare del grado \(\alpha\).}
+                    {.775\linewidth}{figFunzioneHillGradoa}
+
+                Nel complesso, quindi, da questi risultati si può dedurre che la migrazione non può dipendere solo dalla popolazione relativa.
+
+            \subsubsection{Regola taglia-grado \ref{eqRegolaEmigrazioneTagliaGrado}}
+
+                Questi risultati sono decisamente piú realistici, tuttavia, contrariamente alla popolazione relativa, l'introduzione del grado relativo tramite il rapporto \(k_{i_*}/k_i\) non è intuitiva; in altra parole ci si potrebbe chiedere perché sia piú ragionevole postulare che una città con grado basso, cioè meno connessa, abbia anche popolazione bassa. Il timore è che si stia forzando il modello a dei risultati che, seppure corrispondenti a quelli reali, non sono realistici nella loro logica fondamentale. Eppure, per motivare quest'ipotesi, è sufficiente far emergere due vincoli:
+
+                \begin{enumerate}[
+                    label=V\arabic*,
+                    %topsep=0.5em,
+                    %parsep=0em,
+                    %itemsep=0.25em,
+                    %leftmargin=2em,
+                    %rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    %labelindent=3em,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item\label{ossRETGVincoloFisico} il vincolo fisico, indotto dal grafo spaziale, discende dal fatto che per loro natura i lati occupano spazi tra città, e si devono collegare a esse prendendo quindi una porzione del loro bordo; di conseguenza l'unico modo che una città ha di aumentare i suoi gradi è quella di espandersi per avere un bordo piú esteso, eppure ciò implica necessariamente un aumento di popolazione perché questa la deve mantenere.
+                    \item\label{ossRETGVincoloSociale} D'altra parte il vincolo sociale, indotto dai flussi pendolari, viene dal fatto che una connettività maggiore sottintende una rete di trasporto piú complessa che quindi può essere giustificata solo se vi sono abbastanza pendolari che la usano; questi, però, possono essere attratti da una città se e solo se essa presenta una popolazione sufficientemente elevata.
+                \end{enumerate}
+
+                Il secondo vincolo è difatti confermato dalla \cref{figForzaVsGrado20} che rappresenta una correlazione positiva tra il grado e la forza: maggiore è il primo altrettanto lo sarà il secondo, vale a dire il flusso di pendolari, da cui segue \ref{ossRETGVincoloSociale}.
+                
+                Dunque il vincolo fisico giustifica a prescindere questo tipo d'interazione perché il grafo è necessariamente spaziale; parimenti il vincolo sociale motiva l'interazione se e solo se v'è una correlazione positiva tra grado e forza\footnotemark{}. Tutto ciò implica la relazione
+                \[
+                    k\gg1\ \ \implies\ \ s\gg1,
+                \]
+                che rende realistica l'introduzione di \(k_{i_*}/k_i\) da un punto di modellistico.%
+                \footnotetext{Si conferma tale caratteristica anche per ogni regione italiana, oltre che per l'Italia medesima.}%
+
+                È anche notevole che soffermarsi, seppure senza una risposta risolutiva, sul perché la regola d'emigrazione converga affatto: ci si potrebbe chiede, difatti, come mai non manifesti il flusso
+                \[
+                    \text{centri minori}\ \ \to\ \ \text{centri medi}\ \ \to\ \ \text{centri maggiori}.
+                \]
+                L'unica ragione della mancata degenerazione del modello va ricondotta alla presenza di un retroflusso naturalmente indotto dalla \ref{eqRegolaEmigrazioneTagliaGrado} che bilancia quello verso i centri relativamente piú popolati e connessi; in altre parole, non solo l'introduzione dei gradi nella \ref{eqRegolaEmigrazioneTaglia} rende i centri medi attrattivi rispetto a quelli minori nel breve termine, ma stabilizza anche le interazioni stazionarie. Cionnonostante l'esatta dinamica che instaura un flusso inverso stabilizzante non è chiara dato che il rapporto \(r\) nella funzione di Hill della \cref{figFunzioneHillGradoa} è piú piccolo nella \ref{eqRegolaEmigrazioneTagliaGrado} che nella \ref{eqRegolaEmigrazioneTaglia}.
+                
+                In conclusione, anche se i risultati non sono perfetti, la \ref{eqRegolaEmigrazioneTagliaGrado} implica che la migrazione è governata dalla popolazione e dalla connettività relative tra due città, e che tale fenomeno dipenda \textit{almeno} da questi due fattori.
+
+            \subsubsection{Regola frazionata \ref{eqRegolaEmigrazioneTagliaGradiFrazionata}}
+
+                Innanzitutto l'introduzione di \(\zeta\in(0,1)\) preserva l'\cref{ipLimitiTassoEmigrazione} essendo una combinazione convessa\footnotemark{} di due \ref{eqRegolaEmigrazioneTagliaGrado}:
+                \footnotetext{Tale logica si può generalizzare con una combinazione affine di tassi d'emigrazione, ove ogni peso è associato a una frazione della popolazione con un certo tipo di comportamento purché soddisfaccia \cref{ipLimitiTassoEmigrazione}.}%
+                \[
+                    E^f_{SK}=(1-\zeta)E_{SK}+\zeta E_{SK}\leq(1-\zeta)\lambda+\zeta\lambda=\lambda,
+                \]
+                ove gli argomenti sono sottintesi. Per il resto valgono le stesse considerazioni precedenti, essendo costruita a partire dalla \ref{eqRegolaEmigrazioneTagliaGrado}, mentre i risultati in generale sono migliori ma non nella dispersione ove si ha un piccolo assestamento; ciò significa che l'introduzione di due tipi di popolazioni con obbiettivi opposti fa emergere una dimensione minima ideale che le persone vogliono raggiungere anche a costo di vivere in una città meno connessa. Inoltre, per altri parametri o regole d'interazione (\cref{secVariantiRegoleInterazione}), lo stesso si può dire anche per la dimensione massima ideale, anche se nella \cref{figRiferimentoRETGf} è lieve ragion per cui si nota poco.
+
+                In ogni caso dalla dispersione reale della Sardegna è chiaro che la città minima non è realistica, ma non è detto che non possa descrivere correttamente altre distribuzioni. Perciò la \ref{eqRegolaEmigrazioneTagliaGradiFrazionata} non è intrinsecamente sbagliata e, anzi, riesce comunque a perfezionare molti aspetti della regola precedente; semplicemente è chiaro che nel panorama sardo non esistano frazioni di popolazioni con tendenze opposte alla \ref{eqRegolaEmigrazioneTagliaGrado}.
+
+            \subsubsection{Regola taglia-forza \ref{eqRegolaEmigrazioneTagliaForza}}
+
+                L'introduzione della forza si motiva attraverso gli stessi vincoli descritti per motivare l'introduzione del grado nella \ref{eqRegolaEmigrazioneTaglia}. In effetti vincolo sociale vale direttamente poiché la forza coincide proprio col flusso di pendolari; d'altro canto quello fisico vale poiché la forza non è che un'estensione delle informazioni puramente binarie del grado, in cui ora un valore positivo implica sia la presenza di un lato che l'intensità del suo flusso pendolare.
+                
+                Cosí ragionando si possono distinguere città le quali considerando solo il grado risultano equivalenti, ma che non necessariamente lo sono se si analizza il loro traffico. Ciò corregge proprio la relazione quasi biunivoca tra il grado e la popolazione nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{k}{l} trasformandola in una piú realistica correlazione positiva descritta dalle \crefsubfigInt[ e ]{figRiferimentoRETG}{k}{l}.
+
+                Nel complesso, essendo questi risultati i migliori tra quelli visti sotto quasi tutt'i punti di vista, la \ref{eqRegolaEmigrazioneTagliaForza} implica che molto probabile il fenomeno della migrazione è governato dalla popolazione e dal traffico relativo tra due città.
+
+            \subsubsection{Parametri \(\lambda\) e \(\alpha\)}
+
+                In tutte le regole d'emigrazione analizzate vi sono due principali parametri: \(\lambda\) e \(\alpha\); per cercare di comprendere il loro significato si può procedere mediante due studi parametrici. Nel corrente lavoro si è deciso di prendere la configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} nella \cref{tabParametriRETF} e di perturbare solo uno dei due parametri lasciando invariati gli altri; la \cref{tabStudiParametriciRETF} riassumere quanto detto dove \(N_p=5\) indica il numero di valori campionati uniformemente nei due intervalli.
+
+                \begin{table}[htb]
+                    \centering
+                    \caption{Parametri degli studi parametrici delle \cref{figStudioParametricolRETFSDF1,figStudioParametricolRETFSDF2,figStudioParametricolRETFSDF3,figStudioParametricolRETFSVsD,figStudioParametricolRETFSE,figStudioParametricoaRETFSDF1,figStudioParametricoaRETFSDF2,figStudioParametricoaRETFSDF3,figStudioParametricoaRETFSVsD,figStudioParametricoaRETFSE}}
+                    \begin{tabular}{ccccc}
+                        \hline
+                        &\(N_p\)&\(\lambda\)&\(\alpha\)&\(N_t\)\\
+                        \hline
+                        Studio parametrico \(\lambda\)&5&\([\num{.01},\num{.3}]\)&\(\num{.44}\)&\(\num{1e7}\)\\
+                        Studio parametrico \(\alpha\)&5&\(\num{.18}\)&\([\num{.3},\num{.6}]\)&\(\num{3e6}\)\\
+                        \hline
+                    \end{tabular}
+                    \label{tabStudiParametriciRETF}
+                \end{table}
+
+                Prima di procedere è necessario tenere a mente una proprietà:
+
+                \begin{oss}
+                    Per l'\cref{ipConservazionePopolazioneMedia} qualunque coppia parametrica \((\lambda,\alpha)\) genera una distribuzione con uguale media: la variazione di uno di essi comporta quindi solo una variazione nella deviazione [\textit{stardard}] \(\sigma\). Per l'adattamento lognormale bimodale \cref{eqDistribuzioneLognormaleBimodale}, ciò si traduce come la costanza delle medie \(\mu_1/\mu_2\) e della variazione delle deviazioni \(\sigma_1/\sigma_2\).
+                \end{oss}
+
+                Per quanto riguarda il primo studio parametrico, esso varia \(\lambda\):
+
+                \begin{itemize}[
+                    label=\(\diamond\),
+                    %topsep=0.5em,
+                    %parsep=0em,
+                    %itemsep=0.25em,
+                    %leftmargin=2em,
+                    %rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    %labelindent=30pt,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item nella \cref{figStudioParametricolRETFSDF1} si può notare come la distribuzione si allarghi per \(\lambda\) crescente, seppure leggermente;
+                    \item nella \cref{figStudioParametricolRETFSDF2} l'indice di Pareto di fatto rimane inalterato variando tra gli estremi solo di \(\num{.05}\) nella media;
+                    \item nella \cref{figStudioParametricolRETFSDF3} la relazione tra Pareto e lognormale bimodale rimane invariata: conferma in ogni caso che la seconda segue meglio la fine della coda della prima, mentre coincidono all'inizio;
+                    \item nella \cref{figStudioParametricolRETFSVsD} si può osservare che la dispersione è inalterata al variare di \(\lambda\): il comportamento medio è il medesimo;
+                    \item nella \cref{figStudioParametricolRETFSE} confermano la convergenza di tutt'i casi considerati, oltre che indicare un minore tempo di convergenza per \(\lambda\) crescente.
+                \end{itemize}
+
+                Si nota che tutte queste variazioni sono comunque lievi considerando che \(\lambda\) aumenta di un ordine di grandezza; ciò significa che \(\lambda\) impatta poco le deviazioni \(\sigma_1/\sigma_2\) della distribuzione delle taglie, anche se un suo valore eccessivamente elevato porta comunque a una configurazione instabile, come si può notare dalle \crefsubfigInt{figStudioParametricolRETFSDF1}{(m)}{(o)}.
+
+                %\begingroup Inizio studio parametrico l
+                    % \tikzfigure{p}
+                        % {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SDF1/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SDF1/Infopagina.tex}
+                        {Distribuzioni dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.55\linewidth}{figStudioParametricolRETFSDF1}
+
+                    % \tikzfigure{p}
+                        % {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SDF2/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SDF2/Infopagina.tex}
+                        {Adattamenti di Pareto dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.59\linewidth}{figStudioParametricolRETFSDF2}
+
+                    % \tikzfigure{p}
+                        % {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SDF3/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SDF3/Infopagina.tex}
+                        {Adattamenti di Pareto e lognormali bimodali dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.7\linewidth}{figStudioParametricolRETFSDF3}
+
+                    % \tikzfigure{p}
+                        % {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SVsD/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SVsD/Infopagina.tex}
+                        {Taglie contro gradi dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.59\linewidth}{figStudioParametricolRETFSVsD}
+
+                    % \tikzfigure{p}
+                        % {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SE/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricol/SE/Infopagina.tex}
+                        {Evoluzioni delle taglie medie delle classi dei gradi dello studio parametrico \(\lambda\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.7\linewidth}{figStudioParametricolRETFSE}
+                %\endgroup
+
+                Per quanto riguarda il secondo studio parametrico, esso varia \(\alpha\):
+
+                \begin{itemize}[
+                    label=\(\diamond\),
+                    %topsep=0.5em,
+                    %parsep=0em,
+                    %itemsep=0.25em,
+                    %leftmargin=2em,
+                    %rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    %labelindent=30pt,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item nella \cref{figStudioParametricoaRETFSDF1} si può notare come questa volta la distribuzione si allarghi notevolmente al crescere di \(\lambda\);
+                    \item nella \cref{figStudioParametricoaRETFSDF2} l'indice di Pareto varia in modo significativo passando di un ordine di grandezza;
+                    \item nella \cref{figStudioParametricoaRETFSDF3} la relazione tra Pareto e lognormale bimodale continua a rimanere invariata, come nello studio parametrico precedente;
+                    \item nella \cref{figStudioParametricoaRETFSVsD} la dispersione inizialmente sovrastima i centri minori-medi e sottostima quelli maggiori, e successivamente cambia invertendo tale relazione coll'aumentare di \(\alpha\);
+                    \item nella \cref{figStudioParametricoaRETFSE} confermano la convergenza di tutt'i casi considerati, oltre che indicare un maggior tempo di convergenza per \(\alpha\) crescente.
+                \end{itemize}
+
+                \begin{oss}
+                    Si ricorda che l'aumento dell'area della lognormale bimodale parallelamente ad \(\alpha\) è un effetto indotto dalla scala logaritmica applicata alle ascisse, come già mostrato nella \cref{figEsempioFunzioneLognormale}; infatti, a parole, in scala lineare la densità occupa uno spazio vieppiú piccolo, che deve compensare con un'intensità maggiore al fine di mantenere la sua massa unitaria.
+                \end{oss}
+
+                Contrariamente allo studio parametrico \(\lambda\) la variazione delle deviazioni \(\sigma_1/\sigma_2\) è qui significativa; in particolare l'indice di Pareto \(\alpha\) sembra in larga parte dipendere esclusivamente dal valore di \(\alpha\). Similmente, anche qui per valori eccessivamente elevati si raggiunge rapidamente una configurazione instabile, come si può vedere dalle \crefsubfigInt{figStudioParametricoaRETFSDF1}{(m)}{(o)}.
+
+                %\begingroup Studio parametrico a
+                    % \tikzfigure{p}
+                    %     {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SDF1/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SDF1/Infopagina.tex}
+                        {Distribuzioni dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.57\linewidth}{figStudioParametricoaRETFSDF1}
+        
+                    % \tikzfigure{p}
+                    %     {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SDF2/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SDF2/Infopagina.tex}
+                        {Adattamenti di Pareto dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.595\linewidth}{figStudioParametricoaRETFSDF2}
+        
+                    % \tikzfigure{p}
+                    %     {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SDF3/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SDF3/Infopagina.tex}
+                        {Adattamenti di Pareto e lognormali bimodali dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.7\linewidth}{figStudioParametricoaRETFSDF3}
+        
+                    % \tikzfigure{p}
+                    %     {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SVsD/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SVsD/Infopagina.tex}
+                        {Taglie contro gradi dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.59\linewidth}{figStudioParametricoaRETFSVsD}
+                        
+                    % \tikzfigure{p}
+                    %     {\input{../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/Infopagina.tex}}
+                    \tikzexternalizedfigure{p}
+                        {../../Figure/.fnl/Capitolo4/20RETFStudioParametricoa/SE/Infopagina.tex}
+                        {Evoluzioni delle taglie medie delle classi dei gradi dello studio parametrico \(\alpha\) con \ref{eqRegolaEmigrazioneTagliaForza} e parametri dalla \cref{tabStudiParametriciRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                        {.7\linewidth}{figStudioParametricoaRETFSE}
+                %\endgroup
+
+                Nel complesso, di fronte a questi risultati, \(\lambda\) e \(\alpha\) sono cosí interpretabili:
+
+                \begin{itemize}[
+                    label=\(\diamond\),
+                    %topsep=0.5em,
+                    %parsep=0em,
+                    %itemsep=0.25em,
+                    %leftmargin=2em,
+                    %rightmargin=1.5em,
+                    % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                    %itemindent=!,
+                    %labelindent=30pt,
+                    %labelwidth=!,
+                    %labelsep=!,
+                ]
+                    \item \(\lambda\) è l'attrazione: maggiore è il suo valore piú i centri relativamente maggiori riescono ad attrarre frazioni maggiori della popolazione dei centri relativamente minori in una singola interazione;
+                    \item \(\alpha\) è la repulsione: maggiore è il suo valore piú i centri relativamente minori spingono la propria popolazione a migrare verso centri relativamente maggiori; di fatto rappresenta quanto rapidamente il rapporto \(s_*/s\) raggiunge la massima attrattività.
+                \end{itemize}
+
+                Un altro punto di vista è il seguente: \(\lambda\) influenza principalmente la porzione della funzione di Hill (\cref{figFunzioneHillGradoa}) oltre l'unità (\(r>1\)), e quindi l'attrazione, mentre \(\alpha\) condiziona maggiormente la porzione sotto l'unità (\(r<1\)), e dunque la repulsione.
+
+    \section{Altri casi notevoli}
+
+        \subsection{Varianti delle regole d'interazione}\label{secVariantiRegoleInterazione}
+
+            La prima variante consiste nel dividere il rapporto per la repulsione \(\alpha\) anziché valutarne la potenza:
+            %
+            \begin{equation}
+                \label{eqVarianteRegolaEmigrazioneTagliaForza}
+                E(s,s_*,i,i_*)
+                =\lambda\frac{\frac{(s_*/s)(w_{i_*}/w_i)}\alpha}{1+\frac{(s_*/s)(w_{i_*}/w_i)}\alpha}
+                =\lambda\frac{(s_*/s)(w_{i_*}/w_i)}{\alpha+(s_*/s)(w_{i_*}/w_i)},
+            \end{equation}
+            %
+            in tal modo si può scegliere \(\alpha\) per avere tra città con popolazioni e connettività simili, ossia \[(s_*/s)(w_{i_*}/w_i)\approx1\ \ \implies\ \ s\approx s_*\text{ e }w_{i_*}\approx w_i,\] scambi intorno all'\(1\%\) [o una generica percentuale \(p\)] della loro taglia:
+            %
+            \begin{equation*}
+                1\%=\frac\lambda{\alpha+1}\ \ \implies\ \ \alpha=\frac\lambda{1\%}-1=4.
+            \end{equation*}
+            %
+            Purtroppo, nonostante la bontà di questa logica, questa regola non riesce a convergere e spopola molte città analogamente alla \ref{eqRegolaEmigrazioneTaglia}, almeno ciò è valido per molti parametri; difatti va sottolineata la seguente osservazione:
+           
+            \begin{oss}
+                Proprio per i pessimi risultati si è deciso di non analizzarla a fondo, ragion per cui potrebbero esservi dei buoni parametri che fanno convergere anche la \cref{eqVarianteRegolaEmigrazioneTagliaForza}.
+            \end{oss}
+
+            \begin{oss}
+                La \cref{eqVarianteRegolaEmigrazioneTagliaForzaFrazionata} non è altro che la versione frazionata della \cref{eqVarianteRegolaEmigrazioneTagliaForza}.
+            \end{oss}
+
+            La seconda variante si ottiene prendendo la \ref{eqRegolaEmigrazioneTagliaForza} e anziché elevare i singoli rapporti rispetto a \(\alpha\) si eleva l'intero rapporo:
+            %
+            \begin{equation}
+                \label{eqRegolaEmigrazioneTagliaForzaVarianteHill}
+                E(s,s_*,i,i_*)=\lambda\left(
+                    \frac{(s_*/s)(w_{i_*}/w_i)}{1+(s_*/s)(w_{i_*}/w_i)}
+                \right)^\alpha.
+            \end{equation}
+            %
+            La principale differenza rispetto a \ref{eqRegolaEmigrazioneTagliaForza} è che tende a \(\lambda\) per \(\alpha\to0\) come illustrato nella \cref{figFunzioneVarianteHillGradoa} in contrapposizione alla \cref{figFunzioneHillGradoa}.
+
+                % \tikzfigure{htb}
+                %     {\input{../../Figure/.fnl/Capitolo4/FunzioneVarianteHillGradoa.tex}}
+                \tikzexternalizedfigure{htb}
+                    {../../Figure/.fnl/Capitolo4/FunzioneVarianteHillGradoa.tex}
+                    {Funzione di Hill modificata al variare del grado \(\alpha\).}
+                    {.775\linewidth}{figFunzioneVarianteHillGradoa}
+
+            Per il resto i risultati ottenuti sono analoghi a quelli della \ref{eqRegolaEmigrazioneTagliaForza}, considerando, ovviamente, dei parametri diversi da quelli nella \cref{tabParametriRETF}.
+
+        \subsection{L'Italia e la Valle d'Aosta}\label{secItaliaValleDAosta}
+
+            \begin{table}[htb]
+                \centering
+                % \captionsetup{width=10cm}
+                \caption{Dati \cite{ISTATCensimento1991,ISTATPendolarismo1991} e parametri della Valle d'Aosta e dell'Italia nel 1991.}
+                \begin{tabular}{ccccccccc}
+                    \hline
+                    &\(N\)&\(P\)&\(\beta\)&\(\xi\)&
+                    \(\mu_1\)&\(\sigma_1\)&\(\mu_2\)&\(\sigma_2\)\\
+                    \hline
+                    VdA&\(\num{74}\)&\(\approx\num{115938}\)&\(\num{1.635}\)&\(\num{0.237}\)&
+                    \(\num{2.483}\)&\(\num{.445}\)&\(\num{2.990}\)&\(\num{.445}\)\\
+                    It&\(\num[exponent-mode=input]{8100}\)&\(\approx\num{56778031}\)&\(\num{1.169}\)&\(\num{.886}\)&
+                    \(\num{3.318}\)&\(\num{.674}\)&\(\num{3.908}\)&\(\num{.674}\)\\
+                    \hline
+                \end{tabular}
+                \label{tabDatiParametriValledAostaItalia}
+            \end{table}
+
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} per la Valle d'Aosta con parametri dalla \cref{tabDatiParametriValledAostaItalia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.65\linewidth}{figRiferimentoRETFValledAosta}
+
+            \tikzexternalizedfigure[lualatex]{p}
+                {../../Figure/.fnl/Capitolo4/21RETFConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} per l'Italia con parametri dalla \cref{tabDatiParametriValledAostaItalia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.65\linewidth}{figRiferimentoRETFItalia}

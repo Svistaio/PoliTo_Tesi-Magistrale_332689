@@ -52,20 +52,11 @@
                 no marks,
             ] gnuplot [raw gnuplot] {
                 set samples 1000;
-                f(x,a,b)=(1/(b**a * gamma(a))) * x**(a-1) * exp(-x/b);
+                f(x,a,b)=(1/(b**a*gamma(a)))*x**(a-1)*exp(-x/b);
                 mi = \mi; a = \a; b = mi/a;
                 plot [x=0:3] f(x,a,b);
             };
 
-            \pgfmathparse{\a==100?1:0}
-            \ifnum\pgfmathresult=1
-                \addplot [draw=none,forget plot] gnuplot [raw gnuplot] {
-                    f(x,a,b)=(1/(b**a * gamma(a))) * x**(a-1) * exp(-x/b);
-                    mi = \mi; a = \a; b = mi/a;
-                    plot "+" using (mi):(f(mi,a,b)) with points;
-                } coordinate (PiccoMedia); 
-            \fi
-            
             \pgfmathsetmacro\skewness{2/sqrt(\a)}
             \addlegendentryexpanded{
                 \makebox[4em][l]{$\alpha=\a$} 
@@ -75,9 +66,17 @@
                     fixed zerofill
                 ]{\skewness}$
             }
+
+            % \pgfmathparse{\a==100?1:0}
+            % \ifnum\pgfmathresult=1
+                \addplot [draw=none,forget plot] gnuplot [raw gnuplot] {
+                    f(x,a,b)=(1/(b**a*gamma(a)))*x**(a-1)*exp(-x/b);
+                    a = 100; b = \mi/a; plot[mi=\mi:\mi] (f(mi,a,b));
+                } coordinate (media); 
+            % \fi
         }
 
-        \draw [thick,dashed,black] (axis cs:\mi,0) -- (PiccoMedia);
+        \draw [thick,dashed,black] (axis cs:\mi,0) -- (media);
             % node[pos=1,right,xshift=0.25em] {\dimTesto{9}$\langle\hat\gamma\rangle=0.9$};
 
     \end{axis}

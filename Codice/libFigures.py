@@ -27,11 +27,11 @@ class FigData():
         self.projectFolder = projectFolder
 
         self.regCode = str(clsPrm.region)
-        self.PdfPopUp = clsPrm.PdfPopUp
-        self.LaTeXConversion = clsPrm.LaTeXConversion
+        self.pdfPopUp = clsPrm.pdfPopUp
+        self.TikZConversion = clsPrm.TikZConversion
 
         for ext in ('.pdf','.mat','.tex'):
-            if ext=='.pdf' or self.LaTeXConversion:
+            if ext=='.pdf' or self.TikZConversion:
                 setattr(self,f'{ext[1:]}FolderPath',self.CreateFolders(ext))
                 # for p in folder.iterdir():
                 #     if p.is_file():
@@ -55,7 +55,7 @@ class FigData():
                 figsize=size,
                 gridspec_kw=dict(
                     wspace=0.2,
-                    hspace=0.2
+                    hspace=0.4
                 )
             )
 
@@ -66,7 +66,7 @@ class FigData():
             f'{name}fig{f+1}' for f in range(self.nFig)
         ] if self.nFig>1 else [name]
 
-        if self.LaTeXConversion:
+        if self.TikZConversion:
             for f in range(self.nFig):
                 self.SaveFig2mat(f)
                 self.SaveFig2tex(f)
@@ -81,7 +81,7 @@ class FigData():
             bbox_inches='tight'
         )
 
-        if self.PdfPopUp:
+        if self.pdfPopUp:
             sumatraPath = self.projectFolder/'.vscode'/'SumatraPDF.lnk'
             cmd = f'"{str(sumatraPath)}" "{str(pdfFilePath)}"'
             subprocess.Popen(cmd,shell=True)
@@ -113,7 +113,7 @@ class FigData():
         t = self.texFilePath.as_posix()
 
         cmd = (
-            r'matlab -batch "mat2tex('
+            r'matlab -batch "../Elaborato/Convertitore/mat2tex('
             fr"'{m}',"fr"'{t}'"r')"'
         )
         return cmd
@@ -490,24 +490,42 @@ def CreateLognormalFitPlot(
             1000
         )
 
-    yFData = [None]*Ni
-    xiData = [None]*Ni
+    yFData = [None]*Ni; xiData = [None]*Ni
+    m1Data = [None]*Ni; s1Data = [None]*Ni
+    m2Data = [None]*Ni; s2Data = [None]*Ni
 
     for r in range(Ni):
         if bimodal:
-            xi,scale1,shape1,scale2,shape2 = FitLognormalData(v[r,:],bimodal)
+            xi,m1,s1,m2,s2 = FitLognormalData(v[r,:],bimodal)
             yFData[r] = (
-                xi*stats.lognorm.pdf(xF,s=shape1,scale=np.exp(scale1)) + 
-                (1-xi)*stats.lognorm.pdf(xF,s=shape2,scale=np.exp(scale2))
-            )
-            xiData[r] = xi
-        else:
-            shape,loc,scale = FitLognormalData(v[r,:],bimodal)
-            yFData[r] = stats.lognorm.pdf(xF,shape,loc=loc,scale=scale)
-            xiData[r] = 1
+                xi*stats.lognorm.pdf(xF,s1,scale=np.exp(m1)) + 
+                (1-xi)*stats.lognorm.pdf(xF,s2,scale=np.exp(m2))
+            )#; print(xi,m1,s1,m2,s2)
 
-    if Ni>1: yF = yFData; xi = xiData
-    else: yF = yFData[0]; xi = xiData[0]
+            xiData[r] = xi
+            m1Data[r] = m1*np.log10(np.exp(1))
+            s1Data[r] = s1*np.log10(np.exp(1))
+            m2Data[r] = m2*np.log10(np.exp(1))
+            s2Data[r] = s2*np.log10(np.exp(1))
+            # Base 10 conversion
+
+        else:
+            shape,scale = FitLognormalData(v[r,:],bimodal)
+            yFData[r] = stats.lognorm.pdf(xF,shape,scale=scale)
+            
+            xiData[r] = 1
+            m1Data[r] = np.log10(scale) # Base 10 conversion
+            s1Data[r] = shape*np.log10(np.exp(1))
+            m2Data[r] = 0; s2Data[r] = 0
+
+    if Ni>1:
+        yF = yFData; xi = xiData
+        m1 = m1Data; s1 = s1Data
+        m2 = m2Data; s2 = s2Data
+    else:
+        yF = yFData[0]; xi = xiData[0]
+        m1 = m1Data[0]; s1 = s1Data[0]
+        m2 = m2Data[0]; s2 = s2Data[0]
 
     # Fit plot
     CreateFunctionPlot(
@@ -524,7 +542,7 @@ def CreateLognormalFitPlot(
         ax=ax
     )
 
-    return xi
+    return xi,m1,s1,m2,s2 
 
 def CreateParetoFitPlot(
     v,
@@ -645,10 +663,10 @@ def CreateParetoFitPlot(
         Nc = v.shape[1]
 
         for r in range(Ni):
-            xi,loc1,shape1,loc2,shape2 = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
+            xi,m1,s1,m2,s2 = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
 
-            ccdfFit1 = stats.norm.sf(xFl,loc=loc1,scale=shape1)
-            ccdfFit2 = stats.norm.sf(xFl,loc=loc2,scale=shape2)
+            ccdfFit1 = stats.norm.sf(xFl,loc=m1,scale=s1)
+            ccdfFit2 = stats.norm.sf(xFl,loc=m2,scale=s2)
 
             yFData[r] = xi*ccdfFit1+(1-xi)*ccdfFit2
             # yFData[r] /= yFData[r][0] # Normalization
@@ -842,10 +860,14 @@ def CreateConfidenceIntervalPlot(
                 }
 
 def FitLognormalData(v,bimodal):
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit
+
     if not bimodal:
         shape,loc,scale = stats.lognorm.fit(v[v>0],floc=0)
-        # The average is «μ=np.log(scale)» while the standard deviation is «σ=shape»
-        return shape,loc,scale
+        # The average is «μ=np.log(scale)» (base e) while the standard deviation is «σ=shape»
+        return shape,scale
     else:
         vp = v[v>0]
         vl = np.log(vp)
@@ -866,30 +888,38 @@ def FitLognormalData(v,bimodal):
             
             # Prevent log(0) errors
             epsilon = 1e-10
-            return -np.sum(np.log(mixture + epsilon))
+            return -np.sum(np.log(mixture+epsilon))
 
         # Initial heuristic guesses
-        m0 = np.mean(vl)
+        # m0 = np.mean(vl)
         s0 = np.std(vl)
         prm0 = [
-            0.8, # The first gaussian is initially the most important one
-            m0,s0,
-            m0+0.5,s0
-        ] # Same standard deviation but translated average
+            0.5, # Equal initial weigth
+            np.percentile(vl,25), # First small average
+            s0*0.25,
+            np.percentile(vl,75), # Second big average
+            s0*0.75
+        ] # Same standard deviation
 
         bounds = ( # xi must be in [0,1]
+            # (.001,.999), # xi
             (0,1),       # xi
-            (None,None), # m1
-            (1e-5,None), # s1
-            (None,None), # m2
-            (1e-5, None) # s2
-        ) # mi does not have a bound while si>0
+            (None,None),  # m1
+            (1e-2,None), # s1
+            (None,None),  # m2
+            (1e-2, None) # s2
+        ) # m has no bounds while s>0
 
         # Optimization
         minimization = minimize(NegativeLogLikelihood,prm0,bounds=bounds)
         
         # Extract results
         xi,m1,s1,m2,s2 = minimization.x
+
+        # Check for degeneration
+        if s2==1e-2: return 1,m1,s1,m2,s2 # First dominant component
+        if s1==1e-2: return 0,m1,s1,m2,s2 # Second dominant component
+        # Indeed, if the fit is too unbalanced it means that there is one component not significant enough to jusfity a whole Gaussian (it's like trying to fit it with one point)
 
         return xi,m1,s1,m2,s2
 
@@ -898,8 +928,8 @@ def DataString(
     Ni=1,
     ta=None,
     head='',
-    formatVal='.2f',
-    formatErr='.2f',
+    formatVal='.3f',
+    formatErr='.3f',
     space=True
 ):
     (value,error) = EvaluateConfidenceInterval(data,ta,Ni)

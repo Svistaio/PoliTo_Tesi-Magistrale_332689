@@ -1,0 +1,89 @@
+
+% !TEX root = ../Testa/Principale.tex
+% LTeX: language=it
+
+\chapter{Introduzione}\label{secIntroduzione}
+
+    Lo studio della distribuzione della popolazione tra le città è stato un fenomeno già analizzato [sporadicamente] in passato. Il primo fu Auerbach \cite{Auerbach1913} che all'inizio del 19-esimo secolo notò una caratteristica poi formalizzata successivamente da Zipf\footnotemark{} \cite{Zipf2016} quasi cinquantanni dopo, seppure inizialmente in un contesto linguistico; difatti la legge di Zipf è una legge empirica di forma
+    \footnotetext{In realtà, come Zipf stesso ammette \cite[p. 546]{Zipf2016}, non fu il primo a scoprire tale legge; in ogni caso la popolarizzò a tal punto che oggi è conosciuta col suo nome.}
+    %
+    \begin{equation}
+        \label{eqLeggeZipf}
+        f\propto\frac1 r\quad\text{ove}
+        \left\{\begin{aligned}
+            f&\text{ è la frequenza della parola,}\\
+            r&\text{ è il suo rango nella classifica;}
+        \end{aligned}\right.
+        % https://en.wikipedia.org/wiki/Zipf%27s_law#cite_note-7
+        % https://archive.org/details/in.ernet.dli.2015.90211/page/n393/mode/1up
+    \end{equation}
+    %
+    per dare un esempio concreto, se la 10 parola piú frequente compare 2000 volte allora esiste una costante \(C\) tale che \(2000\approx C/10\). La stessa legge descritta in \eqref{eqLeggeZipf} si può ritrovare in molt'altri contesti, tra i quali figura la distribuzione della popolazione tra le città se in luogo di \(f\) si scrive la popolazione \(s\) \cite[Fig. 9-2, p. 375]{Zipf2016}; tuttavia ciò è vero solo qualora \(s\gg1\), ossia nella coda della distribuzione, contrariamente al contesto linguistico originale di Zipf ove \eqref{eqLeggeZipf} vale sempre.
+  
+    Piú in generale la legge [empirica] di Zipf può essere descritta da una distribuzione di Pareto: sia \(S\) la variabile aleatoria legata alla taglia delle città e sia \(f_S(s)\) la sua funzione di densità di probabilità\footnotemark{}, la quale permette d'interpretare \(f_S(s)\de s\) come il numero di città con \(s\in(s,s+dt)\); allora si dice che \(S\) segue una distribuzione di Pareto nella coda se soddisfà%
+    \footnotetext{Affinché \(f_S(s)\) esista bisogna rigorosamente anche supporre che \(S\) sia assolutamente continua, ma qui non è necessario entrare nei dettagli per i quali si rimanda ai \cref{secDefinizioniPreliminariProbabilitàTCSMA,secDescrizioneCineticaUrbana}.}%
+    %
+    \begin{equation}
+        \label{eqFunzioneRipartizioneComplementarePareto}
+        R(s)\equiv\int_{s}^{+\infty}f_S(t)\de t\approx\frac c{s^\beta}
+        \quad\text{se }s\gg1,
+        % https://en.wikipedia.org/wiki/Pareto_distribution#Relation_to_Zipf's_law
+    \end{equation}
+    %
+    per una certa costante \(c\in\RPlus\) e con \(R(s)\) uguale alla funzione di ripartizione complementare di \(S\): essa rappresenta matematicamente il numero di città con popolazione maggiore o uguale a \(s\) e, qualora l'indice di Pareto \(\beta\) fosse unitario, è analoga al rango \(r\) nella \eqref{eqLeggeZipf}.
+
+    Piú recentemente \cite{Eeckhout2004,Gualandi2019HBLD} si è scoperto che al di fuori della coda la \(f_S(s)\) è ben fittata dalla distribuzione lognormale con densità di probabilità
+    %
+    \begin{equation}
+        \label{eqDistribuzioneLognormale}
+        f_X(x)=\frac1{x\sigma\sqrt{2\pi}}\exp\left( -\frac{(\ln x-\mu)^2}{2\sigma^2}\right),
+    \end{equation}
+    %
+    ove \(X\sim\DstrLognormale(\mu,\sigma)\); come suggerisce il nome, la peculiarità di tale distribuzione è che vale \(\log X\sim\mathcal N(\mu,\sigma)\) (\cref{figEsempioFunzioneLognormale}) in cui \(\mathcal N(\mu,\sigma)\) indica la distribuzione gaussiana.
+
+    % \tikzfigure{H}
+    %     {\input{../../Figure/.fnl/Capitolo1/EsempioFunzioneLognormale.tex}}
+    \tikzexternalizedfigure{H}
+        {../../Figure/.fnl/Capitolo1/EsempioFunzioneLognormale.tex}
+        {Funzione \(\DstrLognormale(0,1)\).}
+        {\linewidth}{figEsempioFunzioneLognormale}
+
+    Perdipiú da Gualandi \etal{} \cite{Gualandi2019HBLD,Gualandi2019SDC} ci si è poi resi conto che l'intera distribuzione è ben fittata da una lognormale bimodale, vale a dire una combinazione convessa della \eqref{eqDistribuzioneLognormale}
+    %
+    \begin{equation}
+        \label{eqDistribuzioneLognormaleBimodale}
+        f_S(s)\approx f_X(s)=\xi f_{S_1}(s)+(1-\xi)f_{S_2}(s),
+    \end{equation}
+    %
+    ove \(\xi\in(0,1)\), \(S_1,S_2\sim\DstrLognormale(\mu,\sigma)\) e \(X\sim\BiLognormal(\xi,\mu_1,\sigma_1,\mu_2,\sigma_2)\).
+
+    Pertanto l'obbiettivo di questa tesi è il seguente: si vuole simulare attraverso la \hypertarget{acrTeorieCineticheSistemiMultiAgenti}{Teoria Cinetica dei Sistemi MultiAgente} (\TCSMA) le interazioni tra città su un grafo spaziale, tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate (principalmente corpo lognormale e coda di Pareto); una volta raggiunto questo scopo si potrà poi meditare sulle implicazioni della legge d'interazione riguardo al fenomeno dell'emigrazione, che è alla base delle interazioni tra città.
+
+    Si sottolinea che qui le città verranno invece considerate come agenti, caratterizzati dalla loro popolazione, che interagiscono attraverso la struttura sottostante di un grafo [spaziale]; tale descrizione, salvo il grafo, non è affatto dissimile a quella classica delle molecole di un gas caratterizzate dalla loro velocità e posizione.
+   
+    Difatti, in letteratura, perlomeno quella a conoscenza dell'autore, non esistono articoli che trattano contemporaneamente le teorie cinetiche, la distribuzione della città e i grafi, nonostante la rappresentazione di queste su un grafo sia del tutto naturale; piú nel dettaglio gli articoli in letteratura
+    
+    \begin{itemize}[
+        label=\(\diamond\),
+        topsep=0.5em,
+        parsep=0em,
+        itemsep=0.25em,
+        leftmargin=2em,
+        rightmargin=1.5em,
+        % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+        %itemindent=!,
+        labelindent=30pt,
+        %labelwidth=!,
+        %labelsep=!,
+    ]
+        \item o applicano la \TCSMA{} alle città senza considerare una naturale topologia sottostante \cite{Gualandi2019SDC}\footnotemark{} o, in senso opposto, considerano la struttura da grafo senza applicare la \TCSMA{} \cite{Berliant2018};
+        \footnotetext{In particolare \cite{Gualandi2019SDC}, nonostante sia un articolo molto interessante e che giunge a conclusioni altrettanto importanti, astrae eccessivamente le interazioni tra città oltre a non definire con sufficiente chiarezza che cosa s'intende per \textit{dintorni}.}
+        \item altri vedono i nodi piú come luoghi ove vivono e interagiscono gli agenti, creando cosí un modello descritto da un sistema di equazioni di Boltzmann elevate e accoppiate \cite{Loy2021};
+        \item infine, l'articolo che piú si avvicina all'obbiettivo di questa tesi applica, tuttavia, la sua teoria nel contesto delle reti sociali \cite{Nurisso2024}.
+    \end{itemize}
+
+    Questa lacuna è probabilmente attribuibile al fatto che gli sviluppi della teoria dei grafi applicata alla \TCSMA{} sono stati piuttosto recenti e principalmente concentrati sulla prospettiva nodo-luogo anziché nodo-agente. Dunque l'aspetto piú innovativo di questo lavoro è mostrare che la prospettiva nodo-agente è altrettanto valida quanto quella piú comune e recente del nodo-luogo; per il resto questa tesi dev'essere considerata come un'esplorazione formale applicativa con pochi approfondimenti analitici.
+
+    Lo scritto sarà cosí suddiviso: nel secondo capitolo si affronteranno brevemente e [superficialmente] alcuni concetti della teoria dei grafi, soprattutto quelli pertinenti alla topologia interurbana; quindi nel terzo la \TCSMA{} è approfondita prima da un punto di vista classico, e poi mediata dai grafi sia esattamente che approssimatamente; infine negli ultimi due si illustreranno i principali risultati concludendo con delle note finali e potenziali sviluppi futuri.
+    
+    Per il lettore interessato è anche presente un'appendice ove il codice di Python dell'implementazione è spiegato a grandi linee.

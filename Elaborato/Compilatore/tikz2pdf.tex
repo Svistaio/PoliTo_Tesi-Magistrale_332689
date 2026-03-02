@@ -1,0 +1,81 @@
+
+% !TEX root = ../../Esperimenti/.tex/MEF.tex
+
+\documentclass[
+    class=scrreprt,
+    tikz
+    % border=1pt,
+    % crop=false,
+]{standalone}
+
+\newif\ifInCompiler\InCompilertrue
+
+\input{../../Elaborato/Corpo/Pacchetti.tex}
+\input{../../Elaborato/Corpo/Definizioni.tex}
+% \input{../../Elaborato/Corpo/tikzextfigure.tex}
+
+%\begingroup Emulazione ArsClassica
+    % Fonti
+    \ifLuaTeX
+        \setmainfont{TeX Gyre Pagella}[Numbers=OldStyle]
+        \linespread{1.05}
+        \setsansfont{Iwona}
+        
+        % https://tex.stackexchange.com/questions/352723/accents-with-eulervm-and-lualatex
+        \PassOptionsToPackage{euler-digits}{eulervm}
+        \usepackage[OT1,euler-digits]{eulervm}
+
+        % \usepackage{euler-math}
+        % \usepackage[math-style=upright]{unicode-math}
+        % \setmathfont{Euler Math}
+    \else\ifPDFTeX
+        \PassOptionsToPackage{osf,sc}{mathpazo}
+        \usepackage{mathpazo} 
+        \linespread{1.05}
+
+        \PassOptionsToPackage{euler-digits}{eulervm}
+        \usepackage{eulervm}
+
+        \usepackage[scaled=0.85]{beramono}
+
+        % \usepackage[scaled=.89]{iwona}
+        \renewcommand{\sfdefault}{iwona}
+        % \renewcommand{\familydefault}{mathpazo}
+        
+        % \usepackage{euler-math}
+        % \usepackage[math-style=upright]{unicode-math}
+    \fi\fi
+
+    % Colori
+    \definecolor{CTtitle}{named}{Maroon}
+    \definecolor{CTlink}{named}{RoyalBlue}
+        
+    % Riga 156 di «classicthesis.sty» 
+    \definecolor{CTsemi}{gray}{0.55} % chapter numbers will be semi transparent .5 .55 .6 .0
+    \definecolor{CTcitation}{rgb}{0,0.5,0} % WebGreen
+    \definecolor{CTurl}{named}{Maroon} % Maroon
+    \definecolor{CTtitle}{named}{Maroon} % Maroon {cmyk}{0, 0.87, 0.68, 0.32}
+    \definecolor{CTlink}{named}{RoyalBlue} % RoyalBlue {cmyk}{1, 0.50, 0, 0}
+    \definecolor{halfgray}{gray}{0.55} % chapter numbers will be semi transparent .5 .55 .6 .0
+    \definecolor{webgreen}{rgb}{0,0.5,0}
+    \definecolor{webbrown}{rgb}{0.6,0,0}
+
+    \IfFileExists{\sourceauxpath.aux}{
+        \externaldocument{\sourceauxpath}
+    }{\relax}
+
+    \pgfkeys{/pgf/plot/gnuplot call={cd /d "\sourceoutdir" && gnuplot}}
+%\endgroup
+
+\begin{document}
+    \def\even{even}
+    \newif\ifpageisodd
+    
+    \ifx\isodd\even
+        \pageisoddfalse
+    \else
+        \pageisoddtrue
+    \fi
+
+    \input{\sourcefilepath}
+\end{document}

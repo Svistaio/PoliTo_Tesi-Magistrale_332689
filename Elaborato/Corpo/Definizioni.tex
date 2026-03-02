@@ -1,0 +1,1572 @@
+
+% !TEX root = ../Testa/Principale.tex
+
+%\begingroup Tipografia
+    \newcommand\dimTesto[1]{%
+        \pgfmathparse{#1*1.2}%
+        \fontsize{#1pt}{\pgfmathresult pt}\selectfont%
+    }
+
+    \newcommand\daRivedere{{\color[HTML]{DC143C}\{§\}}}
+    \newcommand\dubbio{{\color[HTML]{DC143C}\{?\}}}
+
+    \newcommand\dimColla[4]{#1#4 plus #2#4 minus #3#4}
+    \newcommand\vColla[4]{\vspace{\dimColla{#1}{#2}{#3}{#4}}}
+    \newcommand\hColla[4]{\hspace{\dimColla{#1}{#2}{#3}{#4}}}
+%\endgroup
+
+%\begingroup Riferimenti
+    % \newcommand\tref[2]{\hyperref[#1]{#2}}
+    \newcommand\crefsubfigInt[4][-]{Figg. \ref{#2}(#3)#1\ref{#2}(#4)}
+    \newcommand\crefsubfigSep[4]{Figg. \ref{#1}(#2)\foreach \l in#3{, \ref{#1}(\l)} e \ref{#1}(#4)}
+
+    % Comando per definire citazioni con note separate da un punto e virgola: [citazione1, nota1; citazione2, nota2; ecc.]
+    \DeclareMultiCiteCommand{\bracketcitesemi}[\mkbibbrackets]{\cite}{\addsemicolon\space}
+ 
+    \crefname{eqtag}{}{}
+    \crefrangeformat{eqtag}{#3#1#4--#5#2#6}
+    \crefmultiformat{eqtag}{#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+    \crefrangemultiformat{eqtag}{#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}
+    
+    \crefname{equation}{}{}
+    \crefrangeformat{equation}{(#3#1#4--#5#2#6)}
+    \crefmultiformat{equation}{(#2#1#3}{,~#2#1#3)}{,~#2#1#3}{,~#2#1#3)}
+    \crefrangemultiformat{equation}{(#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}
+    
+    \crefname{chapter}{Cap.}{Capp.}
+    \crefrangeformat{chapter}{Capp.~#3#1#4--#5#2#6}
+    \crefmultiformat{chapter}{Capp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{chapter}{Capp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    
+    \crefname{section}{§}{§§}
+    \crefrangeformat{section}{§§~#3#1#4--#5#2#6}
+    \crefmultiformat{section}{§§~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{section}{§§~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    
+    \crefname{figure}{Fig.}{Figg.}
+    \crefrangeformat{figure}{Figg.~#3#1#4--#5#2#6}
+    \crefmultiformat{figure}{Figg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{figure}{Figg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    
+    \crefname{table}{Tab.}{Tabb.}
+    \crefrangeformat{table}{Tabb.~#3#1#4--#5#2#6}
+    \crefmultiformat{table}{Tabb.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{table}{Tabb.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{algorithm}{Alg.}{Algg.}
+    \crefrangeformat{algorithm}{Algg.~#3#1#4--#5#2#6}
+    \crefmultiformat{algorithm}{Algg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{algorithm}{Algg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{listing}{List.}{Listt.}
+    \crefrangeformat{listing}{Listt.~#3#1#4--#5#2#6}
+    \crefmultiformat{listing}{Listt.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{listing}{Listt.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    
+    \crefname{prp}{Prop.}{Propp.}
+    \crefrangeformat{prp}{Propp.~#3#1#4--#5#2#6}
+    \crefmultiformat{prp}{Propp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{prp}{Propp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{dfn}{Def.}{Deff.}
+    \crefrangeformat{dfn}{Deff.~#3#1#4--#5#2#6}
+    \crefmultiformat{dfn}{Deff.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{dfn}{Deff.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{oss}{Oss.}{Oss.ni}
+    \crefrangeformat{oss}{Oss.ni~#3#1#4--#5#2#6}
+    \crefmultiformat{oss}{Oss.ni~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{oss}{Oss.ni~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    % https://www.treccani.it/magazine/lingua_italiana/domande_e_risposte/grammatica/grammatica_123.html
+
+    \crefname{teo}{Teo.}{Teo.ri}
+    \crefrangeformat{teo}{Teo.ri~#3#1#4--#5#2#6}
+    \crefmultiformat{teo}{Teo.ri~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{teo}{Teo.ri~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{ipo}{Ip.}{Ipp.}
+    \crefrangeformat{ipo}{Ipp.~#3#1#4--#5#2#6}
+    \crefmultiformat{ipo}{Ipp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{ipo}{Ipp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+%\endgroup
+
+%\begingroup Abbreviazioni
+    \newcommand\etal{\textit{et al.}}
+    \newcommand\TCSMA{\hyperlink{acrTeorieCineticheSistemiMultiAgenti}{TCSMA}}
+%\endgroup
+
+%\begingroup Matematica
+    \numberwithin{equation}{chapter}
+    \numberwithin{figure}{chapter}
+    \numberwithin{table}{chapter}
+
+    \newcommand\SpazMate[3]{ % Spaz[iatura] Mate[matica]
+        \thinmuskip = #1mu\relax
+        \medmuskip = #2mu\relax
+        \thickmuskip = #3mu\relax
+    }
+    \SpazMate123
+
+    \newcommand\de[1][]{\mathrm{d}#1}
+    \newcommand\derS[3][d]{\frac{\mathrm{#1}#2}{\mathrm{#1}#3}}
+    \newcommand\derP[2]{\frac{\partial#1}{\partial#2}}
+    
+    \DeclareMathOperator\DstrLognormale{Lognormale}
+    \DeclareMathOperator\BiLognormal{BiLognormale}
+    \DeclareMathOperator\DstrBernoulli{Bernoulli}
+    \DeclareMathOperator\DstrEsponenziale{Exp}
+    \DeclareMathOperator\DstrGamma{Gamma}
+    \DeclareMathOperator\DstrStudent{Student}
+    
+    \DeclareMathOperator\Varianza{var}
+    \DeclareMathOperator\IC{IC}
+    \DeclareMathOperator\Histogram{Istogramma}
+    % \DeclareMathOperator\Pareto{Pareto}
+
+    % \newcommand\underdot[1]{\underaccent{\scalebox{0.3}{\(\bullet\)}}{#1}}
+    % \newcommand\underhat[1]{\underaccent{\check}{#1}}
+    \newcommand\underhat[1]{\underaccent{\hat}{#1}} % Circonflesso sottoscritto
+    \renewcommand\undertilde[1]{\underaccent{\tilde}{#1}} % Tilde sottoscritta
+
+    % \newcommand\independent{\perp\!\!\!\!\!\!\!\!\!\!\perp}
+    \newcommand\independent{\perp\hspace{-.5em}\perp}
+
+    \theoremstyle{definition}
+    \newtheorem{dfn}{Definizione}[chapter]
+    \newtheorem{ipo}{Ipotesi}[chapter]
+    \newtheorem{oss}{Osservazione}[chapter]
+    \newtheorem{prt}{Proprietà}[chapter]
+
+    \theoremstyle{plain}
+    \newtheorem{prp}{Proposizione}[chapter]
+    \newtheorem{lmm}{Lemma}[chapter]
+    \newtheorem{teo}{Teorema}[chapter]
+    \newtheorem{crl}{Corollario}[chapter]
+
+    \newcommand\RPlus{\mathbb R_+}
+    % \newcommand\RPlusStar{\mathbb R^*_+}
+    \newcommand\NPlus{\mathbb N_+}
+
+    \makeatletter
+        \newcommand\eqtag{\@ifstar{\eqtag@star}{\eqtag@nostar}}
+        
+        \newcounter{eqtag}
+        \newcommand\eqtag@nostar[2]{%
+            \begin{equation*}%
+                \refstepcounter{eqtag}%
+                % \protected@edef\@currentlabeltype{eqtag}%
+                \protected@edef\@currentlabel{#1}%
+                #2%
+                \tag*{#1}%
+            \end{equation*}%
+        }
+        \newcommand\eqtag@star[2]{%
+            \begin{equation*}%
+                \refstepcounter{eqtag}%
+                % \protected@edef\@currentlabeltype{eqtag}%
+                \protected@edef\@currentlabel{#1}%
+                #2%
+                \notag%
+            \end{equation*}%
+        }
+    \makeatother
+
+    \DeclareMathAlphabet\pazocal{OMS}{zplm}{m}{n}
+    \newcommand\TreQuarti{{3\hspace{-0.15em}/\hspace{-0.15em}4}}
+    \newcommand\UnQuarto{{1\hspace{-0.15em}/\hspace{-0.15em}4}}
+%\endgroup
+
+%\begingroup Algoritmi
+    \SetKwIF{Sea}{AltSe}{Altrimenti}{se}{allora}{altrimenti se}{altrimenti}{fine se}
+    \SetKwInput{KwDati}{Dati}
+    \SetKwFor{Per}{per}{fai}{fine per}
+    \SetKwRepeat{Ripeti}{ripeti}{finché}
+
+    \newcommand\pythoncommfont[1]{\footnotesize\ttfamily\textcolor{gray}{#1}}
+    \SetCommentSty{pythoncommfont}
+    \SetKwComment{tcp}{\# }{}
+
+    \makeatletter
+    \providecommand{\listofloaname}{\listalgorithmcfname}
+    \renewcommand{\listofalgorithms}{%
+        \begingroup
+        \let\listfigurename\listalgorithmcfname
+        \def\ext@figure{loa}%
+        \let\l@algocf\l@figure
+        \renewcommand{\cftfigpresnum}{Algoritmo~}%
+        \listoffigures
+        \endgroup
+    }
+    \makeatother
+%\endgroup
+
+%\begingroup Codice
+    %\begingroup Minted
+        \newunicodechar{λ}{\ensuremath{\lambda}}
+        \newunicodechar{α}{\ensuremath{\alpha}}
+        \newunicodechar{σ}{\ensuremath{\sigma}}
+        \newunicodechar{ζ}{\ensuremath{\zeta}}
+        \newunicodechar{Δ}{\ensuremath{\Delta}}
+        \newunicodechar{μ}{\ensuremath{\mu}}
+        \newunicodechar{≈}{\ensuremath{\approx}}
+        \newunicodechar{≥}{\ensuremath{\ge}}
+        \newunicodechar{≤}{\ensuremath{\le}}
+        % \newunicodechar{«}{\guillemotleft}
+        % \newunicodechar{»}{\guillemotright}
+
+        \renewcommand{\theFancyVerbLine}{%
+            \sffamily
+            \textcolor{gray}{%
+                \tiny\oldstylenums{\arabic{FancyVerbLine}}%
+            }%
+        }
+        
+        \makeatletter
+        \newcommand{\CustomMintedStyle}{%
+            \@namedef{PYG@tok@nn}{\let\PYG@bf=\relax\color{black}}%
+            \@namedef{PYG@tok@c}{\let\PYG@it=\textit\color{gray}}%
+            \@namedef{PYG@tok@c1}{\let\PYG@it=\textit\color{gray}}%
+        }
+        \makeatother
+
+        \setminted{
+            style=bw,
+            fontsize=\small,
+            baselinestretch=.88,
+            breaklines,
+            breakanywhere,
+            % breakbytokenanywhere,
+            % breakanywhereinlinestretch,
+            % breakafter= ,
+            % breakbefore=/,
+            linenos=true,
+            xleftmargin=2em,
+            numbersep=1.5em,
+            formatcom=\CustomMintedStyle,
+        }
+
+        \newenvironment{code}{
+            \captionsetup{
+                type=listing,
+                aboveskip=\dimColla{-.5}{.4}{0}{em},
+                belowskip=-.5em
+            }
+        }{}
+
+        \newcommand\printListing[5][python]{
+            \begin{code}
+                \pdfbookmark[3]{#4}{#5}
+                \captionof{listing}{#4}
+                \inputminted[#2]{#1}{#3}
+                \label{#5}
+            \end{code}
+        }
+
+        \SetupFloatingEnvironment{listing}{
+            listname={Elenco dei listati},
+            name=Listato,
+        }
+        \PrepareListOf{listing}{\renewcommand{\cftfigpresnum}{Listato~}}
+    %\endgroup
+
+    %\begingroup Listings
+        % % Ispirato da https://gist.github.com/nhtranngoc/88b72d9bfb656a3de227eea38ed80627
+    
+        % % Colori «Monokai» adattati per fondo bianco
+        % \definecolor{mkPinkDark}{RGB}{191,0,96}      % Rosa scuro virato verso un rosso cremisi/magenta scuro
+        % % \definecolor{mkPurpleDark}{RGB}{124,79,205} % Vuola scuro
+        % \definecolor{mkPurpleDark}{RGB}{104,59,185} % Vuola scuro
+        % % \definecolor{mkGreenDark}{RGB}{100,140,20}   % Verde scuro virato verso un verde oliva saturo
+        % \definecolor{mkGreenDark}{RGB}{50,110,0}   % Verde scuro virato verso un verde oliva saturo
+        % \definecolor{mkYellowDark}{RGB}{180,130,0}   % Giallo scuro virato verso ocra/oro (il giallo puro è illeggibile su bianco)
+        % \definecolor{mkBlueDark}{RGB}{0,120,150}     % Blu scuro virato verso un ciano scuro/petrolio
+        % \definecolor{mkOrangeDark}{RGB}{204,102,0}   % Arancio scuro virato verso arancio bruciato
+        % \definecolor{mkGrayDark}{RGB}{105,105,105}   % Grigio scuro
+    
+        % % Correzione per colorare la parentesi tonda finale
+        % \makeatletter
+        % \patchcmd{\lsthk@SelectCharTable}{`)}{``}{}{}
+        % \makeatother
+        % % È un problema noto a cui, per fortuna, si può rimediare ma solo perché il mio codice non contiene retrotacche «`»
+        % % https://tex.stackexchange.com/questions/172945/coloring-in-listing
+        % % https://www.reddit.com/r/LaTeX/comments/u98usu/listings_using_literate_to_color_single_symbols/
+        % % https://tex.stackexchange.com/questions/442585/how-to-change-style-for-right-parenthesis-inside-lstlisting-environment
+        % % https://tex.stackexchange.com/questions/73795/problem-with-literate-and-breaklines-true-in-listings-package
+    
+        % \lstset{
+        %     %\begingroup Miscellaneo
+        %         language=Python,
+        %         inputencoding=utf8,
+        %         extendedchars=true,
+        %         columns=flexible,
+        %         lineskip=-2pt,
+        %         breaklines=true,
+        %         showstringspaces=false,
+        %         keepspaces=true,
+        %         % title=\lstname,         % Mostra il nome della filza come titolo preceduto da «\lstinputlisting;»
+        %         % captionpos=b,           % Imposta la posizione della didascalia al fondo
+        %         % showspaces=false,       % Mostra gli spazi sostituendoli con trattini bassi «_»
+        %         % showstringspaces=false, % Mostra gli spazi sostituendoli tra le stringhe con trattini bassi «_»
+        %         % showtabs=false,         % Mostra le tabulazioni tra le stringhe con trattini bassi «_»
+        %         % tabsize=4,              % Imposta la dimensione della tabulazione uguale a 2 spazi
+        %         % breakatwhitespace=true, % Imposta che l'accapo automatico sia applicato solo a spazi bianchi
+        %     %\endgroup
+        %     %
+        %     %\begingroup Colori
+        %         basicstyle=\small\ttfamily\color{black}, % Testo base nero
+        %         keywordstyle=\color{mkPinkDark},
+        %         stringstyle=\color{mkYellowDark},
+        %         commentstyle=\color{mkGrayDark}\itshape,
+        %         % identifierstyle=\color{monokaiGreen}
+        %     %\endgroup
+        %     %
+        %     %\begingroup Caratteri letterali
+        %     literate= %
+        %         {λ}{{$\lambda$}}1 %
+        %         {α}{{$\alpha$}}1 %
+        %         {σ}{{$\sigma$}}1 %
+        %         {ζ}{{$\zeta$}}1 %
+        %         {Δ}{{$\Delta$}}1 %
+        %         {«}{{\guillemotleft}}1 %
+        %         {»}{{\guillemotright}}1 %
+        %         % {(}{{\ProcessSymbol{mkYellowDark}{(}}}1 %
+        %         % {)}{{\ProcessSymbol{mkYellowDark}{)}}}1 %
+        %         {=}{{\ProcessSymbol{mkPinkDark}{=}}}1 %
+        %         {0}{{\ProcessSymbol{mkPurpleDark}{0}}}1 %
+        %         {1}{{\ProcessSymbol{mkPurpleDark}{1}}}1 %
+        %         {2}{{\ProcessSymbol{mkPurpleDark}{2}}}1 %
+        %         {3}{{\ProcessSymbol{mkPurpleDark}{3}}}1 %
+        %         {4}{{\ProcessSymbol{mkPurpleDark}{4}}}1 %
+        %         {5}{{\ProcessSymbol{mkPurpleDark}{5}}}1 %
+        %         {6}{{\ProcessSymbol{mkPurpleDark}{6}}}1 %
+        %         {7}{{\ProcessSymbol{mkPurpleDark}{7}}}1 %
+        %         {8}{{\ProcessSymbol{mkPurpleDark}{8}}}1 %
+        %         {9}{{\ProcessSymbol{mkPurpleDark}{9}}}1 %
+        %         {/}{{\ProcessSymbol{mkBlueDark}{/}}}1,
+        %     %\endgroup
+        %     %
+        %     %\begingroup Elementi verdi scuri
+        %     emph={
+        %         % Librerie esterne
+        %         multiprocessing,freeze_support,
+        %         dataclasses,dataclass,
+        %         Any,typing,
+        %         copy,deepcopy,
+        %         numpy,np,
+        %         pathlib,Path,
+        %         @dataclass,
+        %         %
+        %         % Librerie/funzioni personali
+        %         main,
+        %         %
+        %         libParameters,libP,
+        %         Parameter,Parameters,
+        %         ComboBoxList,
+        %         CopyWorkerShMTemplate,
+        %         %
+        %         libGUIs,
+        %         ParametersGUI,
+        %         GatherParameters,
+        %         %
+        %         libData,libD,
+        %         ExtractRegionData,
+        %         LoadRegionData,
+        %         %
+        %         libNetworks,libN,
+        %         NetworkAnalysis,
+        %         DegreeDistributionFig,
+        %         WeightDistributionFig,
+        %         StrengthDistributionFig,
+        %         BetweennessCentralityFig,
+        %         StrengthVsDegreeFig,
+        %         AClusteringCoefficientFig,
+        %         WClusteringCoefficientFig,
+        %         AAssortativityFig,
+        %         WAssortativityFig,
+        %         %
+        %         libKTMAS,libK,
+        %         ParametricStudy,
+        %         KineticSimulation,
+        %         MonteCarloSimulation,
+        %         SizeDistrFittingsFig,
+        %         AverageSizeFig,
+        %         SizeVsDegreeFig,
+        %         SizeDistrEvolutionFig,
+        %         SizeEvolutionsFig,
+        %         %
+        %         libFigures,
+        %         ShowFig,
+        %         %
+        %         % Librerie/funzioni di Python
+        %         int,
+        %     },emphstyle=\color{mkGreenDark},
+        %     %\endgroup
+        %     %
+        %     %\begingroup Elementi arancioni scuri
+        %     emph={[2]
+        %         self,eq
+        %     },emphstyle={[2]\color{mkOrangeDark}},
+        %     %\endgroup
+        %     %
+        %     %\begingroup Elementi blu scuri
+        %     emph={[3]
+        %         def,f,class
+        %     },emphstyle={[3]\color{mkBlueDark}},
+        %     %\endgroup
+        %     %
+        %     %\begingroup Elementi viola scuri
+        %     emph={[4]
+        %         True,
+        %         False,
+        %         None,e
+        %     },emphstyle={[4]\color{mkPurpleDark}},
+        %     %\endgroup
+        %     %
+        %     %\begingroup Numerazione
+        %         numbers=left,
+        %         numberstyle=\tiny\color{gray},
+        %         xleftmargin=2em,
+        %         framexleftmargin=1.5em,
+        %         % stepnumber=1,  % L'incremente tra due linee
+        %         % numbersep=5pt, % Quanto distano i numeri di linea dal codice
+        %     %\endgroup
+        % }
+    
+        % \makeatletter
+        % \newcommand{\ProcessSymbol}[2]{%
+        %     \ifnum\lst@mode=\lst@Pmode\relax% Se si è in "Plain mode" (codice)
+        %         \textcolor{#1}{#2}%
+        %     \else% Se si è in commento o stringa
+        %         #2%
+        %     \fi%
+        % }
+        % \makeatother
+    
+        % \renewcommand\lstlistingname{Listato}
+        % \renewcommand\lstlistlistingname{Elenco dei listati}
+    %\endgroup
+%\endgroup
+
+%\begingroup TikZ
+    %\begingroup Didascalie
+        \newcommand\didascalia[2]{%
+            \captionsetup{width=#2} % aboveskip=-.2cm,
+            \caption{#1}%
+        }
+        
+        \newcommand\sottoDidascalia[2][ ]{%
+            \refstepcounter{subfigure}%
+            (\thesubfigure)#1#2%
+        }
+    %\endgroup
+    
+    %\begingroup TikZFigure
+        %\begingroup Esternalizzata
+            % \newcommand\compilerpath{../Compilatore/tikz2pdf.tex}
+            % \newcommand\pdfdirectory{../../Figure/.fnl/TikZpdf/}
+            % \newcommand\tikzexternalizedfigure[6][0em]{%
+            %     \begin{figure}[#2]%
+            %         \centering%
+            %         % Recupera la pagina dall'etichetta (default a 1 se non esiste)
+            %         \checkoddpage
+            %         \Ifthispageodd{\def\pagetype{odd}}{\def\pagetype{even}}
+            %         %
+            %         % Alternativa con «\getpagerefnumber»
+            %         % \edef\currentfigpage{\getpagerefnumber{#6}}
+            %         % \ifx\currentfigpage\relax\def\currentfigpage{1} \fi
+            %         % \pgfmathparse{int(mod(\currentfigpage,2) == 1 ? 1 : 0)}
+            %         % \ifnum\pgfmathresult=1\def\pagetype{odd}
+            %         % \else\def\pagetype{even}\fi
+            %         %
+            %         \edef\shlcmd{
+            %             \immediate\ShellEscape{%
+            %                 pdflatex %
+            %                 -shell-escape %
+            %                 -interaction=batchmode %
+            %                 -output-directory="\pdfdirectory" %
+            %                 -jobname="#6" %
+            %                 "\string\def\string\isodd{\pagetype}%
+            %                 \string\def\string\sourcefile{#3}%
+            %                 \string\input{\compilerpath}"%
+            %             }
+            %         }
+            %         \IfSubStr{#2}{p}{% 
+            %             \leavevmode\stepcounter{figposcount}\zsaveposx{figpos-\thefigposcount}%
+            %             \makebox[0pt][l]{%
+            %                 \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+            %                 \hspace*{0.5\paperwidth}%
+            %                 \makebox[0pt][c]{%
+            %                     \begin{minipage}{\paperwidth}%
+            %                         \vspace*{#1}\centering
+            %                         \addtocounter{figure}{1}
+            %                         \setcounter{subfigure}{0}%
+            %                         \IfFileExists{\pdfdirectory#6.pdf}{%
+            %                             \ifbool{forcecompile}{\shlcmd}{\relax}
+            %                         }{\shlcmd}%
+            %                         \includegraphics{\pdfdirectory#6.pdf}%
+            %                         \addtocounter{figure}{-1}
+            %                         \didascalia{#4}{#5}
+            %                         \protect\label{#6}
+            %                     \end{minipage}
+            %                 }%
+            %             }%
+            %         }{%
+            %             \makebox[\textwidth][c]{
+            %                 \begin{minipage}{\linewidth}
+            %                     \centering
+            %                     \addtocounter{figure}{1}\setcounter{subfigure}{0}
+            %                     \IfFileExists{\pdfdirectory#6.pdf}{%
+            %                         \ifbool{forcecompile}{\shlcmd}{\relax}
+            %                     }{\shlcmd}%
+            %                     \includegraphics{\pdfdirectory#6.pdf}%
+            %                     \addtocounter{figure}{-1}
+            %                     \didascalia{#4}{#5}
+            %                     \protect\label{#6}
+            %                 \end{minipage}%
+            %             }%
+            %         }%
+            %     \end{figure}%
+            % }
+        %\endgroup
+
+        %\begingroup Compilata
+            \newcommand\tikzfigure[6][0em]{
+                \begin{figure}[#2]%
+                    \newif\ifpageisodd\checkoddpage
+                    \Ifthispageodd{\pageisoddtrue}{\pageisoddfalse}
+                    \centering%
+                    \IfSubStr{#2}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
+                        \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
+                        \stepcounter{figposcount}%
+                        \zsaveposx{figpos-\thefigposcount}%
+                        \makebox[0pt][l]{%
+                            % Muove indietro il cursore del testo fino al lato sinistro del foglio
+                            \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+                            % Muove avanti il cursore del testo fino al centro del foglio
+                            \hspace*{0.5\paperwidth}%
+                            % Centra la figura TikZ riseptto a questo punto
+                            \makebox[0pt][c]{%
+                                \begin{minipage}{\paperwidth}%
+                                    \vspace*{#1}
+                                    \centering
+                                    \addtocounter{figure}{1}%
+                                    \setcounter{subfigure}{0}%
+                                    #3%
+                                    \addtocounter{figure}{-1}%
+                                    \didascalia{#4}{#5}%
+                                    \protect\label{#6}%
+                                \end{minipage}%
+                            }%
+                        }%
+                    }{% Altrimenti centra la figura rispetto al corpo del testo
+                        \makebox[\textwidth][c]{%
+                            \begin{minipage}{\linewidth}%
+                                \centering
+                                \addtocounter{figure}{1}%
+                                \setcounter{subfigure}{0}%
+                                #3%
+                                \addtocounter{figure}{-1}%
+                                \didascalia{#4}{#5}%
+                                \protect\label{#6}%
+                            \end{minipage}%
+                        }%
+                    }% Cosa che non richiede l'uso del pacchetto «zref»
+                \end{figure}%
+            }
+        %\endgroup
+
+        %\begingroup Vecchia versione incompatibile colla libreria «externalize» di TikZ e contenente una versione stellata per riscalare il contenuto (operazione non gradevole se si ha del testo perché non permette di controllarne facilmente le dimensioni)
+            % \makeatletter
+            % \newcommand\tikzfigure{\@ifstar{\tikzfigure@star}{\tikzfigure@nostar}}
+            
+            % \newcommand\tikzfigure@nostar[6][0em]{%
+            %     \begin{figure}[#2]%
+            %         \centering%
+            %         \IfSubStr{#2}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
+            %             \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
+            %             \stepcounter{figposcount}%
+            %             \zsaveposx{figpos-\thefigposcount}%
+            %             \makebox[0pt][l]{%
+            %                 % Muove indietro il cursore del testo fino al lato sinistro del foglio
+            %                 \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+            %                 % Muove avanti il cursore del testo fino al centro del foglio
+            %                 \hspace*{0.5\paperwidth}%
+            %                 % Centra la figura TikZ riseptto a questo punto
+            %                 \makebox[0pt][c]{%
+            %                     \begin{minipage}{\paperwidth}%
+            %                         \vspace*{#1}
+            %                         \centering
+            %                         \addtocounter{figure}{1}%
+            %                         \setcounter{subfigure}{0}%
+            %                         #3%
+            %                         \addtocounter{figure}{-1}%
+            %                         \didascalia{#4}{#5}%
+            %                         \protect\label{#6}%
+            %                     \end{minipage}%
+            %                 }%
+            %             }%
+            %         }{% Altrimenti centra la figura rispetto al corpo del testo
+            %             \makebox[\textwidth][c]{%
+            %                 \begin{minipage}{\linewidth}%
+            %                     \centering
+            %                     \addtocounter{figure}{1}%
+            %                     \setcounter{subfigure}{0}%
+            %                     #3%
+            %                     \addtocounter{figure}{-1}%
+            %                     \didascalia{#4}{#5}%
+            %                     \protect\label{#6}%
+            %                 \end{minipage}%
+            %             }%
+            %         }% Cosa che non richiede l'uso del pacchetto «zref»
+            %     \end{figure}%
+            % }
+            % \newcommand\tikzfigure@star[6]{%
+            %     \tikzsetnextfilename{#6}
+            %     \begin{figure}[#1]%
+            %         \centering%
+            %         \IfSubStr{#1}{p}{% Se p è all'interno delle opzioni della figura, allora questa è centrata rispetto alla pagina e non al corpo del testo definito da ArsClassica
+            %             \leavevmode% Forza la modalità orizzontale cosí da far leggere a «zref» la corretta linea d'inizio
+            %             \stepcounter{figposcount}%
+            %             \zsaveposx{figpos-\thefigposcount}%
+            %             \makebox[0pt][l]{%
+            %                 % Muove indietro il cursore del testo fino al lato sinistro del foglio
+            %                 \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+            %                 % Muove avanti il cursore del testo fino al centro del foglio
+            %                 \hspace*{0.5\paperwidth}%
+            %                 % Centra la figura TikZ riseptto a questo punto
+            %                 \makebox[0pt][c]{%
+            %                     \begin{minipage}{#2}%
+            %                         \vspace*{-0.5em}
+            %                         \centering
+            %                         \addtocounter{figure}{1}%
+            %                         \setcounter{subfigure}{0}%
+            %                         \resizebox{\linewidth}{!}{#3}%
+            %                         \addtocounter{figure}{-1}%
+            %                         \didascalia{#4}{#5}%
+            %                         \label{#6}%
+            %                     \end{minipage}%
+            %                 }%
+            %             }%
+            %         }{% Altrimenti centra la figura rispetto al corpo del testo
+            %             \makebox[\textwidth][c]{%
+            %                 \begin{minipage}{#2}%
+            %                     \centering
+            %                     \addtocounter{figure}{1}%
+            %                     \setcounter{subfigure}{0}%
+            %                     \resizebox{\linewidth}{!}{#3}%
+            %                     \addtocounter{figure}{-1}%
+            %                     \didascalia{#4}{#5}%
+            %                     \label{#6}%
+            %                 \end{minipage}%
+            %             }%
+            %         }% Cosa che non richiede l'uso del pacchetto «zref»
+            %     \end{figure}%
+            % }
+            % \makeatother
+        %\endgroup
+    %\endgroup
+
+    %\begingroup RedefineTikZbounds
+        % La differenza è che colla prima bisogna catturare anche le etichette perché si crea un pdf isolato mentre colla non è importante perché viene tutto compilato sul momento
+
+        %\begingroup Versione valida con esternalizzazione [ma anche senza]
+            \newcommand\redefineTikZbounds[2]{
+                \coordinate (RealSW) at (current bounding box.south west);
+                \coordinate (RealNE) at (current bounding box.north east);
+                \coordinate (Center) at ($(#1.west)!0.5!(#2.east)$);
+    
+                \pgfresetboundingbox 
+
+                \useasboundingbox 
+                    let \p1=(RealSW),\p2=(RealNE),\p3=(Center),
+                    \n1={max(\x3-\x1,\x2-\x3)} in
+                    (\x3-\n1,\y1) rectangle (\x3+\n1,\y2+.25em);
+                % \path[use as bounding box] 
+                %     let \p1=(RealSW),\p2=(RealNE),\p3=(Center),
+                %     \n1={max(\x3-\x1,\x2-\x3)} in
+                %     (\x3-\n1,\y1) rectangle (\x3+\n1,\y2+.25em);
+                % Lo «.25em» discende dalla traslazione imposta all'etichetta della scala verticale mediante «yScaleLabelShift»
+            } % Scatola delimitante simmetrica
+        %\endgroup
+
+        %\begingroup Versione valida senza esternalizzazione
+            % \newcommand\redefineTikZbounds[2]{
+            %     % Salva le coordinate della cima e del fondo della figura corrente (cosí da mantenere i titoli e le didascalie)
+            %     \coordinate (Cima) at (current bounding box.north);
+            %     \coordinate (Fondo) at (current bounding box.south);
+    
+            %     \pgfresetboundingbox % Resetta la scatola dei limiti
+    
+            %     \useasboundingbox % Definisce la nuova scatola come un rettangolo
+            %         (#1.west |- Cima)   % con ascissa sinistra data da «Col1 c1r1.west», 
+            %         rectangle           % ascissa destra data da «Col2 c1r1.east»
+            %         (#2.east |- Fondo); % ordinate date dalla cima e fondo originali
+            %         % L'operatore «|-» in «(A |- B)» prende come ascissa quella del punto A mentre come coordinata quella del punto B
+            % }
+        %\endgroup
+    %\endgroup
+
+    %\begingroup TikZBox
+        % Parzialmente ispirato da https://gist.github.com/Caramdir/899107
+
+        \makeatletter
+        \newsavebox\tikzBufferBox
+        \xdef\offsetX{0pt}
+        \xdef\offsetY{0pt}
+        
+        % \tikzbox[#1]{#2}{#3}[#4]{#5}
+        % #1 -> Ancora rispetto cui posizionare l'intera scatola
+        % #2 -> Nodo dove posizionare l'origine (per la natura di come LaTeX riceve gli argomenti è buon pratica passare questo circondato da parentesi graffe); di base è «south west» (angolo in basso a sinistra)
+        % #3 -> Nome della scatola limitante definita dall'ambiente «scope»
+        % #4 -> Argomenti opzionali da passare all'ambiente «scope»; di base sono vuoti
+        % #5 -> Contenuto della scatola circondato dall'ambiente «scope»
+        % Es. \tikzbox{{(0,0)}}{figuraTikZ}{blocco TikZ}
+
+        % Macro di apertura che controlla se v'è l'argomento facoltativo dell'ancora
+        \def\tikzbox{\pgfutil@ifnextchar[{\tikzbox@anchor}{\tikzbox@anchor[south west]}}
+        % La funzione «\pgfutil@ifnextchar» serve per controllare se il prossimo carattere è l'apertura di una paretensi graffa «[»
+        
+        % Macro intermedia per cogliere gli argomenti obbligatori e controllare quelli successivi facoltativi
+        \def\tikzbox@anchor[#1]#2#3{\pgfutil@ifnextchar[{\tikzbox@opt[#1]#2#3}{\tikzbox@opt[#1]#2#3[]}}
+
+        % Macro degli argomenti obbligatori
+        \long\def\tikzbox@opt[#1]#2#3[#4]#5{%
+            \node[ % Misurazione della scatola in un nodo invisibile
+                overlay,%
+                opacity=0,%
+                inner sep=0pt,%
+                outer sep=0pt%
+            ] {%
+                \sbox{\tikzBufferBox}{%
+                    \begin{tikzpicture}%
+                        \begin{scope}[local bounding box=measuringTikZBox]%
+                            #5%
+                        \end{scope}%
+                        \pgfpointanchor{measuringTikZBox}{#1}%
+                        \pgfgetlastxy{\tempX}{\tempY}% 
+                        \xdef\offsetX{\tempX}%
+                        \xdef\offsetY{\tempY}%
+                    \end{tikzpicture}%
+                }%
+            };%
+            %
+            % Disegno reale traslato
+            \begin{scope}[%
+                local bounding box=#3,%
+                shift={#2},%
+                xshift=-\offsetX,%
+                yshift=-\offsetY,%
+                #4%
+            ]%
+                #5%
+            \end{scope}%
+        }%
+        \makeatother
+    %\endgroup
+
+    %\begingroup Chiavi-Valori
+        %\begingroup Testo
+            % La dimensione del testo di base è 11pt
+            \newcommand\titleSize{11}
+            \newcommand\subCaptionSize{10}
+            \newcommand\ParameterSize{9}
+            \newcommand\labelSize{10}
+            \newcommand\tickSize{9}
+            \newcommand\legendSize{9}
+        %\endgroup
+    
+        %\begingroup Infopagine
+            %\begingroup Chiavi condivise
+            \newcounter{lpc} % «loopcounter»
+            \newcommand\infopageSharedKeys{
+                %\begingroup Testo
+                    % \renewcommand\titleSize{12}
+                    \renewcommand\subCaptionSize8
+                    \renewcommand\ParameterSize7
+                    \renewcommand\labelSize7
+                    \renewcommand\tickSize6
+                    \renewcommand\legendSize7
+                %\endgroup
+    
+                %\begingroup Dimensioni
+                    \pgfmathsetmacro\plotWidth7
+                    \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+                    %
+                    \pgfmathparse{0.825*\plotWidth}
+                    \pgfmathsetmacro\plotWidth\pgfmathresult
+                    \pgfmathsetmacro\halfWidth{\plotWidth/2}
+                    \pgfmathsetmacro\plotLastWidth{1.25*\plotWidth}
+    
+                    \pgfmathsetmacro\xPlotSep{1}
+                    \pgfmathsetmacro\yPlotSep{1.25}
+                    \pgfmathsetmacro\yGroupSep{2.75}
+                %\endgroup
+    
+                %\begingroup Legende
+                    \newcommand\placeLegend[5]{%
+                        /pgfplots/plotLegend,
+                        at={([shift={(##4,##5)}]axis description cs:##1,##2)},
+                        anchor=##3,
+                    }
+                    \pgfplotsset{%
+                        plotLegend/.style={%
+                            font=\dimTesto{\legendSize},
+                            /pgfplots/legend cell align=left,
+                            align=left,
+                            % draw=white!15!black,
+                            draw=none, % Bordo invisibile
+                            fill=white,
+                            fill opacity=0.5,
+                            text opacity=1,
+                            % text width=2cm,
+                        },
+                        plotLegendNW/.style={legend style={\placeLegend{0}{1}{north west}{0em}{0em}}},
+                        plotLegendNE/.style={legend style={\placeLegend{1}{1}{north east}{0em}{0em}}},
+                        plotLegendSW/.style={legend style={\placeLegend{0}{0}{south west}{0em}{0em}}},
+                        plotLegendSE/.style={legend style={\placeLegend{1}{0}{south east}{0em}{0em}}},
+                        %
+                        % plotLegendW/.style={legend style={plotLegend,at={(0,.5)},anchor=west}},
+                        %
+                        % plotLegendNW/.style={legend style={plotLegend,legend pos=north west}},
+                        % plotLegendNE/.style={legend style={plotLegend,legend pos=north east}},
+                        % plotLegendSW/.style={legend style={plotLegend,legend pos=south west}},
+                        % plotLegendSE/.style={legend style={plotLegend,legend pos=south east}},
+                        %
+                        % plotLegendNWcloser/.style={legend style={plotLegend,at={(0,1)},anchor=north west}},
+                        % plotLegendNEcloser/.style={legend style={plotLegend,at={(1,1)},anchor=north east}},
+                        % plotLegendSWcloser/.style={legend style={plotLegend,at={(0,0)},anchor=south west}},
+                        % plotLegendSEcloser/.style={legend style={plotLegend,at={(0,1)},anchor=south east}},
+                    }
+                    \pgfmathsetmacro\lineLegendLength{1}
+                    \pgfmathsetmacro\areaLegendHeigth{.25}
+                    \pgfplotsset{
+                        legend image code/.code={
+                            \draw [mark repeat=2,mark phase=2,##1]
+                                plot coordinates {
+                                    (0em,0em)
+                                    (.5*\lineLegendLength em,0em)
+                                    (\lineLegendLength em,0em)
+                                };
+                        },
+                        /pgfplots/area legend/.style={
+                            legend image code/.code={
+                                \draw [##1,fill,draw=none] 
+                                    (0em,-\areaLegendHeigth em) 
+                                    rectangle 
+                                    (\lineLegendLength em,\areaLegendHeigth em);
+                            },
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Etichette vuote
+                    \pgfplotsset{
+                        yLabelEmpty/.style={ylabel={}},
+                        yTickLabelsEmpty/.style={yticklabels={}},
+                        yTickScaleLabelEmpty/.style={ytick scale label code/.code={}},
+                        xTickScaleLabelEmpty/.style={xtick scale label code/.code={}},
+                        emptyLeged/.style={
+                            legend style={draw=none,fill=none,nodes={draw=none}},
+                            legend image post style={opacity=0},
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Estetica
+                    \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
+                    \pgfplotsset{
+                        /pgfplots/log number format basis/.code 2 args={%
+                            \pgfmathsetmacro\exponent{##2}%
+                            \pgfmathparse{sign(\exponent)}%
+                            \ifnum\pgfmathresult<0%
+                                \pgfmathparse{abs(\exponent)}%
+                                $##1^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                            \else%
+                                $##1^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                            \fi%
+                        },
+                        ytick scale label code/.code={%
+                            \pgfmathsetmacro\exponent{##1}%
+                            \pgfmathparse{sign(\exponent)}%
+                            \ifnum\pgfmathresult<0
+                                \pgfmathparse{abs(\exponent)}%
+                                $\cdot 10^{\smash{\smallminus\pgfmathprintnumber{\pgfmathresult}}}$%
+                            \else
+                                $\cdot 10^{\smash{\pgfmathprintnumber{\exponent}}}$%
+                            \fi
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Colori
+                    \definecolor{blueish}{rgb}{0.00000,0.44700,0.74100}%
+                    \definecolor{reddish}{rgb}{0.83529,0.36863,0.00000}%
+                %\endgroup
+    
+                %\begingroup Commenti
+                    %\begingroup Impostazioni
+                    \tikzset{
+                        fittedParameters/.style={
+                            align=center,
+                            font=\dimTesto{\ParameterSize},
+                        },
+                        varyingParameter/.style={
+                            align=center,
+                            % rotate=90,
+                            font=\dimTesto{\subCaptionSize},
+                        },
+                        subCaption/.style={
+                            % text width=\plotWidth cm,
+                            align=center,
+                            font=\dimTesto{\subCaptionSize},
+                        },
+                        title/.style={
+                            anchor=south,
+                            font=\bfseries\dimTesto{\titleSize},
+                        },
+                    }
+                    \newcommand\codetocolor[1]{\ifcase##1blueish\or reddish\else black\fi}
+                    %\endgroup
+    
+                    %\begingroup Parametri Sardegna
+                    \newcommand\betaReal{\num{1.271}}
+                    \newcommand\xiReal{\num{0.931}}
+                    \newcommand\mIReal{\num{1.271}}
+                    \newcommand\sIReal{\num{0.931}}
+                    \newcommand\mIIReal{\num{1.271}}
+                    \newcommand\sIIReal{\num{0.931}}
+                    %\endgroup
+    
+                    %\begingroup Parametri Pareto
+                    \newcommand\codetoParetovalue[1]{
+                        \ifcase##1\betaExact\or\betaAprx\else\betaReal\fi
+                    }
+                    \newcommand\writeParetoParameters[7][center]{
+                        \node[fittedParameters,anchor=##1] at ([shift={(##5,##6)}]##4) {%
+                            \(\begin{aligned}
+                                \color{\codetocolor{##2}}\beta
+                                &\color{\codetocolor{##2}}=\codetoParetovalue{##2}\\[##7]
+                                \color{\codetocolor{##3}}\beta
+                                &\color{\codetocolor{##3}}=\codetoParetovalue{##3}
+                            \end{aligned}\)
+                        };
+                    }
+                    %\endgroup
+
+                    %\begingroup % Vecchia versione in cui si scrivevano esplicitamente tutte le 9 combinazioni possibili
+                    % \newcommand\writeParameters[6]{%
+                    %     \node[parameter] at ([shift={(##4,##5)}]##1) {%
+                    %         \ifcase##2% Caso 0
+                    %             \ifcase##3% Caso 0
+                    %                 \(\begin{aligned}
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact\\[##6]
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact
+                    %                 \end{aligned}\)
+                    %             \or% Caso 1
+                    %                 \(\begin{aligned}
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact\\[##6]
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx% Caso 1
+                    %                 \end{aligned}\)
+                    %             \else% Caso 2
+                    %                 \(\begin{aligned}
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact\\[##6]
+                    %                     \color{black}\beta&\color{black}=\betaReal% Caso 2
+                    %                 \end{aligned}\)
+                    %             \fi
+                    %         \or% Caso 1
+                    %             \ifcase##3% Caso 0
+                    %                 \(\begin{aligned}
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx\\[##6]
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact
+                    %                 \end{aligned}\)
+                    %             \or% Caso 1
+                    %                 \(\begin{aligned}
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx\\[##6]
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx
+                    %                 \end{aligned}\)
+                    %             \else% Caso 2
+                    %                 \(\begin{aligned}
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx\\[##6]
+                    %                     \color{black}\beta&\color{black}=\betaReal
+                    %                 \end{aligned}\)
+                    %             \fi
+                    %         \else% Caso 2
+                    %             \ifcase##3% Caso 0
+                    %                 \(\begin{aligned}
+                    %                     \color{black}\beta&\color{black}=\betaReal\\[##6]
+                    %                     \color{blueish}\beta&\color{blueish}=\betaExact
+                    %                 \end{aligned}\)
+                    %             \or% Caso 1
+                    %                 \(\begin{aligned}
+                    %                     \color{black}\beta&\color{black}=\betaReal\\[##6]
+                    %                     \color{reddish}\beta&\color{reddish}=\betaAprx
+                    %                 \end{aligned}\)
+                    %             \else% Caso 2
+                    %                 \(\begin{aligned}
+                    %                     \color{black}\beta&\color{black}=\betaReal\\[##6]
+                    %                     \color{black}\beta&\color{black}=\betaReal
+                    %                 \end{aligned}\)
+                    %             \fi
+                    %         \fi
+                    %     };
+                    % }
+                    %\endgroup
+    
+                    %\begingroup Parametri bilognormale
+                    \newcommand\codetoparameter[1]{
+                        \ifcase##1\xi    % Caso 0
+                        \or\mu_1         % Caso 1
+                        \or\sigma_1      % Caso 2
+                        \or\mu_2         % Caso 3
+                        \else\sigma_2\fi % Caso 4
+                    }
+                    \newcommand\codetoBiLognormalvalue[2]{
+                        \ifcase##1 % Caso 0
+                            \ifcase##2\xiExact % Caso 0
+                            \or\mIExact        % Caso 1
+                            \or\sIExact        % Caso 2
+                            \or\mIIExact       % Caso 3
+                            \else\sIIExact\fi  % Caso 4
+                        \or % Caso 1
+                            \ifcase##2\xiAprx  % Caso 0
+                            \or\mIAprx         % Caso 1
+                            \or\sIAprx         % Caso 2
+                            \or\mIIAprx        % Caso 3
+                            \else\sIIAprx\fi   % Caso 4
+                        \else % Caso 2
+                            \ifcase##2\xiReal  % Caso 0
+                            \or\mIReal         % Caso 1
+                            \or\sIReal         % Caso 2
+                            \or\mIIReal        % Caso 3
+                            \else\sIIReal\fi   % Caso 4
+                        \fi
+                    }
+                    \newcommand\matrixline[2]{\codetoparameter{##2}&=\codetoBiLognormalvalue{##1}{##2}}
+                    \def\lineloop##1##2{%
+                        \matrixline{##1}{\number\value{lpc}}\stepcounter{lpc}%
+                        \ifnum\number\value{lpc}<5\\[##2]\lineloop{##1}{##2}\fi%
+                    } % https://tex.stackexchange.com/questions/491358/tikz-foreach-to-work-with-the-aligned-environment
+                    \newcommand\writeBiLognormalParameters[6][center]{
+                        \node[fittedParameters,anchor=##1] at ([shift={(##4,##5)}]##3) {%
+                            \setcounter{lpc}{0}
+                            \(\color{\codetocolor{##2}}
+                            \begin{aligned}
+                                \lineloop{##2}{##6}
+                            \end{aligned}\)
+                        };
+                    }
+                    %\endgroup
+    
+                    %\begingroup Altre etichette
+                    \newcommand\writeSizeEvolutionDescriptions[1][5]{%
+                        \foreach \col/\clr/\txt in {%
+                            1/blueish/Esatto,
+                            2/reddish/Approssimato
+                        }{
+                            \node[
+                                fittedParameters,
+                                anchor=south,
+                                yshift=.1em,
+                            ] at (Row##1 c\col r1.south) {\color{\clr}\txt};
+                        }
+                    }
+    
+                    \newcommand\writeVaryingParameter[5]{%
+                        \foreach \r in {1,...,5}{
+                            \node[
+                                varyingParameter,
+                                anchor=##3,
+                            ] at ([shift={(##4,##5)}]Row\r\space c##1r1.##2)
+                            {\(\varyingParameterSymbol=\varyingParameterList\r\)};
+                        }
+                    }
+                    %\endgroup
+                %\endgroup
+    
+                %\begingroup Sottodidascalie
+                    \newcommand\writeSubCaption[5]{%
+                        \node[subCaption,anchor=##3]
+                        at ([shift={(##4,##5)}]##1.##2)
+                        {\sottoDidascalia[]{}};
+                    }
+                    \newcommand\writeSubCaptions[5][3]{%
+                        \foreach \r in {1,...,5}{
+                            \foreach \c in {1,...,##1}{
+                                \writeSubCaption{Row\r\space c\c r1}{##2}{##3}{##4}{##5}
+                            }
+                        }
+                    }
+                %\endgroup
+            }
+            %\endgroup
+    
+            %\begingroup Chiavi del primo tipo d'infopagina
+            \newcommand\infopageKeysI{
+                \infopageSharedKeys
+    
+                %\begingroup Gruppi
+                    \ifpageisodd
+                        \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
+                    \else
+                        \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
+                    \fi
+                    \pgfplotsset{
+                        /pgfplots/group/plotGroup/.style={
+                            horizontal sep=\xPlotSep em,
+                            vertical sep=\yPlotSep em,
+                            yDescPos,
+                            group size=3 by 1,
+                        },
+                        /pgfplots/group/plotLastGroup/.style={
+                            plotGroup,
+                            x descriptions at=edge bottom,
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Stili
+                    %\begingroup Selezione «recto»/«verso»
+                    \ifpageisodd
+                        \pgfplotsset{%
+                            yLineAxis/.style={axis y line*=right},
+                            /tikz/yLabelShift/.style={%
+                                yshift=-2.5em,
+                                at={(axis description cs:1,0.5)},
+                                anchor=south,
+                                % rotate=180,
+                            },
+                            /tikz/yScaleLabelShift/.style={%
+                                yshift=.25em,
+                                at={(1,1)},
+                                anchor=south east,
+                            },
+                            /tikz/yTickLabelShift/.style={xshift=-0.15em},
+                        }
+                    \else
+                        \pgfplotsset{%
+                            yLineAxis/.style={axis y line*=left},
+                            /tikz/yLabelShift/.style={%
+                                yshift=1.25em,
+                                at={(axis description cs:0,0.5)},
+                                anchor=south,
+                                % rotate=180,
+                            },
+                            /tikz/yScaleLabelShift/.style={%
+                                yshift=.25em,
+                                at={(0,1)},
+                                anchor=south west,
+                            },
+                            /tikz/yTickLabelShift/.style={xshift=+0.15em},
+                        }
+                    \fi
+                    %\endgroup
+                    %
+                    %\begingroup Grafici
+                    \pgfplotsset{
+                        plotRow/.style={
+                            scale only axis,
+                            width=\plotWidth cm,height=\plotHeight cm,
+                            xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+                            xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                            ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
+                            xticklabel style={font=\dimTesto{\tickSize}},
+                            yticklabel style={font=\dimTesto{\tickSize},yTickLabelShift},
+                            y tick scale label style={yScaleLabelShift},
+                            % axis x line*=bottom,yLineAxis,
+                            enlarge x limits=0.1,enlarge y limits=0.1,
+                            xmajorgrids,ymajorgrids,
+                            xminorticks=true,yminorticks=true,
+                            axis background/.style={fill=white},
+                            grid style={dashed}
+                        },
+                        row1Keys/.style={
+                            enlarge x limits={lower,value=.05},
+                            enlarge y limits={upper,value=.05},
+                            xmode=log,
+                            log origin=infty,
+                        },
+                        row2Keys/.style={xmode=log,ymode=log},
+                        row3Keys/.style={xmode=log,ymode=log},
+                        row4Keys/.style={
+                            xlabel={\(k\)},ylabel={\(s(k)\)},
+                            xmode=log,ymode=log
+                        },
+                        row5Keys/.style={
+                            width=\plotLastWidth cm,
+                            xlabel={\(t\)},ylabel={\(s(t)\)},
+                            ymode=log,
+                            enlarge x limits=0,
+                            enlarge y limits=0.05,
+                            x tick scale label style={
+                                yshift=-1em,
+                                at={(.95,0)},
+                                anchor=north,
+                            },
+                        },
+                    }
+                    %\endgroup
+                %\endgroup
+            }
+            %\endgroup
+    
+            %\begingroup Chiavi del secondo tipo d'infopagina
+            \newcommand\infopageKeysII{
+                \infopageSharedKeys
+    
+                %\begingroup Gruppi
+                    \ifpageisodd
+                        \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge right}}
+                    \else
+                        \pgfplotsset{/pgfplots/group/yDescPos/.style={y descriptions at=edge left}}
+                    \fi
+                    \pgfplotsset{
+                        /pgfplots/group/plotGroup/.style={
+                            horizontal sep=\xPlotSep em,
+                            vertical sep=\yPlotSep em,
+                            y descriptions at=all,
+                            group size=3 by 1,
+                        },
+                        /pgfplots/group/plotLastGroup/.style={
+                            plotGroup,
+                            x descriptions at=edge bottom,
+                        },
+                    }
+                %\endgroup
+    
+                %\begingroup Stili
+                    %\begingroup Selezione «recto»/«verso»
+                    \ifpageisodd
+                        \pgfplotsset{
+                            yLabel/.style={
+                                ylabel style={
+                                    font=\color{white!15!black}\dimTesto{\labelSize},
+                                    yshift=-2.5em,
+                                    at={(axis description cs:1,0.5)},
+                                    anchor=south,
+                                    % rotate=180,
+                                },
+                            },
+                            yLabelInv/.style={yLabelEmpty},
+                            yScaleLabelShift/.style={
+                                y tick scale label style={
+                                    yshift=.25em,
+                                    % xshift=1em,
+                                    at={(1,1)},
+                                    anchor=south east,
+                                },
+                            },
+                            yScaleLabelShiftInv/.style={
+                                y tick scale label style={
+                                    yshift=.25em,
+                                    % xshift=-1em,
+                                    at={(0,1)},
+                                    anchor=south west,
+                                },
+                            },
+                            % yLineAxis/.style={axis y line*=right},
+                        }
+                    \else
+                        \pgfplotsset{
+                            yLabel/.style={yLabelEmpty},
+                            yLabelInv/.style={
+                                ylabel style={
+                                    font=\color{white!15!black}\dimTesto{\labelSize},
+                                    yshift=1.25em,
+                                    at={(axis description cs:0,0.5)},
+                                    anchor=south,
+                                    % rotate=180,
+                                },
+                            },
+                            yScaleLabelShift/.style={
+                                y tick scale label style={
+                                    yshift=.25em,
+                                    % xshift=1em,
+                                    at={(1,1)},
+                                    anchor=south east,
+                                },
+                            },
+                            yScaleLabelShiftInv/.style={
+                                y tick scale label style={
+                                    yshift=.25em,
+                                    % xshift=-1em,
+                                    at={(0,1)},
+                                    anchor=south west,
+                                },
+                            },
+                            % yLineAxis/.style={axis y line*=left},
+                        }
+                    \fi
+                    %\endgroup
+                    %
+                    %\begingroup Grafici
+                    \pgfplotsset{
+                        plotRow/.style={
+                            scale only axis,
+                            width=\plotWidth cm,height=\plotHeight cm,
+                            xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
+                            % ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
+                            xticklabel style={font=\dimTesto{\tickSize}},
+                            xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
+                            % axis x line*=bottom,yLineAxis,
+                            enlarge x limits=0.1,enlarge y limits=0.1,
+                            xmajorgrids,ymajorgrids,
+                            xminorticks=true,yminorticks=true,
+                            scale ticks above exponent=2,
+                            axis background/.style={fill=white},
+                            grid style={dashed},
+                        },
+                        plotLeftCol/.style={
+                            yLabelInv,
+                            yticklabel style={font=\dimTesto{\tickSize},xshift=0.15em},
+                            yticklabel pos=left,
+                            yScaleLabelShiftInv,
+                        },
+                        plotMiddleCol/.style={
+                            yLabelEmpty,
+                            yTickLabelsEmpty,
+                            yTickScaleLabelEmpty,
+                        },
+                        plotRightCol/.style={
+                            yLabel,
+                            yticklabel style={font=\dimTesto{\tickSize},xshift=-0.15em},
+                            yticklabel pos=right,
+                            yScaleLabelShift,
+                        },
+                    }
+                    %\endgroup
+                %\endgroup
+            }
+            %\endgroup
+        %\endgroup
+    %\endgroup
+
+    %\begingroup Diagrammi dei nodi
+    \newcommand\nodeDiagramSettings{
+        %\begingroup Dimensioni
+            \pgfmathsetmacro\xPlotSep{4}
+            \pgfmathsetmacro\yPlotSep{4}
+            \pgfmathsetmacro\plotScale{.8}
+
+            \pgfmathsetmacro\titleSize{11}
+            \pgfmathsetmacro\commentSize{10}
+
+            \pgfmathsetmacro\nodeSize{20pt} % Diametro del nodo
+            \pgfmathsetmacro\starSize{2.25*\nodeSize}
+            \pgfmathsetmacro\numberSize{.53*\nodeSize}
+        %\endgroup
+
+        %\begingroup Colori
+            % \definecolor{cRed}{HTML}{D68490}
+            % \definecolor{cPurple}{HTML}{7E6EAC}
+            % \definecolor{cTeal}{HTML}{87BDB1}
+            % \definecolor{cOrange}{HTML}{F2D0A4}
+            % \definecolor{cEdgeLight}{HTML}{EEE8D5} 
+            % \definecolor{cEdgeDark}{HTML}{998888}
+            % \definecolor{cStar}{HTML}{FDF6E3}
+            %
+            \definecolor{color1}{HTML}{800000} % Deep Red
+            \definecolor{color2}{HTML}{4682B4} % Steel Blue
+            \definecolor{color3}{HTML}{6B8E23} % Olive Green
+            \definecolor{color4}{HTML}{708090} % Slate Gray
+            \definecolor{color5}{HTML}{BC8F8F} % Rosy Brown
+            \definecolor{color6}{HTML}{008B8B} % Dark Cyan
+            \definecolor{color7}{HTML}{B8860B} % Dark Goldenrod
+        %\endgroup
+
+        %\begingroup Testo
+            \tikzset{
+                titleStyle/.style={
+                    font=\dimTesto{\titleSize},
+                    align=center,
+                    anchor=south,
+                },
+                commentStyle/.style={font=\dimTesto{\commentSize}},
+                arrowCommentStyle/.style={
+                    midway,
+                    commentStyle,
+                    left,
+                    sloped,
+                    below
+                },
+                numberStyle/.style={font=\dimTesto{\numberSize}}
+            }
+        %\endgroup
+
+        %\begingroup Frecce
+            \tikzset{
+                transformingArrow/.style={
+                    % >=Latex,
+                    ->,
+                    >=Stealth,
+                    dashed,
+                    line width=.8pt,
+                    black!90,
+                    shorten >=5pt,
+                    shorten <=10pt
+                },
+                nodeArrowExact/.style={
+                    % ->,
+                    % -{Stealth[scale=1.2]},
+                    -{Triangle[scale=.75]},
+                    % draw=cEdgeLight,
+                    % draw=red!50,
+                    draw=black!95,
+                    line width=.5pt,
+                    % shorten >=2pt,
+                    % shorten <=2pt
+                },
+                nodeArrowApprox/.style={
+                    -,
+                    draw=black!95,
+                    line width=.5pt,
+                    dashed,
+                },
+                transparentNodeArrow/.style={
+                    opacity=.4,
+                },
+                arrowAxis/.style={
+                    ->,
+                    line width=.3pt,
+                    >=Latex,
+                },
+            }
+        %\endgroup
+
+        %\begingroup Nodi
+            \tikzset{
+                nodeStyle/.style={
+                    circle,
+                    minimum size=\nodeSize,
+                    % draw=black!80,
+                    draw=black,
+                    line width=.5pt,
+                    inner sep=0pt,
+                },
+                starStyle/.style={
+                    star,
+                    star points=5,
+                    star point ratio=2,
+                    % fill=cStar,
+                    fill=black!50,
+                    fill opacity=.25,
+                    minimum size=\starSize,
+                    draw=none
+                },
+            }
+        %\endgroup
+    }
+    %\endgroup
+%\endgroup
+
+%\begingroup Liste
+    \setlist[enumerate]{
+        topsep=0.5em,
+        parsep=0em,
+        itemsep=0.2em,
+        leftmargin=2em,
+        rightmargin=1.5em,
+        % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+        %itemindent=!,
+        %labelindent=30pt,
+        %labelwidth=!,
+        %labelsep=!,
+    }
+    \setlist[itemize]{
+        topsep=0.5em,
+        parsep=0em,
+        itemsep=0.2em,
+        leftmargin=2em,
+        rightmargin=1.5em,
+        % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+        %itemindent=!,
+        % labelindent=3em,
+        %labelwidth=!,
+        %labelsep=!,
+    }
+%\endgroup
+
+%\begingroup Frontespizio
+    \newcommand\lineaPuntallata[1][4cm]{\makebox[#1]{\dotfill}}
+    \newcommand\Frontespizio{
+        \begin{titlepage}
+            \newgeometry{
+                left=1cm,
+                right=1cm,
+                top=3cm,
+                bottom=3.5cm
+            }
+            \centering
+            %
+            {\Huge\scshape Politecnico di Torino}\\[1cm]
+            {\Large Corso di Laurea\\in Ingegneria Matematica}
+            %
+            \vfill
+            %
+            {\Large Tesi di Laurea Magistrale}\\[0.5cm]
+            \parbox{.9\textwidth}{
+                \centering\huge\bfseries%
+                Modellizzazione della distribuzione della popolazione tra città su reti spaziali mediante la teoria cinetica dei sistemi multiagente
+            }\\[1.5cm]
+            \includegraphics[width=0.25\textwidth]{../../Figure/.fnl/Frontespizio/LogoPoliTO.jpg}
+            %
+            \vfill
+            %
+            \begin{minipage}[t]{0.85\textwidth}
+                \begin{flushleft}\large
+                    \textbf{Relatore} \hfill \textbf{Candidato}\\
+                    prof. Andrea Tosin \hfill Valerio Taralli\\[0.75cm]
+                    % prof. Nome Cognome\\[0.5cm]
+                    \textit{firma del relatore} \hfill \textit{firma del candidato}\\[0.35cm]
+                    % \lineaPuntallata\ \hfill \\
+                    \lineaPuntallata\ \hfill \lineaPuntallata
+                \end{flushleft}
+            \end{minipage}
+            %
+            \vfill
+            %
+            {\large Anno Accademico 2025-2026\par}
+            %
+            \restoregeometry
+        \end{titlepage}
+    }
+%\endgroup
+
+%\begingroup Dedica
+    \newcommand\Dedica{
+        \cleardoublepage
+        \thispagestyle{empty}
+        \phantomsection
+        \pdfbookmark[1]{Dedica}{Dedica}
+    
+        \vspace*{3cm}
+    
+        \begin{center}
+            \Large
+            Ai miei genitori, \\
+            \emph{Elisabetta} e \emph{Marco}
+        \end{center}
+    }
+%\endgroup
+
+%\begingroup Sommario
+    \newcommand{\Sommario}{
+        \cleardoublepage
+        \phantomsection
+        \pdfbookmark[1]{Sommario}{Sommario}
+        \begingroup
+            \let\clearpage\relax
+            \let\cleardoublepage\relax
+            
+            \chapter*{Sommario}
+                
+                La corrente tesi studia la distribuzione della popolazione mediante la teoria cinetica dei sistemi multiagente su reti spaziali, interpretando le città come agenti/vertici e rappresentando le connessioni interurbane come lati. Si propongono varie regole d'emigrazione per regolare le interazioni tra agenti, ricavando due principali risultati: l'adattamento lognormale bimodale della distribuzione della popolazione tra le città e l'adattamento di Pareto della coda. Nel complesso il modello restituisce dei risultati coerenti colla distribuzione reale dedotta dai dati ISTAT della Sardegna; perdipiú l'adattamento lognormale bimodale segue meglio la coda della distribuzione rispetto a quello di Pareto, sebbene nella prima metà coincidano.
+            
+            \vfill
+            
+            \chapter*{Abstract}
+
+                The current thesis investigates population distribution through the kinetic theory of multi-agent systems on spatial networks, interpreting cities as agents/vertices and representing interurban links as edges. Various emigration rules have been proposed to regulate the interactions between agents, yielding two primary results: the bimodal log-normal fit of the total population distribution among cities and the Pareto fit of the tail. Overall, the model provides results consistent with the actual distribution derived from ISTAT data of Sardinia; furthermore, the bimodal log-normal fit follows the distribution tail more accurately than the Pareto one, although the two coincide in the first half.
+        \endgroup
+        \vfill
+    }
+%\endgroup

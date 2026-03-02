@@ -226,10 +226,15 @@ class KineticSimulation():
         self.snapshots = np.array([data[p][1] for p in range(Ni)])
         self.avrState = Convolve(np.mean(self.snapshots,axis=1))
 
-        self.nodeAvrVrtState = np.mean(self.vrtState,axis=1)
-        self.nodeMinVrtState = np.min(self.vrtState,axis=1)
-        self.nodeMaxVrtState = np.max(self.vrtState,axis=1)
-        self.nodeSumVrtState = np.sum(self.vrtState,axis=1)
+        self.nodeSimAvrVrtState = np.mean(self.vrtState,axis=1)
+        self.nodeSimMinVrtState = np.min(self.vrtState,axis=1)
+        self.nodeSimMaxVrtState = np.max(self.vrtState,axis=1)
+        self.nodeSimSumVrtState = np.sum(self.vrtState,axis=1)
+
+        self.nodeRealAvrVrtState = np.mean(self.realSizeDistr)
+        self.nodeRealMinVrtState = np.min(self.realSizeDistr)
+        self.nodeRealMaxVrtState = np.max(self.realSizeDistr)
+        self.nodeRealSumVrtState = np.sum(self.realSizeDistr)
 
         if Ni>1:
             self.ta = stats.t.ppf(0.975,df=Ni-1)
@@ -260,10 +265,15 @@ class KineticSimulation():
         csSv = self.vrtState
         csRv = self.realSizeDistr.reshape(1,-1)
 
-        csAvr = self.nodeAvrVrtState
-        csMin = self.nodeMinVrtState
-        csMax = self.nodeMaxVrtState
-        csSum = self.nodeSumVrtState
+        csSAvr = self.nodeSimAvrVrtState
+        csSMin = self.nodeSimMinVrtState
+        csSMax = self.nodeSimMaxVrtState
+        csSSum = self.nodeSimSumVrtState
+
+        csRAvr = self.nodeRealAvrVrtState
+        csRMin = self.nodeRealMinVrtState
+        csRMax = self.nodeRealMaxVrtState
+        csRSum = self.nodeRealSumVrtState
 
         typ = self.typ
         # lbl = self.lblEn
@@ -289,7 +299,7 @@ class KineticSimulation():
         for i,v in enumerate([csSv[:,:,0],csSv[:,:,1],csRv]):
             def EstimateBinNumber(v):
                 vf = v.ravel()
-                vp = vf[vf > 0]
+                vp = vf[vf>0]
                 vl = np.log10(vp)
                 
                 # The option «'fd'» stands for «Freedman-Diaconis» and
@@ -301,7 +311,7 @@ class KineticSimulation():
                 nBin = EstimateBinNumber(v[j,:])
                 if nBin > nBins[i]: nBins[i] = nBin
 
-        p = (.5,1.07); dp = (.6,.05)
+        p = (.5,1.075); dp = (1,.05)
 
         for t in typ: # t[ype]
             ### Lognormal fit ###
@@ -322,7 +332,7 @@ class KineticSimulation():
                 idx=t+1,
                 ax=ax[0]
             )
-            xiS = libF.CreateLognormalFitPlot(
+            xiS,m1S,s1S,m2S,s2S = libF.CreateLognormalFitPlot(
                 csSv[:,:,t],
                 getattr(figData,f'fig{idx}'),
                 limits=(sMinEA,sMaxEA),
@@ -387,7 +397,7 @@ class KineticSimulation():
                 idx=2,
                 ax=ax[0+t+1]
             )
-            xiR = libF.CreateLognormalFitPlot(
+            xiR,m1R,s1R,m2R,s2R = libF.CreateLognormalFitPlot(
                 csRv,
                 getattr(figData,f'fig{idx+t+1}'),
                 limits=(sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR),
@@ -609,15 +619,19 @@ class KineticSimulation():
 
 
             libF.Text(
-                ax[7],(p[0],p[1]+(1/2-t)*dp[1]),
+                ax[7],(p[0],p[1]-t*dp[1]),
                 # fr'{lbl[t]}:$\quad$'+
                 fr"{lbl[2][t]}:$\quad$"+
                 libF.DataString(xiS,Ni,ta,r'\xi')+
-                libF.DataString(csMin[:,t],Ni,ta,r's_{{min}}')+
-                libF.DataString(csMax[:,t],Ni,ta,r's_{{max}}')+
-                libF.DataString(csAvr[:,t],Ni,ta,r'\langle s\rangle')+
+                libF.DataString(m1S,Ni,ta,r'\mu_1')+
+                libF.DataString(s1S,Ni,ta,r'\sigma_1')+
+                libF.DataString(m2S,Ni,ta,r'\mu_2')+
+                libF.DataString(s2S,Ni,ta,r'\sigma_2')+
+                libF.DataString(csSMin[:,t],Ni,ta,r's_{{min}}')+
+                libF.DataString(csSMax[:,t],Ni,ta,r's_{{max}}')+
+                libF.DataString(csSAvr[:,t],Ni,ta,r'\langle s\rangle')+
                 libF.DataString(
-                    csSum[:,t],Ni,ta,r's_{{\Sigma}}',
+                    csSSum[:,t],Ni,ta,r's_{{\Sigma}}',
                     formatVal='.2e',formatErr='.2e'
                 )+
                 libF.DataString(blS,Ni,ta,r'\beta',space=False),
@@ -625,20 +639,41 @@ class KineticSimulation():
                 color=clr[t]
             )
 
+        libF.Text(
+            ax[7],(p[0],p[1]+dp[1]),
+            # fr'{lbl[t]}:$\quad$'j
+            fr"{lbl[2][2]}:$\quad$"+
+            libF.DataString(xiR,head=r'\xi')+
+            libF.DataString(m1R,head=r'\mu_1')+
+            libF.DataString(s1R,head=r'\sigma_1')+
+            libF.DataString(m2R,head=r'\mu_2')+
+            libF.DataString(s2R,head=r'\sigma_2')+
+            libF.DataString(csRMin,head=r's_{{min}}')+
+            libF.DataString(csRMax,head=r's_{{max}}')+
+            libF.DataString(csRAvr,head=r'\langle s\rangle')+
+            libF.DataString(
+                csRSum,head=r's_{{\Sigma}}',
+                formatVal='.2e',formatErr='.2e'
+            )+
+            libF.DataString(blR,head=r'\beta',space=False),
+            ha='center',
+            color=clr[2]
+        )
+
         if idx == 1:
             libF.TextBlock(
                 ax[1],[[
                     fr'$Nc={self.Nc}$',
                     fr'$R={self.R}$',
-                    libF.DataString(blR,head=r'\beta',space=False),
-                    libF.DataString(xiR,head=r'\xi',space=False)
+                    # libF.DataString(blR,head=r'\beta',space=False),
+                    # libF.DataString(xiR,head=r'\xi',space=False)
                 ]],
-                p=(.5,p[1]-dp[1]/2),
-                dp=(dp[0]/1.5,dp[1])
+                p=(.5,1.01),
+                dp=(dp[0]/6,dp[1])
             )
 
-            p = (.5,p[1])
-            dp = (.8,dp[1])
+            # p = (.5,p[1])
+            # dp = (.8,dp[1])
             libF.TextBlock(
                 ax[-1],[[
                     fr'$\lambda={self.l}$',
@@ -653,7 +688,8 @@ class KineticSimulation():
                     fr'$\Delta t={self.dt}$',
                     fr'$Nw={self.Nw}$',
                 ]],
-                p=p,dp=dp
+                p=(.5,1.05),
+                dp=(dp[0]/1.4,dp[1])
             )
 
         for f in range(Nf):
@@ -987,8 +1023,9 @@ class ParametricStudy():
 
     # Simulation
     def MonteCarloSimulation(self):
-        for sim in self.KS:
-            sim.MonteCarloSimulation()
+        for s,KS in enumerate(self.KS):
+            print(f'Starting simulation {s+1}')
+            KS.MonteCarloSimulation()
 
     # Figures
     def SizeDistrFittingsFig(self):
@@ -1170,6 +1207,8 @@ def MonteCarloAlgorithm(
     nk = ns[1]
     hNc = Nc//2 # Nc half
     nsid = 1
+
+    print(f'Starting iteration {p+1}')
 
     if gui: # If ProgressGUI is required
         progress = workersShM['gui']['progress']

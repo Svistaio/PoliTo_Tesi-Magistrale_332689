@@ -89,12 +89,12 @@ parameters = {
         "text": "Interaction rule",
         "val": "law"
     },
-    "PdfPopUp": {
+    "pdfPopUp": {
         "text": "Open PDF",
         "val": False
     },
-    "LaTeXConversion": {
-        "text": "LaTeX Conversion",
+    "TikZConversion": {
+        "text": "TikZ Conversion",
         "val": False
     },
     "snapshots": {
@@ -162,13 +162,13 @@ caseStudies = {
     "selected": "Default",
     "list": {
         "Default": {
-            "attractivity": .18, #.18,
-            "convincibility": .44, #.44,
+            "attractivity": .18,
+            "convincibility": .44,
             "deviation": 0.05,
-            "region": 1, #19
+            "region": 19,
             "zetaValue": 0.01,
             "timestep": 0.01,
-            "timesteps": int(1e6),
+            "timesteps": int(3e6),
             "iterations": 100,
             "progressBar": False,
             "extraction": False,
@@ -177,15 +177,15 @@ caseStudies = {
             "fluctuations": False,
             "zetaFraction": False,
             "interactionRule": 2,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
+            "pdfPopUp": False,
+            "TikZConversion": True,
             "snapshots": 1000,
             "smoothingFactor": 50,
             "studiedParameter": 1,
             "startValuePrmStudy": .3,
             "endValuePrmStudy": .6,
             "numberPrmStudy": 5,
-            "parametricStudy": False 
+            "parametricStudy": True 
         },
         "λ(rsk/α)/(1+rsk/α)": {
             "attractivity": 0.05,
@@ -202,8 +202,8 @@ caseStudies = {
             "fluctuations": True,
             "zetaFraction": False,
             "interactionRule": 1,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
+            "pdfPopUp": False,
+            "TikZConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
             "studiedParameter": 0,
@@ -227,8 +227,8 @@ caseStudies = {
             "fluctuations": True,
             "zetaFraction": True,
             "interactionRule": 1,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
+            "pdfPopUp": False,
+            "TikZConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
             "studiedParameter": 0,
@@ -253,8 +253,8 @@ caseStudies = {
             "fluctuations": True,
             "zetaFraction": False,
             "interactionRule": 2,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
+            "pdfPopUp": False,
+            "TikZConversion": False,
             "snapshots": 1000,
             "smoothingFactor": 50,
             "studiedParameter": 1,
@@ -279,8 +279,8 @@ caseStudies = {
             "fluctuations": True,
             "zetaFraction": False,
             "interactionRule": 3,
-            "PdfPopUp": False,
-            "LaTeXConversion": False,
+            "pdfPopUp": False,
+            "TikZConversion": False,
             "snapshots": 100,
             "smoothingFactor": 10,
             "studiedParameter": 1,
@@ -431,11 +431,11 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                 "text":"Interacting law",
                 "val":"law"
             },
-            "PdfPopUp": {
+            "pdfPopUp": {
                 "text":"Open PDF",
                 "val":false
             },
-            "LaTeXConversion": {
+            "TikZConversion": {
                 "text":"LaTeX Conversion",
                 "val":false
             },
@@ -485,8 +485,8 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "analysis": false,
                     "edgeWeights": false,
                     "interactionRule": 3,
-                    "PdfPopUp": false,
-                    "LaTeXConversion": false,
+                    "pdfPopUp": false,
+                    "TikZConversion": false,
                     "studiedParameter": 1,
                     "snapshots": 100,
                     "smoothingFactor": 10,
@@ -507,8 +507,8 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "analysis": false,
                     "edgeWeights": false,
                     "interactionRule": 1,
-                    "PdfPopUp": false,
-                    "LaTeXConversion": false,
+                    "pdfPopUp": false,
+                    "TikZConversion": false,
                     "snapshots": 100,
                     "smoothingFactor": 10,
                     "studiedParameter": 0,
@@ -529,8 +529,8 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "analysis": false,
                     "edgeWeights": false,
                     "interactionRule": 2,
-                    "PdfPopUp": false,
-                    "LaTeXConversion": false,
+                    "pdfPopUp": false,
+                    "TikZConversion": false,
                     "studiedParameter": 0,
                     "snapshots": 100,
                     "smoothingFactor": 10,
@@ -553,8 +553,8 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "analysis": false,
                     "edgeWeights": false,
                     "interactionRule": 3,
-                    "PdfPopUp": false,
-                    "LaTeXConversion": false,
+                    "pdfPopUp": false,
+                    "TikZConversion": false,
                     "studiedParameter": 0,
                     "snapshots": 100,
                     "smoothingFactor": 10,
@@ -577,8 +577,8 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
                     "analysis": false,
                     "edgeWeights": false,
                     "interactionRule": 5,
-                    "PdfPopUp": false,
-                    "LaTeXConversion": false,
+                    "pdfPopUp": false,
+                    "TikZConversion": false,
                     "studiedParameter": 0,
                     "snapshots": 100,
                     "smoothingFactor": 10,

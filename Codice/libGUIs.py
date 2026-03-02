@@ -133,8 +133,8 @@ class ParametersGUI(tk.Tk):
         #endregion
 
         #region Postprocessing parameters
-        ppcPrmFrame.CheckBox(self.PdfPopUp)
-        ppcPrmFrame.CheckBox(self.LaTeXConversion)
+        ppcPrmFrame.CheckBox(self.pdfPopUp)
+        ppcPrmFrame.CheckBox(self.TikZConversion)
         ppcPrmFrame.LabelSlider(
             self.snapshots,1,
             (1,self.timesteps.var.get()),
