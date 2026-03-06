@@ -12,59 +12,148 @@
     \setcounter{section}{0}
     \renewcommand\thesection{\Alph{section}}
     \renewcommand\thesubsection{\thesection.\arabic{subsection}}
+    \renewcommand\thefigure{\thesection.\arabic{figure}}
+
 
     % \numberwithin{equation}{section}
     % \renewcommand\theequation{\thesection.\arabic{equation}}
 
     \section{Codice}\label{apnCodice}
 
-        \printListing{%
-                firstline=2,
-                firstnumber=1,
-            }{../../Codice/main.py}
-            {Codice «main.py».}{lstMain}
+        Il codice è reperibile in questo repositorio \cite{Taralli2026} ed è stato scritto interamente in Python 3.13.7 mentre le simulazioni sono state eseguite su una macchina con sistema operativo Windows e processore Intel Core i5-7500 (quadri-nucleo, 3.40 GHz).
+        
+        %\begingroup «main.py»
+            Innanzitutto \texttt{main.py} nel \cref{lstMain} è il \textit{file} principale contenente quasi tutta la logica del programma:
+    
+            \begin{itemize}[
+                label=\(\diamond\),
+                %topsep=0.5em,
+                %parsep=0em,
+                %itemsep=0.25em,
+                %leftmargin=2em,
+                %rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=30pt,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item \texttt{clsGUI.GatherParameters()} raccoglie tutt'i parametri attraverso un'interfaccia grafica mostrata nella \cref{figInterfacciaGraficaParametri};
+                \item \texttt{libD.ExtractRegionData()} estrae e analizza i dati ISTAT \cite{ISTATLimiti1991,ISTATCensimento1991,ISTATPendolarismo1991};
+                \item \texttt{libD.LoadRegionData()} carica i dati appena o già estratti;
+                \item \texttt{libN.NetworkAnalysis()} è la classe contenente le funzioni per riprodurre i risultati di \cite{DeMontis2007};
+                \item \texttt{libK.KineticSimulation()} è la classe contenente le funzioni per simulare l'\cref{algMonteCarlo} e trattare i risultati;
+                \item \texttt{libK.ParametricStudy()} è la classe chiamata in alternativa alla precedente se si è interessati a uno studio parametrico\footnotemark{}.%
+                \footnotetext{Di fatto non è altro che \texttt{libK.KineticSimulation()} tante volte quanti sono le variazioni del parametro studiato.}
+            \end{itemize}
+    
+            \printListing{%
+                    firstline=2,
+                    firstnumber=1,
+                    lastline=64,
+                }{../../Codice/main.py}
+                {\texorpdfstring{Codice \texttt{main.py}.}{Codice «main.py»}}{lstMain}
+        %\endgroup
 
-        \printListing{%
-                firstline=2,
-                firstnumber=1,
-                lastline=369,
-            }{../../Codice/libParameters.py}
-            {Codice «libParameters.py».}{lstParameters}
+        Invece i rimanenti listati formano nel complesso 6 moduli ognuno contenente delle funzioni, classi o anche solo informazioni, che svolgono principalmente quanto appena descritto.
 
-        \printListing{%
-                firstline=2,
-                firstnumber=1,
-                lastline=958,
-            }{../../Codice/libGUIs.py}
-            {Codice «libGUIs.py».}{lstGUIs}
+        %\begingroup «libParameters.py»
+            Il primo modulo è \texttt{libParameters.py} nel \cref{lstParameters} che semplicemente contiene tutt'i parametri\footnotemark{} come, per esempio, i percorsi relativi dei dati estratti oppure i dati degli studi del caso.%
+            \footnotetext{Piccola curiosità: è servito anche a evitare, durante la scrittura del codice, un piccolo problema di ricorsione infinita durante i caricamenti dei moduli.}%
+    
+            \printListing{%
+                    firstline=2,
+                    firstnumber=1,
+                    lastline=369,
+                }{../../Codice/libParameters.py}
+                {\texorpdfstring{Modulo \texttt{libParameters.py}.}{Modulo «libParameters.py»}}{lstParameters}
+        %\endgroup
 
-        \printListing{%
-                firstline=2,
-                firstnumber=1,
-                lastline=395
-            }{../../Codice/libData.py}
-            {Codice «libData.py».}{lstData}
+        %\begingroup «libGUIs.py»
+            Il secondo modulo è \texttt{libGUIs.py} nel \cref{lstGUIs} che definisce due principali interfacce grafiche:
+    
+            \begin{enumerate}[
+                label=\arabic*.,
+                %topsep=0.5em,
+                %parsep=0em,
+                %itemsep=0.25em,
+                %leftmargin=2em,
+                %rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=3em,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item una per raccogliere i parametri (\cref{figInterfacciaGraficaParametri}) e
+                \item l'altra per le barre di progressione (\cref{figInterfacciaGraficaBarreProgressione}).
+            \end{enumerate}
+    
+            \newcommand\dimImm{1.1\linewidth}
 
-        \printListing{%
-                firstline=2,
-                firstnumber=1,
-                lastline=965
-            }{../../Codice/libFigures.py}
-            {Codice «libFigures.py».}{lstFigures}
+            \floatfigure{p}{\dimImm}{%
+                ../../Figure/.fnl/Appendice/InterfacciaGrafica.png
+            }{\linewidth}{%
+                Interfaccia grafica per raccogliere i parametri.
+            }{figInterfacciaGraficaParametri}
 
-        \printListing{%
-                firstline=2,
-                firstnumber=1,
-                lastline=539
-            }{../../Codice/libNetworks.py}
-            {Codice «libNetworks.py».}{lstNetworks}
+            \floatfigure{p}{\dimImm}{%
+                ../../Figure/.fnl/Appendice/BarreProgressione.png
+            }{\linewidth}{%
+                Interfaccia grafica per le barre di progressione.
+            }{figInterfacciaGraficaBarreProgressione}
 
-        \printListing{%
-                firstline=2,
-                firstnumber=1,
-                lastline=1389
-            }{../../Codice/libKTMAS.py}
-            {Codice «libKTMAS.py».}{lstKTMAS}
+            \printListing{%
+                    firstline=2,
+                    firstnumber=1,
+                    lastline=958,
+                }{../../Codice/libGUIs.py}
+                {\texorpdfstring{Modulo \texttt{libGUIs.py}.}{Modulo «libGUIs.py»}}{lstGUIs}
+        %\endgroup
+
+        %\begingroup «libData.py»
+            Il terzo modulo è \texttt{libData.py} nel \cref{lstData} che serve specialmente per estrarre i dati ISTAT \cite{ISTATCensimento1991,ISTATLimiti1991,ISTATPendolarismo1991}, in particolare è qui che si costruiscono le matrici d'adiacenza unitarie e pesate.
+    
+            \printListing{%
+                    firstline=2,
+                    firstnumber=1,
+                    lastline=395,
+                }{../../Codice/libData.py}
+                {\texorpdfstring{Modulo \texttt{libData.py}.}{Modulo «libData.py»}}{lstData}
+        %\endgroup
+
+        %\begingroup «libFigure.py»
+            Il quarto modulo è \texttt{libFigures.py} nel \cref{lstFigures} che racchiude a grandi linee tutte le funzioni necessarie per i grafici, in particolare qui è contenuta la logica degli adattamenti della distribuzione di Pareto e bilognomale.
+    
+            \printListing{%
+                    firstline=2,
+                    firstnumber=1,
+                    lastline=993,
+                }{../../Codice/libFigures.py}
+                {\texorpdfstring{Modulo \texttt{libFigures.py}.}{Modulo «libFigures.py»}}{lstFigures}
+        %\endgroup
+
+        %\begingroup «libNetworks.py»
+            Il quinto modulo è \texttt{libNetworks.py} nel \cref{lstNetworks} che riproduce i principali risultati di \cite{DeMontis2007}.
+    
+            \printListing{%
+                    firstline=2,
+                    firstnumber=1,
+                    lastline=539,
+                }{../../Codice/libNetworks.py}
+                {\texorpdfstring{Modulo \texttt{libNetworks.py}.}{Modulo «libNetworks.py»}}{lstNetworks}
+        %\endgroup
+
+        %\begingroup «libKTMAS.py»
+            Il sesto e ultimo modulo è \texttt{libKTMAS.py} che racchiude tutte le funzioni legate alla \TCSMA{} e all'elaborazione dei risultati cosí ottenuti. È notevole menzionare che il ciclo principale, descritto dalla funzione \texttt{Mon\-te\-Car\-lo\-Al\-go\-ri\-thm()}, è avviato parallelamente con al piú tre lavoratori contemporanei; tale limite discende fondamentalmente dal fatto che la macchina su cui sono state svolte le simulazioni dispone di soli quattro nuclei di calcolo.
+    
+            \printListing{%
+                    firstline=2,
+                    firstnumber=1,
+                    lastline=1341,
+                }{../../Codice/libKTMAS.py}
+                {\texorpdfstring{Modulo \texttt{libKTMAS.py}.}{Modulo «libKTMAS.py»}}{lstKTMAS}
+        %\endgroup
 
         % \printListing[matlab]{%
         %         firstline=2,
@@ -72,7 +161,6 @@
         %         lastline=175
         %     }{../../Codice/mat2tex.m}
         %     {Codice «mat2tex.m».}{lstmat2tex}
-
 
         %\begingroup Vecchia versione con «listings»
             % \lstinputlisting[

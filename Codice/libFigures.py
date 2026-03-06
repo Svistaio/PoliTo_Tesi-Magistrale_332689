@@ -112,11 +112,8 @@ class FigData():
         m = self.matFilePath.as_posix()
         t = self.texFilePath.as_posix()
 
-        cmd = (
-            r'matlab -batch "../Elaborato/Convertitore/mat2tex('
-            fr"'{m}',"fr"'{t}'"r')"'
-        )
-        return cmd
+        cmd = f"addpath('../Elaborato/Convertitore'); mat2tex('{m}','{t}')"
+        return f'matlab -batch "{cmd}"'
 
 # Primary/Basic plots
 def CreateFunctionPlot(
@@ -436,16 +433,17 @@ def CreateLogRegressionPlot(
     slope, intercept, _, _, _ = stats.linregress(logx,logy)
     regression = 10**(intercept+slope*logx)
 
-    fPlot = ax.plot(
+    CreateFunctionPlot(
         xp,regression,
+        figData,
         label=l,
         color=color,
-        linewidth=1
     )
     
-    figData['plots'][f'regressionPlot{idx}'] = {
-        't':'function','x':x,'y':regression,'l':l,'c':color
-    }
+    # fPlot = ax.plot(
+    # figData['plots'][f'regressionPlot{idx}'] = {
+    #     't':'function','x':x,'y':regression,'l':l,'c':color
+    # }
 
     # mplcursors.cursor(fPlot,hover=False).connect(
     #     "add",lambda sel: sel.annotation.set_text(
@@ -496,22 +494,31 @@ def CreateLognormalFitPlot(
 
     for r in range(Ni):
         if bimodal:
-            xi,m1,s1,m2,s2 = FitLognormalData(v[r,:],bimodal)
-            yFData[r] = (
-                xi*stats.lognorm.pdf(xF,s1,scale=np.exp(m1)) + 
-                (1-xi)*stats.lognorm.pdf(xF,s2,scale=np.exp(m2))
-            )#; print(xi,m1,s1,m2,s2)
+            xi,m1,s1,m2,s2 = FitBiLognormalData(v[r,:],scale=xScale)
+            if xScale == 'log':
+                yFData[r] = (
+                    xi*stats.lognorm.pdf(xF,s1*np.log(10),scale=10**m1) + 
+                    (1-xi)*stats.lognorm.pdf(xF,s2*np.log(10),scale=10**m2)
+                )#; print(xi,m1,s1,m2,s2)
+                # Since «stats.lognorm» is defined with the natural lognormal but all the parameters are estimated in base 10, they have to be converted
+                # To confirm that be mindful that, while doing the conversion using https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html, the derivative of «ln(x)» is «1/x» while of «log(x)» is «1/(xln(10))»
+            elif xScale == 'lin':
+                yFData[r] = (
+                    xi*stats.norm.pdf(xF,loc=m1,scale=s1) + 
+                    (1-xi)*stats.norm.pdf(xF,loc=m2,scale=s2)
+                )#; print(xi,m1,s1,m2,s2)
 
             xiData[r] = xi
-            m1Data[r] = m1*np.log10(np.exp(1))
-            s1Data[r] = s1*np.log10(np.exp(1))
-            m2Data[r] = m2*np.log10(np.exp(1))
-            s2Data[r] = s2*np.log10(np.exp(1))
-            # Base 10 conversion
+            m1Data[r] = m1#*np.log10(np.exp(1))
+            s1Data[r] = s1#*np.log10(np.exp(1))
+            m2Data[r] = m2#*np.log10(np.exp(1))
+            s2Data[r] = s2#*np.log10(np.exp(1))
+            # Base 10 conversion if «np.log()» had been used
 
         else:
-            shape,scale = FitLognormalData(v[r,:],bimodal)
+            shape,loc,scale = stats.lognorm.fit(v[r,:],floc=0)
             yFData[r] = stats.lognorm.pdf(xF,shape,scale=scale)
+            # The average is «μ=np.log(scale)» (base e) while the standard deviation is «σ=shape»
             
             xiData[r] = 1
             m1Data[r] = np.log10(scale) # Base 10 conversion
@@ -567,13 +574,13 @@ def CreateParetoFitPlot(
     if ax is None: ax=plt.gca()
 
     if upperbound is None:
-        xF = np.logspace(
+        xF = np.linspace(
             np.log10(np.quantile(v,0.75)),
             np.log10(v.max()),
             100
         )
     else:
-        xF = np.logspace(
+        xF = np.linspace(
             np.log10(np.quantile(v,0.75)),
             np.log10(upperbound),
             100
@@ -587,11 +594,11 @@ def CreateParetoFitPlot(
         # Select the last quarter of city sizes
         vQuarter = np.quantile(v[r,:],.75)
         vTail = v[r,v[r,:] >= vQuarter]
-        vTails[r] = np.sort(vTail) # Ascending values
+        vTails[r] = np.log10(np.sort(vTail)) # Ascending values
 
         # Fitted CCDF from a Pareto function
-        b[r], loc, scale = stats.pareto.fit(vTail,floc=0,fscale=vQuarter) # b≈alpha
-        ccdfFit[r] = stats.pareto.sf(xF,b[r],loc=loc,scale=scale) # Survival function
+        b[r], loc, scale = stats.pareto.fit(vTail,floc=0,fscale=vQuarter)
+        ccdfFit[r] = stats.pareto.sf(10**xF,b[r],loc=loc,scale=scale) # Survival function
 
     # Empirical CCDF on the tail
     n = vTails[0].size
@@ -658,15 +665,17 @@ def CreateParetoFitPlot(
     )
 
     if bimodal:
-        xFl = np.log(xF)
+        # xFl = np.log10(xF)
         yFData = [None]*Ni
         Nc = v.shape[1]
 
         for r in range(Ni):
-            xi,m1,s1,m2,s2 = FitLognormalData(v[r,:] if Ni>1 else v,bimodal)
+            xi,m1,s1,m2,s2 = FitBiLognormalData(v[r,:] if Ni>1 else v)
 
-            ccdfFit1 = stats.norm.sf(xFl,loc=m1,scale=s1)
-            ccdfFit2 = stats.norm.sf(xFl,loc=m2,scale=s2)
+            # ccdfFit1 = stats.norm.sf(xFl,loc=m1,scale=s1)
+            # ccdfFit2 = stats.norm.sf(xFl,loc=m2,scale=s2)
+            ccdfFit1 = stats.norm.sf(xF,loc=m1,scale=s1)
+            ccdfFit2 = stats.norm.sf(xF,loc=m2,scale=s2)
 
             yFData[r] = xi*ccdfFit1+(1-xi)*ccdfFit2
             # yFData[r] /= yFData[r][0] # Normalization
@@ -859,69 +868,73 @@ def CreateConfidenceIntervalPlot(
                     'a':alpha,'h':hatch,
                 }
 
-def FitLognormalData(v,bimodal):
+def FitBiLognormalData(v,scale='log'):
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit
 
-    if not bimodal:
-        shape,loc,scale = stats.lognorm.fit(v[v>0],floc=0)
-        # The average is «μ=np.log(scale)» (base e) while the standard deviation is «σ=shape»
-        return shape,scale
-    else:
+    if scale == 'log':
         vp = v[v>0]
-        vl = np.log(vp)
+        vl = np.log10(vp)
+    else:
+        vl = v
+    # The option «scale» refers to the x scale: if the data is meant to be plotted on a logarithmic scale, then it hasn't been transformed; on the other hand, if the scale is linear it means that the logarithm has already been applied to it
 
-        # The objective function to minimize is the negative log-likelihood
-        # This is equivalent to maximize the log-likelihood, just reversed
-        def NegativeLogLikelihood(params):
-            # xi is fraction between Gaussian
-            # mi and si are the mean and standard deviation of the ith Gaussian
-            xi,m1,s1,m2,s2 = params
-            
-            # Calculate Gaussian PDF for both components on log data
-            pdf1 = stats.norm.pdf(vl,loc=m1,scale=s1)
-            pdf2 = stats.norm.pdf(vl,loc=m2,scale=s2)
-            
-            # Mixture sum
-            mixture = xi*pdf1+(1-xi)*pdf2
-            
-            # Prevent log(0) errors
-            epsilon = 1e-10
-            return -np.sum(np.log(mixture+epsilon))
-
-        # Initial heuristic guesses
-        # m0 = np.mean(vl)
-        s0 = np.std(vl)
-        prm0 = [
-            0.5, # Equal initial weigth
-            np.percentile(vl,25), # First small average
-            s0*0.25,
-            np.percentile(vl,75), # Second big average
-            s0*0.75
-        ] # Same standard deviation
-
-        bounds = ( # xi must be in [0,1]
-            # (.001,.999), # xi
-            (0,1),       # xi
-            (None,None),  # m1
-            (1e-2,None), # s1
-            (None,None),  # m2
-            (1e-2, None) # s2
-        ) # m has no bounds while s>0
-
-        # Optimization
-        minimization = minimize(NegativeLogLikelihood,prm0,bounds=bounds)
+    # The objective function to minimize is the negative log-likelihood
+    # This is equivalent to maximize the log-likelihood, just reversed
+    def NegativeLogLikelihood(params):
+        # xi is fraction between Gaussian
+        # mi and si are the mean and standard deviation of the ith Gaussian
+        xi,m1,s1,m2,s2 = params
         
-        # Extract results
-        xi,m1,s1,m2,s2 = minimization.x
+        # Calculate Gaussian PDF for both components on log data
+        pdf1 = stats.norm.pdf(vl,loc=m1,scale=s1)
+        pdf2 = stats.norm.pdf(vl,loc=m2,scale=s2)
+        
+        mixture = xi*pdf1+(1-xi)*pdf2 # Mixture sum
+        
+        epsilon = 1e-10 # Prevent log(0) errors
+        return -np.sum(np.log10(mixture+epsilon))
 
-        # Check for degeneration
-        if s2==1e-2: return 1,m1,s1,m2,s2 # First dominant component
-        if s1==1e-2: return 0,m1,s1,m2,s2 # Second dominant component
-        # Indeed, if the fit is too unbalanced it means that there is one component not significant enough to jusfity a whole Gaussian (it's like trying to fit it with one point)
+    # Initial heuristic guesses
+    median = np.median(vl)
+    leftvl = vl[vl<=median]
+    rightvl = vl[vl>median]
 
-        return xi,m1,s1,m2,s2
+    prm0 = [
+        0.5, # Equal initial weigth
+        np.mean(leftvl),np.std(leftvl),
+        np.mean(rightvl),np.std(rightvl)
+    ] # As the initial guesses the data is split in two cluters: the first before the meadian and the second after it; in this way the starting values are based on the actual data and are not fixed by design
+
+    s0 = np.std(vl)
+    mins = 0.1*s0
+    bounds = ( # xi must not reach its bounds
+        (.01,.99),   # xi
+        (None,None), # m1
+        (mins,None), # s1
+        (None,None), # m2
+        (mins, None) # s2
+    ) # m has no bounds while s>mins
+
+    # Optimization
+    minimization = minimize(
+        NegativeLogLikelihood,
+        prm0,
+        bounds=bounds,
+        method='L-BFGS-B',
+        options={'ftol':1e-9}
+    )
+    
+    # Extract results
+    xi,m1,s1,m2,s2 = minimization.x
+
+    # Check for degeneration
+    if s2<=mins+1e-5: return 1,m1,s1,m2,s2 # First dominant component
+    if s1<=mins+1e-5: return 0,m1,s1,m2,s2 # Second dominant component
+    # Indeed, if the fit is too unbalanced it means that there is one component not significant enough to jusfity a whole Gaussian (it's like trying to fit it with one point)
+
+    return xi,m1,s1,m2,s2
 
 def DataString(
     data,
@@ -1083,4 +1096,34 @@ def TextBlock(
     #     fr'{lbl[2]} mean value $\langle k\rangle$',
     #     f'{lbl[2]} lognormal fit (ML)'
     # ),
+#endregion
+
+#region Alternative implementation for the «FitBiLognormalData()» function using the «sklearn.mixture» library, which I found it favours too much balanced mixture fittings with ξ close to 0.5
+"""
+    from sklearn.mixture import GaussianMixture
+
+    def FitBiLognormalData(v,scale='log'):
+        # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html
+        # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
+        # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit
+
+        if scale == 'log':
+            vp = v[v>0]
+            vl = np.log10(vp)
+        else:
+            vl = v
+        # The option «scale» refers to the x scale: if the data is meant to be plotted on a logarithmic scale, then it hasn't been transformed; on the other hand, if the scale is linear it means that the logarithm has already been applied to it
+
+        vl = vl.reshape(-1, 1)
+        # n_components=2 definisce la natura "bi-" della distribuzione
+        gmm = GaussianMixture(n_components=2, covariance_type='full', random_state=42)
+        gmm.fit(vl)
+        
+        # Estrazione parametri
+        xi = gmm.weights_[0]
+        m1,m2 = gmm.means_.flatten()
+        s1,s2 = np.sqrt(gmm.covariances_.flatten())
+        
+        return xi,m1,s1,m2,s2
+"""
 #endregion

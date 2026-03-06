@@ -12,7 +12,7 @@
 "edgeWeights": True,
 "fluctuations": False,
 "zetaFraction": False,
-"interactingLaw": 2,
+"interactionRule": 2,
 "pdfPopUp": False,
 "TikZConversion": True,
 "snapshots": 1000,

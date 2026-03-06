@@ -13,26 +13,26 @@
             },
             plotRow,
             row1Keys,
-            plotLegendNE,
+            plotLegendNW,
             %
-            xmax=5e4,% xmin=10,
-            ymin=0,ymax=0.0010933,
+            xmin=.25,%xmax=5e4,
+            ymin=0,ymax=1,
         ]
             \nextgroupplot[%
-                % xmin=1,xmax=1e+05,
-                % ymin=0,ymax=0.0012,
+                % xmin=0.66992,xmax=4.6973,
+                % ymin=0,ymax=0.8,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig1.tex}
             % \input{../../../.tex/2/KS/SizeDistributionFittingsfig1.tex}
     
             \nextgroupplot[%
-                % xmin=1,xmax=1e+05,
-                % ymin=0,ymax=0.0012,
+                % xmin=0.69198,xmax=4.743,
+                % ymin=0,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig2.tex}
             % \input{../../../.tex/2/KS/SizeDistributionFittingsfig2.tex}
     
             \nextgroupplot[%
-                % xmin=1,xmax=1e+05,
-                % ymin=0,ymax=0.0012,
+                % xmin=0.66769,xmax=4.7442,
+                % ymin=0,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig3.tex}
             % \input{../../../.tex/2/KS/SizeDistributionFittingsfig3.tex}
         \end{groupplot}
@@ -46,28 +46,30 @@
             row2Keys,
             plotLegendNE,
             %
-            xticklabels={},
-            xmin=1562.3,xmax=36214,
+            % xmin=1562.3,xmax=36214,
             ymin=0.0058577,ymax=1,
         ]
             \nextgroupplot[%
                 at={($(Row1 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
-                % xmin=1000,xmax=32026,
+                xmin=3.1938,xmax=4.5589,
+                % xmin=3.2,xmax=4.6,
                 % ymin=0.01,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig7.tex}
+            % \input{../../../.tex/2/KS/SizeDistributionFittingsfig7.tex}
+    
+            \nextgroupplot[%
+                xmin=3.1938,xmax=4.5589,
+                % xmin=3,xmax=4.6,
+                % ymin=0.0058577,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig8.tex}
             % \input{../../../.tex/2/KS/SizeDistributionFittingsfig8.tex}
     
             \nextgroupplot[%
-                % xmin=1000,xmax=36214,
+                xmin=3.1938,xmax=4.5589,
+                % xmin=3,xmax=4.6,
                 % ymin=0.0058577,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig9.tex}
             % \input{../../../.tex/2/KS/SizeDistributionFittingsfig9.tex}
-    
-            \nextgroupplot[%
-                % xmin=1000,xmax=36214,
-                % ymin=0.0058577,ymax=1,
-            ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig10.tex}
-            % \input{../../../.tex/2/KS/SizeDistributionFittingsfig10.tex}
         \end{groupplot}
     
         \begin{groupplot}[
@@ -79,27 +81,30 @@
             row3Keys,
             plotLegendNE,
             %
-            xmin=1603,xmax=36214,
-            ymin=0.00062599,ymax=1,
+            % xmin=1603,xmax=36214,
+            ymin=0.0014527,ymax=1,
         ]
             \nextgroupplot[%
                 at={($(Row2 c1r1.south west)-(0,.5*\yPlotSep em)-(0,\plotHeight cm)$)},
-                % xmin=1000,xmax=36214,
-                % ymin=0.0001,ymax=1,
+                xmin=3.1938,xmax=4.5589,
+                % xmin=3,xmax=4.6,
+                % ymin=0.0058577,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig4.tex}
+            % \input{../../../.tex/2/KS/SizeDistributionFittingsfig4.tex}
+    
+            \nextgroupplot[%
+                xmin=3.1938,xmax=4.5589,
+                % xmin=3.2,xmax=4.6,
+                % ymin=0.001,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig5.tex}
             % \input{../../../.tex/2/KS/SizeDistributionFittingsfig5.tex}
     
             \nextgroupplot[%
-                % xmin=1000,xmax=32026,
+                xmin=3.1938,xmax=4.5589,
+                % xmin=3.2,xmax=4.6,
                 % ymin=0.001,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig6.tex}
             % \input{../../../.tex/2/KS/SizeDistributionFittingsfig6.tex}
-    
-            \nextgroupplot[%
-                % xmin=1000,xmax=32026,
-                % ymin=0.001,ymax=1,
-            ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SDFfig7.tex}
-            % \input{../../../.tex/2/KS/SizeDistributionFittingsfig7.tex}
         \end{groupplot}
     
         \begin{groupplot}[
@@ -117,7 +122,7 @@
             \nextgroupplot[%
                 at={($(Row3 c1r1.south west)-(0,\yGroupSep em)-(0,\plotHeight cm)$)},
                 % xmin=5,xmax=100,
-                % ymin=100,ymax=19629,
+                % ymin=100,ymax=19528,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SVsDfig1.tex}
             % \input{../../../.tex/2/KS/SizeVsDegreefig1.tex}
     
@@ -145,7 +150,7 @@
             plotLegendSE,
             %
             xmin=0,xmax=10000,
-            ymin=100,ymax=19572,
+            ymin=100,ymax=19723,
         ]
             \nextgroupplot[%
                 at={($
@@ -154,42 +159,42 @@
                     -(\xPlotSep em,0)-(\plotLastWidth cm,0)
                 $)},
                 % xmin=0,xmax=10000,
-                % ymin=100,ymax=19572,
+                % ymin=100,ymax=19567,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SEfig1.tex}
             % \input{../../../.tex/2/KS/SizeEvolutionsfig1.tex}
 
             \nextgroupplot[%
                 % xmin=0,xmax=10000,
-                % ymin=100,ymax=19617,
+                % ymin=100,ymax=19723,
             ] \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/SEfig2.tex}
             % \input{../../../.tex/2/KS/SizeEvolutionsfig2.tex}
         \end{groupplot}
     %\endgroup
 
     %\begingroup Parametri
-        \newcommand\betaExact{\num{1.637+-0.016}}
-        \newcommand\betaAprx{\num{1.626+-0.016}}
         \renewcommand\betaReal{\num{1.635}}
+        \newcommand\betaExact{\num{1.641+-0.016}}
+        \newcommand\betaAprx{\num{1.621+-0.015}}
         
-        \newcommand\xiExact{\num{0.425+-0.015}}
-        \newcommand\xiAprx{\num{0.399+-0.016}}
-        \renewcommand\xiReal{\num{0.237}}
+        \renewcommand\xiReal{\num{0.979}}
+        \newcommand\xiExact{\num{0.432+-0.016}}
+        \newcommand\xiAprx{\num{0.436+-0.016}}
         
+        \renewcommand\mIReal{\num{2.841}}
         \newcommand\mIExact{\num{2.460+-0.018}}
-        \newcommand\mIAprx{\num{2.434+-0.020}}
-        \renewcommand\mIReal{\num{2.483}}
+        \newcommand\mIAprx{\num{2.473+-0.017}}
         
-        \newcommand\sIExact{\num{0.296+-0.009}}
-        \newcommand\sIAprx{\num{0.291+-0.009}}
-        \renewcommand\sIReal{\num{0.260}}
+        \renewcommand\sIReal{\num{0.421}}
+        \newcommand\sIExact{\num{0.307+-0.008}}
+        \newcommand\sIAprx{\num{0.310+-0.009}}
         
-        \newcommand\mIIExact{\num{3.204+-0.015}}
-        \newcommand\mIIAprx{\num{3.183+-0.015}}
-        \renewcommand\mIIReal{\num{2.990}}
+        \renewcommand\mIIReal{\num{4.215}}
+        \newcommand\mIIExact{\num{3.216+-0.016}}
+        \newcommand\mIIAprx{\num{3.215+-0.017}}
         
-        \newcommand\sIIExact{\num{0.385+-0.007}}
-        \newcommand\sIIAprx{\num{0.392+-0.007}}
-        \renewcommand\sIIReal{\num{0.445}}
+        \renewcommand\sIIReal{\num{0.707}}
+        \newcommand\sIIExact{\num{0.377+-0.007}}
+        \newcommand\sIIAprx{\num{0.381+-0.007}}
 
         \foreach \c/\fl/\sl/\a/\p/\xS/\yS/\yLS in {
             1/0/1/south west/south west/0em/0em/-.5em,
@@ -225,3 +230,5 @@
 
     \redefineTikZbounds{Row1 c1r1}{Row4 c3r1}
 \end{tikzpicture}%
+
+% \input{../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/Parametri.txt}

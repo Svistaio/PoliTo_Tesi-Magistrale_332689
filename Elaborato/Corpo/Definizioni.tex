@@ -15,81 +15,6 @@
     \newcommand\hColla[4]{\hspace{\dimColla{#1}{#2}{#3}{#4}}}
 %\endgroup
 
-%\begingroup Riferimenti
-    % \newcommand\tref[2]{\hyperref[#1]{#2}}
-    \newcommand\crefsubfigInt[4][-]{Figg. \ref{#2}(#3)#1\ref{#2}(#4)}
-    \newcommand\crefsubfigSep[4]{Figg. \ref{#1}(#2)\foreach \l in#3{, \ref{#1}(\l)} e \ref{#1}(#4)}
-
-    % Comando per definire citazioni con note separate da un punto e virgola: [citazione1, nota1; citazione2, nota2; ecc.]
-    \DeclareMultiCiteCommand{\bracketcitesemi}[\mkbibbrackets]{\cite}{\addsemicolon\space}
- 
-    \crefname{eqtag}{}{}
-    \crefrangeformat{eqtag}{#3#1#4--#5#2#6}
-    \crefmultiformat{eqtag}{#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
-    \crefrangemultiformat{eqtag}{#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}
-    
-    \crefname{equation}{}{}
-    \crefrangeformat{equation}{(#3#1#4--#5#2#6)}
-    \crefmultiformat{equation}{(#2#1#3}{,~#2#1#3)}{,~#2#1#3}{,~#2#1#3)}
-    \crefrangemultiformat{equation}{(#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}
-    
-    \crefname{chapter}{Cap.}{Capp.}
-    \crefrangeformat{chapter}{Capp.~#3#1#4--#5#2#6}
-    \crefmultiformat{chapter}{Capp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{chapter}{Capp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-    
-    \crefname{section}{§}{§§}
-    \crefrangeformat{section}{§§~#3#1#4--#5#2#6}
-    \crefmultiformat{section}{§§~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{section}{§§~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-    
-    \crefname{figure}{Fig.}{Figg.}
-    \crefrangeformat{figure}{Figg.~#3#1#4--#5#2#6}
-    \crefmultiformat{figure}{Figg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{figure}{Figg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-    
-    \crefname{table}{Tab.}{Tabb.}
-    \crefrangeformat{table}{Tabb.~#3#1#4--#5#2#6}
-    \crefmultiformat{table}{Tabb.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{table}{Tabb.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-
-    \crefname{algorithm}{Alg.}{Algg.}
-    \crefrangeformat{algorithm}{Algg.~#3#1#4--#5#2#6}
-    \crefmultiformat{algorithm}{Algg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{algorithm}{Algg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-
-    \crefname{listing}{List.}{Listt.}
-    \crefrangeformat{listing}{Listt.~#3#1#4--#5#2#6}
-    \crefmultiformat{listing}{Listt.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{listing}{Listt.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-    
-    \crefname{prp}{Prop.}{Propp.}
-    \crefrangeformat{prp}{Propp.~#3#1#4--#5#2#6}
-    \crefmultiformat{prp}{Propp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{prp}{Propp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-
-    \crefname{dfn}{Def.}{Deff.}
-    \crefrangeformat{dfn}{Deff.~#3#1#4--#5#2#6}
-    \crefmultiformat{dfn}{Deff.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{dfn}{Deff.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-
-    \crefname{oss}{Oss.}{Oss.ni}
-    \crefrangeformat{oss}{Oss.ni~#3#1#4--#5#2#6}
-    \crefmultiformat{oss}{Oss.ni~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{oss}{Oss.ni~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-    % https://www.treccani.it/magazine/lingua_italiana/domande_e_risposte/grammatica/grammatica_123.html
-
-    \crefname{teo}{Teo.}{Teo.ri}
-    \crefrangeformat{teo}{Teo.ri~#3#1#4--#5#2#6}
-    \crefmultiformat{teo}{Teo.ri~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{teo}{Teo.ri~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-
-    \crefname{ipo}{Ip.}{Ipp.}
-    \crefrangeformat{ipo}{Ipp.~#3#1#4--#5#2#6}
-    \crefmultiformat{ipo}{Ipp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
-    \crefrangemultiformat{ipo}{Ipp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
-%\endgroup
-
 %\begingroup Abbreviazioni
     \newcommand\etal{\textit{et al.}}
     \newcommand\TCSMA{\hyperlink{acrTeorieCineticheSistemiMultiAgenti}{TCSMA}}
@@ -121,6 +46,7 @@
     \DeclareMathOperator\Varianza{var}
     \DeclareMathOperator\IC{IC}
     \DeclareMathOperator\Histogram{Istogramma}
+    \DeclareMathOperator\FRC{\mathcal R}
     % \DeclareMathOperator\Pareto{Pareto}
 
     % \newcommand\underdot[1]{\underaccent{\scalebox{0.3}{\(\bullet\)}}{#1}}
@@ -245,19 +171,35 @@
             formatcom=\CustomMintedStyle,
         }
 
+        \newcommand\vTextSep{\dimColla{1}{1}{0}{em}}
+        \newcommand\vCaptionSep{2pt}
+        \newcommand\vBodySep{0pt}
+        
         \newenvironment{code}{
             \captionsetup{
                 type=listing,
-                aboveskip=\dimColla{-.5}{.4}{0}{em},
-                belowskip=-.5em
+                % aboveskip=\dimColla{-.5}{.4}{0}{em},
+                % belowskip=-.5em
+                aboveskip=0em,
+                belowskip=0em
             }
-        }{}
+            \par\addvspace{\vTextSep}
+        }{\par\addvspace{\vTextSep}}
 
         \newcommand\printListing[5][python]{
             \begin{code}
                 \pdfbookmark[3]{#4}{#5}
-                \captionof{listing}{#4}
-                \inputminted[#2]{#1}{#3}
+                \needspace{\baselineskip}
+                \hrule height 0.8pt
+                    \par\nobreak\vskip-\parskip
+                    \vspace{\vCaptionSep}
+                    \captionof{listing}{#4}
+                    \vspace{\vCaptionSep}
+                \hrule height 0.8pt
+                    \vspace{\vBodySep}
+                    \inputminted[#2]{#1}{#3}
+                    \vspace{\vBodySep}
+                \hrule height 0.8pt
                 \label{#5}
             \end{code}
         }
@@ -715,8 +657,8 @@
         \xdef\offsetY{0pt}
         
         % \tikzbox[#1]{#2}{#3}[#4]{#5}
-        % #1 -> Ancora rispetto cui posizionare l'intera scatola
-        % #2 -> Nodo dove posizionare l'origine (per la natura di come LaTeX riceve gli argomenti è buon pratica passare questo circondato da parentesi graffe); di base è «south west» (angolo in basso a sinistra)
+        % #1 -> Ancora rispetto cui posizionare l'intera scatola (di base è «south west», ossia l'angolo in basso a sinistra)
+        % #2 -> Nodo dove posizionare l'origine (per la natura di come LaTeX riceve gli argomenti è buon pratica passare questo circondato da parentesi graffe)
         % #3 -> Nome della scatola limitante definita dall'ambiente «scope»
         % #4 -> Argomenti opzionali da passare all'ambiente «scope»; di base sono vuoti
         % #5 -> Contenuto della scatola circondato dall'ambiente «scope»
@@ -780,10 +722,10 @@
             \newcounter{lpc} % «loopcounter»
             \newcommand\infopageSharedKeys{
                 %\begingroup Testo
-                    % \renewcommand\titleSize{12}
+                    \renewcommand\titleSize{10}
                     \renewcommand\subCaptionSize8
                     \renewcommand\ParameterSize7
-                    \renewcommand\labelSize7
+                    \renewcommand\labelSize9
                     \renewcommand\tickSize6
                     \renewcommand\legendSize7
                 %\endgroup
@@ -791,6 +733,7 @@
                 %\begingroup Dimensioni
                     \pgfmathsetmacro\plotWidth7
                     \pgfmathsetmacro\plotHeight{.618*\plotWidth}
+                    \pgfmathsetmacro\halfPlotHeight{\plotHeight/2}
                     %
                     \pgfmathparse{0.825*\plotWidth}
                     \pgfmathsetmacro\plotWidth\pgfmathresult
@@ -812,7 +755,7 @@
                         plotLegend/.style={%
                             font=\dimTesto{\legendSize},
                             /pgfplots/legend cell align=left,
-                            align=left,
+                            % align=left,
                             % draw=white!15!black,
                             draw=none, % Bordo invisibile
                             fill=white,
@@ -873,7 +816,7 @@
                 %\endgroup
     
                 %\begingroup Estetica
-                    \newcommand\smallminus{\scalebox{0.4}[1]{$-$}\hspace{-.125em}}
+                    \newcommand\smallminus{\scalebox{0.5}[1]{$-$}\hspace{-.11em}}
                     \pgfplotsset{
                         /pgfplots/log number format basis/.code 2 args={%
                             \pgfmathsetmacro\exponent{##2}%
@@ -906,6 +849,11 @@
                 %\begingroup Commenti
                     %\begingroup Impostazioni
                     \tikzset{
+                        title/.style={
+                            align=center,
+                            anchor=south,
+                            font=\bfseries\dimTesto{\titleSize},
+                        },
                         fittedParameters/.style={
                             align=center,
                             font=\dimTesto{\ParameterSize},
@@ -920,21 +868,17 @@
                             align=center,
                             font=\dimTesto{\subCaptionSize},
                         },
-                        title/.style={
-                            anchor=south,
-                            font=\bfseries\dimTesto{\titleSize},
-                        },
                     }
                     \newcommand\codetocolor[1]{\ifcase##1blueish\or reddish\else black\fi}
                     %\endgroup
     
                     %\begingroup Parametri Sardegna
-                    \newcommand\betaReal{\num{1.271}}
-                    \newcommand\xiReal{\num{0.931}}
-                    \newcommand\mIReal{\num{1.271}}
-                    \newcommand\sIReal{\num{0.931}}
-                    \newcommand\mIIReal{\num{1.271}}
-                    \newcommand\sIIReal{\num{0.931}}
+                    \newcommand\betaReal{\num{1.273}}
+                    \newcommand\xiReal{\num{0.929}}
+                    \newcommand\mIReal{\num{3.227}}
+                    \newcommand\sIReal{\num{0.408}}
+                    \newcommand\mIIReal{\num{4.099}}
+                    \newcommand\sIIReal{\num{0.556}}
                     %\endgroup
     
                     %\begingroup Parametri Pareto
@@ -1130,9 +1074,9 @@
                         \pgfplotsset{%
                             yLineAxis/.style={axis y line*=right},
                             /tikz/yLabelShift/.style={%
-                                yshift=-2.5em,
+                                yshift=-1.25em,
                                 at={(axis description cs:1,0.5)},
-                                anchor=south,
+                                anchor=north,
                                 % rotate=180,
                             },
                             /tikz/yScaleLabelShift/.style={%
@@ -1166,7 +1110,6 @@
                         plotRow/.style={
                             scale only axis,
                             width=\plotWidth cm,height=\plotHeight cm,
-                            xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
                             xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
                             ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
                             xticklabel style={font=\dimTesto{\tickSize}},
@@ -1176,25 +1119,40 @@
                             enlarge x limits=0.1,enlarge y limits=0.1,
                             xmajorgrids,ymajorgrids,
                             xminorticks=true,yminorticks=true,
+                            scale ticks above exponent=2,
                             axis background/.style={fill=white},
                             grid style={dashed}
                         },
+                        % xlabel123/.style={xlabel={\(h\)}},
+                        ylabel23/.style={ylabel={\(\FRC(h)\)}},
                         row1Keys/.style={
-                            enlarge x limits={lower,value=.05},
+                            ylabel={\(\underhat{\bar f}^{\log}_N(h)\)},
+                            % enlarge x limits={lower,value=.05},
+                            enlarge x limits=.05,
                             enlarge y limits={upper,value=.05},
-                            xmode=log,
+                            xmode=linear,
                             log origin=infty,
                         },
-                        row2Keys/.style={xmode=log,ymode=log},
-                        row3Keys/.style={xmode=log,ymode=log},
+                        row2KeysWithLabels/.style={
+                            ylabel23,
+                            xmode=linear,ymode=log
+                        },
+                        row2Keys/.style={
+                            ylabel23,
+                            xmode=linear,ymode=log,
+                            xticklabels={},
+                        },
+                        row3Keys/.style={
+                            xlabel={\(h\)},ylabel23,
+                            xmode=linear,ymode=log
+                        },
                         row4Keys/.style={
                             xlabel={\(k\)},ylabel={\(s(k)\)},
                             xmode=log,ymode=log
                         },
-                        row5Keys/.style={
+                        row5KeysLin/.style={
                             width=\plotLastWidth cm,
                             xlabel={\(t\)},ylabel={\(s(t)\)},
-                            ymode=log,
                             enlarge x limits=0,
                             enlarge y limits=0.05,
                             x tick scale label style={
@@ -1202,6 +1160,10 @@
                                 at={(.95,0)},
                                 anchor=north,
                             },
+                        },
+                        row5Keys/.style={
+                            row5KeysLin,
+                            ymode=log,
                         },
                     }
                     %\endgroup
@@ -1240,9 +1202,9 @@
                             yLabel/.style={
                                 ylabel style={
                                     font=\color{white!15!black}\dimTesto{\labelSize},
-                                    yshift=-2.5em,
+                                    yshift=-1.25em,
                                     at={(axis description cs:1,0.5)},
-                                    anchor=south,
+                                    anchor=north,
                                     % rotate=180,
                                 },
                             },
@@ -1306,7 +1268,6 @@
                             xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
                             % ylabel style={font=\color{white!15!black}\dimTesto{\labelSize},yLabelShift},
                             xticklabel style={font=\dimTesto{\tickSize}},
-                            xlabel={\(s\)},ylabel={\(\underhat{\bar f}_N(s)\)},
                             % axis x line*=bottom,yLineAxis,
                             enlarge x limits=0.1,enlarge y limits=0.1,
                             xmajorgrids,ymajorgrids,
@@ -1331,6 +1292,43 @@
                             yticklabel style={font=\dimTesto{\tickSize},xshift=-0.15em},
                             yticklabel pos=right,
                             yScaleLabelShift,
+                        },
+                        ylabel23/.style={ylabel={\(\FRC(h)\)}},
+                        row1Keys/.style={
+                            ylabel={\(\underhat{\bar f}^{\log}_N(h)\)},
+                            enlarge x limits=.05,
+                            enlarge y limits={upper,value=.05},
+                            xmode=linear,
+                            log origin=infty,
+                        },
+                        row2Keys/.style={
+                            ylabel23,
+                            xmode=linear,ymode=log,
+                            % xticklabels={},
+                        },
+                        row3Keys/.style={
+                            xlabel={\(h\)},ylabel23,
+                            xmode=linear,ymode=log,
+                        },
+                        row4KeysLin/.style={
+                            xlabel={\(k\)},ylabel={\(s(k)\)},
+                            xmode=log,
+                        },
+                        row4Keys/.style={row4KeysLin,ymode=log},
+                        row5KeysLin/.style={
+                            width=\plotLastWidth cm,
+                            xlabel={\(t\)},ylabel={\(s(t)\)},
+                            enlarge x limits=0,
+                            enlarge y limits=0.05,
+                            x tick scale label style={
+                                yshift=-1em,
+                                at={(.95,0)},
+                                anchor=north,
+                            },
+                        },
+                        row5Keys/.style={
+                            row5KeysLin,
+                            ymode=log,
                         },
                     }
                     %\endgroup
@@ -1404,21 +1402,23 @@
                     shorten >=5pt,
                     shorten <=10pt
                 },
+                indirectArrow/.style={
+                    draw=black!95,
+                    line width=.5pt,
+                },
                 nodeArrowExact/.style={
+                    indirectArrow,
                     % ->,
                     % -{Stealth[scale=1.2]},
                     -{Triangle[scale=.75]},
                     % draw=cEdgeLight,
                     % draw=red!50,
-                    draw=black!95,
-                    line width=.5pt,
                     % shorten >=2pt,
                     % shorten <=2pt
                 },
                 nodeArrowApprox/.style={
+                    indirectArrow,
                     -,
-                    draw=black!95,
-                    line width=.5pt,
                     dashed,
                 },
                 transparentNodeArrow/.style={
@@ -1458,6 +1458,56 @@
     %\endgroup
 %\endgroup
 
+%\begingroup Figure
+    \newcommand\floatfigure[7][0em]{%
+        \begin{figure}[#2]
+            \centering
+            \IfSubStr{#2}{p}{%
+                \leavevmode
+                \stepcounter{figposcount}%
+                \zsaveposx{figpos-\thefigposcount}%
+                \makebox[0pt][l]{%
+                    \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
+                    \hspace*{0.5\paperwidth}%
+                    \makebox[0pt][c]{%
+                        \vspace*{#1}
+                        \includegraphics[width=#3]{#4}
+                    }
+                }
+            }{%
+                \makebox[0pt][l]{%
+                    \makebox[0pt][c]{%
+                        \vspace*{#1}
+                        \includegraphics[width=#3]{#4}
+                    }
+                }
+            }
+            \didascalia{#6}{#5}%
+            \protect\label{#7}
+        \end{figure}
+    }
+
+    \newcommand\oddevenpagefloat[2][0]{%
+        \ifcase#1 % Figura posizionata nella prima pagina sinistra (numero pari)
+            \ifodd\value{page}
+                #2
+            \else
+                \afterpage{#2}
+            \fi
+        \or % Figura posizionata nella prima pagina destra (numero dispari)
+            \ifodd\value{page}
+                \afterpage{#2}
+            \else
+                #2
+            \fi
+        \else % Figura posizionata senza preferenze
+            #2
+        \fi
+        % Questo comando è pensato per figure flottanti che coprono un'intera pagina: difatti nel primo caso è un po' strano scrivere #2 se la pagina corrente è dispari quando si vuole l'elemento flottante in una pari; la risposta viene dal fatto che LaTeX non posiziona mai una figura flottante con posizione «p» nella pagina in cui la legge, ma la sposta almeno a quella seccessiva che è appunto pari. Un simile discorso vale anche per l'altro ramo condizionale
+        % In ogni caso è un po' debole e dimostra che è difficile gestire tante figure flottanti posizionandole, per es., tutte a sinistra (pagine dispari), ma aiuta in ogni caso
+    }
+%\endgroup
+
 %\begingroup Liste
     \setlist[enumerate]{
         topsep=0.5em,
@@ -1483,6 +1533,81 @@
         %labelwidth=!,
         %labelsep=!,
     }
+%\endgroup
+
+%\begingroup Riferimenti
+    % \newcommand\tref[2]{\hyperref[#1]{#2}}
+    \newcommand\crefsubfigInt[4][-]{Figg.~\ref{#2}(#3)#1\ref{#2}(#4)}
+    \newcommand\crefsubfigSep[4]{Figg.~\ref{#1}(#2)\foreach \l in#3{,~\ref{#1}(\l)}~e~\ref{#1}(#4)}
+
+    % Comando per definire citazioni con note separate da un punto e virgola: [citazione1, nota1; citazione2, nota2; ecc.]
+    \DeclareMultiCiteCommand{\bracketcitesemi}[\mkbibbrackets]{\cite}{\addsemicolon\space}
+ 
+    \crefname{eqtag}{}{}
+    \crefrangeformat{eqtag}{#3#1#4--#5#2#6}
+    \crefmultiformat{eqtag}{#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+    \crefrangemultiformat{eqtag}{#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6}
+    
+    \crefname{equation}{}{}
+    \crefrangeformat{equation}{(#3#1#4--#5#2#6)}
+    \crefmultiformat{equation}{(#2#1#3}{,~#2#1#3)}{,~#2#1#3}{,~#2#1#3)}
+    \crefrangemultiformat{equation}{(#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}{,~#3#1#4--#5#2#6}{,~#3#1#4--#5#2#6)}
+    
+    \crefname{chapter}{Cap.}{Capp.}
+    \crefrangeformat{chapter}{Capp.~#3#1#4--#5#2#6}
+    \crefmultiformat{chapter}{Capp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{chapter}{Capp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    
+    \crefname{section}{§}{§§}
+    \crefrangeformat{section}{§§~#3#1#4--#5#2#6}
+    \crefmultiformat{section}{§§~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{section}{§§~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    
+    \crefname{figure}{Fig.}{Figg.}
+    \crefrangeformat{figure}{Figg.~#3#1#4--#5#2#6}
+    \crefmultiformat{figure}{Figg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{figure}{Figg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    
+    \crefname{table}{Tab.}{Tabb.}
+    \crefrangeformat{table}{Tabb.~#3#1#4--#5#2#6}
+    \crefmultiformat{table}{Tabb.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{table}{Tabb.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{algorithm}{Alg.}{Algg.}
+    \crefrangeformat{algorithm}{Algg.~#3#1#4--#5#2#6}
+    \crefmultiformat{algorithm}{Algg.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{algorithm}{Algg.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{listing}{List.}{Listt.}
+    \crefrangeformat{listing}{Listt.~#3#1#4--#5#2#6}
+    \crefmultiformat{listing}{Listt.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{listing}{Listt.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    
+    \crefname{prp}{Prop.}{Propp.}
+    \crefrangeformat{prp}{Propp.~#3#1#4--#5#2#6}
+    \crefmultiformat{prp}{Propp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{prp}{Propp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{dfn}{Def.}{Deff.}
+    \crefrangeformat{dfn}{Deff.~#3#1#4--#5#2#6}
+    \crefmultiformat{dfn}{Deff.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{dfn}{Deff.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{oss}{Oss.}{Oss.ni}
+    \crefrangeformat{oss}{Oss.ni~#3#1#4--#5#2#6}
+    \crefmultiformat{oss}{Oss.ni~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{oss}{Oss.ni~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+    % https://www.treccani.it/magazine/lingua_italiana/domande_e_risposte/grammatica/grammatica_123.html
+
+    \crefname{teo}{Teo.}{Teo.ri}
+    \crefrangeformat{teo}{Teo.ri~#3#1#4--#5#2#6}
+    \crefmultiformat{teo}{Teo.ri~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{teo}{Teo.ri~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
+
+    \crefname{ipo}{Ip.}{Ipp.}
+    \crefrangeformat{ipo}{Ipp.~#3#1#4--#5#2#6}
+    \crefmultiformat{ipo}{Ipp.~#2#1#3}{ e~#2#1#3}{, #2#1#3}{ e~#2#1#3}
+    \crefrangemultiformat{ipo}{Ipp.~#3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ e~#3#1#4--#5#2#6}
 %\endgroup
 
 %\begingroup Frontespizio

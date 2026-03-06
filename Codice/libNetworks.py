@@ -69,7 +69,8 @@ class NetworkAnalysis():
         def EstimateBinNumber(v):
             # The option «'fd'» stands for «Freedman-Diaconis» and
             # uses Numpy to calculate the optimal edges for the data
-            edges = np.histogram_bin_edges(v,bins='fd')
+            # edges = np.histogram_bin_edges(v,bins='fd')
+            edges = np.histogram_bin_edges(v,bins='doane')
             return len(edges) - 1
         libF.CreateHistogramPlot(di,EstimateBinNumber(di),figData.fig)
 
@@ -449,7 +450,7 @@ class NetworkAnalysis():
 
         # Style
         libF.SetFigStyle(
-            r"$k$",r"$C^w_{\text{rel}}(k)$",
+            r"$k$",r"$C^w_{rel}(k)$",
             xScale="log",yScale="log",
             ax=ax[1],
             data=figData.fig2
