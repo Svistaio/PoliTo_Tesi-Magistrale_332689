@@ -4,220 +4,278 @@
 
 \begin{tikzpicture}%
     %\begingroup Impostazioni
-        %\begingroup Colori
-            \definecolor{colore}{rgb}{0.50196,0.50196,0.50196}%
-        %\endgroup
-    
-        %\begingroup Testo
-            % \renewcommand\titleSize{12}
-            \renewcommand\subCaptionSize{9}
-            \renewcommand\labelSize{8}
-            \renewcommand\tickSize{7}
-            \renewcommand\legendSize{6}
-        %\endgroup
-
-        %\begingroup Dimensioni
-            \pgfmathsetmacro\plotWidth{7}
-            \pgfmathsetmacro\plotHeight{.618*\plotWidth}
-            \pgfmathsetmacro\halfHeightPlot{\plotHeight/2}
-            
-            \pgfmathsetmacro\xPlotSep{2.25}
-            \pgfmathsetmacro\yPlotSepI{1.5}
-            \pgfmathsetmacro\yPlotSepII{3}
-            \pgfmathsetmacro\xLegendSep{.25cm}
-        %\endgroup
-
-        %\begingroup Gruppi
+        \infopageKeysI
         \pgfplotsset{
-            /pgfplots/group/plotGroup/.style={
-                horizontal sep=\xPlotSep em,
-                vertical sep=\yPlotSepI em,
-                % x descriptions at=edge bottom,
-            },
-            /pgfplots/group/plotGroup1/.style={
-                plotGroup,
-                group name=Group1,
-                group size=2 by 4,
-            },
-            /pgfplots/group/plotGroup2/.style={
-                plotGroup,
-                group name=Group2,
+            /pgfplots/group/plotGroup/.append style={
                 group size=2 by 1,
-            }
-        }
-        %\endgroup
-
-        %\begingroup Colonne
-        \pgfplotsset{
-            plotColumn/.style={
-                width=\plotWidth cm,
-                height=\plotHeight cm,
-                scale only axis,
-                xlabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
-                ylabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
-                xticklabel style={font=\dimTesto{\tickSize}},
-                yticklabel style={font=\dimTesto{\tickSize}},
-                axis x line*=bottom,
-                xmajorgrids,ymajorgrids,
-                xminorticks=true,yminorticks=true,
-                axis background/.style={fill=white},
-                grid style={dashed}
             },
-            plotColumn1/.style={
-                plotColumn,
-                axis y line*=left,
-                ylabel={\(\underhat{\bar f}_N(s)\)},
-                y tick scale label style={
-                    yshift=.25cm,
-                    at={(0,1)},
-                    anchor=south west,
-                },
-            },
-            plotColumn2/.style={
-                plotColumn,
-                axis y line*=right,
-                ylabel={\(\underhat{\bar f}_N(s)\)},
-                y tick scale label style={
-                    yshift=.25cm,
-                    at={(1,1)},
-                    anchor=south east,
-                },
+            plotRow/.append style={
+                width=\plotLastWidth cm
             },
         }
-        %\endgroup
-
-        %\begingroup Legende
-        \pgfplotsset{
-            plotLegend/.style={
-                font=\dimTesto{\legendSize},
-                legend cell align=left,
-                align=left,
-                % draw=white!15!black,
-                draw=none, % Bordo invisibile
-                fill=white,
-                fill opacity=0.5,
-                text opacity=1,
-            },
-            plotLegend1/.style={legend style={plotLegend},legend pos=north east},
-            plotLegend2/.style={legend style={plotLegend},legend pos=south west},
-            plotLegend3/.style={legend style={plotLegend},legend pos=north west},
-        }
-        %\endgroup
     %\endgroup
 
-    \begin{groupplot}[group style=plotGroup1]
-        \nextgroupplot[%
-            plotColumn1,plotLegend1,xmode=log,
-            xmin=100,xmax=1000000,
-            ymin=0,ymax=0.0004,
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig2_g.05.tex}
-
-        \nextgroupplot[%
-            plotColumn2,plotLegend1,xmode=log,
-            xmin=100,xmax=1000000,
-            ymin=0,ymax=0.00045,
-            ytick={0,0.0001,0.0002,0.0003,0.0004},
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig2_g0.tex}
-
-        \nextgroupplot[%
-            plotColumn1,plotLegend1,xmode=log,
-            xmin=100,xmax=1000000,
-            ymin=0,ymax=0.00045,
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig3_g.05.tex}
-
-        \nextgroupplot[%
-            plotColumn2,plotLegend1,xmode=log,
-            xmin=100,xmax=1000000,
-            ymin=0,ymax=0.00045,
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig3_g0.tex}
-
-        \nextgroupplot[%
-            plotColumn1,plotLegend2,
-            xmode=log,ymode=log,
-            xmin=3637.5,xmax=204237,
-            ymin=0.00531914893617021,ymax=1,
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig9_g.05.tex}
-
-        \nextgroupplot[%
-            plotColumn2,plotLegend2,
-            xmode=log,ymode=log,
-            xmin=3637.5,xmax=204237,
-            ymin=0.00531914893617021,ymax=1,
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig9_g0.tex}
-
-        \nextgroupplot[%
-            plotColumn1,plotLegend2,
-            xmode=log,ymode=log,
-            xmin=3637.5,xmax=204237,
-            ymin=0.00531914893617021,ymax=1,
-            xlabel={\(s\)},
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig10_g.05.tex}
-
-        \nextgroupplot[%
-            plotColumn2,plotLegend2,
-            xmode=log,ymode=log,
-            xmin=3637.5,xmax=204237,
-            ymin=0.00531914893617021,ymax=1,
-            xlabel={\(s\)},
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig10_g0.tex}
-    \end{groupplot}
-
-    \begin{groupplot}[group style=plotGroup2]
-        \nextgroupplot[%
-            plotColumn1,plotLegend3,
-            at={($(Group1 c1r4.south west)-(0,\yPlotSepII em)-(0,\plotHeight cm)$)},
-            xmin=0,xmax=10000,
-            ymin=4100,ymax=4800,
-            xlabel={\(t\)},ylabel={\(\langle s\rangle\)},
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/AS_g.05.tex}
-
-        \nextgroupplot[%
-            plotColumn2,plotLegend3,
-            xmin=0,xmax=10000,
-            ymin=4395.3279999995,ymax=4395.3280000005,
-            xlabel={\(t\)},ylabel={\(\langle s\rangle\)},
-        ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/AS_g0.tex}
-    \end{groupplot}
-
-    %\begingroup Didascalie
-        \tikzset{
-            Titolo/.style={
-                text width=\plotWidth cm,
-                align=center,
-                % anchor=center,
-                anchor=south,
-                font=\dimTesto{\titleSize}\bfseries,
-            }
-        }
-        \node[Titolo] at (Group1 c1r1.north) {Con fluttuazioni \(\gamma\)};
-        \node[Titolo] at (Group1 c2r1.north) {Senza fluttuazioni \(\gamma\)};
-
-        \tikzset{
-            SubCaption/.style={
-                % text width=\plotWidth cm,
-                align=center,
-                font=\dimTesto{\subCaptionSize},
+    %\begingroup Righe
+        \begin{groupplot}[
+            group style={
+                group name=Row1,
+                plotGroup,
             },
-            SubCaption1/.style={SubCaption,anchor=south east},
-            SubCaption2/.style={SubCaption,anchor=north east},
-            SubCaption3/.style={SubCaption,anchor=south west},
-        }
-
-        \node[SubCaption1] at (Group1 c1r1.south east) {\sottoDidascalia[]{}};
-        \node[SubCaption1] at (Group1 c2r1.south east) {\sottoDidascalia[]{}};
-        \node[SubCaption1] at (Group1 c1r2.south east) {\sottoDidascalia[]{}};
-        \node[SubCaption1] at (Group1 c2r2.south east) {\sottoDidascalia[]{}};
+            plotRow,
+            row1Keys,
+            plotLegendNE,
+            %
+            xticklabels={},
+            % xmin=1.7158,xmax=5.4719,
+            ymin=0,ymax=1.4,
+        ]
+            \nextgroupplot[%
+                xmin=1.7064,xmax=5.4903,
+                % xmin=1.9138,xmax=5.4719,
+                % ymin=0,ymax=1.4,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig2_g.05.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig2.tex}
     
-        \node[SubCaption2] at (Group1 c1r3.north east) {\sottoDidascalia[]{}};
-        \node[SubCaption2] at (Group1 c2r3.north east) {\sottoDidascalia[]{}};
-        \node[SubCaption2] at (Group1 c1r4.north east) {\sottoDidascalia[]{}};
-        \node[SubCaption2] at (Group1 c2r4.north east) {\sottoDidascalia[]{}};
-
-        \node[SubCaption3] at (Group2 c1r1.south west) {\sottoDidascalia[]{}};
-        \node[SubCaption3] at (Group2 c2r1.south west) {\sottoDidascalia[]{}};
+            \nextgroupplot[%
+                xmin=2.0755,xmax=5.4719,
+                % xmin=1.9138,xmax=5.4719,
+                % ymin=0,ymax=1.4,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig2_g0.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig2.tex}
+        \end{groupplot}
     
-        % https://tex.stackexchange.com/questions/632045/get-subcaption-for-every-plot-using-groupplot-pgf-tikz-after-2020-update
+        \begin{groupplot}[
+            group style={
+                group name=Row2,
+                plotGroup,
+            },
+            plotRow,
+            row1Keys,
+            plotLegendNE,
+            %
+            % xmin=1.7158,xmax=5.4719,
+            ymin=0,ymax=1.4,
+        ]
+            \nextgroupplot[%
+                at={($(Row1 c1r1.south west)-(0,.5*\yPlotSep em)-(0,\plotHeight cm)$)},
+                xmin=1.7064,xmax=5.4903,
+                % xmin=1.5262,xmax=5.4903,
+                % ymin=0,ymax=1.4,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig3_g.05.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig3.tex}
+    
+            \nextgroupplot[%
+                xmin=2.0755,xmax=5.4719,
+                % xmin=1.9138,xmax=5.4719,
+                % ymin=0,ymax=1.4,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig3_g0.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig3.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={
+                group name=Row3,
+                plotGroup,
+            },
+            plotRow,
+            row2Keys,
+            plotLegendNE,
+            %
+            xmin=3.4,xmax=5.4,
+            ymin=0.0053191,ymax=1,
+        ]
+            \nextgroupplot[%
+                at={(Row2 c1r1.south east)},yshift=-\yPlotSep em,anchor=north east,
+                % xmin=3.4,xmax=5.4,
+                % ymin=0.0053191,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig8_g.05.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig8.tex}
+    
+            \nextgroupplot[%
+                % xmin=3.4,xmax=5.4,
+                % ymin=0.0053191,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig8_g0.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig8.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={
+                group name=Row4,
+                plotLastGroup,
+            },
+            plotRow,
+            row3Keys,
+            plotLegendNE,
+            %
+            xmin=3.4,xmax=5.4,
+            ymin=0.0053191,ymax=1,
+        ]
+            \nextgroupplot[%
+                at={($(Row3 c1r1.south west)-(0,.5*\yPlotSep em)-(0,\plotHeight cm)$)},
+                % xmin=3.4,xmax=5.4,
+                % ymin=0.0053191,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig9_g.05.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig9.tex}
+    
+            \nextgroupplot[%
+                % xmin=3.4,xmax=5.4,
+                % ymin=0.0053191,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/SDFfig9_g0.tex}
+            % \input{../../../.tex/20/KS/SizeDistributionFittingsfig9.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={
+                group name=Row5,
+                plotLastGroup,
+            },
+            plotRow,
+            row5KeysLin,
+            plotLegendNW,
+            %
+            xmin=0,xmax=10000,
+            ymin=4150,ymax=4650,
+        ]
+            \nextgroupplot[%
+                at={(Row4 c1r1.south east)},yshift=-\yGroupSep em,anchor=north east,
+                % xmin=0,xmax=10000,
+                % ymin=4150,ymax=4650,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/AS_g.05.tex}
+            % \input{../../../.tex/20/KS/AverageSize.tex}
+    
+            \nextgroupplot[%
+                % xmin=0,xmax=10000,
+                % ymin=4395.3,ymax=4395.3,
+            ] \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/AS_g0.tex}
+            % \input{../../../.tex/20/KS/AverageSize.tex}
+        \end{groupplot}
     %\endgroup
 
-    \redefineTikZbounds{Group1 c1r1}{Group2 c2r1}
+    %\begingroup Titoli e didascalie
+        \node[title] at (Row1 c1r1.north) {Con fluttuazioni \(\gamma\)};
+        \node[title] at (Row1 c2r1.north) {Senza fluttuazioni \(\gamma\)};
+
+        \foreach \r in {1,...,5}
+            \foreach \c in {1,2}{
+                \ifcase\r\relax% Caso 0
+                \or\writeSubCaption{Row\r\space c\c r1}{north west}{north west}{0em}{0em}  % Caso 1
+                \or\writeSubCaption{Row\r\space c\c r1}{north west}{north west}{0em}{0em}  % Caso 2
+                \or\writeSubCaption{Row\r\space c\c r1}{south west}{south west}{0em}{0em}  % Caso 3
+                \or\writeSubCaption{Row\r\space c\c r1}{south west}{south west}{0em}{0em}  % Caso 4
+                \else\ifnum\c<3
+                    \writeSubCaption{Row\r\space c\c r1}{south west}{south west}{0em}{0em} % Caso 5
+                \else\relax\fi\fi
+                
+            } % https://tex.stackexchange.com/questions/632045/get-subcaption-for-every-plot-using-groupplot-pgf-tikz-after-2020-update
+    %\endgroup
+
+    %\begingroup Parametri
+        %\begingroup beta
+            \newcommand\betaExactList[1]{
+                \ifnum#1=1\num{1.238+-0.012} % Caso con fluttuazioni
+                \else\num{1.227+-0.010}\fi   % Caso senza fluttuazioni
+            }
+            \newcommand\betaAprxList[1]{
+                \ifnum#1=1\num{1.287+-0.015} % Caso con fluttuazioni
+                \else\num{1.280+-0.011}\fi   % Caso senza fluttuazioni
+            }
+        %\endgroup
+
+        %\begingroup xi
+        \newcommand\xiExactList[1]{
+            \ifnum#1=1\num{0.766+-0.024} % Caso con fluttuazioni
+            \else\num{0.786+-0.021}\fi   % Caso senza fluttuazioni
+        }
+        \newcommand\xiAprxList[1]{
+            \ifnum#1=1\num{0.707+-0.025} % Caso con fluttuazioni
+            \else\num{0.723+-0.022}\fi   % Caso senza fluttuazioni
+        }
+        %\endgroup
+
+        %\begingroup mI
+        \newcommand\mIExactList[1]{
+            \ifnum#1=1\num{3.281+-0.018} % Caso con fluttuazioni
+            \else\num{3.302+-0.005}\fi   % Caso senza fluttuazioni
+        }
+        \newcommand\mIAprxList[1]{
+            \ifnum#1=1\num{3.268+-0.017} % Caso con fluttuazioni
+            \else\num{3.276+-0.006}\fi   % Caso senza fluttuazioni
+        }
+        %\endgroup
+
+        %\begingroup sI
+        \newcommand\sIExactList[1]{
+            \ifnum#1=1\num{0.256+-0.005} % Caso con fluttuazioni
+            \else\num{0.241+-0.005}\fi   % Caso senza fluttuazioni
+        }
+        \newcommand\sIAprxList[1]{
+            \ifnum#1=1\num{0.253+-0.006} % Caso con fluttuazioni
+            \else\num{0.245+-0.005}\fi   % Caso senza fluttuazioni
+        }
+        %\endgroup
+
+        %\begingroup mII
+        \newcommand\mIIExactList[1]{
+            \ifnum#1=1\num{3.926+-0.048} % Caso con fluttuazioni
+            \else\num{3.990+-0.042}\fi   % Caso senza fluttuazioni
+        }
+        \newcommand\mIIAprxList[1]{
+            \ifnum#1=1\num{3.836+-0.042} % Caso con fluttuazioni
+            \else\num{3.870+-0.037}\fi   % Caso senza fluttuazioni
+        }
+        %\endgroup
+
+        %\begingroup sII
+        \newcommand\sIIExactList[1]{
+            \ifnum#1=1\num{0.368+-0.019} % Caso con fluttuazioni
+            \else\num{0.331+-0.019}\fi   % Caso senza fluttuazioni
+        }
+        \newcommand\sIIAprxList[1]{
+            \ifnum#1=1\num{0.392+-0.014} % Caso con fluttuazioni
+            \else\num{0.377+-0.013}\fi   % Caso senza fluttuazioni
+        }
+        %\endgroup
+
+        \foreach \c/\sl/\a/\p/\xS/\yS/\yLS in {
+            1/2/south west/south west/2em/0em/-.5em,
+            2/2/south west/south west/2em/0em/-.5em
+        }{
+            \def\betaExact{\betaExactList\c}
+            \def\betaAprx{\betaAprxList\c}
+
+            \foreach \r/\fl in {3/0,4/1}{
+                \writeParetoParameters[\a]\fl\sl{Row\r\space c\c r1.\p}\xS\yS\yLS
+            }
+        } % «\fl=first line», «\sl=second line», «\a=anchor»
+          % «\xS=\xShift», «\yS=\yShift» e «\yLS=\yLineShift»
+
+        \foreach \c/\a/\p/\xS/\yS/\yLS in {
+            1/south west/south west/0em/2em/-.5em,
+            2/south west/south west/0em/2em/-.5em
+        }{
+            \def\xiExact{\xiExactList\c}
+            \def\xiAprx{\xiAprxList\c}
+
+            \def\mIExact{\mIExactList\c}
+            \def\mIAprx{\mIAprxList\c}
+
+            \def\sIExact{\sIExactList\c}
+            \def\sIAprx{\sIAprxList\c}
+
+            \def\mIIExact{\mIIExactList\c}
+            \def\mIIAprx{\mIIAprxList\c}
+
+            \def\sIIExact{\sIIExactList\c}
+            \def\sIIAprx{\sIIAprxList\c}
+
+            \foreach \r/\t in {3/0,4/1}{
+                \writeBiLognormalParameters[\a]\t{Row\r\space c\c r1.\p}\xS\yS\yLS
+            } % «\fl=first line», «\sl=second line», «\a=anchor»
+              % «\xS=\xShift», «\yS=\yShift» e «\yLS=\yLineShift»
+        }
+    %\endgroup
+
+    \redefineTikZbounds{Row1 c1r1}{Row5 c2r1}
 \end{tikzpicture}%
+
+% \input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Parametri.txt}

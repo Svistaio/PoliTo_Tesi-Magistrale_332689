@@ -12,33 +12,30 @@
                 plotGroup,
             },
             plotRow,
-            plotLegendNE,
+            row1Keys,
+            plotLegendNW,
             %
-            enlarge x limits=0.01,
-            enlarge y limits={upper,value=.025},
-            xmode=log,
-            log origin=infty,
-            xmin=3.9941e-170,xmax=1.1505e+06,
-            ymin=0,%ymax=2.5e+163,
+            % xmin=3.9941e-170,xmax=1.1505e+06,
+            % ymin=0,ymax=0.08,
         ]
             \nextgroupplot[%
                 plotLeftCol,
-                % xmin=1e-200,xmax=1.1505e+06,
-                % ymin=0,ymax=2.5e+163,
+                % xmin=-177.9,xmax=14.698,
+                ymin=0,ymax=0.08,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig1.tex}
             % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig1.tex}
     
             \nextgroupplot[%
                 plotMiddleCol,
-                % xmin=1e-200,xmax=8.9656e+05,
-                % ymin=0,ymax=2.5e+163,
+                % xmin=-177.9,xmax=14.686,
+                ymin=0,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig2.tex}
             % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig2.tex}
     
             \nextgroupplot[%
                 plotRightCol,
-                % xmin=1e-200,xmax=1.1505e+06,
-                % ymin=0,ymax=3.9089e+160,
+                % xmin=-177.46,xmax=14.677,
+                ymin=0,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig3.tex}
             % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig3.tex}
         \end{groupplot}
@@ -49,76 +46,70 @@
                 plotGroup,
             },
             plotRow,
+            row2Keys,
             plotLegendSW,
             %
-            xlabel={},%xticklabels={},
-            xmode=log,ymode=log,
             % xmin=10,xmax=1.1505e+06,
             % ymin=0.0053191,ymax=1.0099,
         ]
             \nextgroupplot[%
-                % at={($(Row1 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
-                at={(Row1 c1r1.south east)},
-                yshift=-\yPlotSep em,
-                anchor=north east,
+                at={(Row1 c1r1.south east)},yshift=-\yPlotSep em,anchor=north east,
                 plotLeftCol,
-                % plotMiddleCol,
-                % xmin=10,xmax=1e+07,
-                % ymin=0.0053191,ymax=1.0099,
+                xmin=1,xmax=6,
+                ymin=0.0053191,ymax=1.0097,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig7.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig7.tex}
+    
+            \nextgroupplot[%
+                plotMiddleCol,
+                ymin=0.0009596,ymax=1.002,
+                xmin=1,xmax=6,
+                % ymin=0.0009596,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig8.tex}
             % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig8.tex}
     
             \nextgroupplot[%
-                plotMiddleCol,
-                xmin=62.237,xmax=1.1505e+06,
-                ymin=0.0006581,%ymin=0.00090388,
-                ymax=1.0099,
+                plotRightCol,
+                ymin=0.0009596,ymax=1.002,
+                xmin=1.5,xmax=6.5,
+                % ymin=0.0001,ymax=1.0002,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig9.tex}
             % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig9.tex}
-    
-            \nextgroupplot[%
-                plotRightCol,
-                xmin=100,xmax=1.1505e+06,
-                ymin=0.0006581,
-                ymax=1.0099,%ymax=1,
-            ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig10.tex}
-            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig10.tex}
         \end{groupplot}
     
         \begin{groupplot}[
             group style={
                 group name=Row3,
                 plotLastGroup,
-                y descriptions at=all
             },
             plotRow,
+            row3Keys,
             plotLegendSW,
             %
-            xmode=log,ymode=log,
             % xmin=10,xmax=2.0424e+05,
             % ymin=0.0041301,ymax=1.0204,
         ]
             \nextgroupplot[%
                 at={($(Row2 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
                 plotLeftCol,
-                % xmin=3637.5,xmax=2.0424e+05,
-                % ymin=0.0041301,ymax=1.0005,
+                xmin=3.4,xmax=5.4,
+                ymin=0.0041299,ymax=1.0005,
+            ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig4.tex}
+            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig4.tex}
+    
+            \nextgroupplot[%
+                plotMiddleCol,
+                xmin=1,xmax=6,
+                ymin=0.0053191,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig5.tex}
             % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig5.tex}
     
             \nextgroupplot[%
-                plotMiddleCol,
-                xmin=62.237,xmax=1.1505e+06,
-                ymin=0.0053191,ymax=1.0204,%ymax=1.0099,
+                plotRightCol,
+                xmin=1.5,xmax=6,
+                ymin=0.0053191,ymax=1,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig6.tex}
             % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig6.tex}
-    
-            \nextgroupplot[%
-                plotRightCol,
-                xmin=100,xmax=1.1505e+06,
-                ymin=0.0053191,ymax=1.0204,
-            ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SDFfig7.tex}
-            % \input{../../../../.tex/20/KS/SizeDistributionFittingsfig7.tex}
         \end{groupplot}
     
         \begin{groupplot}[
@@ -127,32 +118,33 @@
                 plotLastGroup
             },
             plotRow,
+            row4Keys,
             plotLegendSW,
             %
-            xlabel={\(k\)},ylabel={\(s(k)\)},
-            xmode=log,ymode=log,
             xmin=10,xmax=283,
-            ymin=2.9388e-22,ymax=2.7648e+05,
+            % ymin=1.5126e-23,ymax=3.3952e+05,
         ]
             \nextgroupplot[%
                 at={($(Row3 c1r1.south west)-(0,\yGroupSep em)-(0,\plotHeight cm)$)},
                 plotLeftCol,
                 % xmin=10,xmax=283,
-                % ymin=1e-25,ymax=1e+10,
+                % ymin=1e-15,ymax=1e+10,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SVsDfig1.tex}
             % \input{../../../../.tex/20/KS/SizeVsDegreefig1.tex}
     
             \nextgroupplot[%
                 plotMiddleCol,
+                ymin=8.9565e-14,ymax=2.4506e+05,
                 % xmin=10,xmax=283,
-                % ymin=1e-25,ymax=1e+10,
+                % ymin=1e-15,ymax=1e+10,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SVsDfig2.tex}
             % \input{../../../../.tex/20/KS/SizeVsDegreefig2.tex}
     
             \nextgroupplot[%
                 plotRightCol,
+                ymin=8.9565e-14,ymax=2.4506e+05,
                 % xmin=10,xmax=283,
-                % ymin=1e-10,ymax=2.7648e+05,
+                % ymin=1.3083e-11,ymax=2.4506e+05,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SVsDfig3.tex}
             % \input{../../../../.tex/20/KS/SizeVsDegreefig3.tex}
         \end{groupplot}
@@ -165,19 +157,11 @@
                 group size=2 by 1,
             },
             plotRow,
-            plotLegendW,
+            row5Keys,
+            legend style={\placeLegend{0}{.5}{west}{0em}{0em}},
             %
-            width=\plotLastWidth cm,
-            xlabel={\(t\)},ylabel={\(s(t)\)},
-            enlarge x limits=0,enlarge y limits=0.01,
-            ymode=log,
-            x tick scale label style={
-                yshift=-1em,
-                at={(.95,0)},
-                anchor=north,
-            },
             xmin=0,xmax=10000,
-            ymin=2.8684e-17,%ymax=4730.6,
+            ymin=9.9387e-20,ymax=3.3665e+05,
         ]
             \nextgroupplot[%
                 at={($
@@ -187,42 +171,42 @@
                 $)},
                 plotLeftCol,
                 % xmin=0,xmax=10000,
-                % ymin=1e-20,ymax=1e+10,
+                % ymin=1e-15,ymax=1e+10,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SEfig1.tex}
             % \input{../../../../.tex/20/KS/SizeEvolutionsfig1.tex}
 
             \nextgroupplot[%
                 plotRightCol,
                 % xmin=0,xmax=10000,
-                % ymin=1e-08,ymax=1e+06,
+                % ymin=1e-10,ymax=2.4549e+05,
             ] \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/SEfig2.tex}
             % \input{../../../../.tex/20/KS/SizeEvolutionsfig2.tex}
         \end{groupplot}
     %\endgroup
 
     %\begingroup Parametri
-        \newcommand\betaExact{\num{0.321+-0.021}}
-        \newcommand\xiExact{\num{.641+-.241}}
+        \newcommand\betaExact{\num{0.305+-0.014}}
+        \newcommand\betaAprx{\num{0.384+-0.019}}
         
-        \newcommand\betaAprx{\num{0.381+-0.031}}
-        \newcommand\xiAprx{\num{.481+-.261}}
+        \newcommand\xiExact{\num{0.229+-0.024}}
+        \newcommand\xiAprx{\num{0.268+-0.033}}
 
-        \newcommand\mIExact{\num{2.460+-0.018}}
-        \newcommand\mIAprx{\num{2.434+-0.020}}
+        \newcommand\mIExact{\num{-29.095+-2.280}}
+        \newcommand\mIAprx{\num{-25.552+-2.910}}
         
-        \newcommand\sIExact{\num{0.296+-0.009}}
-        \newcommand\sIAprx{\num{0.291+-0.009}}
+        \newcommand\sIExact{\num{24.271+-2.930}}
+        \newcommand\sIAprx{\num{22.259+-0.842}}
         
-        \newcommand\mIIExact{\num{3.204+-0.015}}
-        \newcommand\mIIAprx{\num{3.183+-0.015}}
+        \newcommand\mIIExact{\num{-1.602+-0.195}}
+        \newcommand\mIIAprx{\num{-0.852+-0.335}}
         
-        \newcommand\sIIExact{\num{0.385+-0.007}}
-        \newcommand\sIIAprx{\num{0.392+-0.007}}
+        \newcommand\sIIExact{\num{4.715+-0.306}}
+        \newcommand\sIIAprx{\num{4.206+-0.342}}
 
         \foreach \c/\fl/\sl/\a/\p/\xS/\yS/\yLS in {
-            1/0/1/north east/north east/0em/0em/-.5em,
-            2/0/2/north east/north east/0em/0em/-.5em,
-            3/1/2/north east/north east/0em/0em/-.5em
+            1/0/1/west/west/0em/0em/-.5em,
+            2/0/2/west/west/0em/0em/-.5em,
+            3/1/2/west/west/0em/0em/-.5em
         } {\writeParetoParameters[\a]\fl\sl{Row2 c\c r1.\p}\xS\yS\yLS}
             % «\fl=first line», «\sl=second line», «\a=anchor»
             % «\xS=\xShift», «\yS=\yShift» e «\yLS=\yLineShift»
@@ -238,9 +222,9 @@
         \foreach \r in {1,...,5}
             \foreach \c in {1,2,3}{
                 \ifcase\r\relax% Caso 0
-                \or\writeSubCaption{Row\r\space c\c r1}{south east}{south east}{0em}{0em}  % Caso 1
-                \or\writeSubCaption{Row\r\space c\c r1}{west}{west}{0em}{0em}              % Caso 2
-                \or\writeSubCaption{Row\r\space c\c r1}{east}{east}{0em}{0em}              % Caso 3
+                \or\writeSubCaption{Row\r\space c\c r1}{south west}{south west}{0em}{0em}  % Caso 1
+                \or\writeSubCaption{Row\r\space c\c r1}{north east}{north east}{0em}{0em}              % Caso 2
+                \or\writeSubCaption{Row\r\space c\c r1}{north east}{north east}{0em}{0em}              % Caso 3
                 \or\writeSubCaption{Row\r\space c\c r1}{south east}{south east}{0em}{0em}  % Caso 4
                 \else\ifnum\c<3
                     \writeSubCaption{Row\r\space c\c r1}{south west}{south west}{0em}{0em} % Caso 5
@@ -253,3 +237,5 @@
 
     \redefineTikZbounds{Row1 c1r1}{Row4 c3r1}
 \end{tikzpicture}%
+
+% \input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/Parametri.txt}

@@ -261,7 +261,7 @@
             \end{oss}
 
             \begin{ipo}
-                In questa trattazione si considerano \(\Delta t=0.01\), \(N_s=1000\), \(N_f=50\) mentre \(N_t\) viene scelto per essere poco superiore al tempo di convergenza della simulazione, se i risultati convergono, ma sicuramente è un multiplo di \(10\) per garantire che \(N_s\) sia un suo divisore.
+                In questa trattazione si considerano \(\Delta t=0.01\), \(N_s=1000\), \(N_f=50\) mentre \(N_t\) viene scelto per essere poco superiore al tempo di convergenza per ogni simulazione, se i risultati convergono, ma sicuramente è un multiplo di \(10\) per garantire che \(N_s\) sia un suo divisore.
             \end{ipo}
 
             \begin{oss}
@@ -282,22 +282,23 @@
                     s_{\min}\equiv\min_{a,i,r}\ s^{T,a}_{i,r},
                 \end{equation*}
                 %
-                coi quali si può definire una griglia comune equispaziata su cui costruire gl'istogrammi. Siano \(N_c\) il numero di intervalli della griglia, ossia il numero di classi, allora definita \(\Histogram\colon\mathbb R^N\to\mathbb R^{N_c}\) come la funzione che restituisce i valori [normalizzati] delle classi dell'istogramma, il tensore \(\mathbf h\in\RPlus^{2\times N_c\times R}\) si scrive
+                coi quali si può definire una griglia comune equispaziata su cui costruire gl'istogrammi. Siano \(N_c\) il numero di intervalli della griglia, ossia il numero di classi, allora definita \(\Histogram\colon\mathbb R^N\to\mathbb R^{N_c}\) come la funzione che restituisce i valori [normalizzati] delle classi dell'istogramma, il tensore \(\mathbf b\in\RPlus^{2\times N_c\times R}\) si scrive
                 %
-                \begin{equation*}
-                    \mathbf h^a_{\cdot,r}\equiv\Histogram(\mathbf s^{T,a}_{\cdot,r}),
+                \begin{equation}
+                    \label{eqAltezzeIstogrammi}
+                    \mathbf b^a_{\cdot,r}\equiv\Histogram(\mathbf s^{T,a}_{\cdot,r}),
                     \ \ \forall a\text{ e }\forall r,
-                \end{equation*}
+                \end{equation}
                 %
                 Valutati gl'intervalli di confidenza
                 %
                 \begin{equation*}
-                    \IC_R^{0.05}(\mathbf h^a_c)=
-                    \bar h^a_c\pm t^{0.025}_{R-1}\sqrt{\frac{v^a_c}R},
+                    \IC_R^{0.05}(\mathbf b^a_c)=
+                    \bar b^a_c\pm t^{0.025}_{R-1}\sqrt{\frac{v^a_c}R},
                     \ \ \forall a\text{ e }\forall c,
                 \end{equation*}
                 %
-                si possono rappresentare con \(\bar{\mathbf h}^a\) l'istogramma medio della simulazione esatta e approssimata, e con \(\pm t^{0.025}_{R-1}\sqrt{v^a_c/R}\) l'errore stocastico sulle stime dei valori medi delle classi.
+                si possono rappresentare con \(\bar{\mathbf b}^a\) l'istogramma medio della simulazione esatta e approssimata, e con \(\pm t^{0.025}_{R-1}\sqrt{v^a_c/R}\) l'errore stocastico sulle stime dei valori medi delle classi.
 
             \subsubsection{Lognormale bimodale}
 
@@ -342,7 +343,7 @@
 
                 Si nota, in conclusione, che i tre grafici sono in scala semilogaritmica per far emergere la distribuzione normale dalla lognormale bimodale.
 
-            \subsubsection{Funzione di ripartizione empirica}\label{secFRCEmpirica}
+            \subsubsection{Funzione di ripartizione complementare empirica}\label{secFRCEmpirica}
 
                 La distribuzione di Pareto è fittata a partire dalla funzione di ripartizione complementare (FRC) empirica che quindi va prima analizzata, ma solo nella coda della distribuzione della popolazione.
                 
@@ -362,7 +363,7 @@
                 %
                 \begin{equation}
                     \label{eqFunzioneRipartizioneComplementare}
-                    \mathcal F(x;\mathbf s^a_{\cdot,r})\equiv
+                    \FRC_{\mathcal E}(x;\mathbf s^a_{\cdot,r})\equiv
                     1-\frac1N\sum_{i=1}^N\chi_{[0,x]}
                     \left(s^{T,a}_{i,r}\right),
                     \ \ \forall a\text{ e }\forall r,
@@ -389,7 +390,7 @@
                 %
                 \begin{equation*}
                     \begin{aligned}
-                        \mathcal F(x;\mathbf s^{T,a}_{\cdot,r})&=1-\frac{N-N_\UnQuarto}N-\frac1N\sum_{i=1}^{N_\UnQuarto}
+                        \FRC_{\mathcal E}(x;\mathbf s^{T,a}_{\cdot,r})&=1-\frac{N-N_\UnQuarto}N-\frac1N\sum_{i=1}^{N_\UnQuarto}
                         \chi_{[0,x]}\left(s^{T,a}_{N-N_\UnQuarto+i,r}\right)\\&
                         % =\frac1N\left(
                         %     N_\UnQuarto-\sum_{i=1}^{N_\UnQuarto}
@@ -399,34 +400,31 @@
                             1-\frac1{N_\UnQuarto}\smash{\sum_{i=1}^{N_\UnQuarto}}
                             \chi_{[0,x]}\left(p^{T,a}_{i,r}\right)
                         \right]%\\&
-                        =\frac{N_\UnQuarto}N\mathcal F(x;\mathbf p^a_{\cdot,r}),
+                        =\frac{N_\UnQuarto}N\FRC_{\mathcal E}(x;\mathbf p^a_{\cdot,r}),
                         \ \ \forall a\text{ e }\forall r,
                     \end{aligned}
                 \end{equation*}
                 %
-                Vale a dire che \(\mathcal F(x;\mathbf p^a_{\cdot,r})\) è uguale a \(\mathcal F(x;\mathbf s^{T,a}_{\cdot,r})\) a meno di un riscalamento \(N_\UnQuarto/N\). Tuttavia l'indice di Pareto è invariante rispetto ai riscalamenti:
+                Vale a dire che \(\FRC_{\mathcal E}(x;\mathbf p^a_{\cdot,r})\) è uguale a \(\FRC_{\mathcal E}(x;\mathbf s^{T,a}_{\cdot,r})\) a meno di un riscalamento \(N_\UnQuarto/N\). Tuttavia l'indice di Pareto è invariante rispetto ai riscalamenti:
                 
                 \begin{oss}
+                    \label{ossLogaritmooFRCPareto}
                     In scala logaritmica la \cref{eqFunzioneRipartizioneComplementarePareto} si scrive
-                    %
-                    \begin{equation*}
-                        \log(R)=\log(c)-\beta\log(s),
-                    \end{equation*}
-                    %
-                    che equivale a una retta traslata di \(\log(c)\); indicando con \(R'\) il rapporto \(R/c\) segue
-                    %
-                    \begin{equation*}
-                        \log(R')\equiv\log(R)-\log(c)=-\beta\log(s),
-                    \end{equation*}
-                    %
-                    per la quale il coefficiente di Pareto \(\beta\) è invariato.
+                    \[
+                        \log(\pazocal R(s))\approx-\beta\log(s)+\log(c),
+                    \]
+                    che equivale a una retta con pendenza \(\beta\) e intercetta \(\log(c)\); indicando con \(\pazocal R'(s)\) il rapporto \(\pazocal R(s)/c\) segue
+                    \[
+                        \log(\pazocal R'(s))\equiv\log(\pazocal R(s))-\log(c)\approx-\beta\log(s),
+                    \]
+                    per la quale l'indice di Pareto \(\beta\) è invariato.
                 \end{oss}
 
-                Da quest'osservazione si può pertanto scegliere \(\mathcal F(x;\mathbf s^{T,a}_{\cdot,r})\) in scala logaritmica per una maggiore leggibilità dei valori i quali altrimenti, con \(\mathcal F(x;\mathbf p^a_{\cdot,r})\), sarebbero bassi. L'uso di tale scala introduce però un lieve problema: l'ultimo elemento \(p^a_{N_\UnQuarto,r}\) ha ordinata nulla ed è dunque non visibile; per ovviare il problema si può traslare la FRC empirica in scala lineare
+                Da quest'osservazione si può pertanto scegliere \(\FRC_{\mathcal E}(x;\mathbf s^{T,a}_{\cdot,r})\) in scala logaritmica per maggiore leggibilità, sebbene ciò a cui si è piú interessati non sono i valori bensí la tendenza di essi racchiusa nel parametro \(\beta\). L'uso di tale scala introduce però un lieve problema: l'ultimo elemento \(p^a_{N_\UnQuarto,r}\) ha ordinata nulla ed è dunque non visibile; per ovviare il problema si può traslare la FRC empirica in scala lineare
                 %
                 \begin{equation}
                     \label{eqFRCEmpiricaFinale}
-                    \mathcal F(x;\mathbf p^a_{\cdot,r})+\frac1{2N_\UnQuarto},
+                    \FRC_{\mathcal E}(x;\mathbf p^a_{\cdot,r})+\frac1{2N_\UnQuarto},
                     \ \ \forall a\text{ e }\forall r,
                 \end{equation}
                 %
@@ -436,11 +434,11 @@
                 %
                 \begin{equation*}
                     \left(
-                        \frac N{N_\UnQuarto}\mathcal F(\bar p^a_i;\mathbf s^{T,a}_{\cdot,r})
+                        \frac N{N_\UnQuarto}\FRC_{\mathcal E}(\bar p^a_i;\mathbf s^{T,a}_{\cdot,r})
                         +\frac1{2N_\UnQuarto},\bar p^a_i
                     \right)
                     =\left(
-                        \mathcal F(\bar p^a_i;\mathbf p^a_{\cdot,r})
+                        \FRC_{\mathcal E}(\bar p^a_i;\mathbf p^a_{\cdot,r})
                         +\frac1{2N_\UnQuarto},\bar p^a_i
                     \right)
                     \ \ \forall a\text{ e }\forall i,
@@ -458,47 +456,139 @@
                     Si noti che, contrariamente ai casi precedenti, l'intervallo di confidenza è orizzontale e non verticale; difatti l'immagine della FRC empirica è invariata rispetto alle simulazioni che modificano solo le popolazioni dei centri maggiori, ossia l'ascissa della FRC empirica.
                 \end{oss}
 
-            \subsubsection{Pareto e relativo indice}
+            \subsubsection{FRC della Pareto e relativo indice}
 
                 Per quanto riguarda il fittaggio della distribuzione di Pareto il ragionamento è analogo a quello visto per la lognormale bimodale: sia
                 %
                 \begin{equation*}
-                    \mathcal P(x;\mathbf p^a_{\cdot,r})\colon\RPlus\to\RPlus,
+                    \FRC_{\mathcal P}(x;\mathbf p^a_{\cdot,r})\colon\RPlus\to\RPlus,
                     \ \ \forall a\text{ e }\forall r,
                 \end{equation*}
                 %
-                la densità di distribuzione di Pareto, con FRC \cref{eqFunzioneRipartizioneComplementarePareto}, fittata dal vettore \(\mathbf p^a_{\cdot,r}\) e sia
+                la FRC della densità della distribuzione di Pareto, analoga alla \cref{eqFunzioneRipartizioneComplementarePareto}, fittata dal vettore \(\mathbf p^a_{\cdot,r}\) e sia
                 %
                 \begin{equation*}
-                    \mathcal P(x;\mathbf p^a)\colon\RPlus\to\RPlus^R
+                    \FRC_{\mathcal P}(x;\mathbf p^a)\colon\RPlus\to\RPlus
                 \end{equation*}
                 %
                 la funzione vettoriale tale che
                 %
                 \begin{equation*}
-                    \mathcal P(x;\mathbf p^a)\equiv
+                    \FRC_{\mathcal P}(x;\mathbf p^a)\equiv
                     \begin{bmatrix}
-                        \mathcal P(x;\mathbf p^a_{\cdot,1})&
-                        \mathcal P(x;\mathbf p^a_{\cdot,2})&
+                        \FRC_{\mathcal P}(x;\mathbf p^a_{\cdot,1})&
+                        \FRC_{\mathcal P}(x;\mathbf p^a_{\cdot,2})&
                         \cdots&
-                        \mathcal P(x;\mathbf p^a_{\cdot,R})
+                        \FRC_{\mathcal P}(x;\mathbf p^a_{\cdot,R})
                     \end{bmatrix}^\top.
                 \end{equation*}
                 %
                 Allora gl'intervalli di confidenza hanno forma
                 %
                 \begin{equation*}
-                    \IC_R^{0.05}\left(\frac N{N_\UnQuarto}\mathcal P(x;\mathbf p^a)\right)
-                    =\bar{\mathcal P}^a(x)\pm t^{0.025}_{R-1}\sqrt{\frac{v^a(x)}R},
+                    \IC_R^{0.05}\left(\frac N{N_\UnQuarto}\FRC_{\mathcal P}(x;\mathbf p^a)\right)
+                    =\bar{\FRC}_{\mathcal P}^a(x)\pm t^{0.025}_{R-1}\sqrt{\frac{v^a(x)}R},
                     \ \ \forall x\in[s_\TreQuarti,s_{\max}]\text{ e }\forall a,
                 \end{equation*}
                 %
                 ove \(N/N_\UnQuarto\) è il fattore di riscalamento descritto nel \cref{secFRCEmpirica} necessario per confrontare l'adattamento colla FRC empirica.
 
                 \begin{oss}
-                    È fittando i dati \(\mathbf p\) alla distribuzione di Pareto che si ricava il relativo indice \(\beta\), non dalla FRC empirica: ecco perché,  essendo puramente grafiche, le modifiche nella \cref{eqFRCEmpiricaFinale} sono tollerabili.
+                    È fittando i dati \(\mathbf p\) alla distribuzione di Pareto che si ricava il relativo indice \(\beta\), non dalla FRC empirica: ecco perché,  essendo puramente grafiche, la traslazione descritta dalla \cref{eqFRCEmpiricaFinale} è tollerabile.
                 \end{oss}
         
+            \subsubsection{FRC della lognormale bimodale}
+
+                La bilogonormale non è solo necessaria per l'intera distribuzione ma anche per la coda: siano
+                %
+                \begin{equation*}
+                    \FRC_{\mathcal L}(x;\mathbf p^a_{\cdot,r}),\ 
+                    \FRC_{\mathcal B}(x;\mathbf p^a_{\cdot,r})
+                    \colon\RPlus\to\RPlus,
+                    \ \ \forall a\text{ e }\forall r,
+                \end{equation*}
+                %
+                le FRC rispettivamente della densità della distribuzione lognormale e bilognormale adattate al vettore \(\mathbf p^a_{\cdot,r}\); allora per linearità della FRC, indotta dalla linearità dell'integrale, dalla \cref{eqDistribuzioneLognormaleBimodale} vale
+                %
+                \begin{equation*}
+                    \FRC_{\mathcal B}(x;\mathbf p^a_{\cdot,r})
+                    =\xi\FRC_{\mathcal L}(x;\mathbf p^a_{\cdot,r})
+                    +(1-\xi)\FRC_{\mathcal L}(x;\mathbf p^a_{\cdot,r}),
+                    \ \ \forall a\text{ e }\forall r.
+                \end{equation*}
+                %
+                Pertanto, come prima, si può definire
+                %
+                \begin{equation*}
+                    \FRC_{\mathcal B}(x;\mathbf p^a)\colon\RPlus\to\RPlus
+                \end{equation*}
+                %
+                la funzione vettoriale tale che
+                %
+                \begin{equation*}
+                    \FRC_{\mathcal B}(x;\mathbf p^a)\equiv
+                    \begin{bmatrix}
+                        \FRC_{\mathcal B}(x;\mathbf p^a_{\cdot,1})&
+                        \FRC_{\mathcal B}(x;\mathbf p^a_{\cdot,2})&
+                        \cdots&
+                        \FRC_{\mathcal B}(x;\mathbf p^a_{\cdot,R})
+                    \end{bmatrix}^\top,
+                \end{equation*}
+                %
+                che porta agl'intervalli di confidenza
+                %
+                \begin{equation*}
+                    \IC_R^{0.05}\left(\frac N{N_\UnQuarto}\FRC_{\mathcal B}(x;\mathbf p^a)\right)
+                    =\bar{\FRC}_{\mathcal B}^a(x)\pm t^{0.025}_{R-1}\sqrt{\frac{v^a(x)}R},
+                    \ \ \forall x\in[s_\TreQuarti,s_{\max}]\text{ e }\forall a.
+                \end{equation*}
+        
+            \subsubsection{Trasformazione dei dati}
+
+                Come mostrato nella \cref{figEsempioFunzioneLognormale}, se un insieme di dati \(\mathbf s\) sono distribuiti seguendo una lognormale allora i dati \(\mathbf h\in\RPlus^{N_f\times2\times N\times R}\) riformulati tramite
+                %
+                \begin{equation*}
+                    h_{i,r}^{n,a}\equiv\log(s_{i,r}^{n,a})
+                    \quad\forall n,\ \forall a,\ \forall i,\ \forall r,
+                \end{equation*}
+                %
+                sono distribuiti seguendo una normale; il vantaggio di usare \(\mathbf h\) anziché \(\mathbf s\) si trova nella piú facile interpretabilità dei dati, soprattutto quando si variano i parametri.
+
+                Questa trasformazione viene pertanto applicata ai grafici finora definiti i quali cambiano nel seguente modo: innanzitutto gl'istogrammi si calcolano come prima ma coi dati riformulati, per cui la \cref{eqAltezzeIstogrammi} diventa
+                %
+                \begin{equation*}
+                    \mathbf b^a_{\cdot,r}\equiv\Histogram(\mathbf h^{T,a}_{\cdot,r}),
+                    \ \ \forall a\text{ e }\forall r,
+                \end{equation*}
+                %
+                e similmente per gl'intervalli di confidenza. È altrettanto importante sottolineare che nello spazio \(h\equiv\log(s)\in\mathbb R\) anche la densità \(\underhat{\bar f}_N(s)\) si trasforma\footnotemark{} pur preservando la probabilità totale; il che matematicamente vuol dire che, data \(\de P\) la variazione di probabilità relativa alla variazione di popolazione \(\de s\) in un punto generico \(s\),%
+                \footnotetext{Piú nel dettaglio diventa la densità di una gaussiana.}%
+                \[
+                    \de P=\underhat{\bar f}_N(s)\de s
+                    =\underhat{\bar f}^{\log}_N(h)\de h
+                    =\underhat{\bar f}^{\log}_N(h)\frac1{s\ln(10)}\de s,
+                \]
+                da cui
+                \[
+                    \underhat{\bar f}^{\log}_N(h)=10^h\ln(10)\underhat{\bar f}_N(10^h),
+                \]
+                ove \(\underhat{\bar f}^{\log}_N(h)\) è trasformazione di \(\underhat{\bar f}_N(s)\) nel nuovo spazio \(h\).
+
+                D'altra parte, per quanto riguarda le FRC empirica, di Pareto e bilognormale, esse rimangono invariate e vengono semplicemente rimappate dall'intervallo \([s_{\min},s_{\max}]\) a \([h_{\min},h_{\max}]\), con \(h_{\min}=\log(s_{\min})\) e \(h_{\max}=\log(s_{\max})\). Ciò deriva dal fatto che il logaritmo è una funzione strettamente crescente, dunque preserva l'ordine dei dati trasformati: data una generica variabile aleatoria \(X\in\RPlus\), vale
+                %
+                \begin{equation*}
+                    \mathbb P(X<x)=\mathbb P(\log(X)<\log(x)),\ \ \forall x\in\RPlus.
+                \end{equation*}
+
+                \begin{oss}
+                    Dall'\cref{ossLogaritmooFRCPareto}, trasformando \(s\) in \(h=\log(s)\), la retta diventa
+                    \[
+                        \log(\pazocal R(h))\approx-\beta h+\log(c)
+                        \text{ o }\log(\pazocal R'(h))\approx-\beta h,
+                    \]
+                    la quale è la stessa relazione ma in scala semilogaritmica, che quindi sarà quella usata per tutt'i grafici contenenti le FRC.
+                \end{oss}
+
             \subsubsection{Evoluzione della taglia media}
 
                 Si esprima con \(\bar{\mathbf s}\in\RPlus^{N_f\times2\times R}\) il tensore delle taglie medie rispetto ai nodi
@@ -526,7 +616,7 @@
                 %
                 a istanti temporali contingui; lo stesso vale per gli estremi degl'intervalli di confidenza \(\pm t^{0.025}_{R-1}\sqrt{v^{n,a}/R}\), che quindi diventano un fascio di confidenza.
         
-            \subsubsection{Taglie medie \textit{vs} gradi}
+            \subsubsection{Taglie medie contro gradi}
             
                 S'indichi ora con \(\bar{\mathbf s}\in\RPlus^{2\times R}\) il tensore delle taglie medie rispetto alle simulazioni
                 %
@@ -574,6 +664,15 @@
         
         \subsection{Sulle fluttuazioni \texorpdfstring{\(\gamma\)}{γ}}
 
+            % \oddevenpagefloat[1]{
+            % \tikzfigure{p}
+            %     {\input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}
+                {Confronto di una simulazione con e senza fluttuazioni; la regola d'emigrazione è la \cref{eqVarianteRegolaEmigrazioneTagliaForzaFrazionata} mentre i parametri sono illustrati nella \cref{tabParametriConEsenzaGamma}.}
+                {.6\linewidth}{figConfrontoConESenzaFluttuazioni}
+            % }
+
             Nelle \ref{eqRegoleInterazioneUrbaneEsplicite} è stato introdotto per completezza il termine \(\gamma\) legato alle fluttuazioni, ossia a quei fenomeni di morte e nascita che caratterizzano la naturale variazione di una popolazione intorno a una media. Si argomenta adesso che è possibile trascurarle per due ragioni:
 
             \begin{enumerate}[
@@ -619,13 +718,6 @@
             \end{table}
 
             Dunque \(\gamma\) introduce solo del lieve rumore che, sebbene abbia il nobile scopo di rendere piú realistico il modello, non aiuta a interpretare i risultati rispetto a quelli reali.
-
-            % \tikzfigure{p}
-            %     {\input{../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}}
-            \tikzexternalizedfigure{p}
-                {../../Figure/.fnl/Capitolo4/ConfrontoConESenzaFluttuazioni/Infopagina.tex}
-                {Confronto di una simulazione con e senza fluttuazioni; la regola d'emigrazione è la \cref{eqVarianteRegolaEmigrazioneTagliaForzaFrazionata} mentre i parametri sono illustrati nella \cref{tabParametriConEsenzaGamma}.}
-                {.6\linewidth}{figConfrontoConESenzaFluttuazioni}
 
     \section{Regole d'emigrazione}\label{secRegoleEmigrazione}
 
@@ -673,6 +765,24 @@
 
         \subsection{Regola taglia}
 
+            % \oddevenpagefloat[1]{
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Stabile/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Stabile/Infopagina.tex}
+                {Studio della configurazione di riferimento stabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figRiferimentoStabileRET}
+            % }
+
+            % \oddevenpagefloat[1]{
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/Infopagina.tex}
+                {Studio della configurazione di riferimento instabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figRiferimentoInstabileRET}
+            % }
+
             Una prima possibilità\footnotemark{} consiste nella%
             \footnotetext{È stata ispirata dalla \cite[(2.2), § 2, p. 223]{Gualandi2019SDC} modificata mediante la \cite[(4.5), § 4, p. 228]{Gualandi2019SDC}, ossia è una funzione di Hill di ordine \(\alpha\).}%
             %
@@ -719,21 +829,16 @@
 
             Piú in generale si è verificato empiricamente che per ogni \(\lambda\) esiste un \(\bar\alpha\in\RPlus\) tale che \(\alpha<\bar\alpha\) risulta nella configurazione stabile nella \cref{figRiferimentoStabileRET} mentre \(\alpha\geq\bar\alpha\) restituisce quella instabile nella \cref{figRiferimentoInstabileRET}.
 
-            % \tikzfigure{p}
-                % {\input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Stabile/Infopagina.tex}}
-            \tikzexternalizedfigure{p}
-                {../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Stabile/Infopagina.tex}
-                {Studio della configurazione di riferimento stabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.6\linewidth}{figRiferimentoStabileRET}
-
-            % \tikzfigure{p}
-                % {\input{../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/Infopagina.tex}}
-            \tikzexternalizedfigure{p}
-                {../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/Infopagina.tex}
-                {Studio della configurazione di riferimento instabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.6\linewidth}{figRiferimentoInstabileRET}
-
         \subsection{Regola taglia-grado}
+
+            % \oddevenpagefloat[0]{
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/20RETGConfigurazioneRiferimento/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/20RETGConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGrado} con parametri dalla \cref{tabParametriRETG}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figRiferimentoRETG}
+            % }
 
             Al fine di correggere la \ref{eqRegolaEmigrazioneTaglia} si può introdurre anche il rapporto relativo dei gradi:
             %
@@ -750,7 +855,7 @@
                     \hline
                     \(\lambda\)&\(\alpha\)&\(N_t\)\\
                     \hline
-                    \(\num{.15}\)&\(\num{.63}\)&\(\num{2e6}\)\\
+                    \(\num{.15}\)&\(\num{.63}\)&\(\num{3e6}\)\\
                     \hline
                 \end{tabular}
                 \label{tabParametriRETG}
@@ -772,19 +877,21 @@
                 %labelsep=!,
             ]
                 \item le \crefsubfigSep{figRiferimentoRETG}{a}{{d}}{j} illustrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{b}{c} le distribuzioni simulate sono piú larghe di quella reale, seppure nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{e}{f} gll'indici di Pareto siano ragionevolmente simili;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{b}{c} le distribuzioni simulate sono piú larghe di quella reale, seppure nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{e}{f} gl'indici di Pareto siano ragionevolmente simili;
                 \item a eccezione del caso reale in cui coincidono, nelle \crefsubfigInt{figRiferimentoRETG}{g}{i} la lognormale bimodale segue meglio la coda verso la fine, sebbene coincida colla Pareto nella prima metà;
                 \item nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{k}{l} le dispersioni presentano un'analoga correlazione positiva ma piú stretta rispetto alla reale.
             \end{itemize}
 
-            % \tikzfigure{p}
-                % {\input{../../Figure/.fnl/Capitolo4/20RETGConfigurazioneRiferimento/Infopagina.tex}}
-            \tikzexternalizedfigure{p}
-                {../../Figure/.fnl/Capitolo4/20RETGConfigurazioneRiferimento/Infopagina.tex}
-                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGrado} con parametri dalla \cref{tabParametriRETG}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.6\linewidth}{figRiferimentoRETG}
-
         \subsection{Regola frazionata}
+
+            % \oddevenpagefloat[0]{
+            % \tikzfigure{p}
+                % {\input{../../Figure/.fnl/Capitolo4/20RETGfConfigurazioneRiferimento/Infopagina.tex}}
+            \tikzexternalizedfigure{p}
+                {../../Figure/.fnl/Capitolo4/20RETGfConfigurazioneRiferimento/Infopagina.tex}
+                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGradiFrazionata} con parametri dalla \cref{tabParametriRETGf}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                {.6\linewidth}{figRiferimentoRETGf}
+            % }
 
             La \ref{eqRegolaEmigrazioneTagliaGrado} può essere poi modificata introducendo un ulteriore parametro \(\zeta\)
             %
@@ -830,14 +937,16 @@
                 \item nelle \crefsubfigInt[ e ]{figRiferimentoRETGf}{k}{l} le dispersioni sono compatte quanto prima e manifestano ora un lieve assestamento per taglie piccole.
             \end{itemize}
 
-            % \tikzfigure{p}
-                % {\input{../../Figure/.fnl/Capitolo4/20RETGfConfigurazioneRiferimento/Infopagina.tex}}
-            \tikzexternalizedfigure{p}
-                {../../Figure/.fnl/Capitolo4/20RETGfConfigurazioneRiferimento/Infopagina.tex}
-                {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGradiFrazionata} con parametri dalla \cref{tabParametriRETGf}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.6\linewidth}{figRiferimentoRETGf}
-
         \subsection{Regola taglia-forza}
+
+            \oddevenpagefloat[1]{
+                % \tikzfigure{p}
+                    % {\input{../../Figure/.fnl/Capitolo4/20RETFConfigurazioneRiferimento/Infopagina.tex}}
+                \tikzexternalizedfigure{p}
+                    {../../Figure/.fnl/Capitolo4/20RETFConfigurazioneRiferimento/Infopagina.tex}
+                    {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
+                    {.575\linewidth}{figRiferimentoRETF}
+            }
 
             Siccome dai dati nella \cref{tabStrutturaDatiPendolarismo} si potrebbe anche pensare di sostituire nella \ref{eqRegolaEmigrazioneTagliaGrado} le forze in luogo dei gradi:
             %
@@ -883,17 +992,7 @@
 
             L'unico aspetto negativo si trova nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{k}{l}: il modello non riesce a prevedere correttamente in media le taglie della porzione inferiore della dispersione reale; in altre parole la previsione sovrastima la taglia per gradi medio-bassi mentre è abbastanza precisa per gradi elevati.
 
-            \afterpage{
-                \clearpage
-                % \tikzfigure{p}
-                    % {\input{../../Figure/.fnl/Capitolo4/20RETFConfigurazioneRiferimento/Infopagina.tex}}
-                \tikzexternalizedfigure{p}
-                    {../../Figure/.fnl/Capitolo4/20RETFConfigurazioneRiferimento/Infopagina.tex}
-                    {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                    {.575\linewidth}{figRiferimentoRETF}
-            }
-
-        \subsection{Interpretazioni}
+        \subsection{Interpretazioni}\label{secInterpretazioni}
 
             Innanzitutto bisogna delucidare una caratteristica che accomuna tutte le regole d'emigrazioni precedenti: esse sono da un punto di vista interpretative miope, vale a dire non vede i dettagli ma solo i fattori comuni che governano il fenomeno delle migrazioni. Pertanto il modello non dice il perché una città piú popolata, connessa o trafficata è piú attraente ma solo che quella misura viene presa in considerazione nei movimenti migratori; certamente, però, si può \textit{a posteriori} motivare queste scelte: per esempio, i precedenti fattori possono essere legati a piú opportunità di lavoro, a maggiore vicinanza coi propri familiari, minor costo della vita, eccetera. Poi, sempre \textit{a posteriori}, si può decidere quale fattore sia il piú realistico e da li trarre le proprie conclusioni. Detto ciò si possono ora analizzare le singole leggi, dopo una piccola osservazione linguistica:
 
@@ -1213,6 +1312,8 @@
 
         \subsection{L'Italia e la Valle d'Aosta}\label{secItaliaValleDAosta}
 
+            Come menzionato all'inizio del \cref{secRegoleEmigrazione}, è interessante studiare la regione della Valle d'Aosta e l'intera Italia, specialmente per il numero di nodi. Per brevità, tuttavia, non si ripropongono tutte le regole d'emigrazione viste previamente ma si considera solo la configurazione migliore, vale a dire la \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRETF}; perdipiú, per la Valle d'Aosta si aumentano le simulazioni a \(R=1000\) mentre per l'Italia si diminuiscono a \(10\).
+
             \begin{table}[htb]
                 \centering
                 % \captionsetup{width=10cm}
@@ -1230,6 +1331,8 @@
                 \end{tabular}
                 \label{tabDatiParametriValledAostaItalia}
             \end{table}
+           
+            Difatti come si può notare nella \cref{tabDatiParametriValledAostaItalia} la prima è composta da soli \(74\) mentre la seconda da ben \(8100\): due ordini di grandezza superiori alla prima e uno rispetto alla Sardegna; di conseguenza mentre i risultati della Valle d'Aosta nella \cref{figRiferimentoRETFValledAosta} hanno richiesto meno di \(15\) minuti, quelli dell'Italia nella \cref{figRiferimentoRETFItalia} hanno richiesto piú di \(14\) ore; per dare un ulteriore confronto i risultati della Sardegna hanno richiesto meno di \(30\) minuti per configurazione. Di fatto è dunque proibitivo considerare piú di \(10\) simulazioni per l'Italia.
 
             \tikzexternalizedfigure{p}
                 {../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/Infopagina.tex}
@@ -1240,3 +1343,51 @@
                 {../../Figure/.fnl/Capitolo4/21RETFConfigurazioneRiferimento/Infopagina.tex}
                 {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} per l'Italia con parametri dalla \cref{tabDatiParametriValledAostaItalia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
                 {.65\linewidth}{figRiferimentoRETFItalia}
+
+            I risultati sono molto semplici da commentare: per la Valle d'Aosta
+
+            \begin{itemize}[
+                label=\(\diamond\),
+                %topsep=0.5em,
+                %parsep=0em,
+                %itemsep=0.25em,
+                %leftmargin=2em,
+                %rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=30pt,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item le \crefsubfigSep{figRiferimentoRETFValledAosta}{a}{{d}}{j} illustrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETFValledAosta}{b}{c} le distribuzioni simulate approssimano bene quella reale, mentre nelle \crefsubfigInt[ e ]{figRiferimentoRETFValledAosta}{e}{f} gl'indici di Pareto siano ragionevolmente simili;
+                \item nelle \crefsubfigInt{figRiferimentoRETFValledAosta}{g}{i} Pareto sembra fittare meglio la coda rispetto alla bilognormale;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETFValledAosta}{k}{l} le dispersioni ben approssimano quella reale sovrastimandola leggermente.
+            \end{itemize}
+
+            Si nota anche che nelle \crefsubfigInt{figRiferimentoRETFValledAosta}{a}{c} è presente un lieve rumore lungo la curva, che si può probabilmente attribuire a instabilità indotta dal numero basso di agenti.
+
+            Per quanto riguarda l'Italia
+
+            \begin{itemize}[
+                label=\(\diamond\),
+                %topsep=0.5em,
+                %parsep=0em,
+                %itemsep=0.25em,
+                %leftmargin=2em,
+                %rightmargin=1.5em,
+                % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+                %itemindent=!,
+                %labelindent=30pt,
+                %labelwidth=!,
+                %labelsep=!,
+            ]
+                \item le \crefsubfigSep{figRiferimentoRETFItalia}{a}{{d}}{j} illustrano che l'approssimazione corrisponde quasi perfettamente solo nella coda mentre nel corpo quella approssimata sovrastima leggermente la densità;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETFItalia}{b}{c} le distribuzioni simulate non riescono ad approssimare a pieno la quella reale, sovrastimando anche nelle \crefsubfigInt[ e ]{figRiferimentoRETFItalia}{e}{f} gl'indici di Pareto;
+                \item nelle \crefsubfigInt{figRiferimentoRETFItalia}{g}{i} la bilognormale bimodale segue meglio la coda verso la fine, sebbene coincida colla Pareto nella prima metà;
+                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETFItalia}{k}{l} le dispersioni ben approssimano quella reale sovrastimandola leggermente.
+            \end{itemize}
+
+            Nel complesso è perciò chiaro che i parametri migliori della Sardegna vanno bene solo per la Valle d'Aosta mentre per l'Italia lasciano chiaramente a desiderare.
+
+            Si conclude osservando che i parametri adattati della bilognormale nella \cref{tabDatiParametriValledAostaItalia} corrispondono abbastanza bene con quelli ottenuti da \cite[Tab. 6.2 p. 230]{Gualandi2019SDC}: le differenze sono imputabili o ai dati del \(1991\) o all'algoritmo usato per fittare la bilognormale (\cref{lstKTMAS}).

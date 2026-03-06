@@ -1,136 +1,318 @@
 
-% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% !TEX root = ../../../../Esperimenti/.tex/MEF.tex
 % LTeX: language=it
 
 \begin{tikzpicture}%
-    %\begingroup Comandi
-        \definecolor{colore}{rgb}{0.50196,0.50196,0.50196}%
-    
-        % \renewcommand\subCaptionSize{10}
-        % \renewcommand\labelSize{10}
-        % \renewcommand\tickSize{9}
-        % \renewcommand\legendSize{9}
+    %\begingroup Impostazioni
+        \infopageKeysII
 
-        \pgfmathsetmacro\plotWidth{7}
-        \pgfmathsetmacro\plotHeight{.618*\plotWidth}
-        \pgfmathsetmacro\halfHeightPlot{\plotHeight/2}
-        
-        \pgfmathsetmacro\xPlotSep{2.5}
-        \pgfmathsetmacro\yPlotSep{5.5}
-        \pgfmathsetmacro\yPlotSepPartial{.8*\yPlotSep}
-        \pgfmathsetmacro\xLegendSep{.25cm}
-    %\endgroup
+        \definecolor{mycolor1}{rgb}{0.50196,0.50196,0.50196}%
 
-    %\begingroup Impostazioni pgfplots - Prima colonna
-        \pgfplotsset{
-            /pgfplots/group/plotGroup/.style={
-                group name=Col1,
-                group size=1 by 5,
-                vertical sep=\yPlotSep em,
-                % x descriptions at=edge bottom,
-                % y descriptions at=edge left,
+        \pgfplotsset{%
+            /pgfplots/group/plotGroup/.append style={group size=2 by 1},
+            plotRow/.append style={%
+                width=\plotLastWidth cm,
+                ylabel style={font=\color{white!15!black}\dimTesto{\labelSize}},
             },
-            plotColumn/.style={
-                width=\plotWidth cm,
-                height=\plotHeight cm,
-                scale only axis,
-                xlabel style={
-                    font=\color{white!15!black}\dimTesto{\labelSize},
-                },
+            plotHalfRow/.style={plotRow,height=\halfPlotHeight cm},
+            plotLegend/.append style={fill opacity=1},
+            plotLeftCol/.style={
                 ylabel style={
                     font=\color{white!15!black}\dimTesto{\labelSize},
+                    yshift=1.5em,
+                    at={(axis description cs:0,0.5)},
+                    anchor=south,
+                    % rotate=180,
                 },
-                xticklabel style={font=\dimTesto{\tickSize}},
-                yticklabel style={font=\dimTesto{\tickSize}},
-                % axis background/.style={fill=white},
-                axis x line*=bottom,
-                axis y line*=left,
-                xmajorgrids,
-                ymajorgrids,
-                grid style={dashed}
+                yticklabel style={font=\dimTesto{\tickSize},xshift=0.15em},
+                yticklabel pos=left,
+                yScaleLabelShiftInv,
             },
-            plotLegend/.style={
-                font=\dimTesto{\legendSize},
-                legend cell align=left,
-                align=left,
-                legend pos=north east,
-                xshift=\xLegendSep,
-                draw=white!15!black,
+            plotRightCol/.style={
+                ylabel style={
+                    font=\color{white!15!black}\dimTesto{\labelSize},
+                    yshift=-1.5em,
+                    at={(axis description cs:1,0.5)},
+                    anchor=north,
+                    % rotate=180,
+                },
+                yticklabel style={font=\dimTesto{\tickSize},xshift=-0.15em},
+                yticklabel pos=right,
+                yScaleLabelShift,
             },
         }
-    %\endgroup
 
-    \begin{groupplot}[group style=plotGroup,plotColumn]
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/DD.tex}
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/AA.tex}
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WD.tex}
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WCC1.tex}
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WCC2.tex}
-    \end{groupplot}
-
-    %\begingroup Impostazioni pgfplots - Seconda colonna
-        \pgfplotsset{
-            /pgfplots/group/plotGroup/.append style={
-                group name=Col2,
-                y descriptions at=edge right,
-            },
-            plotColumn/.append style={
-                xmax=50,
-                % xlabel={},
-                axis y line*=right,
-                y tick scale label style={
-                    xshift=.4cm,
-                    at={(1,1)},
-                    anchor=south west,
-                },
-                % ytick distance=0.01,
-            },
-            % plotLegend/.append style={
-            %     at={(1,.5)},
-            %     anchor=east,
-            %     xshift=-2*\xLegendSep, % Le traslazioni vengono sommate; quindi se prima si aveva \xLegendSep ora si ha «\xLegendSep-2*\xLegendSepcm=-\xLegendSep», come desiderato
-            % },
+        \renewcommand\writeSubCaption[7][]{%
+            \node[subCaption,anchor=#5,#1]
+            at ([shift={(#6,#7)}]#3.#4)
+            {\sottoDidascalia{#2}};
         }
+
+        \renewcommand\legendSize8
+        % \renewcommand\subCaptionSize{10}
+        % \renewcommand\labelSize{10}
+        % \renewcommand\tickSize9
+        
+        \newcommand\commentSize\legendSize
+        \newcommand\lineshift{-.6em}
+        \tikzset{comment/.style={align=center,font=\dimTesto{\commentSize}}}
+        \newcommand\placecomment[6]{\node[comment,anchor=#3] at ([xshift=#4,yshift=#5]#1.#2) {#6};}
     %\endgroup
 
-    \begin{groupplot}[group style=plotGroup,plotColumn,clip=false]
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/ACC.tex}
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/BC.tex}
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/SD.tex}
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WA1.tex}
-        \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WA2.tex}
-    \end{groupplot}
+    %\begingroup Righe
+        \begin{groupplot}[
+            group style={%
+                group name=Row1,
+                plotGroup
+            },
+            plotRow,
+            legend style={\placeLegend{1}{.5}{east}{0em}{2em}},
+        ]
+            \nextgroupplot[
+                plotLeftCol,
+                %
+                ylabel={$P(k)$},
+                enlarge x limits=.05,
+                enlarge y limits={upper,value=.05},
+                % xmin=10,xmax=283,
+                % ymin=0,ymax=0.0251526251526252,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/DD.tex}
+            % \input{../../Figure/.tex/20/NA/DegreeDistribution.tex}
+
+            \nextgroupplot[%
+                plotRightCol,
+                %
+                ylabel={$C(k)$},
+                enlarge x limits=0.05,
+                enlarge y limits=0.05,
+                xmin=10,xmax=283,
+                % ymin=0.161115705586046,
+                % ymax=0.781818181818182,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/ACC.tex}
+            % \input{../../Figure/.tex/20/NA/AClusteringCoefficient.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={%
+                group name=Row2,
+                plotLastGroup
+            },
+            plotRow,
+            %
+            xlabel={$k$},
+        ]
+            \nextgroupplot[
+                at={($(Row1 c1r1.south west)-(0,\yPlotSep em)-(0,\plotHeight cm)$)},
+                plotLeftCol,
+                %
+                ylabel={$k_{nn}(k)$},
+                enlarge x limits=0.05,
+                enlarge y limits=0.05,
+                % xmin=10,xmax=283,
+                % ymin=44.7216494845361,ymax=89.75,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/AA.tex}
+            % \input{../../Figure/.tex/20/NA/AAssortativity.tex}
+
+            \nextgroupplot[%
+                plotRightCol,
+                %
+                ylabel={$g(i)$},
+                xtickten={1,2,3},
+                enlarge x limits=0.05,
+                enlarge y limits=0.05,
+                xmode=log,ymode=log,
+                % xmin=10,xmax=283,
+                % ymin=0.1,ymax=100000,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/BC.tex}
+            % \input{../../Figure/.tex/20/NA/BetweennessCentrality.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={%
+                group name=Row3,
+                plotLastGroup
+            },
+            plotRow,
+            legend style={\placeLegend{1}{.5}{east}{0em}{2em}},
+            %
+            enlarge x limits=.05,
+            enlarge y limits=.05,
+            log origin=infty,
+            xmode=log,ymode=log,
+        ]
+            \nextgroupplot[
+                at={($(Row2 c1r1.south west)-(0,\yGroupSep em)-(0,\plotHeight cm)$)},
+                plotLeftCol,
+                %
+                xlabel={$w$},ylabel={$P(w)$},
+                ytickten={-8,-6,-4,-2,0},
+                % xmin=0.1,xmax=100000,
+                % ymin=1e-08,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WD.tex}
+            % \input{../../Figure/.tex/20/NA/WeightDistribution.tex}
+
+            \nextgroupplot[
+                plotRightCol,
+                %
+                xlabel={$s$},ylabel={$P(s)$},
+                % xmin=10,xmax=100000,
+                % ymin=1e-07,ymax=0.01,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/SD.tex}
+            % \input{../../Figure/.tex/20/NA/StrengthDistribution.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={%
+                group name=Row4,
+                plotGroup
+            },
+            plotHalfRow,
+            %
+            xmode=log,
+            xtickten={1,2,3},
+            xticklabels=\empty,
+        ]
+            \nextgroupplot[%
+                at={($(Row3 c1r1.south west)-(0,\yGroupSep em)-(0,\halfPlotHeight cm)$)},
+                plotLeftCol,
+                %
+                ylabel={$C^w(k)$},
+                ytick={0.5,1},
+                xmin=10,xmax=283,
+                ymin=0.2,ymax=1,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WCC1.tex}
+            % \input{../../Figure/.tex/20/NA/WClusteringCoefficientfig1.tex}
+            
+            \nextgroupplot[%
+                plotRightCol,
+                %
+                ylabel={$k_{nn}^w(k)$},
+                ymode=log,
+                ymin=10,ymax=1000,
+                xmin=10,xmax=283,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WA1.tex}
+            % \input{../../Figure/.tex/20/NA/WAssortativityfig1.tex}
+        \end{groupplot}
+    
+        \begin{groupplot}[
+            group style={%
+                group name=Row5,
+                plotLastGroup
+            },
+            plotHalfRow,
+            %
+            xlabel={$k$},
+            xmode=log,ymode=log,
+        ]
+            \nextgroupplot[%
+                at={($(Row4 c1r1.south west)-(0,.5*\yPlotSep em)-(0,\halfPlotHeight cm)$)},
+                plotLeftCol,
+                %
+                % xtickten={1,2,3},ytickten={0,1,2,3},
+                ylabel={$C^w_{\text{rel}}(k) [\%]$},
+                xmin=10,xmax=283,
+                ymin=1,ymax=1000,
+            ]
+            \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WCC2.tex}
+            % \input{../../Figure/.tex/20/NA/WClusteringCoefficientfig2.tex}
+
+            \nextgroupplot[%
+                plotRightCol,
+                %
+                % xtickten={1,2,3},ytickten={0,1,2,3},
+                ylabel={$k_{nn,\text{rel}}^w(k)[\%]$},
+                ymin=1,ymax=1000,
+                xmin=10,xmax=283,
+            ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WA2.tex}
+            % \input{../../Figure/.tex/20/NA/WAssortativityfig2.tex}
+        \end{groupplot}
+    %\endgroup
 
     %\begingroup Didascalie
-        \tikzset{SubCaption/.style={
-            text width=\plotWidth cm,
-            anchor=north,
-            align=center,
-            yshift=-3em
-        }}
-        \node[SubCaption] at (Col1 c1r1.south)
-            {\dimTesto{\subCaptionSize}\sottoDidascalia{Distribuzione di probabilità dei gradi.\label{figDeMontisPk}}};
-        \node[SubCaption] at (Col2 c1r1.south)
-            {\dimTesto{\subCaptionSize}\sottoDidascalia{Coefficiente d'aggregrazione \(C(k)\).\label{figDeMontisCk}}};
+        \writeSubCaption{%[text width=5cm]{%
+            Distribuzione dei gradi.\label{figDeMontisPk}
+        }{Row1 c1r1}{north east}{north east}{0em}{0em}
+        \writeSubCaption{%[text width=5cm]{%
+            Coefficiente d'aggregrazione.\label{figDeMontisCk}
+        }{Row1 c2r1}{north east}{north east}{0em}{0em}
 
-        \node[SubCaption] at (Col1 c1r2.south)
-            {\dimTesto{\subCaptionSize}\sottoDidascalia{Assortatività \(k_{nn}(k)\).\label{figDeMontisKnnk}}};
-        \node[SubCaption] at (Col2 c1r2.south)
-            {\dimTesto{\subCaptionSize}\sottoDidascalia{Centralità per intermediazione \(g(i)\).\label{figDeMontisGi}}};
-    
-        \node[SubCaption] at (Col1 c1r3.south)
-            {\dimTesto{\subCaptionSize}\sottoDidascalia{Distribuzione di probabilità dei pesi.\label{figDeMontisWk}}};
-        \node[SubCaption] at (Col2 c1r3.south)
-            {\dimTesto{\subCaptionSize}\sottoDidascalia{Distribuzione di probabilità delle forze.\label{figDeMontisSk}}};
+        \writeSubCaption{%[text width=5cm]{%
+            Assortatività.\label{figDeMontisKnnk}
+        }{Row2 c1r1}{north east}{north east}{0em}{0em}
+        \writeSubCaption{%[text width=5cm]{%
+            Centralità per intermediazione.\label{figDeMontisGi}
+        }{Row2 c2r1}{north west}{north west}{0em}{0em}
 
-        
-        \pgfmathparse{1.5*\plotWidth}\node[SubCaption,text width=\pgfmathresult cm] at (Col1 c1r5.south)
-            {\dimTesto{\subCaptionSize}\sottoDidascalia{Coefficiente [relativo] d'aggregazione pesato \(C^w(k)\).\label{figDeMontisCwk}}};
-        \node[SubCaption] at (Col2 c1r5.south)
-            {\dimTesto{\subCaptionSize}\sottoDidascalia{Assortatività [relativa] pesata \(k_{nn}^w(k)\).\label{figDeMontisKnnwk}}};
+        \writeSubCaption{%[text width=5cm]{%
+            Distribuzione dei pesi.\label{figDeMontisWk}
+        }{Row3 c1r1}{north east}{north east}{0em}{0em}
+        \writeSubCaption{%[text width=5cm]{%
+            Distribuzione delle forze.\label{figDeMontisSk}
+        }{Row3 c2r1}{north east}{north east}{0em}{0em}
+
+        \writeSubCaption{%[text width=5cm]{%
+            Coefficiente d'aggregazione pesato.\label{figDeMontisCwk}
+        }{Row4 c1r1}{south west}{south west}{0em}{0em}
+        \writeSubCaption{%[text width=5cm]{%
+            Assortatività pesata.\label{figDeMontisKnnwk}
+        }{Row4 c2r1}{south east}{south east}{0em}{0em}
     
+        \writeSubCaption{%[text width=5cm]{%
+            Coefficiente relativo d'aggregazione pesato.\label{figDeMontisCwk}
+        }{Row5 c1r1}{south west}{south west}{0em}{0em}
+        \writeSubCaption{%[text width=5cm]{%
+            Assortatività relativa pesata.\label{figDeMontisKnnwk}
+        }{Row5 c2r1}{south east}{south east}{0em}{0em}
+
         % https://tex.stackexchange.com/questions/632045/get-subcaption-for-every-plot-using-groupplot-pgf-tikz-after-2020-update
     %\endgroup
 
-    \redefineTikZbounds{Col1 c1r1}{Col2 c1r1}
+    %\begingroup Commenti
+        \placecomment{Row1 c1r1}{east}{east}{0em}{-2em}{
+            \(\begin{aligned}
+                % N&=\num{375}\\[\lineshift]
+                % E&=\num{8649}\\[\lineshift]
+                k_{\min}&=\num{10}\\[\lineshift]
+                k_{\max}&=\num{283}\\[\lineshift]
+                \langle k\rangle&=\num{46.128}
+            \end{aligned}\)
+        }
+
+        \placecomment{Row2 c1r1}{east}{east}{0em}{1em}{
+            \renewcommand\lineshift{-.4em}
+            \(\begin{aligned}
+                k^{\min}_{nn}&=\num{44.722}\\[\lineshift]
+                k^{\max}_{nn}&=\num{99.875}\\[\lineshift]
+                \langle k_{nn}\rangle&=\num{69.162}
+            \end{aligned}\)
+        }
+
+        \placecomment{Row1 c2r1}{east}{east}{0em}{0em}{
+            \(\begin{aligned}
+                C_{\min}&=\num{0.161}\\[\lineshift]
+                C_{\max}&=\num{0.879}\\[\lineshift]
+                \langle C\rangle&=\num{0.453}
+            \end{aligned}\)
+        }
+
+        \placecomment{Row2 c2r1}{east}{east}{0em}{-2em}{
+            \(\begin{aligned}
+                g_{\min}&=\num{0.641}\\[\lineshift]
+                g_{\max}&=\num{10694}\\[\lineshift]
+                \langle g\rangle&=\num{191.704}
+            \end{aligned}\)
+        }
+        
+        \placecomment{Row3 c1r1}{east}{east}{0em}{0em}{\(\gamma_w=\num{-1.851}\)}
+        \placecomment{Row3 c1r1}{south}{south}{-2.5em}{0em}{
+            \(\begin{aligned}
+                w_{\min}&=\num{1}\\[\lineshift]
+                w_{\max}&=\num{14709}\\[\lineshift]
+                \langle w\rangle&=\num{23.291}
+            \end{aligned}\)
+        }
+        \placecomment{Row3 c2r1}{east}{east}{0em}{0em}{\(\gamma_s=\num{-1.993}\)}
+    %\endgroup
+
+    \redefineTikZbounds{Row1 c1r1}{Row5 c2r1}
 \end{tikzpicture}%

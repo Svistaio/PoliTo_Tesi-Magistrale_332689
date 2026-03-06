@@ -4,7 +4,7 @@
 
 \chapter{Note di teoria dei grafi}\label{secTeoriaGrafi}
 
-    In questo capitolo sono prima introdotti alcuni oggetti di base della teoria dei grafi, quindi si discute la natura della rete d'interesse, infine si descriveranno molto brevemente i dati usati.
+    In questo capitolo sono prima introdotti alcuni oggetti di base della teoria delle reti, quindi si discute la natura della rete d'interesse, infine si descriveranno molto brevemente i dati usati.
 
     \section{Definizioni miscellanee}\label{secDefinizioniGrafi}
 
@@ -12,29 +12,32 @@
         
         \begin{dfn}[Grafo]
             \label{defGrafo}
-            Un grafo è formato dalla coppia \(\mathcal G=(\mathcal I,\mathcal E)\), ove \(\mathcal I\) è l'insieme degl'indici dei nodi mentre \(\mathcal I\) è l'insieme dei lati, vale a dire di coppie d'indici \(\mathcal I\): due nodi \(i,j\in\mathcal I\) sono connessi sse \((i,j)\in\mathcal E\).
+            Un grafo è un insieme \(\mathcal G=(\mathcal I,\mathcal E)\) formato dalla coppia dell'insieme degl'indici dei nodi \(\mathcal I\) e dell'insieme dei lati \(\mathcal E\), vale a dire di coppie d'indici \(\mathcal I\): due nodi \(i,j\in\mathcal I\) sono connessi sse \((i,j)\in\mathcal E\).
         \end{dfn}
         
         Dall'insieme \(\mathcal E\) si può poi specializzare il concetto di grafo:
         
         \begin{dfn}[Grafo \textnormal{[in]}diretto]
             \label{defGrafoInDiretto}
-            Un grafo è indiretto sse dato \((i,j)\in\mathcal E\) allora \((j,i)\in\mathcal E\) e la direzione è trascurabile; altrimenti è detto diretto.
+            Un grafo è indiretto sse \[%
+                (i,j)\in\mathcal E\ \ \iff\ \ (j,i)\in\mathcal E, %\forall(i,j)\in\mathcal E,
+            \] e la direzione è trascurabile; altrimenti è detto diretto.
         \end{dfn}
         
-        La trascurabilità della direzione sarà discussa poco dopo nella \cref{secRetiECittà}, anche se è facilmente intuibile dalla \cref{figEsempioGrafoInDiretto}.
+        La trascurabilità della direzione sarà discussa poco dopo nel \cref{secRetiECittà}, anche se è facilmente intuibile dalla \cref{figEsempioGrafoInDiretto}.
 
         % \tikzfigure{H}
-        %     {\input{../../Figure/.fnl/Capitolo2/EsempioGrafo[In]Diretto.tex}}
+        %     {\input{../../Figure/.fnl/Capitolo2/EsempioGrafoInDiretto.tex}}
         \tikzexternalizedfigure{H}
-            {../../Figure/.fnl/Capitolo2/EsempioGrafo[In]Diretto.tex}
-            {Esempio di un grafo indiretto, della sua equivalente forma diretta [simmetrica] e della loro [identica] matrice d'adiacenza.}
-            {.9\linewidth}{figEsempioGrafoInDiretto}
+            {../../Figure/.fnl/Capitolo2/EsempioGrafoInDiretto.tex}
+            {Esempio di un grafo indiretto (a), della sua equivalente forma diretta (b) e della loro [identica] matrice d'adiacenza (c).}
+            {.95\linewidth}{figEsempioGrafoInDiretto}
         
         \begin{dfn}[Matrice d'adiacenza]
             \label{defMatriceAdiacenzaUnitariaPesata}
             \newcommand\hspz{\hspace{1em}}
-            Sia \(N\equiv\vert\mathcal I\vert\in\NPlus\) la cardinalità dell'insieme degl'indici, ossia il numero di vertici totali, si definisce la matrice d'adiacenza \(\mathbf M\in\mathbb R^{N\times N}\) pesata come:
+            Sia \(N\equiv\vert\mathcal I\vert\in\NPlus\) la cardinalità dell'insieme degl'indici\footnotemark{}, ossia il numero di vertici totali, si definisce la matrice d'adiacenza \(\mathbf M\in\mathbb R^{N\times N}\) pesata come:%
+            \footnotetext{Per \(\NPlus\) si veda la \cref{defSemirettaInteraRealePositiva} poco dopo.}%
             %
             \begin{equation}
                 \label{eqMatriceAdiacenzaPesata}
@@ -56,24 +59,24 @@
                 \end{aligned}\right.
             \end{equation}
             %
-            Si osserva che, se non altrimenti detto, scrivendo solo «matrice d'adiacenza» si sottintende sempre quella unitaria.
+            Si osserva che, se non altrimenti detto, scrivendo solo \textit{matrice d'adiacenza} si sottintende sempre quella unitaria.
         \end{dfn}
 
         \begin{dfn}[Matrice trasposta]
-            Data \(\mathbf M\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), allora s'indica \(\mathbf M^\top\) la matrice trasposta cosí definita:
+            Data \(\mathbf M\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), s'indica con \(\mathbf M^\top\) la matrice trasposta cosí definita:
             %
             \begin{equation*}
-                m^\top_{i,j}=m_{j,i}\quad\forall i,j\in\{1,2,\ldots,N\}.
+                m^\top_{i,j}=m_{j,i},\quad\forall i,j\in\{1,2,\ldots,N\}.
             \end{equation*}
         \end{dfn}
 
         \begin{dfn}[Matrice simmetrica]
-            Data \(\mathbf M\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), allora
+            Data \(\mathbf M\in\mathbb R^{N\times N}\), con \(N\in\NPlus\), essa è simmetrica sse
             %
             \begin{equation}
                 \label{eqMatriceAdiacenzaSimmetrica}
-                \mathbf M\text{ è simmetrica}
-                \ \ \iff\ \ 
+                % \mathbf M\text{ è simmetrica}
+                % \ \ \iff\ \ 
                 m_{i,j}=m_{j,i}=m^\top_{i,j}
                 \ \ \iff\ \ 
                 \mathbf M=\mathbf M^\top.
@@ -97,7 +100,7 @@
             \end{equation}
             %
             % dove \(\mathbf 1\equiv(1,1,\ldots,1)\in\mathbb R^N\);
-            le quali se il grafo è simmetrico queste coincidono: \(\mathbf w=\mathbf w^-=\mathbf w^+\). Nel caso unitario \(\mathbf M\equiv\mathbf A\) si è soliti denominare le forze come gradi uscenti ed entranti:
+            le quali se il grafo è simmetrico coincidono: \(\mathbf w=\mathbf w^-=\mathbf w^+\). Nel caso unitario \(\mathbf M\equiv\mathbf A\) si è soliti denominare le forze come gradi uscenti ed entranti:
             %
             \begin{equation}
                 \label{eqGradoGrafoDiretto}
@@ -112,40 +115,38 @@
 
     \section{Reti e città}\label{secRetiECittà}
 
-        Dopo aver illustrato un po' di teoria sui grafi sorge successivamente il problema di come rappresentare con essi la moltitudine di collegamenti possibili tra le città
-        
-        Difatti vi sono molti modi di rappresentare le città mediante i grafi: i primi si pongono a livello \textit{intraurbano}, o considerando le strade come lati e le loro intersezioni come nodi \cite[§ 3.1.3.1 p. 17]{Barthelemy2011}, o rappresentando la rete di trasporto di tram, di bus e della metro \cite[§ 3.2.1 p. 22]{Barthelemy2011}; altri si pongono piú propriamente a livello \textit{interurbano} prendono singolarmente in considerazione varie reti dei trasporti (ferroviario \cite[§ 3.1.3.2 p. 17]{Barthelemy2011}, navale \cite[§ 3.1.4 p. 19]{Barthelemy2011}, aereo \cite[§ 3.1.2 p. 13]{Barthelemy2011}, ecc.).
+        Dopo aver illustrato un po' di teoria sui grafi sorge successivamente il problema di come rappresentare con essi la moltitudine di collegamenti urbani; in effetti, vi sono molti modi di rappresentare le città mediante i grafi: i primi si pongono a livello \textit{intraurbano}, o considerando le strade come lati e le loro intersezioni come nodi \cite[§ 3.1.3.1 p. 17]{Barthelemy2011}, o rappresentando le reti di trasporto (tram, bus e metro) \cite[§ 3.2.1 p. 22]{Barthelemy2011}; altri si pongono piú propriamente a livello \textit{interurbano} prendono singolarmente in considerazione varie reti dei trasporti (ferroviario \cite[§ 3.1.3.2 p. 17]{Barthelemy2011}, navale \cite[§ 3.1.4 p. 19]{Barthelemy2011}, aereo \cite[§ 3.1.2 p. 13]{Barthelemy2011}, ecc.).
 
-        Tuttavia, da quanto detto nella \cref{secIntroduzione}, è chiaro che per predire la distribuzione della popolazione tra città valgono le seguenti osservazioni:
+        Tuttavia, da quanto detto nel \cref{secIntroduzione}, è chiaro che per predire la distribuzione della popolazione tra città valgono le seguenti osservazioni:
 
         \begin{enumerate}[
             label=\arabic*.,
-            topsep=0.5em,
-            parsep=0em,
-            itemsep=0.25em,
-            leftmargin=2em,
-            rightmargin=1.5em,
+            % topsep=0.5em,
+            % parsep=0em,
+            % itemsep=0.25em,
+            % leftmargin=2em,
+            % rightmargin=1.5em,
             % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
             %itemindent=!,
             %labelindent=3em,
             %labelwidth=!,
             %labelsep=!,
         ]
-            \item ogni rappresentazione intraurbana va scartata perché sono troppo fini, oltre a considerare movimenti limitatamente a una sola città;
+            \item ogni rappresentazione intraurbana va scartata perché è troppo fine, oltre a considerare movimenti limitatamente a una sola città;
             \item d'altra parte tutte quelle interurbane vanno considerate contemporaneamente e non singolarmente siccome ciascun individuo può scegliere diversi trasporti per muoversi.
         \end{enumerate}
 
         Ecco perché la corretta rete da considerare è quella legata ai movimenti pendolari \bracketcitesemi[§ 3.1.3.3 p. 18]{Barthelemy2011}[]{DeMontis2007} tra città che mostrano olisticamente tutt'i possibili collegamenti tra le città a prescindere del trasporto scelto; inoltre essa mostra collegamenti realistici associati a movimenti quotidiani anziché straordinari (vacanze, visite mediche, ecc.).
 
-        Una volta fissata la rappresentazione è necessario comprendere il tipo di grafo con cui si ha a che fare. Eppure qui la risposta è immediata dopo due osservazioni:
+        Una volta fissata la rappresentazione è necessario comprendere il tipo di grafo con cui si ha a che fare. Eppure anche qui la risposta è immediata dopo due ulteriori note:
        
         \begin{enumerate}[
             label=\arabic*.,
-            topsep=0.5em,
-            parsep=0em,
-            itemsep=0.25em,
-            leftmargin=2em,
-            rightmargin=1.5em,
+            % topsep=0.5em,
+            % parsep=0em,
+            % itemsep=0.25em,
+            % leftmargin=2em,
+            % rightmargin=1.5em,
             % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
             %itemindent=!,
             %labelindent=3em,
@@ -153,14 +154,14 @@
             %labelsep=!,
         ]
             \item una città può interagire con un'altra senza che quest'ultima interagisca colla prima: è necessario considerare il senso di direzione;
-            \item ammesso che una città possa interagire con un'altra, allora è sempre possibile l'opposta: le potenziali interazioni sono simmetriche.
+            \item ammesso che una città possa interagire con un'altra, allora è sempre possibile l'opposto: le potenziali interazioni sono simmetriche.
         \end{enumerate}
     
-        Dunque il grafo in questione è diretto ma con struttura indiretta (\cref{defGrafoInDiretto}), ovvero la sua matrice d'adiacenza \(\mathbf A\) è simmetrica.
+        Dunque il grafo in questione è diretto ma con struttura indiretta (\cref{defGrafoInDiretto}):
 
-        \begin{ipo}
+        \begin{ipo}[\(\mathbf A\) simmetrica]
             \label{ipTipoGrafo}
-            Il grafo \(\mathcal G\) è diretto e simmetrico (\(\mathbf A\) è simmetrica).
+            Il grafo \(\mathcal G\) è diretto e simmetrico.
         \end{ipo}
 
         Inoltre in questa trattazione vale la seguente fondamentale ipotesi:
@@ -170,9 +171,9 @@
             Il grafo \(\mathcal G\) è statico: \(\mathcal I\) e \(\mathcal E\) sono costanti nel tempo.
         \end{ipo}
 
-        In altre parole si è solo interessati a prevedere come la popolazione si distribuisce rispetto a una topologia prestabilita \textit{a priori}; ovviamente si tratta di una forte semplificazione dato che nella realtà la topologia delle connessioni interurbane si è chiaramente coevoluta assieme allo sviluppo delle città stesse.
+        In altre parole si è solo interessati a prevedere come la popolazione si distribuisce rispetto a una topologia prestabilita \textit{a priori}; naturalmente si tratta di una forte semplificazione siccome nella realtà la topologia, soprattutto le connessioni  interurbane in \(\mathcal E\), sono chiaramente coevoluta assieme allo sviluppo delle città stesse.
 
-        Infine si osserva che questo tipo di grafo è spaziale \cite{Barthelemy2011,DeMontis2007}, ovvero i suoi nodi occupano un punto nello spazio euclideo, seppure, al momento, sia una caratteristica alquanto formale; tuttavia servirà tenerlo a mente quando si definiranno alcune regole d'interazione nel \cref{secSimulazioni}. Perdipiú, contrariamente a quanto si possa pensare di primo acchito, tale grafo non è a invarianza di scala \cite{Barabasi1999} a causa del tipo di grafo \cite{Broido2019,Barthelemy2011}; ciò non esclude l'esistenza di nodi piú centrali di altri, ma solo che il massimo grado di un nodo è limitato superiormente proprio dalla natura spaziale del grafo.
+        Infine si osserva che questo tipo di grafo è spaziale \cite{Barthelemy2011,DeMontis2007}, ovvero i suoi nodi occupano un punto nello spazio euclideo, seppure, al momento, sia una caratteristica alquanto formale; tuttavia serve tenerlo a mente quando s'interpretano alcune regole d'emigrazione nel \cref{secSimulazioni}. Perdipiú, contrariamente a quanto si possa pensare di primo acchito, tale grafo non è a invarianza di scala \cite{Barabasi1999} proprio per la sua natura spaziale \cite{Broido2019,Barthelemy2011}; ciò non esclude l'esistenza di nodi piú centrali di altri, ma solo che il massimo grado di un nodo è limitato superiormente a causa di limiti fisici.
 
     \section{Cenni sui dati}\label{secCenniSuiDati}
 
@@ -201,29 +202,33 @@
                     Numero di persone & 18 & 12 \\
                     \hline
                 \CodeAfter
-                    \tikz \foreach \r in {4,...,8} \draw (\r.5-|1) -- (\r.5-|4);
+                    \tikz \foreach \r in {4,...,8} \draw[%
+                        color=white!40!black,
+                        line width=.5pt,
+                    ] (\r.5-|1) -- (\r.5-|4);
+                    \tikz \node[anchor=east] at (11.5-|1) {\Circled{\(\ast\)}};
             \end{NiceTabular}
             \label{tabStrutturaDatiPendolarismo}
         \end{table}
         \footnotetext{si v. il documento \texttt{trapen91.txt} per maggiori informazioni.}
 
-        I comuni considerati sono tutt'i quell'italiani (8100) nel 1991, quindi è necessario estrapolare da essi le matrici di pendolarismo delle singole regioni e parallelamente quella complessiva dell'Italia. Si possono definire due tipi di matrici:
+        I dati considerano tutt'i comuni italiani nel 1991 (in totale 8100), quindi è necessario estrapolare da essi le matrici di pendolarismo delle singole regioni e parallelamente quella complessiva dell'Italia. In piú, si possono definire due tipi di matrici d'adiacenza:
 
         \begin{enumerate}[
             label=\arabic*.,
-            topsep=0.5em,
-            parsep=0em,
-            itemsep=0.25em,
-            leftmargin=2em,
-            rightmargin=1.5em,
+            % topsep=0.5em,
+            % parsep=0em,
+            % itemsep=0.25em,
+            % leftmargin=2em,
+            % rightmargin=1.5em,
             % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
             %itemindent=!,
             %labelindent=3em,
             %labelwidth=!,
             %labelsep=!,
         ]
-            \item quella d'adiacenza unitaria in cui un lato esiste se almeno un pendolare (cioè il «[n]umero di persone» nella \cref{tabStrutturaDatiPendolarismo}) si muove tra i due comuni e
-            \item quella d'adiacenza pesata che è analoga alla precedente ma con peso \(q_{i,j}\) uguale alla somma totale dei pendolari tra due comuni.
+            \item quella unitaria in cui un lato esiste se almeno un pendolare (cioè la riga \Circled{\(\ast\)} nella \cref{tabStrutturaDatiPendolarismo}) si muove tra i due comuni e
+            \item quella pesata che è analoga alla precedente ma con peso \(q_{i,j}\) uguale alla somma totale dei pendolari tra due comuni.
         \end{enumerate}
 
         Si notano tuttavia due principali difetti dei dati contenuti nel documento \texttt{Pen\_91It.txt}:
@@ -242,10 +247,10 @@
             %labelsep=!,
         ]
             \item in alcune linee come comune di destinazione è segnato il codice «022008» che però non è elencato nel documento \texttt{elencom91.xls} che riassume tutti gli 8100 comuni italiani nel 1991;
-            \item in molte linee come comune di destinazione sono segnati dei codici incompleti contenenti solo l'ultima metà (codice comune) ma non la prima (codice provincia), e questi sono in totale 8: «215», «229», «241», «216», «203», «224», «236», «246».
+            \item in molte linee come comune di destinazione sono segnati dei codici incompleti contenenti solo l'ultima metà (codice comune) ma non la prima (codice provincia), e questi sono in totale 8: «215», «229», «241», «216», «203», «224», «236» e «246».
         \end{enumerate}
 
-        In entrambi i casi i dati relativi [a quelli che sono potenzialmente refusi] sono stati trascurati nella corrente tesi; il primo errore è già di per sé molto raro, mentre il secondo è eccessivamente ambiguo da risolvere come si può notare dalla linea successiva relativa al codice «215»:
+        In entrambi i casi i relativi dati [a quelli che sono molto probabilmente refusi] sono stati trascurati nella corrente tesi. Infatti il primo errore è già di per sé molto raro, mentre il secondo è eccessivamente ambiguo da risolvere; per esempio, si prenda la linea successiva relativa al codice «215»:
         %
         \begin{center}
             \texttt{00200714212215\_\_\_\_\_\_\_\_\_\_\_\_\_\_1},
@@ -254,17 +259,19 @@
         ove \_ indica uno spazio, per la quale, tralasciando il fatto che vi sono in totale 6 città italiane collo stesso codice comunale, se ci si limita alla regione del Piemonte (vale a dire la stessa del comune di partenza «002007») esistono in realtà ben due città condividenti lo stesso codice: «001215» e «004215», eppure entrambe non hanno lo stesso codice provinciale («002») del comune di partenza. Da questo piccolo estratto, quindi, non si può nemmeno ipotizzare che il codice provinciale sia lo stesso tra il comune di partenza e d'arrivo; è allora chiaro che sia impossibile scegliere la prima metà per completare il codice del comune di destinazione.
 
         \begin{oss}
-            A dire il vero si potrebbe scegliere, tra tutt'i comuni collo stesso codice comunale, quello che minimizza la distanza geografica (ossia euleriana) siccome le coordinate dei punti rappresentativi di ogni comune sono disponibili nell'ISTAT \cite{ISTATLimiti1991}. In ogni caso il numero cosí esiguo d'eccezioni rendono una tale "correzione" del tutto innecessaria, oltre che irrilevante come il \cref{secSimulazioni} mostrerà.
+            A dire il vero si potrebbe scegliere, tra i comuni con uguale codice comunale, quello che minimizza la distanza euleriana, visto che l'ISTAT \cite{ISTATLimiti1991} rende disponibili le coordinate dei punti rappresentativi di ogni comune. In ogni caso il numero d'eccezioni è cosí esiguo da rendere una tale "correzione" del tutto innecessaria\footnotemark{}. Il tutto senza considerare che la scelta piú saggia è banalmente quella di prendere dati piú recenti\footnotemark{}.
         \end{oss}
+        \footnotetext{I risultati del \cref{secSimulazioni} mostrano anche che è irrilevante.}
+        \footnotetext{Non si è fatto per riprodurre \cite{DeMontis2007}, com'è discusso súbito dopo.}
 
         % \tikzfigure{H}
         %     {\input{../../Figure/.fnl/Capitolo2/AnalisiRete20/SVsD.tex}}
         \tikzexternalizedfigure{H}
             {../../Figure/.fnl/Capitolo2/AnalisiRete20/SVsD.tex}
-            {Forza contro il grado per la Sardegna.}
+            {Forza contro grado della Sardegna.}
             {.75\linewidth}{figForzaVsGrado20}
 
-        Infine nelle \cref{figForzaVsGrado20,figDeMontisRiproduzione} sono stati anche riprodotti i risultati di \cite{DeMontis2007} colle seguenti osservazioni:
+        Infine nelle \cref{figForzaVsGrado20,figDeMontisRiproduzione} sono stati anche riprodotti i risultati di \cite{DeMontis2007} anche se con alcune differenze:
 
         \begin{enumerate}[
             label=\arabic*.,
@@ -280,10 +287,12 @@
             %labelsep=!,
         ]
             \item il coefficiente d'aggregazione medio \(\langle C(k)\rangle=0.453\) è quasi il doppio di quello riportato da \cite[p. 911]{DeMontis2007} (0.26);
-            \item la \cref{figDeMontisKnnk} rispetto alla \cite[Fig. 3b]{DeMontis2007} presenta sia una forma leggermente diversa, seppure la tendenza a mezza luna sia la stessa, che limiti superiori e inferiori piú estesi;
-            \item il coefficiente d'aggregazione pesato rapppresentato nella \cref{figDeMontisCwk} ha chiaramente una tendenza decrescente, anche se molto lenta, ragion per cui si può considerare comunque «circa costante» come afferma \cite{DeMontis2007};
-            \item i primi due pesi piú elevati, riportati nella \cref{tabConfrontoPesiDeMontis}, non corrispondono: ciò si può giustificare molto probabilmente come refuso da parte di \cite{DeMontis2007} poiché i collegamenti «Cagliari-Sassari» e «Sassari-Olbia» sono molto distanti geograficamente\footnote{Il primo equivale a percorrere l'intera lunghezza dell'isola ogni giorno.}, per cui è ragionevole che i flussi siano bassi.
+            \item la \cref{figDeMontisRiproduzione}(c) rispetto alla \cite[Fig. 3b]{DeMontis2007} presenta sia una forma leggermente diversa, seppure la tendenza a mezza luna sia la stessa, che limiti superiori e inferiori piú estesi;
+            \item il coefficiente d'aggregazione pesato nella \cref{figDeMontisRiproduzione}(g) ha chiaramente una tendenza decrescente, anche se poco ripida per cui si può considerare comunque «circa costante» come afferma \cite{DeMontis2007};
+            \item i primi due pesi piú elevati, riportati nella \cref{tabConfrontoPesiDeMontis}, non corrispondono, ma è probabilmente un refuso da parte di \cite{DeMontis2007} poiché i collegamenti «Cagliari-Sassari» e «Sassari-Olbia» sono molto distanti geograficamente\footnote{Il primo equivale a percorrere l'intera estensione dell'isola ogni giorno.}, per cui è ragionevole che i flussi siano bassi.
         \end{enumerate}
+
+        Queste discrepanze sono trascurabili perché lievi e, per quanto concerne questo elaborato, non significative. Inoltre l'unico risultato di rilievo, usato nel \cref{secInterpretazioni}, è la correlazione positiva tra la forza e il grado nella \cref{figForzaVsGrado20}.
 
         \begin{table}[htb]
             \centering
@@ -293,12 +302,12 @@
             \newcommand\sepTab{\hspace{0em}}
             % \newcommand\sepTab{\hfill}
             %
-            \label{tabConfrontoPesiDeMontis}
             \caption{Confronto con \cite{DeMontis2007} dei pesi maggiori.}
+            \label{tabConfrontoPesiDeMontis}
             \begin{subtable}{\dimTab}
                 \centering
-                \label{tabPesiCorrenti}
                 \caption{Pesi maggiori correnti.}
+                \label{tabPesiCorrenti}
                 \begin{tabular}{c@{\sepCol}c}
                     \hline
                     Connessione & Peso \\
@@ -314,8 +323,8 @@
             \sepTab
             \begin{subtable}{\dimTab}
                 \centering
-                \label{tabPesiDeMontis}
                 \caption{Pesi maggiori di \cite{DeMontis2007}}
+                \label{tabPesiDeMontis}
                 \begin{tabular}{c@{\sepCol}c}
                     \hline
                     Connessione & Peso \\
@@ -330,11 +339,9 @@
             \end{subtable}
         \end{table}
        
-        Queste discrepanze sono perché sono lievi e, per quanto concerne questo elaborato, irrilevanti. Inoltre, l'unico risultato di rilievo è la correlazione positiva tra la forza e il grado nella \cref{figForzaVsGrado20}.
-
         % \tikzfigure[-1em]{p}
         %     {\input{../../Figure/.fnl/Capitolo2/AnalisiRete20/Infopagina.tex}}
-        \tikzexternalizedfigure{p}[-1em]
+        \tikzexternalizedfigure{p}%[-1em]
             {../../Figure/.fnl/Capitolo2/AnalisiRete20/Infopagina.tex}
-            {Riproduzione dei principali grafici di \protect\cite{DeMontis2007} [a cui si rimanda per maggiori dettagli sui vari coefficienti] relativi alla topologia della rete del pendolarismo sarda.}
+            {Riproduzione dei principali grafici di \protect\cite{DeMontis2007} [a cui si rimanda per maggiori dettagli sui vari coefficienti] relativi alla topologia della rete sarda del pendolarismo.}
             {.69\linewidth}{figDeMontisRiproduzione}

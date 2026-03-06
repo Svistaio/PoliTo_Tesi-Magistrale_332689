@@ -165,11 +165,11 @@ caseStudies = {
             "attractivity": .18,
             "convincibility": .44,
             "deviation": 0.05,
-            "region": 19,
+            "region": 20,
             "zetaValue": 0.01,
             "timestep": 0.01,
-            "timesteps": int(3e6),
-            "iterations": 100,
+            "timesteps": int(3e7),
+            "iterations": 10,
             "progressBar": False,
             "extraction": False,
             "analysis": False,
@@ -185,7 +185,7 @@ caseStudies = {
             "startValuePrmStudy": .3,
             "endValuePrmStudy": .6,
             "numberPrmStudy": 5,
-            "parametricStudy": True 
+            "parametricStudy": False 
         },
         "λ(rsk/α)/(1+rsk/α)": {
             "attractivity": 0.05,

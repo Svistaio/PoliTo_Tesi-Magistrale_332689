@@ -15,7 +15,8 @@
 
         Si annoverano ora alcuni concetti e risultati di teoria della probabilità avvisando, però, che per molti di essi è impossibile entrare eccessivamente nei dettagli senza spiegare un intero corso; in ogni caso si rimanda a \cite{Durrett2019PTE} per gl'interessati.
 
-        \begin{dfn}[Semiretta intera/reale positiva]
+        \begin{dfn}[Semirette]
+            \label{defSemirettaInteraRealePositiva}
             In tutto questo elaborato si fanno uso dei seguenti sottinsiemi dei numeri reali e naturali:
             %
             \begin{equation*} % https://en.wikipedia.org/wiki/Positive_real_numbers
@@ -118,7 +119,8 @@
         \end{dfn}
 
         \begin{dfn}[Valore atteso condizionato]
-            Sia \(X\in\mathbb R\) una variabile aleatoria assolutamente continua a media finita \(\mathbb E[X]\infty\) e sia \(\mathcal G\subseteq\mathcal F\) una sotto-\(\sigma\)-algebra, allora l'attesa di \(X\) condizionata a \(\mathcal G\) è una variabile aleatoria \(Y\) tale che
+            \label{defValoreAttesoCondizionato}
+            Sia \(X\in\mathbb R\) una variabile aleatoria assolutamente continua a media finita \(\mathbb E[X]<\infty\) e sia \(\mathcal G\subseteq\mathcal F\) una sotto-\(\sigma\)-algebra, allora l'attesa di \(X\) condizionata a \(\mathcal G\) è una variabile aleatoria \(Y\) tale che
 
             \begin{enumerate}[
                 label=AC\arabic*,
@@ -140,7 +142,7 @@
                     \]
             \end{enumerate}
 
-            L'insieme delle \(Y\) che soddisfanno le \ref{ipAttesaCondizionataGMisurabile} e \ref{ipAttesaCondizionataUgualeMisura} sono indicate col simbolo \(\mathbb E[X|\mathcal G]\) che ne è anche il suo rappresentante; in effetti una generica \(Y\) si può indicare anche direttamente come \(\mathbb E[X|\mathcal G]\).
+            L'insieme delle \(Y\) che soddisfanno le \ref{ipAttesaCondizionataGMisurabile} e \ref{ipAttesaCondizionataUgualeMisura} sono indicate col simbolo \(\mathbb E[X|\mathcal G]\) che ne è anche il suo rappresentante: una generica \(Y\) si può indicare anche direttamente come \(\mathbb E[X|\mathcal G]\).
 
             Un'analoga definizione vale anche per i vettori aleatori e per i caso misti con \(X\) scalare e \(Y\) vettoriale.
         \end{dfn}
@@ -155,9 +157,114 @@
             Un simile risultato vale anche per i vettori aleatori \(\mathbf Y\in\mathbb R^n\).
         \end{oss}
 
-        \begin{prp}
-            \label{prpAttesaCondizionataInterpretazionePratica}
-            Dati
+        %\begingroup Vecchia proposizione
+            % \begin{prp}
+            %     \label{prpAttesaCondizionataInterpretazionePratica}
+            %     Dati
+    
+            %     \begin{enumerate}[
+            %         label=\arabic*.,
+            %         topsep=0.5em,
+            %         parsep=0em,
+            %         itemsep=0.25em,
+            %         leftmargin=2em,
+            %         rightmargin=1.5em,
+            %         % \leftmargin + \itemindent = \labelindent + \labelwidth + \labelsep
+            %         %itemindent=!,
+            %         %labelindent=3em,
+            %         %labelwidth=!,
+            %         %labelsep=!,
+            %     ]
+            %         \item \(n,h,k\in\mathbb N_+\) tali che \(n=h+k\);
+            %         \item un vettore aleatorio \(\mathbf Z=(\mathbf X,\mathbf Y)\in\mathbb R^n\) assolutamente continuo costituito da \(\mathbf X\in\mathbb R^h\) e \(\mathbf Y\in\mathbb R^k\) con densità congiunta \(f_{\mathbf Z}(\mathbf x,\mathbf y)\) e marginali \(f_{\mathbf X}\) e \(f_{\mathbf Y}\);
+            %         \item una funzione \(\varphi\colon\mathbb R^n\to\mathbb R\) misurabile e tale che \[\mathbb E[\varphi(\mathbf Z)]=\mathbb E[\varphi(\mathbf X,\mathbf Y)]<\infty;\]
+            %     \end{enumerate}
+    
+            %     allora si può definire \(h\colon\mathbb R^k\to\mathbb R\) tramite la seguente equazione
+            %     %
+            %     \begin{equation}
+            %         \label{eqCondizionehVettoreAleatorio}
+            %         \int_{\mathbb R^h}h(\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x
+            %         =\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x
+            %         % =\mathbb E[\varphi(\mathbf X,\mathbf y)] % Non è corretto poiché la media necessita della densità delle variabili aleatorie al suo interno ma qui è presente solo quella relativa a Z
+            %         \quad\forall\mathbf y\in\mathbb R^k,
+            %     \end{equation}
+            %     %
+            %     che soddisfà \(h(\mathbf Y)\in\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y]\).
+            % \end{prp}
+            
+            % \begin{proof}
+            %     Per la \ref{ipAttesaCondizionataGMisurabile} è sufficiente esplicitare la forma di \(\sigma(h(\mathbf Y))\):
+            %     \[
+            %         \sigma(h(\mathbf Y))
+            %         \equiv\sigma({\mathbf Y^{-1}(h^{-1}(B))\ |\ B\in\mathcal B(\mathbb R)})
+            %         \subseteq\sigma({\mathbf Y^{-1}(B)\ |\ B\in\mathcal B(\mathbb R^h)}),
+            %     \]
+            %     a parole si considera la controimmagine tramite \(\mathbf Y\) dei borelliani filtrati da \(h\), ragion per cui la \(\sigma\)-algebra non potrà che essere contenuta in quella non filtrata.  
+                
+            %     Per la \ref{ipAttesaCondizionataUgualeMisura} si verifica la condizione \(\forall A\in\sigma(\mathbf Y)\) avvalendosi della caratterizzazione di \(h(\mathbf Y)\) tramite \eqref{eqCondizionehVettoreAleatorio}:
+            %     \[
+            %         \begin{aligned}
+            %             \int_Ah(\mathbf Y)\de\mathbb P
+            %             &=\int_Bh(\mathbf y)f_{\mathbf Y}(\mathbf y)\de\mathbf y
+            %             \overset{\eqref{eqDensitàMarginaleProbabilità}}{=}
+            %             \int_Bh(\mathbf y)\int_{\mathbb R^h}f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+            %             \\&=\int_B\int_{\mathbb R^h}h(\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+            %             \overset{\eqref{eqCondizionehVettoreAleatorio}}{=}
+            %             \int_B\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+            %             \\&=\int_{\mathbb R^n}\chi_B(\mathbf y)\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
+            %             =\int_\Omega\chi_B(\mathbf Y)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+            %             \\&=\int_\Omega\chi_C(\mathbf Z)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+            %             =\int_\Omega\chi_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P
+            %             =\int_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P,
+            %         \end{aligned}
+            %     \] % P. 127 di «Probabilità II {29-09-2022}.pdf»
+            %     ove \(\chi_A\), \(\chi_B\) e \(\chi_C\) sono funzioni indicatrici dei rispettivi insiemi, e in piú vale \(B\equiv\mathbf Y(A)\subseteq\mathbb R^k\) e \(C\equiv\mathbf Z(\mathbb R^h\times A)\subseteq\mathbb R^n\) dimodoché
+            %     \[
+            %         A=\mathbf Y^{-1}(B)=\mathbf Z^{-1}(C).
+            %     \]
+            % \end{proof}
+
+            % Si consideri la \eqref{eqCondizionehVettoreAleatorio}, allora \(h(y)\) si può cosí riformulare:
+            % %
+            % \begin{equation}
+            %     \label{eqAttesaCondizionataEvento}
+            %     h(\mathbf y)
+            %     =\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)
+            %     f_{\mathbf X|\mathbf Y=\mathbf y}(\mathbf x)\de\mathbf x
+            %     =\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y=\mathbf y]
+            %     \quad\forall\mathbf y\in\mathbb R^k,
+            % \end{equation}
+            % %
+            % in cui
+            % \[
+            %     f_{\mathbf X|\mathbf Y=\mathbf y}
+            %     \equiv\left\{
+            %         \begin{aligned}
+            %             &f_{\mathbf Z}(\mathbf x,\mathbf y)/f_{\mathbf Y}(\mathbf y)&\text{se }f_{\mathbf Y}(\mathbf y)\neq0\\
+            %             &0&\text{se }f_{\mathbf Y}(\mathbf y)=0
+            %         \end{aligned}
+            %     \right.
+            % \]
+            % è la densità di \(\mathbf X\) condizionata dall'evento \(\mathbf Y=\mathbf y\).
+
+        %\endgroup
+
+        \begin{oss}[Dalla teoria alla pratica]
+            \label{ossAttesaCondizionataInterpretazionePratica}
+            Esiste un'interpretazione piú pratica per l'attesa condizionata rispetto alla \cref{defValoreAttesoCondizionato} alquanto teorica: la \(\mathbb E[\mathbf X|\mathcal G]\) si calcola mediando \(\mathbf X\) \textit{considerando \(\mathcal G\) noto}; ciò implica che si sanno tutte le informazioni di \(\mathcal G\), ovverosia che i suoi eventi si sono realizzati.
+           
+            Un uso che permette di capire meglio quanto detto si può trovare nell'\ref{ipAttesaCondizionataUgualeMisura} imponendo \(A=\Omega\) (sempre lecito essendo \(\mathcal G\) una \(\sigma\)-al\-ge\-bra):
+            %
+            \begin{equation}
+                \label{eqAttesaCondizionataInterpretazionePraticaGenerale}
+                \mathbb E[\mathbf X]
+                =\mathbb E[\mathbb E[\mathbf X|\mathcal G]],
+            \end{equation}
+            %
+            che a parole significa che l'attesa di \(\mathbf X\) si può calcolare mediando l'attesa condizionata; tuttavia \(\mathcal G\) continua a essere una generica \(\sigma\)-algebra, difficilmente rappresentabile, per cui è opportuno specializzare ulteriormente la \cref{eqAttesaCondizionataInterpretazionePraticaGenerale}.
+            
+            Dati \(n,h,k\in\mathbb N_+\) tali che \(n=h+k\), siano
 
             \begin{enumerate}[
                 label=\arabic*.,
@@ -172,94 +279,36 @@
                 %labelwidth=!,
                 %labelsep=!,
             ]
-                \item \(n,h,k\in\mathbb N_+\) tali che \(n=h+k\);
-                \item un vettore aleatorio \(\mathbf Z=(\mathbf X,\mathbf Y)\in\mathbb R^n\) assolutamente continuo costituito da \(\mathbf X\in\mathbb R^h\) e \(\mathbf Y\in\mathbb R^k\) con densità congiunta \(f_{\mathbf Z}(\mathbf x,\mathbf y)\) e marginali \(f_{\mathbf X}\) e \(f_{\mathbf Y}\);
-                \item una funzione \(\varphi\colon\mathbb R^n\to\mathbb R\) misurabile e tale che \[\mathbb E[\varphi(\mathbf Z)]=\mathbb E[\varphi(\mathbf X,\mathbf Y)]<\infty;\]
+                \item un vettore aleatorio \(\mathbf Z=(\mathbf X,\mathbf Y)\in\mathbb R^n\), con \(\mathbf X\in\mathbb R^h\) e \(\mathbf Y\in\mathbb R^k\) discreta, e% con densità congiunta \(f_{\mathbf Z}(\mathbf x,\mathbf y)\) e marginali \(f_{\mathbf X}\) e \(f_{\mathbf Y}\), e
+                \item una funzione \(\varphi\colon\mathbb R^n\to\mathbb R\) misurabile e tale che \(\mathbb E[\varphi(\mathbf Z)]<\infty,\)%=\mathbb E[\varphi(\mathbf X,\mathbf Y)]
             \end{enumerate}
 
-            allora si può definire \(h\colon\mathbb R^k\to\mathbb R\) tramite la seguente equazione
+            allora, ipotizzando che \(\mathbf X(\mathbf Y)\) sia funzione di \(\mathbf Y\) e che quest'ultimo \textit{non} sia funzione\footnotemark{} di \(\mathbf X\), posto \(\mathcal G\equiv\mathbf Y\) la \cref{eqAttesaCondizionataInterpretazionePraticaGenerale} diventa%
+            \footnotetext{Si noti che i due vettori \(\mathbf X\) e \(\mathbf Y\) sono per costruzione dipendenti.}%
+            %
+            \begin{equation*}
+                \mathbb E[\varphi(\mathbf X(\mathbf Y),\mathbf Y)]
+                =\mathbb E[\mathbb E[\varphi(\mathbf X(\mathbf Y),\mathbf Y)|\mathbf Y]];
+            \end{equation*}
+            %
+            ma ora è facile capire cosa s'intende per \(\mathbf Y\) noto: si assuma che \(\mathbf Y\) abbia realizzato l'evento \(\mathbf y\) arbitrario, e, siccome non è funzione di \(\mathbf X\), ciò implica
             %
             \begin{equation}
-                \label{eqCondizionehVettoreAleatorio}
-                \int_{\mathbb R^h}h(\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x
-                =\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x
-                % =\mathbb E[\varphi(\mathbf X,\mathbf y)] % Non è corretto poiché la media necessita della densità delle variabili aleatorie al suo interno ma qui è presente solo quella relativa a Z
-                \quad\forall\mathbf y\in\mathbb R^k,
+                \label{eqAttesaCondizionataInterpretazionePraticaSpecializzata}
+                \mathbb E[\varphi(\mathbf X(\mathbf Y),\mathbf Y)|\mathbf Y=\mathbf y]
+                =\mathbb E[\varphi(\mathbf X(\mathbf y),\mathbf y)],
             \end{equation}
             %
-            che soddisfà \(h(\mathbf Y)\in\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y]\).
-        \end{prp}
-        
-        \begin{proof}
-            Per la \ref{ipAttesaCondizionataGMisurabile} è sufficiente esplicitare la forma di \(\sigma(h(\mathbf Y))\):
-            \[
-                \sigma(h(\mathbf Y))
-                \equiv\sigma({\mathbf Y^{-1}(h^{-1}(B))\ |\ B\in\mathcal B(\mathbb R)})
-                \subseteq\sigma({\mathbf Y^{-1}(B)\ |\ B\in\mathcal B(\mathbb R^h)}),
-            \]
-            a parole si considera la controimmagine tramite \(\mathbf Y\) dei borelliani filtrati da \(h\), ragion per cui la \(\sigma\)-algebra non potrà che essere contenuta in quella non filtrata.  
-            
-            Per la \ref{ipAttesaCondizionataUgualeMisura} si verifica la condizione \(\forall A\in\sigma(\mathbf Y)\) avvalendosi della caratterizzazione di \(h(\mathbf Y)\) tramite \eqref{eqCondizionehVettoreAleatorio}:
-            \[
-                \begin{aligned}
-                    \int_Ah(\mathbf Y)\de\mathbb P
-                    &=\int_Bh(\mathbf y)f_{\mathbf Y}(\mathbf y)\de\mathbf y
-                    \overset{\eqref{eqDensitàMarginaleProbabilità}}{=}
-                    \int_Bh(\mathbf y)\int_{\mathbb R^h}f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
-                    \\&=\int_B\int_{\mathbb R^h}h(\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
-                    \overset{\eqref{eqCondizionehVettoreAleatorio}}{=}
-                    \int_B\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
-                    \\&=\int_{\mathbb R^n}\chi_B(\mathbf y)\varphi(\mathbf x,\mathbf y)f_{\mathbf Z}(\mathbf x,\mathbf y)\de\mathbf x\de\mathbf y
-                    =\int_\Omega\chi_B(\mathbf Y)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
-                    \\&=\int_\Omega\chi_C(\mathbf Z)\varphi(\mathbf X,\mathbf Y)\de\mathbb P
-                    =\int_\Omega\chi_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P
-                    =\int_A\varphi(\mathbf X,\mathbf Y)\de\mathbb P,
-                \end{aligned}
-            \] % P. 127 di «Probabilità II {29-09-2022}.pdf»
-            ove \(\chi_A\), \(\chi_B\) e \(\chi_C\) sono funzioni indicatrici dei rispettivi insiemi, e in piú vale \(B\equiv\mathbf Y(A)\subseteq\mathbb R^k\) e \(C\equiv\mathbf Z(\mathbb R^h\times A)\subseteq\mathbb R^n\) dimodoché
-            \[
-                A=\mathbf Y^{-1}(B)=\mathbf Z^{-1}(C).
-            \]
-        \end{proof}
+            vale a dire che, in questo caso specifico, \(\mathbb E[\varphi(\mathbf X(\mathbf Y),\mathbf Y)|\mathbf Y]\) si svolge mediando \(\varphi(\mathbf X(\mathbf Y),\mathbf Y)\) ma considerando \(\mathbf Y\) come un parametro anziché una variabile aleatoria, ossia essa diventa di fatto fissa nel conto perché, appunto, nota.
 
-        \begin{oss}
-            \label{ossAttesaCondizionataInterpretazionePratica}
-            La precedente dimostrazione svela un'interpretazione piú pratica dell'attesa condizionata rispetto alla sua definizione alquanto teorica.
-
-            Si consideri la \eqref{eqCondizionehVettoreAleatorio}, allora \(h(y)\) si può cosí riformulare:
+            Lo stesso \textit{non} si può dire invertendo il condizionamento
             %
-            \begin{equation}
-                \label{eqAttesaCondizionataEvento}
-                h(\mathbf y)
-                =\int_{\mathbb R^h}\varphi(\mathbf x,\mathbf y)
-                f_{\mathbf X|\mathbf Y=\mathbf y}(\mathbf x)\de\mathbf x
-                =\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y=\mathbf y]
-                \quad\forall\mathbf y\in\mathbb R^k,
-            \end{equation}
+            \begin{equation*}
+                \mathbb E[\varphi(\mathbf X(\mathbf Y),\mathbf Y)]
+                =\mathbb E[\mathbb E[\varphi(\mathbf X(\mathbf Y),\mathbf Y)|\mathbf X]],
+            \end{equation*}
             %
-            in cui
-            \[
-                f_{\mathbf X|\mathbf Y=\mathbf y}
-                \equiv\left\{
-                    \begin{aligned}
-                        &f_{\mathbf Z}(\mathbf x,\mathbf y)/f_{\mathbf Y}(\mathbf y)&\text{se }f_{\mathbf Y}(\mathbf y)\neq0\\
-                        &0&\text{se }f_{\mathbf Y}(\mathbf y)=0
-                    \end{aligned}
-                \right.
-            \]
-            è la densità di \(\mathbf X\) condizionata dall'evento \(\mathbf Y=\mathbf y\).
-
-            La \eqref{eqAttesaCondizionataEvento}, in pratica, si calcola svolgendo la media di \(\varphi(\mathbf X,\textbf Y)\) rispetto a \(\mathbf X\) dopo aver "fissato" l'evento \(\mathbf Y=\mathbf y\), vale a dire considerando la \(\mathbf Y\) come fosse un parametro uguale alla realizzazione \(\mathbf y\). 
-
-            Successivamente, se s'impone \(A=\Omega\) (sempre lecito essendo \(\mathcal G\) una \(\sigma\)-al\-ge\-bra) allora dalla \ref{ipAttesaCondizionataUgualeMisura} vale
-            %
-            \begin{equation}
-                \label{eqAttesaCondizionataInterpretazionePratica}
-                \mathbb E[\varphi(\mathbf X,\mathbf Y)]
-                =\mathbb E[\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y]],
-            \end{equation}
-            %
-            il che significa che l'attesa di \(\varphi(\mathbf X,\mathbf Y)\) si calcola mediando rispetto a \(\mathbf Y\) la variabile aleatoria \(\mathbb E[\varphi(\mathbf X,\mathbf Y)|\mathbf Y]\), ricavata dalla \eqref{eqAttesaCondizionataEvento} ma considerando \(\mathbf y\) arbitrario.
+            sebbene l'identità rimanga valida; difatti in questo caso \(\mathbf X\) è funzione di \(\mathbf Y\): una sua realizzazione condiziona implicitamente \(\mathbf Y\) che non può essere di conseguenza arbitrario, per cui un'analoga relazione alla \cref{eqAttesaCondizionataInterpretazionePraticaSpecializzata}, in cui \(\mathbf X\) diventa questa volta un parametro, sarebbe in generale sbagliata.
         \end{oss}
 
         \begin{dfn}[Processo stocastico]
@@ -283,7 +332,7 @@
 
             \subsubsection{Descrizione classica}
 
-                Innanzitutto è necessario caratterizzare alcune proprietà del gas da modellizzare.
+                Innanzitutto è necessario postulare alcune proprietà del gas da modellizzare.
 
                 \begin{ipo}
                     \label{ipGasPerfetto}

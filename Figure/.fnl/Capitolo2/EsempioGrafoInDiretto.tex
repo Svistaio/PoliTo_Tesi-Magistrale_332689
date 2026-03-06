@@ -1,0 +1,79 @@
+
+% !TEX root = ../../../Esperimenti/.tex/MEF.tex
+% LTeX: language=it
+
+\begin{tikzpicture}
+    \nodeDiagramSettings
+
+    %\begingroup Impostazioni
+        % \renewcommand\subCaptionSize{10}
+        \pgfmathsetmacro\radius{1.5}
+        \newcommand\hPlotSep{4}
+    %\endgroup
+
+    \begin{scope}[
+        local bounding box=tikZFigure,
+        scale=\plotScale,
+        transform shape,
+    ]
+        %\begingroup Grafo Indiretto a forma di triangolo equilatero
+            \tikzbox{{(0,0)}}{IndirectGraph}{
+                \node[nodeStyle] (Aa) at (90:\radius) {1};
+                \node[nodeStyle] (Ba) at (330:\radius) {2};
+                \node[nodeStyle] (Ca) at (210:\radius) {3};
+                % Coordinate polari: (angolo:raggio)
+    
+                \draw[indirectArrow] (Aa) -- (Ba);
+                \draw[indirectArrow] (Ba) -- (Ca);
+                \draw[indirectArrow] (Ca) -- (Aa);
+            }
+        %\endgroup
+
+        %\begingroup Grado diretto a forma di triangolo equilatero
+            \tikzbox{{
+                ($(IndirectGraph.south east)
+                +(\hPlotSep em,0em)$)
+            }}{DirectGraph}{
+                \node[nodeStyle] (Ab) at (90:\radius) {1};
+                \node[nodeStyle] (Bb) at (330:\radius) {2};
+                \node[nodeStyle] (Cb) at (210:\radius) {3};
+    
+                \draw[nodeArrowExact] (Ab) edge[bend left=15] (Bb);
+                \draw[nodeArrowExact] (Bb) edge[bend left=15] (Ab);
+    
+                \draw[nodeArrowExact] (Bb) edge[bend left=15] (Cb);
+                \draw[nodeArrowExact] (Cb) edge[bend left=15] (Bb);
+    
+                \draw[nodeArrowExact] (Cb) edge[bend left=15] (Ab);
+                \draw[nodeArrowExact] (Ab) edge[bend left=15] (Cb);
+            }
+        %\endgroup
+    \end{scope}
+
+    %\begingroup Matrice d'adiacenza
+        \tikzbox{{
+            ($(DirectGraph.south east)
+            +(.7*\hPlotSep em,0)$)
+        }}{AdjacencyMatrix}{
+            \node[
+                inner sep=0pt,
+                outer sep=0pt
+            ] (M) {
+                \(
+                    A = 
+                    \begin{bmatrix}
+                        0 & 1 & 1 \\
+                        1 & 0 & 1 \\
+                        1 & 1 & 0 
+                    \end{bmatrix}%
+                \)%
+            };%
+        }
+    %\endgroup
+
+    %\begingroup Didascalie
+        \node[anchor=center] at (IndirectGraph.north west) {\dimTesto{\subCaptionSize}\sottoDidascalia[]{}};
+        \node[anchor=center] at (DirectGraph.north west) {\dimTesto{\subCaptionSize}\sottoDidascalia[]{}};
+        \node[anchor=center] at (DirectGraph.north-|AdjacencyMatrix.north) {\dimTesto{\subCaptionSize}\sottoDidascalia[]{}};
+    %\endgroup
+\end{tikzpicture}%
