@@ -41,7 +41,7 @@
                 fill:CTred,
                 style:"italic",
                 size: sub-title-size
-            )[Corso in Ingegneria Matematica]
+            )[Corso di Laurea in Ingegneria Matematica]
 
             #v(1fr)
 

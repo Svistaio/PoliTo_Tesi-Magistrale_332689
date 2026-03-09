@@ -4,13 +4,13 @@
 
 \chapter{Conclusioni}\label{secConclusioni}
 
-    Tutt'i grafici illustrati nel precedente capitolo corroborano che la prospettiva nodo-agente è applicabile anche in un contesto urbano per descrivere la distribuzione della taglia tra città.
+    Tutt'i risultati illustrati nel precedente capitolo corroborano la prospettiva nodo-agente in un contesto urbano per descrivere sia la distribuzione della taglia tra città che il loro indice di Pareto.
 
-    L'approssimazione di rango unitario dalla \cref{defMatriceGradi} produce dei risultati corrispondenti quasi perfettamente ai quelli ottenuti esattamente sia con \(N\) limitato (Valle d'Aosta) che elevato (Italia), confermando \cite{Nurisso2024}; nel caso dell'Italia l'approssimazione è lievemente peggiore di quelli precedenti minando cosí la validità dell'\cref{ossBontaApprossimazione}.
+    L'approssimazione di rango unitario dalla \cref{defMatriceGradi} produce dei risultati corrispondenti quasi perfettamente a quelli ottenuti esattamente sia con \(N\) limitato (Valle d'Aosta) che elevato (Italia), confermando \cite{Nurisso2024}.%; nel caso dell'Italia l'approssimazione è lievemente peggiore di quelli precedenti minando cosí la validità dell'\cref{ossBontaApprossimazione}.
 
-    Tutte le regole d'interazione, vale a dire d'emigrazione (\cref{ossUguaglianzaInterazioneEmigrazione}), riescono a riprodurre fedelmente l'indice di Pareto della coda della distribuzione reale, mentre la restante porzione è stata riprodotta solo parzialmente a seconda della regola considerata. In ogni caso la lognormale bimodale segue meglio, in generale, la coda della distribuzione confermando \cite{Gualandi2019SDC,Gualandi2019HBLD}. Tuttavia entrambi gli adattamenti hanno pregi e difetti: da un punto di vista ingegneristico la Pareto è piú facile da trattare avendo solo un parametro, sebbene sia al tempo stesso peggiore matematicamente; viceversa, la bilognormale è piú corretta a livello matematico ma è composta da ben \(5\) parametri.
+    Tutte le regole d'interazione, vale a dire d'emigrazione (\cref{ossUguaglianzaInterazioneEmigrazione}), riescono a riprodurre fedelmente l'indice di Pareto della coda della distribuzione reale, mentre la distribuzione in sé è stata complessivamente ben riprodotta con quasi ogni regola considerata. In ogni caso la lognormale bimodale segue meglio la coda rispetto alla Pareto confermando \cite{Gualandi2019SDC,Gualandi2019HBLD}; tuttavia entrambi gli adattamenti hanno pregi e difetti: da un punto di vista ingegneristico la Pareto è piú facile da trattare avendo solo un parametro, sebbene sia al tempo stesso peggiore matematicamente; viceversa, la lognormale bimodale è piú corretta a livello matematico ma è composta da ben \(5\) parametri, rendendo piú difficile un eventuale confronto.
 
-    Ovviamente il lavoro qui presentato non è esaustivo e conduce a molteplici sviluppi futuri:
+    In conclusione, è naturale che il lavoro qui presentato non sia esaustivo e conduca a molteplici sviluppi futuri:
 
     \begin{enumerate}[
         label=\arabic*.,
@@ -25,9 +25,9 @@
         %labelwidth=!,
         %labelsep=!,
     ]
-        \item sperimentare con regole d'interazione contenenti altri coefficienti della teoria dei grafi come, per esempio, la centralità per intermediazione o il coefficiente di aggregazione;
-        \item ricavare l'equazione di Fokker-Planck della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano} per studiare analiticamente la distribuzione stazionaria, sebbene la natura non lineare e simmetrica delle regole d'emigrazione qui proposte rendano tale obbiettivo alquanto difficile da raggiungere;
-        \item abbandonare l'ipotesi semplificativa della rete statica per descrivere una rete dinamica che vari assieme alla popolazione con un possibile confronto con dati reali [se esistenti];
+        \item sperimentare con regole d'interazione contenenti altri coefficienti della teoria dei grafi come, per esempio, la centralità per intermediazione o il coefficiente d'aggregazione;
+        \item ricavare l'equazione di Fokker-Planck della \ref{eqFormaDeboleTipoBoltzmannOmogeneoAssimmetricoUrbano} per studiare analiticamente la densità stazionaria, sebbene la natura non lineare e simmetrica delle regole d'emigrazione qui proposte rendano tale obbiettivo alquanto difficile da raggiungere;
+        \item abbandonare l'ipotesi semplificativa della rete statica per descrivere una rete dinamica che evolva parallelamente alla popolazione con un possibile confronto con dati reali [se esistenti];
         \item applicare la presente teoria anche a reti europee o internazionali per confermare la sua validità sia in altri contesti che a scale superiori.
     \end{enumerate}
     

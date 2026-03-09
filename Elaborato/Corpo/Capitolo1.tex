@@ -45,8 +45,8 @@
     %     {\input{../../Figure/.fnl/Capitolo1/EsempioFunzioneLognormale.tex}}
     \tikzexternalizedfigure{p}
         {../../Figure/.fnl/Capitolo1/EsempioFunzioneLognormale.tex}
-        {Funzione \(\DstrLognormale(\sigma,1)\) in scala lineare (a), logaritmica (b) e con dati logaritmati (c) per diverse deviazioni.}
-        {.51\linewidth}{figEsempioFunzioneLognormale}
+        {Funzione \(X\sim\DstrLognormale(\mu,\sigma)\) al variare dei parametri, ma con uguale valore atteso \(\mathbb E[X]=10^{\mu+\sigma^2\ln(10)/2}=10\), in scala lineare (a) e logaritmica (b); invece in (c) sono riportate le stesse distribuzioni in spazio logaritmico \(y=\log(x)\). Le linee tratteggiate sono i valori attesi di ciascuna distribuzione.}
+        {.55\linewidth}{figEsempioFunzioneLognormale}
 
     Perdipiú da Gualandi \etal{} \cite{Gualandi2019HBLD,Gualandi2019SDC} ci si è poi resi conto che l'intera distribuzione è ben adattata da una lognormale bimodale (qui denotata anche come bilognormale), vale a dire una combinazione convessa della \eqref{eqDistribuzioneLognormale}
     %
@@ -82,4 +82,4 @@
 
     Questa lacuna è probabilmente attribuibile al fatto che gli sviluppi della teoria dei grafi applicata alla \TCSMA{} sono stati piuttosto recenti e principalmente concentrati sulla prospettiva nodo-luogo anziché nodo-agente. Dunque l'aspetto piú innovativo di questo lavoro è mostrare che la seconda prospettiva è altrettanto valida quanto la prima, nonostante sia piú comune; per il resto questa tesi dev'essere considerata come un'esplorazione formale applicativa con pochi approfondimenti analitici.
 
-    Per il resto lo scritto sarà cosí suddiviso: nel secondo capitolo si affronteranno brevemente e superficialmente alcuni concetti della teoria dei grafi, soprattutto quelli pertinenti alla topologia interurbana; quindi nel terzo la \TCSMA{} è approfondita prima da un punto di vista classico, e poi mediata dai grafi sia esattamente che approsimativamente; infine negli ultimi due s'illustreranno i principali risultati concludendo con delle note finali e potenziali sviluppi futuri. Per il lettore interessato è anche presente un'appendice ove si spiega a grandi linee il codice di Python dell'implementazione.
+    Nel complesso lo scritto è cosí suddiviso: nel secondo capitolo si affronteranno brevemente e superficialmente alcuni concetti della teoria dei grafi, soprattutto quelli pertinenti alla topologia interurbana; quindi nel terzo la \TCSMA{} è approfondita prima da un punto di vista classico, e poi mediata dai grafi sia esattamente che approssimatamente; infine negli ultimi due s'illustreranno i principali risultati concludendo con delle note finali e potenziali sviluppi futuri. Per il lettore interessato è anche presente un'appendice ove si spiega a grandi linee il codice di Python dell'implementazione.
