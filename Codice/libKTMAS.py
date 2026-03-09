@@ -317,7 +317,8 @@ class KineticSimulation():
                 if nBin > nBins[i]: nBins[i] = nBin
 
         p = (.5,1.075); dp = (1,.05)
-        axis = 4; xScale='lin'
+        axis = 4; xScale='lin';
+        string = 'h' if xScale == 'lin' else 's'
 
         for t in typ: # t[ype]
             ### Lognormal fit ###
@@ -567,11 +568,11 @@ class KineticSimulation():
                 libF.DataString(s1S,Ni,ta,r'\sigma_1')+
                 libF.DataString(m2S,Ni,ta,r'\mu_2')+
                 libF.DataString(s2S,Ni,ta,r'\sigma_2')+
-                libF.DataString(logCsSMin[:,t],Ni,ta,r's_{{min}}')+
-                libF.DataString(logCsSMax[:,t],Ni,ta,r's_{{max}}')+
-                libF.DataString(logCsSAvr[:,t],Ni,ta,r'\langle s\rangle')+
+                libF.DataString(logCsSMin[:,t],Ni,ta,fr'{string}_{{min}}')+
+                libF.DataString(logCsSMax[:,t],Ni,ta,fr'{string}_{{max}}')+
+                libF.DataString(logCsSAvr[:,t],Ni,ta,fr'\langle {string}\rangle')+
                 libF.DataString(
-                    logCsSSum[:,t],Ni,ta,r's_{{\Sigma}}',
+                    logCsSSum[:,t],Ni,ta,fr'{string}_{{\Sigma}}',
                     formatVal='.2e',formatErr='.2e'
                 )+
                 libF.DataString(blS,Ni,ta,r'\beta',space=False),
@@ -588,11 +589,11 @@ class KineticSimulation():
             libF.DataString(s1R,head=r'\sigma_1')+
             libF.DataString(m2R,head=r'\mu_2')+
             libF.DataString(s2R,head=r'\sigma_2')+
-            libF.DataString(logCsRMin,head=r's_{{min}}')+
-            libF.DataString(logCsRMax,head=r's_{{max}}')+
-            libF.DataString(logCsRAvr,head=r'\langle s\rangle')+
+            libF.DataString(logCsRMin,head=fr'{string}_{{min}}')+
+            libF.DataString(logCsRMax,head=fr'{string}_{{max}}')+
+            libF.DataString(logCsRAvr,head=fr'\langle {string}\rangle')+
             libF.DataString(
-                logCsRSum,head=r's_{{\Sigma}}',
+                logCsRSum,head=fr'{string}_{{\Sigma}}',
                 formatVal='.2e',formatErr='.2e'
             )+
             libF.DataString(blR,head=r'\beta',space=False),

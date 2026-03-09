@@ -8,75 +8,84 @@
     >=Stealth,
     every node/.style={font=\large}
 ]
-    \dimTesto{11pt}
-
-    \newcommand\xpad{\hspace{0.75em}}
-    \newcommand\arrowText{\dimTesto{8pt}\(\xpad N\to\infty\xpad\)}
-    \newlength\arrowLen
-    \settowidth\arrowLen{\arrowText} 
-
-    \newcommand\vseptext{3em}
-
-    % Nodi principali
-    \newcommand\hsepbound\arrowLen
-    \newcommand\vsepbound{1.25em}
-
-    \node(dN) {\(\underhat{\bar d}_N\)};
-    \node(d) [right=\hsepbound of dN] {\(\underhat{\bar d}\)};
-
-    \node(gN) [below=\vsepbound of dN] {\(\underhat{\bar g}_N\)};
-    \node(g) at (d |- gN) {\(\underhat{\bar g}\)};
-
-    \node(fN) [below=\vsepbound of gN] {\(\underhat{\bar f}_N\)};
-    \node(f) at (d |- fN) {\(\underhat{\bar f}\)};
-
-    % Frecce
-    \newcommand\vsepNinf{-0.1em}
-    \draw[->] (dN) -- (d) node[midway,above=\vsepNinf] {\arrowText};
-    \draw[->] (gN) -- (g) node[midway,above=\vsepNinf] {\arrowText};
-    \draw[->] (fN) -- (f) node[midway,above=\vsepNinf] {\arrowText};
-
-    % Uguaglianze e approssimazioni
-    \path(dN) -- (gN) node [midway,rotate=90,anchor=center] {\(=\)};
-    \path(d) -- (g) node [midway,rotate=90,anchor=center] {\(=\)};
-
-    \path(gN) -- (fN) node [midway,rotate=90,anchor=center] {\(\approx\)};
-    \path(g) -- (f) node [midway,rotate=90,anchor=center] {\(\approx\)};
+    %\begingroup Impostazioni
+        \dimTesto{11pt}
     
-    % Etichette
-    \newcommand\hseplabel{2em}
-    \path(dN) -- (gN) coordinate[midway] (midhg);
-    \node(teo) [left=\hseplabel of midhg,anchor=center] {\dimTesto{7pt}\cref{teoRilassamentoTopologia}};
+        \newcommand\xpad{\hspace{0.75em}}
+        \newcommand\arrowText{\dimTesto{8pt}\(\xpad N\to\infty\xpad\)}
+        \newlength\arrowLen
+        \settowidth\arrowLen{\arrowText} 
+    
+        \newcommand\vseptext{3em}
+    %\endgroup
 
-    \path(gN) -- (fN) coordinate[midway] (midgf);
-    \node(star) [left=\hseplabel of midgf,anchor=center] {\dimTesto{7pt}\cref{defMatriceGradi}}; %\(\Circled{\ast}\)
+    %\begingroup Nodi principali
+        \newcommand\hsepbound\arrowLen
+        \newcommand\vsepbound{1.25em}
+    
+        \node(dN) {\(\underhat{\bar d}_N\)};
+        \node(d) [right=\hsepbound of dN] {\(\underhat{\bar d}\)};
+    
+        \node(gN) [below=\vsepbound of dN] {\(\underhat{\bar g}_N\)};
+        \node(g) at (d |- gN) {\(\underhat{\bar g}\)};
+    
+        \node(fN) [below=\vsepbound of gN] {\(\underhat{\bar f}_N\)};
+        \node(f) at (d |- fN) {\(\underhat{\bar f}\)};
+    %\endgroup
 
-    % Annotazioni
-    \newcommand\hsepAnnotation{5.5em}
-    \node (textK) [right=\hsepAnnotation of d,anchor=center] {\dimTesto{10pt} Topologia rilassata};
-    \node (textB) [right=\hsepAnnotation of g,anchor=center] {\dimTesto{10pt} Topologia esatta (\(\mathbf B\))};
-    \node (textA) [right=\hsepAnnotation of f,anchor=center] {\dimTesto{10pt} Topologia esatta (\(\mathbf A\))};
+    %\begingroup Frecce
+        \newcommand\vsepNinf{-0.1em}
+        \draw[->] (dN) -- (d) node[midway,above=\vsepNinf] {\arrowText};
+        \draw[->] (gN) -- (g) node[midway,above=\vsepNinf] {\arrowText};
+        \draw[->] (fN) -- (f) node[midway,above=\vsepNinf] {\arrowText};
+    %\endgroup
 
-    % Frecce
-    % \draw[->] (textK.west) -- (d.east);
-    % \draw[->] (textB.west) -- (g.east);
-    % \draw[->] (textA.west) -- (f.east);
+    %\begingroup Uguaglianze e approssimazioni
+        \path(dN) -- (gN) node [midway,rotate=90,anchor=center] {\(=\)};
+        \path(d) -- (g) node [midway,rotate=90,anchor=center] {\(=\)};
+    
+        \path(gN) -- (fN) node [midway,rotate=90,anchor=center] {\(\approx\)};
+        \path(g) -- (f) node [midway,rotate=90,anchor=center] {\(\approx\)};
+    %\endgroup
+    
+    %\begingroup Etichette
+        \newcommand\hseplabel{2em}
+        \path(dN) -- (gN) coordinate[midway] (midhg);
+        \node(teo) [left=\hseplabel of midhg,anchor=center] {\dimTesto{7pt}\cref{teoRilassamentoTopologia}};
+    
+        \path(gN) -- (fN) coordinate[midway] (midgf);
+        \node(star) [left=\hseplabel of midgf,anchor=center] {\dimTesto{7pt}\cref{defMatriceGradi}}; %\(\Circled{\ast}\)
+    %\endgroup
 
-    % Rettangoli
-    \newcommand\linewidthRectangle{0pt}
-    \newcommand\paddingRectangle{0.5pt}
-    \begin{scope}[
-        % Stile locale: esiste solo tra \begin{scope} e \end{scope}
-        rectangleStyle/.style={
-            inner sep=\paddingRectangle,
-            line width=\linewidthRectangle,
-            fill opacity=0.2
-        }
-    ]
-        \draw [rectangleStyle,fill=gray!75] (textK.north west) rectangle (textK.south east);
-        \draw [rectangleStyle,fill=red!75] (textK.north west |- textB.north west) rectangle (textK.south east |- textB.south east);
-        \draw [rectangleStyle,fill=blue!75] (textK.north west |- textA.north west) rectangle (textK.south east |- textA.south east);
-    \end{scope}
+    %\begingroup Annotazioni
+        \newcommand\hsepAnnotation{1em}
+        \node (textK) [right=\hsepAnnotation of d,anchor=west,align=left] {\dimTesto{10pt} Topologia rilassata (\(\underhat k\))};
+        \node (textB) [right=\hsepAnnotation of g,anchor=west,align=left] {\dimTesto{10pt} Topologia approssimata (\(\mathbf B\))};
+        \node (textA) [right=\hsepAnnotation of f,anchor=west,align=left] {\dimTesto{10pt} Topologia esatta (\(\mathbf A\))};
+    %\endgroup
+
+    %\begingroup Frecce
+        % \draw[->] (textK.west) -- (d.east);
+        % \draw[->] (textB.west) -- (g.east);
+        % \draw[->] (textA.west) -- (f.east);
+    %\endgroup
+
+    %\begingroup Rettangoli
+        % \newcommand\linewidthRectangle{0pt}
+        % \newcommand\paddingRectangle{0.5pt}
+        % \begin{scope}[
+        %     % Stile locale: esiste solo tra \begin{scope} e \end{scope}
+        %     rectangleStyle/.style={
+        %         inner sep=\paddingRectangle,
+        %         line width=\linewidthRectangle,
+        %         fill opacity=0.2
+        %     }
+        % ]
+        %     \draw [rectangleStyle,fill=gray!75] (textK.north west) rectangle (textK.south east);
+        %     \draw [rectangleStyle,fill=red!75] (textK.north west |- textB.north west) rectangle (textK.south east |- textB.south east);
+        %     \draw [rectangleStyle,fill=blue!75] (textK.north west |- textA.north west) rectangle (textK.south east |- textA.south east);
+        % \end{scope}
+    %\endgroup
 \end{tikzpicture}
 
 %\begingroup Vecchia versione

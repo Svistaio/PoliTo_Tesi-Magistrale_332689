@@ -2,14 +2,24 @@
 % !TEX root = ../../../Esperimenti/.tex/MEF.tex
 % LTeX: language=it
 
-\nodeDiagramSettings
-\pgfmathsetmacro\xPlotSep{10}
-
 \begin{tikzpicture}%
+    %\begingroup Impostazioni
+        \nodeDiagramSettings
+        \pgfmathsetmacro\xPlotSep{10}
+
+        \tikzset{
+            transformingArrow/.append style={
+                shorten >=1em,
+                shorten <=1.5em
+            }
+        }
+    %\endgroup
+
     %\begingroup Coordinate dei vertici
         \newcommand\vertexCoordinates{
             \coordinate (v1) at (0,0);
-            \coordinate (v2) at (2,.75);
+            % \coordinate (v2) at (2,.75);
+            \coordinate (v2) at (xyz polar cs:angle=40,radius=2.1);
         }
 
         \newcommand\drawEmptyNodes[2]{

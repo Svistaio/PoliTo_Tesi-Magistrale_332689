@@ -16,18 +16,33 @@
     %\endgroup
 
     %\begingroup Funzioni
-        \pgfmathsetmacro\m1\pgfmathsetmacro\lasts{0.04}
+        \pgfmathsetmacro\mean{10}
+        \pgfmathsetmacro\lasts{0.04}
         \newcommand\lognormalX{(1/(x*log(10)*s*sqrt(2*pi)))*exp(-(log10(x)-m)**2/(2*s**2))}
         \newcommand\normal{(1/(s*sqrt(2*pi)))*exp(-(x-m)**2/(2*s**2))}
 
-        \newcommand\plotFunction[1]{
-            \foreach \s in {1.12,1,0.85,0.65,0.45,0.25,0.15,0.08,0.05,\lasts}{%
+        \newcommand\plotFunction[2]{
+            \foreach \s [evaluate=\s as \m using log10(\mean)-\s^2*ln(10)/2] in {%
+                0.74,0.63,0.45,0.25,0.15,0.08,0.05,\lasts
+            }{%
+                % \pgfmathsetmacro\m{1-\s^2*ln(10)/2}
                 \addplot+ [thick,no marks] gnuplot [raw gnuplot] {%
-                    set samples 5000; m=\m; s=\s; #1
-                };
-                \addlegendentryexpanded{\(\sigma=\s\)}
+                    set samples 5000; s=\s; m=\m; #1
+                };#2
+                \addlegendentryexpanded{
+                    \makebox[5.5em][l]{
+                        \(\sigma=\pgfmathprintnumber[
+                            fixed,
+                            precision=3,
+                            fixed zerofill
+                        ]{\s}\)
+                    }\(\mu=\pgfmathprintnumber[
+                        fixed,
+                        precision=3,
+                        fixed zerofill
+                    ]{\m}\)
+                }
             }
-
             % Parametri validi per la lognormale naturale con «ln(x)»
             % \foreach \s in {2.5,2,1.5,1,0.5,0.3,0.2,0.13,0.1}{%
             %     \addplot+ [thick,no marks] gnuplot [raw gnuplot]{%
@@ -38,17 +53,29 @@
             % }
         }
         \newcommand\plotLognormalAverage{
-            \addplot [draw=none,forget plot] gnuplot [raw gnuplot] {%
-                f(x,m,s)=\lognormalX; m=\m; s=\lasts;
-                plot[x=10**(\m):10**(\m)] (f(x,m,s));
+            \addplot [draw=none,forget plot,dashed] gnuplot [raw gnuplot] {%
+                f(x,m,s)=\lognormalX; m=\m; s=\s; plot[x=\mean:\mean] (f(x,m,s));
             } coordinate (media); 
-            \draw [line width=.5pt,dashed,black] (axis cs:{10^\m},0) -- (media);
+            \pgfplotsset{cycle list shift=-1}
+            \addplot+ [draw=.,dashed,thick,forget plot] (\mean,0) -- (media); 
+
+            % \addplot [draw=.,forget plot,dashed] gnuplot [raw gnuplot] {%
+            %     f(x,m,s)=\lognormalX; m=\m; s=\s;
+            %     plot[x=10**\m:10**\m] (f(x,m,s));
+            % } -- (axis cs:{10^\m},0); 
+            % \draw [line width=.5pt,dashed,draw=.] (axis cs:{10^\m},0) -- (media);
         }
         \newcommand\plotNormalAverage{
-            \addplot [draw=none,forget plot] gnuplot [raw gnuplot] {%
-                f(x,m,s)=\normal; m=\m; s=\lasts; plot[x=\m:\m] (f(x,m,s));
+            \addplot [draw=none,forget plot,dashed] gnuplot [raw gnuplot] {%
+                f(x,m,s)=\normal; m=\m; s=\s; plot[x=\m:\m] (f(x,m,s));
             } coordinate (media); 
-            \draw [line width=.5pt,dashed,black] (axis cs:\m,0) -- (media);
+            \pgfplotsset{cycle list shift=-1}
+            \addplot+ [draw=.,dashed,thick,forget plot] (\m,0) -- (media); 
+
+            % \addplot [draw=none,forget plot] gnuplot [raw gnuplot] {%
+            %     f(x,m,s)=\normal; m=\m; s=\lasts; plot[x=\m:\m] (f(x,m,s));
+            % } coordinate (media); 
+            % \draw [line width=.5pt,dashed,black] (axis cs:\m,0) -- (media);
         }
     %\endgroup
 
@@ -61,6 +88,7 @@
                 % x descriptions at=edge bottom,
                 y descriptions at=edge left,
                 group size=1 by 3,
+                % group size=1 by 1,
             },
             %\endgroup
             %
@@ -82,7 +110,7 @@
                     gray!20
                 },
                 colormap/viridis,
-                cycle list={[samples of colormap={10} of viridis]},
+                cycle list={[samples of colormap={8} of viridis]},
             },
             label0/.style={ylabel={\(f_X(x)\)}},
             label1/.style={xlabel={\(x\)},label0},
@@ -95,13 +123,14 @@
 
     \begin{groupplot}[
         group style={goupStyle},
-        plotStyle
+        plotStyle,
+        enlarge y limits={upper,value=.01},
     ]
         %\begingroup
             \gdef\xmin{1e-10}\gdef\xmax{15}
             \nextgroupplot[%
                 legend style={
-                    \placeLegend{0}{1}{north west}{5em}{0em},
+                    \placeLegend{0}{1}{north west}{3em}{0em},
                     legend cell align=left
                 },
                 label0,
@@ -116,10 +145,10 @@
         %\endgroup
 
         %\begingroup
-            \gdef\xmin{1e-5}\gdef\xmax{100}
+            \gdef\xmin{5e-3}\gdef\xmax{50}
             \nextgroupplot[%
                 legend style={
-                    \placeLegend{0}{1}{north west}{0em}{0em},
+                    \placeLegend{0}{0}{south west}{0em}{0em},
                     legend cell align=left
                 },
                 label1,
@@ -133,7 +162,7 @@
         %\endgroup
 
         %\begingroup
-            \gdef\xmin{.5}\gdef\xmax{1.5}
+            \gdef\xmin{0}\gdef\xmax{1.5}
             \nextgroupplot[%
                 legend style={
                     \placeLegend{0}{1}{north west}{0em}{0em},
