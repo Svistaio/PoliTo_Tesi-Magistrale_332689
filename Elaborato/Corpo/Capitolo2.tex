@@ -93,9 +93,9 @@
             %
             \begin{equation}
                 \label{eqForzaGrafoDiretto}
-                w^-_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}m_{j,i}%=(\mathbf M^\top\mathbf 1)_i
+                w^-_i\equiv\sum_{j=1}^Nm_{j,i}%=(\mathbf M^\top\mathbf 1)_i
                 \quad\text{e}\quad
-                w^+_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}m_{i,j},%=(\mathbf M\mathbf 1)_i,
+                w^+_i\equiv\sum_{j=1}^Nm_{i,j},%=(\mathbf M\mathbf 1)_i,
                 \quad\forall i\in\mathcal I,
             \end{equation}
             %
@@ -104,9 +104,9 @@
             %
             \begin{equation}
                 \label{eqGradoGrafoDiretto}
-                k^-_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{j,i}%=(\mathbf A^\top\mathbf 1)_i
+                k^-_i\equiv\sum_{j=1}^Na_{j,i}%=(\mathbf A^\top\mathbf 1)_i
                 \quad\text{e}\quad
-                k^+_i\equiv\sum_{j=1}^{\vert\mathcal I\vert}a_{i,j},%=(\mathbf A\mathbf 1)_i,
+                k^+_i\equiv\sum_{j=1}^Na_{i,j},%=(\mathbf A\mathbf 1)_i,
                 \quad\forall i\in\mathcal I,
             \end{equation}
             %
@@ -259,10 +259,8 @@
         ove \_ indica uno spazio, per la quale, tralasciando il fatto che vi sono in totale 6 città italiane collo stesso codice comunale, se ci si limita alla regione del Piemonte (vale a dire la stessa del comune di partenza «002007») esistono in realtà ben due città condividenti lo stesso codice: «001215» e «004215», eppure entrambe non hanno lo stesso codice provinciale («002») del comune di partenza. Da questo piccolo estratto, quindi, non si può nemmeno ipotizzare che il codice provinciale sia lo stesso tra il comune di partenza e d'arrivo; è allora chiaro che sia impossibile scegliere la prima metà per completare il codice del comune di destinazione.
 
         \begin{oss}
-            A dire il vero si potrebbe scegliere, tra i comuni con uguale codice comunale, quello che minimizza la distanza euleriana, visto che l'ISTAT \cite{ISTATLimiti1991} rende disponibili le coordinate dei punti rappresentativi di ogni comune. In ogni caso il numero d'eccezioni è cosí esiguo da rendere una tale "correzione" del tutto innecessaria\footnotemark{}. Il tutto senza considerare che la scelta piú saggia è banalmente quella di prendere dati piú recenti\footnotemark{}.
+            A dire il vero si potrebbe scegliere, tra i comuni con uguale codice comunale, quello che minimizza la distanza euleriana, visto che l'ISTAT \cite{ISTATLimiti1991} rende disponibili le coordinate dei punti rappresentativi di ogni comune. In ogni caso il numero d'eccezioni è cosí esiguo da rendere una tale "correzione" del tutto innecessaria\footnotemark{}\footnotetext{I risultati del \cref{secSimulazioni} mostrano anche che è irrilevante.}. Il tutto senza considerare che la scelta piú saggia è banalmente quella di prendere dati piú recenti\footnotemark{}\footnotetext{Non si è fatto per riprodurre \cite{DeMontis2007}, com'è discusso súbito dopo.}.
         \end{oss}
-        \footnotetext{I risultati del \cref{secSimulazioni} mostrano anche che è irrilevante.}
-        \footnotetext{Non si è fatto per riprodurre \cite{DeMontis2007}, com'è discusso súbito dopo.}
 
         % \tikzfigure{H}
         %     {\input{../../Figure/.fnl/Capitolo2/AnalisiRete20/SVsD.tex}}

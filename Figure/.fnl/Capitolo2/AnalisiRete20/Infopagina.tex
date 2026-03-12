@@ -116,7 +116,7 @@
             \nextgroupplot[%
                 plotRightCol,
                 %
-                ylabel={$g(i)$},
+                ylabel={$g(k)$},
                 xtickten={1,2,3},
                 enlarge x limits=0.05,
                 enlarge y limits=0.05,
@@ -144,7 +144,7 @@
                 at={($(Row2 c1r1.south west)-(0,\yGroupSep em)-(0,\plotHeight cm)$)},
                 plotLeftCol,
                 %
-                xlabel={$w$},ylabel={$P(w)$},
+                xlabel={$m$},ylabel={$P(m)$},
                 ytickten={-8,-6,-4,-2,0},
                 % xmin=0.1,xmax=100000,
                 % ymin=1e-08,ymax=1,
@@ -154,7 +154,7 @@
             \nextgroupplot[
                 plotRightCol,
                 %
-                xlabel={$s$},ylabel={$P(s)$},
+                xlabel={$w$},ylabel={$P(w)$},
                 % xmin=10,xmax=100000,
                 % ymin=1e-07,ymax=0.01,
             ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/SD.tex}
@@ -176,7 +176,7 @@
                 at={($(Row3 c1r1.south west)-(0,\yGroupSep em)-(0,\halfPlotHeight cm)$)},
                 plotLeftCol,
                 %
-                ylabel={$C^w(k)$},
+                ylabel={$C^m(k)$},
                 ytick={0.5,1},
                 xmin=10,xmax=283,
                 ymin=0.2,ymax=1,
@@ -186,7 +186,7 @@
             \nextgroupplot[%
                 plotRightCol,
                 %
-                ylabel={$k_{nn}^w(k)$},
+                ylabel={$k_{nn}^m(k)$},
                 ymode=log,
                 ymin=10,ymax=1000,
                 xmin=10,xmax=283,
@@ -209,7 +209,7 @@
                 plotLeftCol,
                 %
                 % xtickten={1,2,3},ytickten={0,1,2,3},
-                ylabel={$C^w_{\text{rel}}(k) [\%]$},
+                ylabel={$C^m_{\text{rel}}(k) [\%]$},
                 xmin=10,xmax=283,
                 ymin=1,ymax=1000,
             ]
@@ -220,7 +220,7 @@
                 plotRightCol,
                 %
                 % xtickten={1,2,3},ytickten={0,1,2,3},
-                ylabel={$k_{nn,\text{rel}}^w(k)[\%]$},
+                ylabel={$k_{nn,\text{rel}}^m(k)[\%]$},
                 ymin=1,ymax=1000,
                 xmin=10,xmax=283,
             ] \input{../../Figure/.fnl/Capitolo2/AnalisiRete20/WA2.tex}
@@ -303,15 +303,15 @@
             \end{aligned}\)
         }
         
-        \placecomment{Row3 c1r1}{east}{east}{0em}{0em}{\(\gamma_w=\num{-1.851}\)}
+        \placecomment{Row3 c1r1}{east}{east}{0em}{0em}{\(\gamma_m=\num{-1.851}\)}
         \placecomment{Row3 c1r1}{south}{south}{-2.5em}{0em}{
             \(\begin{aligned}
-                w_{\min}&=\num{1}\\[\lineshift]
-                w_{\max}&=\num{14709}\\[\lineshift]
-                \langle w\rangle&=\num{23.291}
+                m_{\min}&=\num{1}\\[\lineshift]
+                m_{\max}&=\num{14709}\\[\lineshift]
+                \langle m\rangle&=\num{23.291}
             \end{aligned}\)
         }
-        \placecomment{Row3 c2r1}{east}{east}{0em}{0em}{\(\gamma_s=\num{-1.993}\)}
+        \placecomment{Row3 c2r1}{east}{east}{0em}{0em}{\(\gamma_w=\num{-1.993}\)}
     %\endgroup
 
     \redefineTikZbounds{Row1 c1r1}{Row5 c2r1}
