@@ -989,7 +989,7 @@
                     \newcommand\matrixline[2]{\codetoparameter{##2}&=\codetoBiLognormalvalue{##1}{##2}}
                     \def\lineloop##1##2{%
                         \matrixline{##1}{\number\value{lpc}}\stepcounter{lpc}%
-                        \ifnum\number\value{lpc}5\\[##2]\lineloop{##1}{##2}\fi%
+                        \ifnum\number\value{lpc}<5\\[##2]\lineloop{##1}{##2}\fi%
                     } % https://tex.stackexchange.com/questions/491358/tikz-foreach-to-work-with-the-aligned-environment
                     \newcommand\writeBiLognormalParameters[6][center]{
                         \node[fittedParameters,anchor=##1] at ([shift={(##4,##5)}]##3) {%

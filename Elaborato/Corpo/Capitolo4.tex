@@ -39,11 +39,11 @@
         Per tali ragioni si procede in maniera piú semplice: conoscendo l'\ref{eqAlgoritmoInterazioneUrbano}, che governa le interazioni binarie tra agenti, si possono quindi direttamente simulare tutte le molteplici collisioni mediante un metodo di Monte Carlo di tipo Nanbu-Babovsky, descritto nel dettaglio nell'\cref{algMonteCarlo} nel quale \(T>0\) è il tempo finale di simulazione, mentre \(P\) è la popolazione totale iniziale. Infatti usare un metodo di Monte Carlo è un approccio piú fisico perché si recupera la fisica particellare stocastica soggiacente all'equazione di Boltzmann.
         
         \begin{oss}
-            Nella linea \ref{algMonteCarloDistribuzioneNesima}, \(\bar q_N\) è una densità arbitraria: va intesa come \(\bar f_N\) se l'approccio è esatto e come \(\bar g_N\) se è approssimato.
+            Nella linea \ref{algMonteCarloDistribuzioneNesima}, \(\bar z_N\) è una densità arbitraria: va intesa come \(\bar f_N\) se l'approccio è esatto e come \(\bar g_N\) se è approssimato.
         \end{oss}
 
         \begin{oss}
-            Piú in generale, nella linea \ref{algMonteCarloDistribuzioneIniziale}, \(\pazocal S_0\) può essere campionato da una densità \(\bar q_0\) iniziale; tuttavia non conoscendone alcuna per la distribuzione della popolazione, si è deciso di definire \(\pazocal S^0\) come un vettore uniforme rispetto a una popolazione totale \(P\) iniziale.
+            Piú in generale, nella linea \ref{algMonteCarloDistribuzioneIniziale}, \(\pazocal S_0\) può essere campionato da una densità \(\bar z_0\) iniziale; tuttavia non conoscendone alcuna per la distribuzione della popolazione, si è deciso di definire \(\pazocal S^0\) come un vettore uniforme rispetto a una popolazione totale \(P\) iniziale.
         \end{oss}
 
         % \afterpage{
@@ -94,7 +94,7 @@
                     }
                     %
                     \(\pazocal S^{n+1}\gets(s_1^{n+1},s_2^{n+1},\dots,s_N^{n+1})\)\;
-                    \(\bar q_N(s,(n+1)\Delta{t})\gets\) istogramma di \(\pazocal S^{n+1}\)\;\label{algMonteCarloDistribuzioneNesima}
+                    \(\bar z_N(s,(n+1)\Delta{t})\gets\) istogramma di \(\pazocal S^{n+1}\)\;\label{algMonteCarloDistribuzioneNesima}
                 }
             \end{algorithm}
         % }
@@ -122,7 +122,7 @@
             \end{equation*}
             %
             rispettivamente la media e la varianza campionarie. Allora, data \(\mu\) la \textit{vera}\footnotemark{} media della densità \(\bar l_N\), la distribuzione \(T\) di Student con parametro \(R-1\) si scrive%
-            \footnotetext{Vale a dire \(\mu\) \textit{non} è una variabile aleatoria ma l'esatto parametro della media della \(\bar q_N\).}%
+            \footnotetext{Vale a dire \(\mu\) \textit{non} è una variabile aleatoria ma l'esatto parametro della media della \(\bar z_N\).}%
             %
             \begin{equation*}
                 T=\frac{\bar S-\mu}{\sqrt{V/R}}\sim\DstrStudent(R-1).
@@ -785,7 +785,7 @@
         Cionnonostante, nel \cref{secItaliaValleDAosta} si studiano cursoriamente comunque la Valle d'Aosta e l'Italia essendo casi estremi rispetto al numero di nodi.
 
         \begin{oss}
-            Nel corrente paragrafo con minori, medi e maggiori si fa riferimento ai centri rispettivamente con grado piccolo, medio e alto, come mostrato nelle sottofigure (j)-(l) delle \cref{figRiferimentoStabileRET,figRiferimentoInstabileRET,figRiferimentoRETG,figRiferimentoRETGf,figRiferimentoRETF}.
+            Nel corrente paragrafo con minori, medi e maggiori si fa riferimento ai centri rispettivamente con grado piccolo, medio e alto, come mostrato nelle sottofigure (j)-(l) delle \cref{figConfigurazioneRiferimentoStabileRET,figConfigurazioneRiferimentoInstabileRET,figConfigurazioneRiferimentoRETG,figConfigurazioneRiferimentoRETGf,figConfigurazioneRiferimentoRETF}.
         \end{oss}
             
         \subsection{Regola taglia}\label{secRET}
@@ -796,7 +796,7 @@
             \tikzexternalizedfigure{p}[-.5em]
                 {../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Stabile/Infopagina.tex}
                 {Studio della configurazione di riferimento stabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.6\linewidth}{figRiferimentoStabileRET}
+                {.6\linewidth}{figConfigurazioneRiferimentoStabileRET}
             % }
 
             % \oddevenpagefloat[1]{
@@ -805,7 +805,7 @@
             \tikzexternalizedfigure{p}[-1em]
                 {../../Figure/.fnl/Capitolo4/20RETConfigurazioneRiferimento/Instabile/Infopagina.tex}
                 {Studio della configurazione di riferimento instabile della \ref{eqRegolaEmigrazioneTaglia} con parametri dalla \cref{tabParametriRegolaEmigrazioneTaglia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.6\linewidth}{figRiferimentoInstabileRET}
+                {.6\linewidth}{figConfigurazioneRiferimentoInstabileRET}
             % }
 
             Una prima possibilità\footnotemark{} consiste nella%
@@ -817,7 +817,7 @@
             }%
             in cui \(\lambda\in(0,1)\) (\cref{ipLimitiTassoEmigrazione}) e \(\alpha\in\mathbb R^+\). La logica è che il tasso d'emigrazione verso la città ricevente è tanto maggiore quanto piú grande è la sua popolazione relativa, data dal rapporto \(s_*/s\), rispetto alla città interagente.
 
-            In totale sono state studiate due configurazioni di riferimento descritte dai parametri nella \cref{tabParametriRegolaEmigrazioneTaglia}, mentre i risultati sono illustrati nelle \cref{figRiferimentoStabileRET,figRiferimentoInstabileRET}; quest'ultimi descrivono due comportamenti:
+            In totale sono state studiate due configurazioni di riferimento descritte dai parametri nella \cref{tabParametriRegolaEmigrazioneTaglia}, mentre i risultati sono illustrati nelle \cref{figConfigurazioneRiferimentoStabileRET,figConfigurazioneRiferimentoInstabileRET}; quest'ultimi descrivono due comportamenti:
 
             \begin{enumerate}[
                 label=\(\diamond\),
@@ -836,13 +836,13 @@
                 \item uno instabile in cui \textit{in media} si spopolano i centri medi.
             \end{enumerate}
            
-            Si sottolinea in media poiché nelle singole realizzazioni è molto piú probabile che si spopolino i centri maggiori mentre su piú realizzazioni si manifesta almeno una con taglia elevata, bilanciando cosí la media; questa è anche la ragione per cui si sono considerate solo 10 iterazioni anziché le usuali 100 nella \cref{tabParametriRegolaEmigrazioneTaglia} visto che la media tende a mascherare lo spopolamento, il quale però è inevitabile ma semplicemente piú lento. Oltre alle \crefsubfigInt{figRiferimentoInstabileRET}{j}{l}, gl'istogrammi nelle \crefsubfigInt{figRiferimentoInstabileRET}{a}{c} confermano anche questa tendenza sotto forma di una coda che allunga la distribuzione nei valori negativi, corrispondenti agli esponenti delle città che si spopolano.
+            Si sottolinea in media poiché nelle singole realizzazioni è molto piú probabile che si spopolino i centri maggiori mentre su piú realizzazioni si manifesta almeno una con taglia elevata, bilanciando cosí la media; questa è anche la ragione per cui si sono considerate solo 10 iterazioni anziché le usuali 100 nella \cref{tabParametriRegolaEmigrazioneTaglia} visto che la media tende a mascherare lo spopolamento, il quale però è inevitabile ma semplicemente piú lento. Oltre alle \crefsubfigInt{figConfigurazioneRiferimentoInstabileRET}{j}{l}, gl'istogrammi nelle \crefsubfigInt{figConfigurazioneRiferimentoInstabileRET}{a}{c} confermano anche questa tendenza sotto forma di una coda che allunga la distribuzione nei valori negativi, corrispondenti agli esponenti delle città che si spopolano.
 
             Piú in generale si è verificato, seppure solo empiricamente, che per ogni \(\lambda\) esiste un \(\bar\alpha\in\RPlus\) tale che \(\alpha<\bar\alpha\) risulta in una configurazione stabile mentre \(\alpha\geq\bar\alpha\) ne restituisce una instabile.
 
             \begin{table}[tb]%h
                 \centering
-                \caption{Parametri delle \cref{figRiferimentoStabileRET,figRiferimentoInstabileRET}.}
+                \caption{Parametri delle \cref{figConfigurazioneRiferimentoStabileRET,figConfigurazioneRiferimentoInstabileRET}.}
                 \begin{tabular}{ccccc}
                     \hline
                     &\(\lambda\)&\(\alpha\)&\(N_t\)&\(R\)\\
@@ -862,20 +862,20 @@
             \tikzexternalizedfigure{p}
                 {../../Figure/.fnl/Capitolo4/20RETGConfigurazioneRiferimento/Infopagina.tex}
                 {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGrado} con parametri dalla \cref{tabParametriRETG}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.58\linewidth}{figRiferimentoRETG}
+                {.58\linewidth}{figConfigurazioneRiferimentoRETG}
             % }
 
             Al fine di correggere la \ref{eqRegolaEmigrazioneTaglia} si può introdurre anche il rapporto relativo dei gradi:
             %
             \eqtag{\([\text{RE}]_{SK}\)}{
                 \label{eqRegolaEmigrazioneTagliaGrado}
-                E_{SK}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(k_{i_*}/k_i)]^\alpha}{1+[(s_*/s)(k_{i_*}/k_i)]^\alpha}.
+                E_{SK}(s,i,s_*,i_*)\equiv\lambda\frac{[(s_*/s)(k_{i_*}/k_i)]^\alpha}{1+[(s_*/s)(k_{i_*}/k_i)]^\alpha}.
             }%
             Cosí la logica diventa che il tasso d'emigrazione verso la città ricevente è tanto maggiore quanto piú popolosa e connessa è rispetto alla città interagente.
 
             \begin{table}[htb]
                 \centering
-                \caption{Parametri della \cref{figRiferimentoRETG}.}
+                \caption{Parametri della \cref{figConfigurazioneRiferimentoRETG}.}
                 \begin{tabular}{ccc}
                     \hline
                     \(\lambda\)&\(\alpha\)&\(N_t\)\\
@@ -886,7 +886,7 @@
                 \label{tabParametriRETG}
             \end{table}
 
-            La configurazione di riferimento studiata è descritta dai parametri nella \cref{tabParametriRETG}, mentre i risultati sono illustrati nella \cref{figRiferimentoRETG}. Nel complesso sono migliori di quelli ottenuti mediante la \ref{eqRegolaEmigrazioneTaglia}: 
+            La configurazione di riferimento studiata è descritta dai parametri nella \cref{tabParametriRETG}, mentre i risultati sono illustrati nella \cref{figConfigurazioneRiferimentoRETG}. Nel complesso sono migliori di quelli ottenuti mediante la \ref{eqRegolaEmigrazioneTaglia}: 
 
             \begin{itemize}[
                 label=\(\diamond\),
@@ -901,10 +901,10 @@
                 %labelwidth=!,
                 %labelsep=!,
             ]
-                \item le \crefsubfigSep{figRiferimentoRETG}{a}{{d}}{j} illustrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{b}{c} le distribuzioni simulate sono abbastanza simili a quelle reale, mentre nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{e}{f} gl'indici di Pareto sono ragionevolmente vicini;
-                \item a eccezione del caso reale in cui coincidono, nelle \crefsubfigInt{figRiferimentoRETG}{g}{i} la bilognormale segue meglio la coda verso la fine, sebbene coincida colla Pareto nella prima metà;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{k}{l} le dispersioni presentano un'analoga correlazione positiva ma piú stretta rispetto alla reale.
+                \item le \crefsubfigSep{figConfigurazioneRiferimentoRETG}{a}{{d}}{j} illustrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETG}{b}{c} le distribuzioni simulate sono abbastanza simili a quelle reale, mentre nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETG}{e}{f} gl'indici di Pareto sono ragionevolmente vicini;
+                \item a eccezione del caso reale in cui coincidono, nelle \crefsubfigInt{figConfigurazioneRiferimentoRETG}{g}{i} la bilognormale segue meglio la coda verso la fine, sebbene coincida colla Pareto nella prima metà;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETG}{k}{l} le dispersioni presentano un'analoga correlazione positiva ma piú stretta rispetto alla reale.
             \end{itemize}
 
         \subsection{Regola frazionata}\label{secRETGf}
@@ -915,7 +915,7 @@
             \tikzexternalizedfigure{p}
                 {../../Figure/.fnl/Capitolo4/20RETGfConfigurazioneRiferimento/Infopagina.tex}
                 {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaGradiFrazionata} con parametri dalla \cref{tabParametriRETGf}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.58\linewidth}{figRiferimentoRETGf}
+                {.58\linewidth}{figConfigurazioneRiferimentoRETGf}
             % }
 
             La \ref{eqRegolaEmigrazioneTagliaGrado} si può poi modificare introducendo un ulteriore parametro \(\zeta\)
@@ -930,7 +930,7 @@
 
             \begin{table}[htb]
                 \centering
-                \caption{Parametri della \cref{figRiferimentoRETGf}.}
+                \caption{Parametri della \cref{figConfigurazioneRiferimentoRETGf}.}
                 \begin{tabular}{cccc}
                     \hline
                     \(\lambda\)&\(\alpha\)&\(\zeta\)&\(N_t\)\\
@@ -941,7 +941,7 @@
                 \label{tabParametriRETGf}
             \end{table}
 
-            La configurazione di riferimento analizzata è descritta dai parametri nella \cref{tabParametriRETGf}, mentre i relativi risultati sono mostrati nella \cref{figRiferimentoRETG}. Questi migliorano sotto alcuni aspetti la \ref{eqRegolaEmigrazioneTagliaGrado}: 
+            La configurazione di riferimento analizzata è descritta dai parametri nella \cref{tabParametriRETGf}, mentre i relativi risultati sono mostrati nella \cref{figConfigurazioneRiferimentoRETG}. Questi migliorano sotto alcuni aspetti la \ref{eqRegolaEmigrazioneTagliaGrado}: 
 
             \begin{itemize}[
                 label=\(\diamond\),
@@ -956,10 +956,10 @@
                 %labelwidth=!,
                 %labelsep=!,
             ]
-                \item le \crefsubfigSep{figRiferimentoRETGf}{a}{{d}}{j} confermano di nuovo come l'approssimazione corrisponda quasi perfettamente alla simulazione esatta;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETGf}{b}{c} le distribuzioni simulate si adattano meglio a quella reale, e non alterano la buona corrispondenza degl'indici di Pareto nelle \crefsubfigInt[ e ]{figRiferimentoRETGf}{e}{f};
-                \item le \crefsubfigInt[ e ]{figRiferimentoRETGf}{h}{i} non si discostano in modo significativo dalla precedente configurazione;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETGf}{k}{l} le dispersioni sono compatte quanto prima e manifestano ora un lieve assestamento verso le città minori.
+                \item le \crefsubfigSep{figConfigurazioneRiferimentoRETGf}{a}{{d}}{j} confermano di nuovo come l'approssimazione corrisponda quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETGf}{b}{c} le distribuzioni simulate si adattano meglio a quella reale, e non alterano la buona corrispondenza degl'indici di Pareto nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETGf}{e}{f};
+                \item le \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETGf}{h}{i} non si discostano in modo significativo dalla precedente configurazione;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETGf}{k}{l} le dispersioni sono compatte quanto prima e manifestano ora un lieve assestamento verso le città minori.
             \end{itemize}
 
         \subsection{Regola taglia-forza}\label{secRETF}
@@ -970,20 +970,20 @@
                 \tikzexternalizedfigure{p}
                     {../../Figure/.fnl/Capitolo4/20RETFConfigurazioneRiferimento/Infopagina.tex}
                     {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRETF}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                    {.575\linewidth}{figRiferimentoRETF}
+                    {.575\linewidth}{figConfigurazioneRiferimentoRETF}
             }
 
             Dalla riga \(\Circled{\ast}\) della \cref{tabStrutturaDatiPendolarismo} si potrebbe anche pensare di sostituire nella \ref{eqRegolaEmigrazioneTagliaGrado} le forze in luogo dei gradi:
             %
             \eqtag{\([\text{RE}]_{SW}\)}{
                 \label{eqRegolaEmigrazioneTagliaForza}
-                E_{SW}(s,s_*,i,i_*)\equiv\lambda\frac{[(s_*/s)(w_{i_*}/w_i)]^\alpha}{1+[(s_*/s)(w_{i_*}/w_i)]^\alpha},
+                E_{SW}(s,i,s_*,i_*)\equiv\lambda\frac{[(s_*/s)(w_{i_*}/w_i)]^\alpha}{1+[(s_*/s)(w_{i_*}/w_i)]^\alpha},
             }%
             intendendo cosí che si ha un tasso d'emigrazione verso la città ricevente tanto maggiore quanto piú popolosa e trafficata è rispetto alla città interagente.
 
             \begin{table}[htb]
                 \centering
-                \caption{Parametri della \cref{figRiferimentoRETF}.}
+                \caption{Parametri della \cref{figConfigurazioneRiferimentoRETF}.}
                 \begin{tabular}{ccc}
                     \hline
                     \(\lambda\)&\(\alpha\)&\(N_t\)\\
@@ -994,7 +994,7 @@
                 \label{tabParametriRETF}
             \end{table}
 
-            La configurazione di riferimento analizzata è descritta dai parametri nella \cref{tabParametriRETF}, mentre i relativi risultati sono mostrati nella \cref{figRiferimentoRETF}. Essi sono di fatto i migliori: 
+            La configurazione di riferimento analizzata è descritta dai parametri nella \cref{tabParametriRETF}, mentre i relativi risultati sono mostrati nella \cref{figConfigurazioneRiferimentoRETF}. Essi sono di fatto i migliori: 
 
             \begin{itemize}[
                 label=\(\diamond\),
@@ -1009,19 +1009,19 @@
                 %labelwidth=!,
                 %labelsep=!,
             ]
-                \item le \crefsubfigSep{figRiferimentoRETF}{a}{{d}}{j} confermano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{b}{c} le distribuzioni simulate sono quas'identiche a quella reale, e pure i relativi indici di Pareto nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{e}{f} corrispondono;
-                \item le \crefsubfigInt[ e ]{figRiferimentoRETF}{h}{i} non si discostano in modo significativo dalle precedenti due configurazioni;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{k}{l} le dispersioni, oltre ad avere la stessa correlazione positiva rispetto alla reale, manifestano maggiore respiro cogliendo la differenziazione di taglia a parità di grado.
+                \item le \crefsubfigSep{figConfigurazioneRiferimentoRETF}{a}{{d}}{j} confermano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETF}{b}{c} le distribuzioni simulate sono quas'identiche a quella reale, e pure i relativi indici di Pareto nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETF}{e}{f} corrispondono;
+                \item le \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETF}{h}{i} non si discostano in modo significativo dalle precedenti due configurazioni;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETF}{k}{l} le dispersioni, oltre ad avere la stessa correlazione positiva rispetto alla reale, manifestano maggiore respiro cogliendo la differenziazione di taglia a parità di grado.
             \end{itemize}
 
-            L'unico aspetto negativo si trova nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{k}{l}: la regola d'emigrazione non riesce a prevedere correttamente in media le taglie della porzione inferiore della dispersione reale; in altre parole la previsione sovrastima la taglia dei centri minori e sottostima leggermente quella dei centri maggiori. Eppure, ripensandoci, questa è una caratteristica condivisa anche dagli altri casi nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{k}{l} e \crefsubfigInt[ e ]{figRiferimentoRETGf}{k}{l}, come si può notare osservando la pendenza della retta descritta dalla dispersione.
+            L'unico aspetto negativo si trova nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETF}{k}{l}: la regola d'emigrazione non riesce a prevedere correttamente in media le taglie della porzione inferiore della dispersione reale; in altre parole la previsione sovrastima la taglia dei centri minori e sottostima leggermente quella dei centri maggiori. Eppure, ripensandoci, questa è una caratteristica condivisa anche dagli altri casi nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETG}{k}{l} e \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETGf}{k}{l}, come si può notare osservando la pendenza della retta descritta dalla dispersione.
 
         \subsection{Interpretazioni}\label{secInterpretazioni}
 
             Innanzitutto bisogna delucidare una caratteristica che accomuna tutte le regole d'emigrazione precedenti: esse sono da un punto di vista interpretativo miope, vale a dire non vedono i dettagli ma solo i fattori comuni che potrebbero governare le migrazioni. Pertanto il modello non dice il perché una città piú popolata, connessa o trafficata è piú attraente ma solo che quella misura viene presa in considerazione nei movimenti migratori; certamente, però, si può \textit{a posteriori} motivare queste scelte: per esempio, i precedenti fattori possono essere legati a piú opportunità di lavoro, a maggiore vicinanza coi propri familiari, minor costo della vita, eccetera. Poi, sempre \textit{a posteriori}, si può decidere quale fattore sia il piú realistico e da li trarre le proprie conclusioni in merito al fenomeno migratorio.
 
-            Vista dunque l'arbitrarietà delle potenziali interpretazioni si è deciso in questo sottoparagrafo di non esprimersi nel dettaglio, ma solo di evidenziare quali fattori influiscano piú probabilmente sulla migrazione alla luce dei confronti coi dati reali nelle \cref{figRiferimentoInstabileRET,figRiferimentoStabileRET,figRiferimentoRETG,figRiferimentoRETGf,figRiferimentoRETF}.
+            Vista dunque l'arbitrarietà delle potenziali interpretazioni si è deciso in questo sottoparagrafo di non esprimersi nel dettaglio, ma solo di evidenziare quali fattori influiscano piú probabilmente sulla migrazione alla luce dei confronti coi dati reali nelle \cref{figConfigurazioneRiferimentoInstabileRET,figConfigurazioneRiferimentoStabileRET,figConfigurazioneRiferimentoRETG,figConfigurazioneRiferimentoRETGf,figConfigurazioneRiferimentoRETF}.
 
             \subsubsection{Regola taglia \ref{eqRegolaEmigrazioneTaglia}}
 
@@ -1045,7 +1045,7 @@
                     \item i centri minori non s'interfacciano mai direttamente con quelli maggiori per cui non si spopolano inizialmente come quelli medi.
                 \end{enumerate}
             
-                Il risultato di questa dinamica è quello mostrato nelle \crefsubfigInt[ e ]{figRiferimentoInstabileRET}{k}{l} almeno nel caso instabile. Invece, in quello stabile non è chiaro a cosa si possa attribuire questo comportamento: di certo \(\alpha\) non è abbastanza piccolo da rendere la funzione di Hill nella \ref{eqRegolaEmigrazioneTaglia} costante e uguale \(\lambda/2\), specialmente considerando che la \ref{eqRegolaEmigrazioneTagliaForza} nella configurazione di riferimento dalla \cref{tabParametriRETF} presenta pure un valore di \(\alpha\) minore; di conseguenza l'unica conclusione che si può trarre è che il problema sia la regola d'emigrazione in sé.
+                Il risultato di questa dinamica è quello mostrato nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoInstabileRET}{k}{l} almeno nel caso instabile. Invece, in quello stabile non è chiaro a cosa si possa attribuire questo comportamento: di certo \(\alpha\) non è abbastanza piccolo da rendere la funzione di Hill nella \ref{eqRegolaEmigrazioneTaglia} costante e uguale \(\lambda/2\), specialmente considerando che la \ref{eqRegolaEmigrazioneTagliaForza} nella configurazione di riferimento dalla \cref{tabParametriRETF} presenta pure un valore di \(\alpha\) minore; di conseguenza l'unica conclusione che si può trarre è che il problema sia la regola d'emigrazione in sé.
 
                 % \tikzfigure{htb}
                 %     {\input{../../Figure/.fnl/Capitolo4/FunzioneHillGradoa.tex}}
@@ -1097,7 +1097,7 @@
                 \[
                     E^f_{SK}=(1-\zeta)E_{SK}+\zeta E_{SK}\leq(1-\zeta)\lambda+\zeta\lambda=\lambda,
                 \]
-                ove gli argomenti sono sottintesi. Per il resto valgono le stesse considerazioni precedenti, essendo costruita a partire dalla \ref{eqRegolaEmigrazioneTagliaGrado}, mentre i risultati, come già notato nel \cref{secRETGf}, in generale sono migliori. Nella dispersione, però, si può notare l'emergenza di una dimensione minima ideale che le città raggiungono anche con bassa connettività; inoltre, per altri parametri o regole d'interazione (\cref{secVariantiRegoleInterazione}), lo stesso si può dire anche per la dimensione massima ideale, anche se nella \crefsubfigInt[ e ]{figRiferimentoRETGf}{k}{l} è lieve ragion per cui si nota poco. In ogni caso, il confronto colla dispersione reale implica che la città minima ideale non è realistica, ma non è detto che non possa descrivere correttamente altre dispersioni al di fuori di quella sarda.
+                ove gli argomenti sono sottintesi. Per il resto valgono le stesse considerazioni precedenti, essendo costruita a partire dalla \ref{eqRegolaEmigrazioneTagliaGrado}, mentre i risultati, come già notato nel \cref{secRETGf}, in generale sono migliori. Nella dispersione, però, si può notare l'emergenza di una dimensione minima ideale che le città raggiungono anche con bassa connettività; inoltre, per altri parametri o regole d'interazione (\cref{secVariantiRegoleInterazione}), lo stesso si può dire anche per la dimensione massima ideale, anche se nella \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETGf}{k}{l} è lieve ragion per cui si nota poco. In ogni caso, il confronto colla dispersione reale implica che la città minima ideale non è realistica, ma non è detto che non possa descrivere correttamente altre dispersioni al di fuori di quella sarda.
                
                 Perciò la \ref{eqRegolaEmigrazioneTagliaGradiFrazionata} non è intrinsecamente sbagliata e, anzi, riesce comunque a perfezionare molti aspetti della regola precedente; semplicemente è chiaro che nel panorama sardo non esistano frazioni di popolazioni con tendenze opposte alla \ref{eqRegolaEmigrazioneTagliaGrado}.
 
@@ -1105,7 +1105,7 @@
 
                 L'introduzione della forza si motiva attraverso gli stessi vincoli descritti per motivare l'introduzione del grado nella \ref{eqRegolaEmigrazioneTaglia}. In effetti, il vincolo sociale vale direttamente poiché la forza coincide proprio col flusso di pendolari; d'altro canto quello fisico vale poiché la forza non è che un'estensione delle informazioni puramente binarie del grado, in cui ora un valore positivo implica sia la presenza di un lato che l'intensità del suo flusso pendolare.
                 
-                Cosí ragionando è possibile ora distinguere città che hanno ugual grado ma non necessariamente ugual traffico; tale naturale distinzione permette proprio di corregge la relazione quasi biunivoca tra il grado e la popolazione nelle \crefsubfigInt[ e ]{figRiferimentoRETG}{k}{l} trasformandola in una piú realistica correlazione positiva descritta dalle \crefsubfigInt[ e ]{figRiferimentoRETF}{k}{l}.
+                Cosí ragionando è possibile ora distinguere città che hanno ugual grado ma non necessariamente ugual traffico; tale naturale distinzione permette proprio di corregge la relazione quasi biunivoca tra il grado e la popolazione nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETG}{k}{l} trasformandola in una piú realistica correlazione positiva descritta dalle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETF}{k}{l}.
 
                 Nel complesso, essendo questi risultati i migliori tra quelli visti, la \ref{eqRegolaEmigrazioneTagliaForza} implica che molto probabilmente il fenomeno della migrazione è governato da due fattori: la popolazione e il traffico relativi fra due città.
 
@@ -1343,17 +1343,17 @@
 
             Come menzionato all'inizio del \cref{secRegoleEmigrazione}, è interessante studiare la regione della Valle d'Aosta e l'intera Italia, specialmente per il numero di nodi. Per brevità, tuttavia, non si ripropongono tutte le regole d'emigrazione viste previamente ma si considera solo la configurazione migliore della Sardegna, vale a dire la \ref{eqRegolaEmigrazioneTagliaForza} con parametri dalla \cref{tabParametriRETF}.
            
-            Perdipiú, si varia il numero di simulazioni: per la Valle d'Aosta si aumentano a \(R=1000\) e per l'Italia si diminuiscono a \(10\); difatti come si può notare nella \cref{tabDatiParametriValledAostaItalia} la prima è composta da soli \(74\) nodi e invece la seconda da ben \(8100\): due ordini di grandezza superiori alla prima e uno rispetto alla Sardegna; di conseguenza, mentre i risultati della Valle d'Aosta nella \cref{figRiferimentoRETFValledAosta} hanno richiesto meno di \(15\) minuti, quelli dell'Italia nella \cref{figRiferimentoRETFItalia} hanno richiesto piú di \(14\) ore; per dare un ulteriore confronto, i risultati della Sardegna hanno richiesto meno di \(30\) minuti per configurazione. Di fatto è dunque proibitivo considerare piú di \(10\) simulazioni per l'Italia.
+            Perdipiú, si varia il numero di simulazioni: per la Valle d'Aosta si aumentano a \(R=1000\) e per l'Italia si diminuiscono a \(10\); difatti come si può notare nella \cref{tabDatiParametriValledAostaItalia} la prima è composta da soli \(74\) nodi e invece la seconda da ben \(8100\): due ordini di grandezza superiori alla prima e uno rispetto alla Sardegna; di conseguenza, mentre i risultati della Valle d'Aosta nella \cref{figConfigurazioneRiferimentoRETFValledAosta} hanno richiesto meno di \(15\) minuti, quelli dell'Italia nella \cref{figConfigurazioneRiferimentoRETFItalia} hanno richiesto piú di \(14\) ore; per dare un ulteriore confronto, i risultati della Sardegna hanno richiesto meno di \(30\) minuti per configurazione. Di fatto è dunque proibitivo considerare piú di \(10\) simulazioni per l'Italia.
 
             \tikzexternalizedfigure{p}
                 {../../Figure/.fnl/Capitolo4/2RETFConfigurazioneRiferimento/Infopagina.tex}
                 {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} per la Valle d'Aosta con parametri dalla \cref{tabDatiParametriValledAostaItalia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.675\linewidth}{figRiferimentoRETFValledAosta}
+                {.675\linewidth}{figConfigurazioneRiferimentoRETFValledAosta}
 
             \tikzexternalizedfigure[lualatex]{p}
                 {../../Figure/.fnl/Capitolo4/21RETFConfigurazioneRiferimento/Infopagina.tex}
                 {Studio della configurazione di riferimento della \ref{eqRegolaEmigrazioneTagliaForza} per l'Italia con parametri dalla \cref{tabDatiParametriValledAostaItalia}; per la spiegazione dei grafici si veda il \cref{secDefinizioneGrafici}.}
-                {.65\linewidth}{figRiferimentoRETFItalia}
+                {.65\linewidth}{figConfigurazioneRiferimentoRETFItalia}
 
             I risultati si commentano parimenti a prima: per la Valle d'Aosta
 
@@ -1370,10 +1370,10 @@
                 %labelwidth=!,
                 %labelsep=!,
             ]
-                \item le \crefsubfigSep{figRiferimentoRETFValledAosta}{a}{{d}}{j} illustrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETFValledAosta}{b}{c} le distribuzioni simulate approssimano bene quella reale al di fuori del picco, segnalando una maggiore varianza, cosa che però non sembra influenzare gl'indici di Pareto nelle \crefsubfigInt[ e ]{figRiferimentoRETFValledAosta}{e}{f} essendo ragionevolmente simili;
-                \item nelle \crefsubfigInt{figRiferimentoRETFValledAosta}{g}{i} Pareto pare fittare meglio la coda rispetto alla bilognormale, probabilmente a causa del basso valore di \(N\);
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETFValledAosta}{k}{l} le dispersioni ben approssimano quella reale, sovrastimando di poco i centri minori-medi.
+                \item le \crefsubfigSep{figConfigurazioneRiferimentoRETFValledAosta}{a}{{d}}{j} illustrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETFValledAosta}{b}{c} le distribuzioni simulate approssimano bene quella reale al di fuori del picco, segnalando una maggiore varianza, cosa che però non sembra influenzare gl'indici di Pareto nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETFValledAosta}{e}{f} essendo ragionevolmente simili;
+                \item nelle \crefsubfigInt{figConfigurazioneRiferimentoRETFValledAosta}{g}{i} Pareto pare fittare meglio la coda rispetto alla bilognormale, probabilmente a causa del basso valore di \(N\);
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETFValledAosta}{k}{l} le dispersioni ben approssimano quella reale, sovrastimando di poco i centri minori-medi.
             \end{itemize}
 
             Per quanto riguarda l'Italia
@@ -1391,10 +1391,10 @@
                 %labelwidth=!,
                 %labelsep=!,
             ]
-                \item le \crefsubfigSep{figRiferimentoRETFItalia}{a}{{d}}{j} mostrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETFItalia}{b}{c} le distribuzioni simulate riproducono tutto sommato la forma di quella reale, ma sovrastimano leggermente la media come pure negl'indici di Pareto nelle \crefsubfigInt[ e ]{figRiferimentoRETFItalia}{e}{f};
-                \item nelle \crefsubfigInt{figRiferimentoRETFItalia}{g}{i} la bilognormale bimodale segue meglio la coda verso la fine, sebbene coincida colla Pareto nella prima metà;
-                \item nelle \crefsubfigInt[ e ]{figRiferimentoRETFItalia}{k}{l} le dispersioni ben approssimano quella reale ma ripropongono in scala maggiore i difetti riscontrati nella dispersione della \ref{eqRegolaEmigrazioneTagliaForza} nelle \crefsubfigInt[ e ]{figRiferimentoRETF}{k}{l}.
+                \item le \crefsubfigSep{figConfigurazioneRiferimentoRETFItalia}{a}{{d}}{j} mostrano che l'approssimazione corrisponde quasi perfettamente alla simulazione esatta;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETFItalia}{b}{c} le distribuzioni simulate riproducono tutto sommato la forma di quella reale, ma sovrastimano leggermente la media come pure negl'indici di Pareto nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETFItalia}{e}{f};
+                \item nelle \crefsubfigInt{figConfigurazioneRiferimentoRETFItalia}{g}{i} la bilognormale bimodale segue meglio la coda verso la fine, sebbene coincida colla Pareto nella prima metà;
+                \item nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETFItalia}{k}{l} le dispersioni ben approssimano quella reale ma ripropongono in scala maggiore i difetti riscontrati nella dispersione della \ref{eqRegolaEmigrazioneTagliaForza} nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETF}{k}{l}.
             \end{itemize}
 
             Nel complesso i parametri migliori della Sardegna vanno bene per la Valle d'Aosta se si è interessati esclusivamente ad approssimare l'indice di Pareto e non la distribuzione, al contrario per l'Italia.
