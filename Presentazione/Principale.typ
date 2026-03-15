@@ -86,16 +86,16 @@
             Il primo a popolarizzare lo studio della distribuzione della popolazione è stato Zipf formulando la legge empirica
             $
               f prop 1/r quad upright("ove") cases(
-                f&upright(" è la frequenza della parola,"),
-                r&upright(" è il suo rango nella classifica,")
+                f&quad #text(font:"TeX Gyre Pagella")[ è la frequenza della parola,],
+                r&quad #text(font:"TeX Gyre Pagella")[ è il suo rango nella classifica,]
               )
             $
             applicabile anche in in un contesto urbano; essa è generalizzabile mediante una distribuzione di Pareto
             $
-              pzclR(s) equiv integral_s^(+oo)f_S(t)dif t
+              pzclR(s) equiv integral_s^(+oo)f_S (z)dif z
               approx c/s^beta quad
             $
-            con $s gt.double 1$.
+            con $f_S$ è la distribuzione della popolazione, $beta in RR$ e $s gt.double 1$.
         ]
       ]
 
@@ -137,10 +137,13 @@
             + le interazioni tra città 
             + su un grafo spaziale, 
            
-          tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate, principalmente
+          per tentare di riprodurre una distribuzione con caratteristiche analoghe a quelle realmente misurate, principalmente
+          // tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate, principalmente
+          // // Sebbene mi suoni estremamente naturale, ripassando, ho scoperto che il gerundio non può reggere una subordinata finale implicita; che strano ...
+          // // https://www.treccani.it/enciclopedia/proposizioni-finali_(La-grammatica-italiana)/
           
             #set enum(numbering:"R1")
-            + corpo lognormale e
+            + corpo bilognormale e
             + coda di Pareto.
            
           // Una volta raggiunto questo scopo, s'interpreta il fenomeno della migrazione tramite le leggi d'emigrazione proposte, che sono alla base delle interazioni tra città.
@@ -159,9 +162,10 @@
           #boxed(text:"Definizione")[
             Sia $N equiv |cal(I)| in NPlus$, la matrice d'adiacenza pesata $bold(M) in RR^(N times N)$ è
             $ 
+              #let hsep = h(.75em)
               m_(i,j) equiv cases(
-                q_(i,j)&" se "(i,j) in cal(E)\,,
-                0&" altrimenti".,
+                q_(i,j)in RR&hsep" se "(i,j) in cal(E)\,,
+                0&hsep" altrimenti".,
               )
             $
             // Nel caso $q_(i,j) equiv 1$ $forall i,j in cal(I)$ si ha la matrice d'adiacenza unitaria $bold(A)$.
@@ -239,8 +243,8 @@
                 let RI_S = {$
                   #BracketRef("RI","S")
                   cases(
-                      S'_t&=S_t (1-E(S_t,I,S_t^*,I_*))\,,
-                      S_t^(*prime)&=S_t^*+S E(S_t,I,S_t^*,I_*)\,
+                      S'_t&=S_t -S_t E(S_t,I,S_t^*,I_*)\,,
+                      S_t^(*prime)&=S_t^*+S_t E(S_t,I,S_t^*,I_*)\,
                   )
                 $}
       
@@ -251,7 +255,7 @@
                   // #BracketRef("AR","S")
                   cases(
                       S_(t+Delta t)&=(1-Theta)S_t+Theta S'_t\,,
-                      S^*_(t+Delta t)&=(1-Theta)S^*_t+Theta S_t^(*prime),
+                      S^*_(t+Delta t)&=(1-Theta)S^*_t+Theta S_t^(*prime)\,,
                   )
                 $}
       
@@ -312,7 +316,7 @@
                   }
                 )
   
-                group(name: "AR_S", {
+                group(name:"AR_S", {
                   content(
                     (rel:(.5*hsep,-vsep),
                     to:"RI_S.south-east"),
@@ -328,7 +332,7 @@
                   )
                 })
 
-                group(name: "AR_S-label", {
+                group(name:"AR_S-label", {
                   content(
                     (rel:(0,0),
                     to:"AR_S.west"),
@@ -378,11 +382,11 @@
             })
           ]
            
-          ove il microstato degli agenti è $(I,S_t)$ ed
+          ove
           $
             E colon RPlus cal(I) times RPlus times cal(I) -> RPlus
           $
-          è il tasso d'emigrazione. // Quest'equazioni valgono anche per le singole realizzazioni.
+          è il regola d'emigrazione. // Quest'equazioni valgono anche per le singole realizzazioni.
 
           //#region Ipotesi TCSMA
             // Per poter applicare la TCSMA sono necessarie quattro ipotesi
@@ -396,9 +400,7 @@
             // Tralascio queste ipotesi e non parlo della distribuzione scelta perché l'esatta forma della f non è importante per capire i risultati
           //#endregion
         ]
-      ]
 
-      #subsection(subtitle:"Modello esatto")[
         #slide[
           #let LHS = $
             pderv(t)integral_cal(I) integral_(RPlus) #bis() Phi f de v de i
@@ -421,21 +423,21 @@
           $
             underbrace(#LHS#vLHSpad,circledI)=underbrace(#RHS#vLHSpad,circledII),
           $
-          ove $f colon cal(I) times RPlus times RPlus -> RPlus$ è la distribuzione dello stato microscopico relativo all'agente rappresentativo.
+          ove $f colon cal(I) times RPlus times RPlus -> RPlus$ è la distribuzione statistica del microstato $(I,S_t)$ relativo all'agente rappresentativo.
 
           I due membri veicolano informazioni distinte:
           
-            + $circledI$ è la forma debole di un operatore di trasporto lineare e
-            + $circledII$ è la forma debole dell'opreatore collisionale.
+            + $circledI$ è la forma debole dell'operatore di trasporto lineare e
+            + $circledII$ è la forma debole dell'operatore collisionale.
         ]
       ]
 
       #subsection(subtitle:"Modello approssimato")[
         #slide[
-          La forma debole si ricava semplicemente sostituendo $bold(A)$ con
+          L'approssimazione si ricava semplicemente sostituendo $bold(A)$ con
           $
             bold(B) equiv (bold(k)bold(k)^top)/D_N,
-            quad text("con ") D equiv bold(1)^top bold(A)bold(1)= norm(A)_1,
+            quad text("con ") D equiv bold(1)^top bold(A)bold(1)= norm(bold(A))_1,
           $
           da cui
           $
@@ -502,8 +504,8 @@
                       + $Theta<-DstrBernoulli(B(i,r)Delta t)$;
                     + *se* $Theta = 1$ *allora*
                       + $E<-E(s_i^n,i,s_r^n,r)$;
-                      + #comment(fill:false)[$gamma<-DstrGamma\((1-E)^2\/sigma^2,sigma^2\/(1-E)\)$;]
-                      + $s_i^(n+1)<-s_i^n (1-E+gamma)$; #comment[città interagente]
+                      // + #comment(fill:false)[$gamma<-DstrGamma\((1-E)^2\/sigma^2,sigma^2\/(1-E)\)$;]
+                      + $s_i^(n+1)<-s_i^n (1-E)$; #comment[città interagente]
                       + $s_r^(n+1)<-s_r^n+s_i^n E$; #comment[città ricevente]
                     + *altrimenti*
                       + $s_i^(n+1)<-s_i^n$; $s_r^(n+1)<-s_r^n$;
@@ -526,7 +528,7 @@
             [
               Essa ha forma:
               
-              $ E_S(s,s_*) equiv lambda frac((s_*\/s)^alpha,1 + (s_*\/s)^alpha) $
+              $ E_S (s,s_*) equiv lambda frac((s_*\/s)^alpha,1 + (s_*\/s)^alpha) $
               
               con $lambda in (0,1)$ e $alpha in RR^+$. //La logica è che il tasso d'emigrazione verso la città ricevente è tanto maggiore quanto piú grande è la sua popolazione relativa, data dal rapporto $s_*\/s$, rispetto alla città interagente.
             ],
@@ -635,16 +637,198 @@
         ]
       ]
 
-      #subsection(subtitle:"È ragionevole?")[
+      #subsection(subtitle:"Sulla convergenza")[
         #slide(
           // height:27cm,
           // margin:(top:0em,bottom:0em),
         )[
-          Sí, per due vincoli: uno di natura fisica e l'altro sociale.
-          #let img-path = "../Figure/.fnl/TikZpdf/figForzaVsGrado20.pdf"
-          #includefigure((path:img-path),width:100%)
+          La convergenza della #BracketRef("RE","SK") non è una proprietà scontata:
+
+          #block(
+            width:100%,
+            below:1.75em,
+            above:1.75em
+          )[
+            #set align(center)
+            #canvas({
+              import draw: *
+
+              //#region Impostazioni
+                let vsep = 1em
+                let hsep = 2.5em
+
+                let dsep = 20deg
+                let radius = .6em
+
+                let arrow-style = (
+                  stroke:(
+                    thickness:1pt,
+                    paint:black,
+                    // dash:"dashed",
+                  ),
+                  mark:(
+                    end:">",
+                    // end:">>",
+                    fill:black,
+                    scale:1,
+                    // stroke: (dash:none),
+                  )
+                )
+
+                let lsep = 1.5em
+                let letter-size = 1.2*radius
+
+                let tsep = 1.75em
+                let fsep = 3em
+                let text-size = .8*slide-sizes.text
+              //#endregion
+
+              //#region Nodi
+                if draft {circle((0,0),radius:.1cm,fill:black)}
+
+                circle((-hsep,0),radius:radius,name:"vi")
+                circle((hsep,0),radius:radius,name:"vr")
+              //#endregion
+
+              //#region Frecce
+                let mp = ("vi",50%,"vr") // Punto medio
+
+                // Freccia sinistra
+                let cpl = (rel:(0,-vsep),to:mp) // Punto di controllo
+                bezier(
+                  (name:"vr",anchor:180deg+dsep),
+                  (name:"vi",anchor:-dsep),
+                  cpl,..arrow-style
+                )
+                circle(
+                  cpl,radius:.1,
+                  fill:draftFill(colour:red),
+                  stroke:draftStroke(colour:red)
+                )
+
+                // Freccia destra
+                let cpr = (rel:(0,vsep),to:mp) // Punto di controllo
+                bezier(
+                  (name:"vi",anchor:+dsep),
+                  (name:"vr",anchor:180deg-dsep),
+                  cpr,..arrow-style
+                )
+                circle(
+                  cpr,radius:.1,
+                  fill:draftFill(colour:red),
+                  stroke:draftStroke(colour:red)
+                )
+              //#endregion
+
+              //#region Testo
+                //#region Nodi relativi
+                  content(
+                    (rel:(-tsep,0),to:"vi"),
+                    text(size:text-size)[
+                      #set align(center)
+                      #set par(leading:0.2em)
+                      Nodo int.\ rel. maggiore
+                    ],
+                    anchor:"east"
+                  )
+                  content(
+                    (rel:(+tsep,0),to:"vr"),
+                    text(size:text-size)[
+                      #set align(center)
+                      #set par(leading:0.2em,)
+                      Nodo ric.\ rel. minore
+                    ],
+                    anchor:"west"
+                  )
+                //#endregion
+
+                //#region Simboli interagente
+                  content(
+                    "vi",
+                    text(size:letter-size)[$i$],
+                    // anchor:"west"
+                  )
+                  content(
+                    (rel:(0,lsep),to:"vi"),
+                    text(size:letter-size)[$s$],
+                    // anchor:"west"
+                  )
+                  content(
+                    (rel:(0,-lsep),to:"vi"),
+                    text(size:letter-size)[$k$],
+                    // anchor:"west"
+                  )
+                //#endregion
+
+                //#region Simboli ricevente
+                  content(
+                    "vr",
+                    text(size:letter-size)[$i_*$],
+                    // anchor:"west"
+                  )
+                  content(
+                    (rel:(0,lsep),to:"vr"),
+                    text(size:letter-size)[$s_*$],
+                    // anchor:"west"
+                  )
+                  content(
+                    (rel:(0,-lsep),to:"vr"),
+                    text(size:letter-size)[$k_*$],
+                    // anchor:"west"
+                  )
+                //#endregion
+
+                //#region Maggiore
+                  // https://forum.typst.app/t/how-do-i-use-the-rotate-function-in-the-cetz-content-environment/3055
+                  content(
+                    (0,-lsep),//angle:+90deg,
+                    text(size:letter-size)[>]
+                  )
+                  content(
+                    (0,+lsep),//angle:+90deg,
+                    text(size:letter-size)[>]
+                  )
+                //#endregion
+
+                //#region Flussi
+                  content(
+                    (0,-fsep),//angle:+90deg,
+                    text(size:text-size)[
+                      Flusso accentrante
+                    ],anchor:"south"
+                  )
+                  content(
+                    (0,+fsep),//angle:+90deg,
+                    text(size:text-size)[
+                      Retroflusso stabilizzante
+                    ],anchor:"north"
+                  )
+                //#endregion
+              //#endregion
+            })
+          ]
+
+          Infatti, dalla funzione di Hill $H^alpha (r)equiv lambda (r^alpha)/(1+r^alpha)$, vale
+          $
+            r_(S K)=(s_*)/s (k_*)/k<(s_*)/s=r_S
+            quad ==> quad
+            H^alpha (r_(S K))< H^alpha (r_S),
+          $
+          poiché $H^alpha (r)$ è una funzione crescente.
         ]
       ]
+
+      // #subsection(subtitle:"È ragionevole?")[
+      //   #slide(
+      //     // height:27cm,
+      //     // margin:(top:0em,bottom:0em),
+      //   )[
+      //     Sí, per due vincoli: uno di natura fisica e l'altro sociale.
+      //     #let img-path = "../Figure/.fnl/TikZpdf/figForzaVsGrado20.pdf"
+      //     #includefigure((path:img-path),width:100%)
+      //   ]
+      // ]
+
       #subsection(subtitle:[Risultati #BracketRef("RE","SW")])[
         #let img-path = "../Figure/.fnl/TikZpdf/figConfigurazioneRiferimentoRETF.pdf"
 
@@ -742,7 +926,7 @@
 
             1. definire regole d'interazione piú complesse,
             2. ricavare l'equazione di Fokker-Planck,
-            3. descrivere una rete dinamica coevolvente e
+            3. considerare una rete dinamica coevolvente e
             4. applicare la teoria a reti europee o internazionali.
         ]
       ]

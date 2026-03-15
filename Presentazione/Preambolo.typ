@@ -21,7 +21,7 @@
     #let draftStroke(
       thickness:1pt,colour:black
     ) = if draft {thickness+colour} else {none}
-    #let draftFill(clr:black) = if draft {clr} else {none}
+    #let draftFill(colour:black) = if draft {colour} else {none}
   //#endregion
 
   //#region Tipografia
@@ -83,7 +83,7 @@
       }
     //#endregion
 
-    //#region Modello Articolo
+    //#region Modello articolo
       #let article-sizes = (
         title:18pt,
         sub-title:15pt,
@@ -99,12 +99,13 @@
             width:100%,
             height:100%,
             fill:draftColour(red.lighten(70%)),
-          )
+          ),
+          numbering:"1"
         )// https://typst.app/docs/guides/page-setup/
         set par(
           justify:true,
-          first-line-indent:1.5em,
-          spacing:.65em,
+          // first-line-indent:1.5em,
+          // spacing:.65em,
         )
   
         // Riproduzione dei fonti di ArsClassica
@@ -369,7 +370,7 @@
     br:subscript,
   )// https://typst.app/docs/reference/math/attach/
 
-  #let BracketRef(body,subscript) = [$[text(#body)]_text(#subscript)$]
+  #let BracketRef(body,subscript) = [$[#text(font:"TeX Gyre Pagella")[#body]]_#text(font:"TeX Gyre Pagella")[#subscript]$]
 
   #let num(number,e:6,sep:-1pt) = {$number#h(sep)times#h(sep)10^#e$}
 
@@ -380,9 +381,9 @@
   #let RPlus = math.attach(math.bb("R"),b:math.plus)
   #let NPlus = math.attach(math.bb("N"),b:math.plus)
 
-  #let dstr(name) = math.upright(name)
-  #let DstrBernoulli = math.upright([Bernoulli])
-  #let DstrGamma = math.upright([Gamma])
+  #let dstr(name) = text(font:"TeX Gyre Pagella")[#name]
+  #let DstrBernoulli = dstr("Bernoulli")
+  #let DstrGamma =dstr("Gamma")
 
   #let comment(it,fill:true) = [
       #set text(size:14pt,fill:gray)
@@ -546,5 +547,5 @@
   //   - non vi sono formule matematiche complesse (soprattutto a blocchi e non in linea) e
   //   - non si ricerca uno stile eccessivamente raffinato
 
-  // È tuttavia probabile che migliori in futuro e sono molto curioso di sapere se considereranno anche i dettagli tipografici [che la stragrande maggioranza ignora] oppure se si accontereranno tralasciandoli
+  // È tuttavia probabile che migliori in futuro e sono molto curioso di sapere se considereranno anche i dettagli tipografici [che la stragrande maggioranza ignora] oppure se si accontenteranno tralasciandoli
 //#endregion
