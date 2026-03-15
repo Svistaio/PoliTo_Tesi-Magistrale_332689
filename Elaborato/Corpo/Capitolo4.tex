@@ -742,7 +742,7 @@
 
     \section{Regole d'emigrazione}\label{secRegoleEmigrazione}
 
-        In questo paragrafo si specializza la regola d'emigrazione \(E\) definita nelle \ref{eqRegoleInterazioneUrbaneEsplicite} per completare le \ref{eqRegoleInterazioneUrbane}; tutte le forme qui presenti condividono comunque tre aspetti: sono non simmetriche, non lineari e vedono i microstati \((i,s)\) e \((i_*,s_*)\) rispettivamente come la città interagente e ricevente.
+        In questo paragrafo si specializza la regola d'emigrazione \(E\) definita nelle \ref{eqRegoleInterazioneUrbaneEsplicite} per completare le \ref{eqRegoleInterazioneUrbane}; tutte le forme qui presenti sono euristiche e condividono tre aspetti: sono non simmetriche, non lineari e vedono i microstati \((i,s)\) e \((i_*,s_*)\) rispettivamente come la città interagente e ricevente.
 
         Per brevità si limita lo studio a venire su tre aspetti:
 
@@ -785,7 +785,7 @@
         Cionnonostante, nel \cref{secItaliaValleDAosta} si studiano cursoriamente comunque la Valle d'Aosta e l'Italia essendo casi estremi rispetto al numero di nodi.
 
         \begin{oss}
-            Nel corrente paragrafo con minori, medi e maggiori si fa riferimento ai centri rispettivamente con grado piccolo, medio e alto, come mostrato nelle sottofigure (j)-(l) delle \cref{figConfigurazioneRiferimentoStabileRET,figConfigurazioneRiferimentoInstabileRET,figConfigurazioneRiferimentoRETG,figConfigurazioneRiferimentoRETGf,figConfigurazioneRiferimentoRETF}.
+            Nel corrente paragrafo con minori, medi e maggiori si fa riferimento ai centri rispettivamente con grado piccolo, medio e grande, come mostrato nelle sottofigure (j)-(l) delle \cref{figConfigurazioneRiferimentoStabileRET,figConfigurazioneRiferimentoInstabileRET,figConfigurazioneRiferimentoRETG,figConfigurazioneRiferimentoRETGf,figConfigurazioneRiferimentoRETF}.
         \end{oss}
             
         \subsection{Regola taglia}\label{secRET}
@@ -1079,7 +1079,8 @@
 
                 Il secondo vincolo è difatti confermato dalla \cref{figForzaVsGrado20} che riporta una correlazione positiva tra il grado e la forza: maggiore è il primo altrettanto lo sarà il secondo, vale a dire il flusso di pendolari, da cui segue \ref{ossRETGVincoloSociale}.
                 
-                Dunque il vincolo fisico giustifica a prescindere questo tipo d'interazione perché il grafo è necessariamente spaziale; parimenti il vincolo sociale motiva l'interazione se e solo se v'è una correlazione positiva tra grado e forza\footnotemark{}. Tutto ciò implica la relazione \(k\gg1\implies s\gg1\), che rende realistica l'introduzione di \(k_{i_*}/k_i\) da un punto di vista modellistico.%
+                Dunque il vincolo fisico giustifica a prescindere questo tipo d'interazione perché il grafo è necessariamente spaziale; parimenti il vincolo sociale motiva l'interazione se e solo se v'è una correlazione positiva tra grado e forza\footnotemark{}. Tutto ciò implica la relazione %\(k\gg1\implies s\gg1\)
+                \(s\propto k\), anche confermata dalla medesima dispersione reale nelle \crefsubfigInt[ e ]{figConfigurazioneRiferimentoRETG}kl, che rende realistica l'introduzione di \(k_{i_*}/k_i\) da un punto di vista modellistico.%
                 \footnotetext{Si conferma tale caratteristica anche per ogni regione italiana, oltre che per l'Italia medesima.}%
 
                 È anche notevole soffermarsi, sebbene senza una risposta risolutiva, sul perché la regola d'emigrazione converga affatto: ci si potrebbe chiedere, difatti, come mai non si manifesti il flusso
@@ -1288,7 +1289,7 @@
                     \item \(\alpha\) è la repulsione: maggiore è il suo valore piú i centri relativamente maggiori sono respinti da quelli relativamente minori; essa è chiaramente inversamente legata all'entità del retroflusso stabilizzante.
                 \end{itemize}
 
-                Un altro punto di vista è il seguente: \(\lambda\) influenza principalmente la porzione della funzione di Hill (\cref{figFunzioneHillGradoa}) oltre l'unità (\(r>1\)), e quindi l'attrazione, mentre \(\alpha\) condiziona maggiormente la porzione sotto l'unità (\(r<1\)), e dunque la repulsione.
+                Un altro punto di vista è il seguente: \(\lambda\) influenza principalmente la porzione della funzione di Hill (\cref{figFunzioneHillGradoa}) oltre l'unità (\(r>1\)), e quindi l'attrazione, mentre \(\alpha\) condiziona maggiormente la porzione sotto l'unità (\(r\le1\)), e dunque la repulsione.
 
     \section{Altri casi notevoli}
 

@@ -25,12 +25,12 @@
     %
     \begin{equation}
         \label{eqFunzioneRipartizioneComplementarePareto}
-        \pazocal R(s)\equiv\int_{s}^{+\infty}f_S(t)\de t\approx\frac c{s^\beta}
+        \pazocal R(s)\equiv\int_{s}^{+\infty}f_S(z)\de z\approx\frac c{s^\beta}
         \quad\text{se }s\gg1,
         % https://en.wikipedia.org/wiki/Pareto_distribution#Relation_to_Zipf's_law
     \end{equation}
     %
-    per una certa costante \(c\in\RPlus\) e con \(\pazocal R(s)\) uguale alla funzione di ripartizione complementare di \(S\): essa rappresenta il numero di città con popolazione maggiore o uguale a \(s\) e, qualora l'indice di Pareto \(\beta\) fosse unitario, è analoga al rango \(r\) nella \eqref{eqLeggeZipf}.
+    per una certa costante \(c\in\RPlus\) e con \(\pazocal R(s)\) uguale alla funzione di ripartizione complementare di \(S\): essa rappresenta il numero di città con popolazione maggiore o uguale a \(s\) e, qualora l'indice di Pareto \(\beta\in\mathbb R\) fosse unitario, è analoga al rango \(r\) nella \eqref{eqLeggeZipf}.
 
     Piú recentemente \cite{Eeckhout2004,Gualandi2019HBLD} si è scoperto che al di fuori della coda la \(f_S(s)\) è ben fittata dalla distribuzione lognormale con densità di probabilità
     %
@@ -57,7 +57,7 @@
     %
     ove \(\xi\in(0,1)\), \(X_1,X_2\sim\DstrLognormale(\mu,\sigma)\) e \(X\sim\BiLognormal(\xi,\mu_1,\sigma_1,\mu_2,\sigma_2)\).
 
-    Pertanto l'obbiettivo di questa tesi è il seguente: si vogliono simulare attraverso la \hypertarget{acrTeorieCineticheSistemiMultiAgenti}{Teoria Cinetica dei Sistemi MultiAgente} (\TCSMA) le interazioni tra città su un grafo spaziale, tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate (principalmente corpo lognormale e coda di Pareto); una volta raggiunto questo scopo, s'interpreta il fenomeno della migrazione tramite le leggi d'emigrazione proposte, che sono alla base delle interazioni tra città.
+    Pertanto l'obbiettivo di questa tesi è il seguente: si vogliono simulare attraverso la \hypertarget{acrTeorieCineticheSistemiMultiAgenti}{Teoria Cinetica dei Sistemi MultiAgente} (\TCSMA) le interazioni tra città su un grafo spaziale, tentando di riprodurre una distribuzione della popolazione con caratteristiche analoghe a quelle realmente misurate (principalmente corpo bilognormale e coda di Pareto); una volta raggiunto questo scopo, s'interpreta il fenomeno della migrazione tramite le leggi d'emigrazione proposte, che sono alla base delle interazioni tra città.
 
     Inoltre, si sottolinea che in questo lavoro le città verranno considerate come agenti caratterizzati dalla loro popolazione, le quali interagiscono attraverso la struttura sottostante di un grafo [spaziale]; tale descrizione, salvo la rete, non è affatto dissimile a quella classica delle molecole di un gas caratterizzate dalla loro velocità e posizione. Difatti in letteratura, perlomeno quella a conoscenza dell'autore, non esistono articoli che trattano contemporaneamente la \TCSMA{}, la distribuzione della popolazione tra città e i grafi, nonostante la rappresentazione di queste su una rete sia del tutto naturale; piú nel dettaglio
     
