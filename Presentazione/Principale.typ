@@ -17,6 +17,7 @@
         bottom:0em
       ),
       extremes:true,
+      // counting:false,
     )[
       #set align(center+horizon)
       
@@ -37,7 +38,7 @@
             leading:0.4em,
           )
           
-          Modellizzazione della distribuzione della popolazione tra città su reti spaziali mediante la teoria cinetica dei sistemi multiagente
+          Modellizzazione della distribuzione della popolazione fra città su reti spaziali mediante la teoria cinetica dei sistemi multiagente
         ]
       ]
       
@@ -90,12 +91,12 @@
                 r&quad #text(font:"TeX Gyre Pagella")[ è il suo rango nella classifica,]
               )
             $
-            applicabile anche in in un contesto urbano; essa è generalizzabile mediante una distribuzione di Pareto
+            applicabile anche in un contesto urbano; essa è generalizzabile mediante una distribuzione di Pareto
             $
               pzclR(s) equiv integral_s^(+oo)f_S (z)dif z
               approx c/s^beta quad
             $
-            con $f_S$ è la distribuzione della popolazione, $beta in RR$ e $s gt.double 1$.
+            dove $f_S$ è la distribuzione della popolazione, $beta in RR$ e $s gt.double 1$.
         ]
       ]
 
@@ -105,7 +106,7 @@
           $
             f_X (x)=xi f_X_1(x)+(1-xi)f_X_2(x),
           $
-          che è una combinazione convessa di due lognormali
+          e $xi in (0,1)$, ossia una combinazione convessa di due lognormali
           $
             f_X_i (x)=1/ln(10) 1/(x sigma sqrt(2 pi)) exp(- (log x- mu)^2/(2 sigma^2)),
             quad i in {1,2},
@@ -134,7 +135,7 @@
 
             #set enum(numbering:"M1")
             + la teoria cinetica dei sistemi multiagente// (TCSMA)
-            + le interazioni tra città 
+            + le interazioni fra città 
             + su un grafo spaziale, 
            
           per tentare di riprodurre una distribuzione con caratteristiche analoghe a quelle realmente misurate, principalmente
@@ -146,8 +147,8 @@
             + corpo bilognormale e
             + coda di Pareto.
            
-          // Una volta raggiunto questo scopo, s'interpreta il fenomeno della migrazione tramite le leggi d'emigrazione proposte, che sono alla base delle interazioni tra città.
-          // Inoltre, si sottolinea che in questo lavoro le città verranno considerate come agenti caratterizzati dalla loro popolazione, le quali interagiscono attraverso la struttura sottostante di un grafo [spaziale]; tale descrizione, salvo la rete, non è affatto dissimile a quella classica delle molecole di un gas caratterizzate dalla loro velocità e posizione. Difatti in letteratura, perlomeno quella a conoscenza dell'autore, non esistono articoli che trattano contemporaneamente la TCSMA, la distribuzione della popolazione tra città e i grafi, nonostante la rappresentazione di queste su una rete sia del tutto naturale; piú nel dettaglio
+          // Una volta raggiunto questo scopo, s'interpreta il fenomeno della migrazione tramite le leggi d'emigrazione proposte, che sono alla base delle interazioni fra città.
+          // Inoltre, si sottolinea che in questo lavoro le città verranno considerate come agenti caratterizzati dalla loro popolazione, le quali interagiscono attraverso la struttura sottostante di un grafo [spaziale]; tale descrizione, salvo la rete, non è affatto dissimile a quella classica delle molecole di un gas caratterizzate dalla loro velocità e posizione. Difatti in letteratura, perlomeno quella a conoscenza dell'autore, non esistono articoli che trattano contemporaneamente la TCSMA, la distribuzione della popolazione fra città e i grafi, nonostante la rappresentazione di queste su una rete sia del tutto naturale; piú nel dettaglio
         ]
       ]
     ]
@@ -182,9 +183,9 @@
             // Nel caso $q_(i,j) equiv 1$ $forall i,j in cal(I)$ si ha la matrice d'adiacenza unitaria $bold(A)$.
           ]
         ]
-      ]
+      // ]
 
-      #subsection(subtitle:"Tipo di grafo")[
+      // #subsection(subtitle:"Tipo di grafo")[
         #slide(margin:(x:5em))[
           #boxed(text:"Ipotesi")[
             #align(center)[
@@ -384,9 +385,9 @@
            
           ove
           $
-            E colon RPlus cal(I) times RPlus times cal(I) -> RPlus
+            E colon RPlus times cal(I) times RPlus times cal(I) -> RPlus
           $
-          è il regola d'emigrazione. // Quest'equazioni valgono anche per le singole realizzazioni.
+          è la regola d'emigrazione. // Quest'equazioni valgono anche per le singole realizzazioni.
 
           //#region Ipotesi TCSMA
             // Per poter applicare la TCSMA sono necessarie quattro ipotesi
@@ -419,7 +420,7 @@
           #let circledI = {circle(..circle-options)[#align(center)[I]]}
           #let circledII = {circle(..circle-options)[#align(center)[II]]}
 
-          Avvalendosi dell'osservabile $Phi colon cal(I) times RPlus -> RR$ dall'#BracketRef("AR","S") si perviene a all'equazione di tipo Boltzmann
+          Dall'#BracketRef("AR","S"), avvalendosi dell'osservabile $Phi colon cal(I) times RPlus -> RR$, si perviene all'equazione di tipo Boltzmann
           $
             underbrace(#LHS#vLHSpad,circledI)=underbrace(#RHS#vLHSpad,circledII),
           $
@@ -658,6 +659,7 @@
                 let hsep = 2.5em
 
                 let dsep = 20deg
+                // let radius = .8em
                 let radius = .6em
 
                 let arrow-style = (
@@ -671,6 +673,8 @@
                     // end:">>",
                     fill:black,
                     scale:1,
+                    length:.15em,
+                    width:.2em,
                     // stroke: (dash:none),
                   )
                 )
@@ -818,17 +822,6 @@
         ]
       ]
 
-      // #subsection(subtitle:"È ragionevole?")[
-      //   #slide(
-      //     // height:27cm,
-      //     // margin:(top:0em,bottom:0em),
-      //   )[
-      //     Sí, per due vincoli: uno di natura fisica e l'altro sociale.
-      //     #let img-path = "../Figure/.fnl/TikZpdf/figForzaVsGrado20.pdf"
-      //     #includefigure((path:img-path),width:100%)
-      //   ]
-      // ]
-
       #subsection(subtitle:[Risultati #BracketRef("RE","SW")])[
         #let img-path = "../Figure/.fnl/TikZpdf/figConfigurazioneRiferimentoRETF.pdf"
 
@@ -895,14 +888,13 @@
     ]
 
     #section(title:"Interpretazione")[
-      #subsection(subtitle:"Paremetri")[
+      #subsection(subtitle:"Parametri")[
         #slide(
           // height:27cm,
           // margin:(top:0em,bottom:0em),
           // alignment:center+horizon,
         )[
           Da alcuni studi parametrici, $lambda$ e $alpha$ sono cosí interpretabili:
-
             - $lambda$ è l'attrazione esercitata dai centri relativamente maggiori e
             - $alpha$ è la repulsione sprigionata dai centri relativamente minori.
             // essa è chiaramente inversamente legata all'entità del retroflusso stabilizzante.
@@ -912,7 +904,7 @@
           #let img-path = "../Figure/.fnl/TikZpdf/figFunzioneHillGradoa.pdf"
           #includefigure((path:img-path,height:auto,dy:-0cm),width:80%)
 
-          #v(1fr)
+          #v(.5fr)
         ]
       ]
     ]
@@ -936,24 +928,69 @@
   //#region Ringraziamenti
     #slide(
       margin:(
-        x:0em,
-        top:0em,
-        bottom:0em
+        x:1em,
+        top:2em,
+        bottom:2em
       ),
       extremes:true,
+      alignment:center+horizon,
+      // counting:false
     )[
-      #set align(center+horizon)
-      
+      #v(1fr)
+
       #block(
-        width:120%,
-        // stroke:0.5pt+CTred
+        width:100%,
+        stroke:draftColour(CTred),
       )[
-        #text(
+        #set text(
           fill:CTred,
           // weight:"bold",
           size:slide-sizes.title+5pt,
           // stroke:0.5pt+CTred
-        )[Grazie dell'attenzione]
+        )
+        Grazie dell'attenzione
+      ]
+
+      #v(1.5fr)
+
+      #block(
+        width:100%,
+        stroke:draftColour(CTred),
+      )[
+        // #set text(fill:CTred)
+        #set align(left)
+        #text(size:slide-sizes.paragraph)[*Estratto bibliografico*]
+
+        #set enum(
+          numbering:"[1]",
+          // indent:1em
+        )
+        + Stefano Gualandi & Giuseppe Toscani _Size distribution of cities: A kinetic explanation_ (2019).
+        + Nurisso _et al._ _Network-based kinetic models: Emergence of a statistical description of the graph topology_ (2024).
+        + Andrea De Montis _et al._ _The structure of interurban traffic: a weighted network analysis_ (2007).
+        + Dati ISTAT. _Matrici di contiguità, distanza e pendolarismo_ e _Basi territoriali e variabili censuarie_ (1991).
+        + Nadia Loy & Andrea Tosin. _Essentials of the kinetic theory of multi-agent systems_ (2025).
+        // + Lorenzo Pareschi e Giuseppe Gualandi _Interacting multiagent systems: kinetic equations and Monte Carlo methods_ (2013).
+      ]
+
+      #v(1fr)
+    ]
+  //#endregion
+
+  //#region Appendice
+    #section(title:"Appendice")[
+      #subsection(subtitle:[È ragionevole #BracketRef("RE","SK")?])[
+        #slide(
+          // height:27cm,
+          // margin:(top:0em,bottom:0em),
+          alignment:top,
+          footer:false,
+          counting:false
+        )[
+          Sí, per due vincoli: uno di natura fisica e l'altro sociale.
+          #let img-path = "../Figure/.fnl/TikZpdf/figForzaVsGrado20.pdf"
+          #includefigure((path:img-path),width:100%)
+        ]
       ]
     ]
   //#endregion

@@ -12,168 +12,167 @@
     // #import "@preview/touying:0.6.1":*
 //#endregion
 
-//#region Impostazioni
-  //#region Bozza
-    #let draft = true
-    #let draft = false
+//#region Bozza
+  #let draft = true
+  #let draft = false
 
-    #let draftColour(clr) = if draft {clr} else {white}
-    #let draftStroke(
-      thickness:1pt,colour:black
-    ) = if draft {thickness+colour} else {none}
-    #let draftFill(colour:black) = if draft {colour} else {none}
+  #let draftColour(clr) = if draft {clr} else {white}
+  #let draftStroke(
+    thickness:1pt,colour:black
+  ) = if draft {thickness+colour} else {none}
+  #let draftFill(colour:black) = if draft {colour} else {none}
+//#endregion
+
+//#region Colori
+  #let CTred = rgb("#800000") // Colore rosso di ClassicThesis
+  // https://typst.app/docs/reference/visualize/color/
+//#endregion
+
+//#region Tipografia
+  // https://typst.app/docs/tutorial/making-a-template/
+  //#region Modello diapo
+    #let slide-sizes = (
+      title:32pt,
+      sub-title:30pt,
+      section:30pt,
+      paragraph:27pt,
+      text:24pt,
+    )
+
+    #let slideTemplate(body) = {
+      set page(
+        paper:"presentation-4-3"
+        // paper: "presentation-16-9",
+      )
+      set par(justify:true)
+
+      // Riproduzione dei fonti di ArsClassica
+      set text(
+        size:slide-sizes.text,
+        font:"TeX Gyre Pagella",
+        lang:"it",
+      ) // Con grazie
+
+      show heading: set text(
+        font:"Iwona",
+        weight:"light"
+      ) // Senza grazie
+
+      show math.equation: set text(
+        font:"Euler Math"
+      ) // Matematico
+
+      let list-indent = 1em
+      // https://typst.app/docs/reference/model/list/
+      set list(
+        marker:[
+          #box(height:.8em)[
+            #align(horizon)[
+              #rotate(45deg)[
+                #square(
+                  width:7pt,
+                  fill:white,
+                  stroke:1pt
+                )
+              ]
+            ]
+          ]
+        ],
+        indent:list-indent,
+      )
+
+      // https://typst.app/docs/reference/model/enum/
+      set enum(indent:list-indent)
+
+      body
+    }
   //#endregion
 
-  //#region Tipografia
-    // https://typst.app/docs/tutorial/making-a-template/
-    //#region Modello diapo
-      #let slide-sizes = (
-        title:32pt,
-        sub-title:30pt,
-        section:30pt,
-        text:24pt,
-      )
-  
-      #let slideTemplate(body) = {
-        set page(
-          paper:"presentation-4-3"
-          // paper: "presentation-16-9",
-        )
-        set par(justify:true)
-  
-        // Riproduzione dei fonti di ArsClassica
-        set text(
-          size:slide-sizes.text,
-          font:"TeX Gyre Pagella",
-          lang:"it",
-        ) // Con grazie
-  
-        show heading: set text(
-          font:"Iwona",
-          weight:"light"
-        ) // Senza grazie
-  
-        show math.equation: set text(
-          font:"Euler Math"
-        ) // Matematico
-  
-        let list-indent = 1em
-        // https://typst.app/docs/reference/model/list/
-        set list(
-          marker:[
-            #box(height:.8em)[
-              #align(horizon)[
-                #rotate(45deg)[
-                  #square(
-                    width:7pt,
-                    fill:white,
-                    stroke:1pt
-                  )
-                ]
-              ]
-            ]
-          ],
-          indent:list-indent,
-        )
-  
-        // https://typst.app/docs/reference/model/enum/
-        set enum(indent:list-indent)
-  
-        body
-      }
-    //#endregion
+  //#region Modello articolo
+    #let article-sizes = (
+      title:18pt,
+      sub-title:15pt,
+      section:13pt,
+      text:11pt,
+    )
 
-    //#region Modello articolo
-      #let article-sizes = (
-        title:18pt,
-        sub-title:15pt,
-        section:13pt,
-        text:11pt,
-      )
-  
-      #let articleTemplate(body) = {
-        set page(
-          paper:"a4",
-          margin:(x:4cm,y:3cm),
-          background:rect(
-            width:100%,
-            height:100%,
-            fill:draftColour(red.lighten(70%)),
-          ),
-          numbering:"1"
-        )// https://typst.app/docs/guides/page-setup/
-        set par(
-          justify:true,
-          // first-line-indent:1.5em,
-          // spacing:.65em,
-        )
-  
-        // Riproduzione dei fonti di ArsClassica
-        set text(
-          size:article-sizes.text,
-          font:"TeX Gyre Pagella",
-          lang:"it",
-        ) // Con grazie
-  
-        show heading: set text(
-          font:"Iwona",
-          weight:"light"
-        ) // Senza grazie
-  
-        show math.equation: set text(
-          font:"Euler Math"
-        ) // Matematico
-  
-        let list-indent = 1em
-        // https://typst.app/docs/reference/model/list/
-        set list(
-          marker:[
-            #box(height:.8em)[
-              #align(horizon)[
-                #rotate(45deg)[
-                  #square(
-                    width:7pt,
-                    fill:white,
-                    stroke:1pt
-                  )
-                ]
-              ]
-            ]
-          ],
-          indent:list-indent,
-        )
-  
-        // https://typst.app/docs/reference/model/enum/
-        set enum(indent:list-indent)
-  
-        block(
+    #let articleTemplate(body) = {
+      set page(
+        paper:"a4",
+        margin:(x:4cm,y:3cm),
+        background:rect(
           width:100%,
-          // height:100%, // Se si vuole che il testo sia separato in piú pagine bisogna commentare l'altezza essendo un vincolo eccessivamente rigido
-          fill:draftColour(blue.lighten(70%)),
-          inset:0pt,
-          breakable:true,
-        )[
-          #set align(left+top)
-          #body
-        ]
-      }
-    //#endregion
-  //#endregion
+          height:100%,
+          fill:draftColour(red.lighten(70%)),
+        ),
+        numbering:"1"
+      )// https://typst.app/docs/guides/page-setup/
+      set par(
+        justify:true,
+        // first-line-indent:1.5em,
+        // spacing:.65em,
+      )
 
-  //#region Immagini
-    #let border = 0.5pt+black
-    #let rowHeight = 6.5cm
+      // Riproduzione dei fonti di ArsClassica
+      set text(
+        size:article-sizes.text,
+        font:"TeX Gyre Pagella",
+        lang:"it",
+      ) // Con grazie
 
-    #let factor(number,exponent,base:1) = {base+number*calc.pow(10,exponent)}
-    #let img-height-14 = rowHeight*factor(1.75,-1)
-    #let img-height-23 = rowHeight*factor(1.75,-1)
-    #let img-dy(shift:0cm) = -19.1cm+shift
-  //#endregion
+      show heading: set text(
+        font:"Iwona",
+        weight:"light"
+      ) // Senza grazie
 
-  //#region Colori
-    #let CTred = rgb("#800000") // Colore rosso di ClassicThesis
-    // https://typst.app/docs/reference/visualize/color/
+      show math.equation: set text(
+        font:"Euler Math"
+      ) // Matematico
+
+      let list-indent = 1em
+      // https://typst.app/docs/reference/model/list/
+      set list(
+        marker:[
+          #box(height:.8em)[
+            #align(horizon)[
+              #rotate(45deg)[
+                #square(
+                  width:7pt,
+                  fill:white,
+                  stroke:1pt
+                )
+              ]
+            ]
+          ]
+        ],
+        indent:list-indent,
+      )
+
+      // https://typst.app/docs/reference/model/enum/
+      set enum(indent:list-indent)
+
+      block(
+        width:100%,
+        // height:100%, // Se si vuole che il testo sia separato in piú pagine bisogna commentare l'altezza essendo un vincolo eccessivamente rigido
+        fill:draftColour(blue.lighten(70%)),
+        inset:0pt,
+        breakable:true,
+      )[
+        #set align(left+top)
+        #body
+      ]
+    }
   //#endregion
+//#endregion
+
+//#region Immagini
+  #let border = 0.5pt+black
+  #let rowHeight = 6.5cm
+
+  #let factor(number,exponent,base:1) = {base+number*calc.pow(10,exponent)}
+  #let img-height-14 = rowHeight*factor(1.75,-1)
+  #let img-height-23 = rowHeight*factor(1.75,-1)
+  #let img-dy(shift:0cm) = -19.1cm+shift
 //#endregion
 
 //#region Suddivisione
@@ -221,8 +220,12 @@
     footer:true,
     extremes:false,
     centred-content:true,
+    counting:true,
   ) = {
     context {
+      // Se non si conta la pagina si decrementa il relativo contatore
+      if not counting {counter(page).update(n => n - 1)}
+
       let height = if height == none {width*3/4} else {height}
 
       // Inizializzazione
