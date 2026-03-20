@@ -5,21 +5,22 @@
 % LTeX: language=it
 
 \documentclass[
-    a4paper,
+    paper=a4,
     twoside,
-    openright,
+    open=right,
     titlepage,
     headinclude,
     footinclude,
-    BCOR5mm,
+    BCOR=10mm, % Cioè 1cm
     numbers=noenddot,
     cleardoublepage=empty,
-    tablecaptionabove
+    captions=tableheading,
+    version=last
 ]{scrreprt}
 % La dimensione del testo è di base 11pt
 
-% \newcommand\bozza{true}
-\newcommand\bozza{false}
+\newcommand\bozza{true}
+\renewcommand\bozza{false}
 \newif\ifInCompiler
 
 \input{../Corpo/Pacchetti.tex}
@@ -32,8 +33,10 @@
     \immediate\ShellEscape{copy /Y "Principale.aux" "../Compilatore/CopiaPrincipale.aux"}
 }{\relax}
 
-\begin{document}
+\pdfcompresslevel=9
+\pdfobjcompresslevel=3
 
+\begin{document}
     \pagenumbering{roman}
 
     \Frontespizio
@@ -98,5 +101,4 @@
         heading=bibintoc,
         title=\bibname
     ]
-
 \end{document}

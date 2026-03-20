@@ -30,8 +30,8 @@
     \begin{figure}[#2]%
         \centering%
         % Recupera la pagina dall'etichetta (default a 1 se non esiste)
-        \checkoddpage
-        \Ifthispageodd{\def\pagetype{odd}}{\def\pagetype{even}}
+        \checkoddpage%
+        \Ifthispageodd{\def\pagetype{odd}}{\def\pagetype{even}}%
         %
         % Alternativa con «\getpagerefnumber»
         % \edef\currentfigpage{\getpagerefnumber{#7}}
@@ -40,7 +40,7 @@
         % \ifnum\pgfmathresult=1\def\pagetype{odd}
         % \else\def\pagetype{even}\fi
         %
-        \def\shlcmd{
+        \def\shlcmd{%
             \immediate\ShellEscape{%
                 #1 %
                 --shell-escape %
@@ -52,40 +52,45 @@
                 \string\def\string\sourceoutdir{\outdirectory}%
                 \string\def\string\sourceauxpath{\auxpath}%
                 \string\input{\compilerpath}"%
-            }
-        }
+            }%
+        }%
         \IfSubStr{#2}{p}{% 
             \leavevmode\stepcounter{figposcount}\zsaveposx{figpos-\thefigposcount}%
             \makebox[0pt][l]{%
                 \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
-                \hspace*{0.5\paperwidth}%
+                % \hspace*{\dimexpr0.5\paperwidth\relax}%
+                \def\hsep{-0.4cm}\Ifthispageodd{\def\offset{+\hsep}}{\def\offset{-\hsep}}% per far toccare il bordo sinistro/destro dei grafici al margine interno/esterno si trasla di -/+1.9 cm
+                \hspace*{\dimexpr0.5\paperwidth+\offset\relax}%
                 \makebox[0pt][c]{%
-                    \begin{minipage}{\paperwidth}%
-                        \vspace*{#3}\centering
-                        \addtocounter{figure}{1}
+                    \begin{minipage}\paperwidth%
+                        \centering%
+                        \vspace*{#3}%
+                        \addtocounter{figure}{1}%
                         \setcounter{subfigure}{0}%
                         \IfFileExists{\pdfdirectory#7.pdf}{%
-                            \ifbool{forcetikzrecompile}{\shlcmd}{\relax}
+                            \ifbool{forcetikzrecompile}{\shlcmd}{\relax}%
                         }{\shlcmd}%
-                        \includegraphics{\pdfdirectory#7.pdf}%
-                        \addtocounter{figure}{-1}
-                        \didascalia{#5}{#6}
-                        \protect\label{#7}
-                    \end{minipage}
+                        \scalebox{0.95}{%
+                            \includegraphics{\pdfdirectory#7.pdf}%
+                        }%
+                        \addtocounter{figure}{-1}%
+                        \didascalia{#5}{#6}%
+                        \protect\label{#7}%
+                    \end{minipage}%
                 }%
             }%
         }{%
-            \makebox[\textwidth][c]{
-                \begin{minipage}{\linewidth}
-                    \centering
-                    \addtocounter{figure}{1}\setcounter{subfigure}{0}
+            \makebox[\textwidth][c]{%
+                \begin{minipage}\linewidth
+                    \centering%
+                    \addtocounter{figure}{1}\setcounter{subfigure}{0}%
                     \IfFileExists{\pdfdirectory#7.pdf}{%
                         \ifbool{forcetikzrecompile}{\shlcmd}{\relax}
                     }{\shlcmd}%
                     \includegraphics{\pdfdirectory#7.pdf}%
-                    \addtocounter{figure}{-1}
-                    \didascalia{#5}{#6}
-                    \protect\label{#7}
+                    \addtocounter{figure}{-1}%
+                    \didascalia{#5}{#6}%
+                    \protect\label{#7}%
                 \end{minipage}%
             }%
         }%

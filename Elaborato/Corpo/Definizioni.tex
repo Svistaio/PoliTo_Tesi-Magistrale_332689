@@ -622,8 +622,8 @@
 
                 \useasboundingbox 
                     let \p1=(RealSW),\p2=(RealNE),\p3=(Center),
-                    \n1={max(\x3-\x1,\x2-\x3)} in
-                    (\x3-\n1,\y1) rectangle (\x3+\n1,\y2+.25em);
+                    \n={max(\x3-\x1,\x2-\x3)} in
+                    (\x3-\n,\y1) rectangle (\x3+\n,\y2+.25em);
                 % \path[use as bounding box] 
                 %     let \p1=(RealSW),\p2=(RealNE),\p3=(Center),
                 %     \n1={max(\x3-\x1,\x2-\x3)} in
@@ -1464,30 +1464,30 @@
 
 %\begingroup Figure
     \newcommand\floatfigure[7][0em]{%
-        \begin{figure}[#2]
-            \centering
+        \begin{figure}[#2]%
+            \centering%
             \IfSubStr{#2}{p}{%
-                \leavevmode
+                \leavevmode%
                 \stepcounter{figposcount}%
                 \zsaveposx{figpos-\thefigposcount}%
                 \makebox[0pt][l]{%
                     \hspace*{-\dimexpr\zposx{figpos-\thefigposcount}sp\relax}%
                     \hspace*{0.5\paperwidth}%
                     \makebox[0pt][c]{%
-                        \vspace*{#1}
-                        \includegraphics[width=#3]{#4}
-                    }
-                }
+                        \vspace*{#1}%
+                        \includegraphics[width=#3]{#4}%
+                    }%
+                }%
             }{%
                 \makebox[0pt][l]{%
                     \makebox[0pt][c]{%
-                        \vspace*{#1}
-                        \includegraphics[width=#3]{#4}
-                    }
-                }
-            }
+                        \vspace*{#1}%
+                        \includegraphics[width=#3]{#4}%
+                    }%
+                }%
+            }%
             \didascalia{#6}{#5}%
-            \protect\label{#7}
+            \protect\label{#7}%
         \end{figure}
     }
 
@@ -1621,41 +1621,42 @@
 
 %\begingroup Frontespizio
     \newcommand\lineaPuntallata[1][4cm]{\makebox[#1]{\dotfill}}
-    \newcommand\Frontespizio{
+    \newcommand\Frontespizio{%
         \begin{titlepage}
-            \newgeometry{
+            \newgeometry{%
                 left=1cm,
                 right=1cm,
                 top=3cm,
                 bottom=3.5cm
             }
-            \centering
+            \centering%
             %
-            {\Huge\scshape Politecnico di Torino}\\[1cm]
-            {\Large Corso di Laurea\\in Ingegneria Matematica}
+            {\Huge\scshape Politecnico di Torino}\\[1cm]%
+            {\Large Corso di Laurea\\in Ingegneria Matematica}%
             %
-            \vfill
+            \vfill%
             %
-            {\Large Tesi di Laurea Magistrale}\\[0.5cm]
-            \parbox{.9\textwidth}{
+            {\Large Tesi di Laurea Magistrale}\\[0.5cm]%
+            \parbox{.9\textwidth}{%
                 \centering\huge\bfseries%
                 Modellizzazione della distribuzione della popolazione tra città su reti spaziali mediante la teoria cinetica dei sistemi multiagente
-            }\\[1.5cm]
-            \includegraphics[width=0.25\textwidth]{../../Figure/.fnl/Frontespizio/LogoPoliTO.jpg}
+            }\\[1.5cm]%
+            \includegraphics[width=0.25\textwidth]{../../Figure/.fnl/Frontespizio/LogoPoliTO.jpg}%
             %
-            \vfill
+            \vfill%
             %
-            \begin{minipage}[t]{0.85\textwidth}
-                \begin{flushleft}\large
-                    \textbf{Relatore} \hfill \textbf{Candidato}\\
-                    prof. Andrea Tosin \hfill Valerio Taralli\\[0.75cm]
+            \begin{minipage}[t]{0.85\textwidth}%
+                \begin{flushleft}\large%
+                    \textbf{Relatore}\hfill\textbf{Candidato}\\%
+                    Prof. Andrea Tosin\hfill Valerio Taralli%\\[0.75cm]%
                     % prof. Nome Cognome\\[0.5cm]
-                    \textit{firma del relatore} \hfill \textit{firma del candidato}\\[0.35cm]
+                    % \textit{firma del relatore} \hfill \textit{firma del candidato}\\[0.35cm]
                     % \lineaPuntallata\ \hfill \\
-                    \lineaPuntallata\ \hfill \lineaPuntallata
-                \end{flushleft}
-            \end{minipage}
+                    % \lineaPuntallata\ \hfill \lineaPuntallata
+                \end{flushleft}%
+            \end{minipage}%
             %
+            % \vspace{0pt}
             \vfill
             %
             {\large Anno Accademico 2025-2026\par}
