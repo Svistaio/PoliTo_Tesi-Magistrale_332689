@@ -1,21 +1,22 @@
 
 % !TEX root = Principale.tex
 % !LW recipe=pdfLaTeX ➞ biber ➞ pdfLaTeX
+% !LW recipe=2xpdfLaTeX
 % !LW recipe=pdfLaTeX
 % LTeX: language=it
 
 \documentclass[
-    paper=a4,
-    twoside,
-    open=right,
-    titlepage,
-    headinclude,
-    footinclude,
-    BCOR=10mm, % Cioè 1cm
-    numbers=noenddot,
-    cleardoublepage=empty,
-    captions=tableheading,
-    version=last
+  paper=a4,
+  twoside,
+  open=right,
+  titlepage,
+  headinclude,
+  footinclude,
+  BCOR=10mm, % Cioè 1cm
+  numbers=noenddot,
+  cleardoublepage=empty,
+  captions=tableheading,
+  version=last
 ]{scrreprt}
 % La dimensione del testo è di base 11pt
 
@@ -25,80 +26,80 @@
 
 \input{../Corpo/Pacchetti.tex}
 \input{../Corpo/Definizioni.tex}
-\input{../Compilatore/tikzextfigure.tex}
+\input{../Altro/tikzextfigure.tex}
 
 % \setbool{forcetikzrecompile}{true}
 
 \IfFileExists{Principale.aux}{%
-    \immediate\ShellEscape{copy /Y "Principale.aux" "../Compilatore/CopiaPrincipale.aux"}
+  \immediate\ShellEscape{copy /Y "Principale.aux" "../Altro/CopiaPrincipale.aux"}
 }{\relax}
 
 \pdfcompresslevel=9
 \pdfobjcompresslevel=3
 
 \begin{document}
-    \pagenumbering{roman}
+  \pagenumbering{roman}
 
-    \Frontespizio
+  \Frontespizio
 
-    \Dedica
-    \Sommario
+  \Dedica
+  \Sommario
 
-    \cleardoublepage
+  \cleardoublepage
+  \phantomsection
+  \pdfbookmark[1]{\contentsname}{tableofcontents}
+  \tableofcontents
+
+  \cleardoublepage
+  \pagenumbering{arabic}
+
+  \makeatletter
+  \ifct@drafting
+    \linenumbers
+  \fi
+  \makeatother
+
+  \input{../Corpo/Capitolo1.tex}
+  \input{../Corpo/Capitolo2.tex}
+  \input{../Corpo/Capitolo3.tex}
+  \input{../Corpo/Capitolo4.tex}
+  \input{../Corpo/Capitolo5.tex}
+
+  \input{../Corpo/Appendice.tex}
+
+  \cleardoublepage
+  \phantomsection
+  \addcontentsline{toc}{chapter}{\listfigurename}
+  \listoffigures
+
+  \cleardoublepage
+  \phantomsection
+  \addcontentsline{toc}{chapter}{\listtablename}
+  \listoftables
+
+  \cleardoublepage
+  \begingroup
+    \let\clearpage\relax
+    \let\cleardoublepage\relax
+    
     \phantomsection
-    \pdfbookmark[1]{\contentsname}{tableofcontents}
-    \tableofcontents
+    % \addcontentsline{toc}{chapter}{\listoflistingscaption} % Senza l'opzione «newfloat» di «minted»
+    \addcontentsline{toc}{chapter}{\listlistingname} % Con l'opzione «newfloat» di «minted»
+    \listoflistings
+    % \addcontentsline{toc}{chapter}{\lstlistlistingname}
+    % \lstlistoflistings
+    
+    \vfill
 
-    \cleardoublepage
-    \pagenumbering{arabic}
-
-    \makeatletter
-    \ifct@drafting
-        \linenumbers
-    \fi
-    \makeatother
-
-    \input{../Corpo/Capitolo1.tex}
-    \input{../Corpo/Capitolo2.tex}
-    \input{../Corpo/Capitolo3.tex}
-    \input{../Corpo/Capitolo4.tex}
-    \input{../Corpo/Capitolo5.tex}
-
-    \input{../Corpo/Appendice.tex}
-
-    \cleardoublepage
     \phantomsection
-    \addcontentsline{toc}{chapter}{\listfigurename}
-    \listoffigures
+    \addcontentsline{toc}{chapter}{\listalgorithmcfname}
+    \listofalgorithms
+    
+    \vfill
+  \endgroup
 
-    \cleardoublepage
-    \phantomsection
-    \addcontentsline{toc}{chapter}{\listtablename}
-    \listoftables
-
-    \cleardoublepage
-    \begingroup
-        \let\clearpage\relax
-        \let\cleardoublepage\relax
-        
-        \phantomsection
-        % \addcontentsline{toc}{chapter}{\listoflistingscaption} % Senza l'opzione «newfloat» di «minted»
-        \addcontentsline{toc}{chapter}{\listlistingname} % Con l'opzione «newfloat» di «minted»
-        \listoflistings
-        % \addcontentsline{toc}{chapter}{\lstlistlistingname}
-        % \lstlistoflistings
-        
-        \vfill
-
-        \phantomsection
-        \addcontentsline{toc}{chapter}{\listalgorithmcfname}
-        \listofalgorithms
-        
-        \vfill
-    \endgroup
-
-    \printbibliography[
-        heading=bibintoc,
-        title=\bibname
-    ]
+  \printbibliography[
+    heading=bibintoc,
+    title=\bibname
+  ]
 \end{document}

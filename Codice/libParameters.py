@@ -12,331 +12,331 @@ from pathlib import Path
 
 ### Module attributes ###
 
-mainFolder     = Path(__file__).resolve().parent
-projectFolder  = mainFolder.parent
-dataFolder     = projectFolder/'Dati'
+mainFolder    = Path(__file__).resolve().parent
+projectFolder = mainFolder.parent
+dataFolder    = projectFolder/'Dati'
 
-matrixZipPath  = dataFolder/'MatriciPendolarismo1991.zip'
-sizeZipPath    = dataFolder/'CensimentoRegioni1991.zip'
-coordZipPath   = dataFolder/'LimitiRegioni1991.zip'
-shpFilePath    = f"zip://{coordZipPath}!Limiti1991_g/Com1991_g/Com1991_g_WGS84.shp"
+matrixZipPath = dataFolder/'MatriciPendolarismo1991.zip'
+sizeZipPath   = dataFolder/'CensimentoRegioni1991.zip'
+coordZipPath  = dataFolder/'LimitiRegioni1991.zip'
+shpFilePath   = f"zip://{coordZipPath}!Limiti1991_g/Com1991_g/Com1991_g_WGS84.shp"
 
 regDataZipPath = dataFolder/'DatiRegioni1991.zip'
 simDataZipFile = dataFolder/'DatiSimulazione.zip'
 
 parameters = {
-    "population": {
-        "text": "S",
-        "val": 1
-    },
-    "attractivity": {
-        "text": "λ",
-        "val": 1.0
-    },
-    "convincibility": {
-        "text": "α",
-        "val": 1.0
-    },
-    "deviation": {
-        "text": "σ",
-        "val": 1.0
-    },
-    "region": {
-        "text": "Region selected",
-        "val": "region"
-    },
-    "zetaValue": {
-        "text": "ζ",
-        "val": 1.0
-    },
-    "timestep": {
-        "text": "Δt",
-        "val": 1.0
-    },
-    "timesteps": {
-        "text": "Nt",
-        "val": 1
-    },
-    "iterations": {
-        "text": "Ni",
-        "val": 1
-    },
-    "progressBar": {
-        "text": "Progress Bar",
-        "val": True
-    },
-    "extraction": {
-        "text": "Extract data",
-        "val": False
-    },
-    "analysis": {
-        "text": "Network analysis",
-        "val": False
-    },
-    "edgeWeights": {
-        "text": "Edge weights",
-        "val": False
-    },
-    "fluctuations": {
-        "text": "Fluctuations",
-        "val": True
-    },
-    "zetaFraction": {
-        "text": "Fraction",
-        "val": False
-    },
-    "interactionRule": {
-        "text": "Interaction rule",
-        "val": "law"
-    },
-    "pdfPopUp": {
-        "text": "Open PDF",
-        "val": False
-    },
-    "TikZConversion": {
-        "text": "TikZ Conversion",
-        "val": False
-    },
-    "snapshots": {
-        "text": "Ns",
-        "val": 100
-    },
-    "smoothingFactor": {
-        "text": "Sf",
-        "val": 10
-    },
-    "parametricStudy": {
-        "text": "Parametric study",
-        "val": False
-    },
-    "studiedParameter": {
-        "text": "Studied parameter",
-        "val": "study"
-    },
-    "startValuePrmStudy": {
-        "text": "Start",
-        "val": 1.0
-    },
-    "endValuePrmStudy": {
-        "text": "End",
-        "val": 1.0
-    },
-    "numberPrmStudy": {
-        "text": "Nv",
-        "val": 1
-    }
+  "population": {
+    "text": "S",
+    "val": 1
+  },
+  "attractivity": {
+    "text": "λ",
+    "val": 1.0
+  },
+  "convincibility": {
+    "text": "α",
+    "val": 1.0
+  },
+  "deviation": {
+    "text": "σ",
+    "val": 1.0
+  },
+  "region": {
+    "text": "Region selected",
+    "val": "region"
+  },
+  "zetaValue": {
+    "text": "ζ",
+    "val": 1.0
+  },
+  "timestep": {
+    "text": "Δt",
+    "val": 1.0
+  },
+  "timesteps": {
+    "text": "Nt",
+    "val": 1
+  },
+  "iterations": {
+    "text": "Ni",
+    "val": 1
+  },
+  "progressBar": {
+    "text": "Progress Bar",
+    "val": True
+  },
+  "extraction": {
+    "text": "Extract data",
+    "val": False
+  },
+  "analysis": {
+    "text": "Network analysis",
+    "val": False
+  },
+  "edgeWeights": {
+    "text": "Edge weights",
+    "val": False
+  },
+  "fluctuations": {
+    "text": "Fluctuations",
+    "val": True
+  },
+  "zetaFraction": {
+    "text": "Fraction",
+    "val": False
+  },
+  "interactionRule": {
+    "text": "Interaction rule",
+    "val": "law"
+  },
+  "pdfPopUp": {
+    "text": "Open PDF",
+    "val": False
+  },
+  "TikZConversion": {
+    "text": "TikZ Conversion",
+    "val": False
+  },
+  "snapshots": {
+    "text": "Ns",
+    "val": 100
+  },
+  "smoothingFactor": {
+    "text": "Sf",
+    "val": 10
+  },
+  "parametricStudy": {
+    "text": "Parametric study",
+    "val": False
+  },
+  "studiedParameter": {
+    "text": "Studied parameter",
+    "val": "study"
+  },
+  "startValuePrmStudy": {
+    "text": "Start",
+    "val": 1.0
+  },
+  "endValuePrmStudy": {
+    "text": "End",
+    "val": 1.0
+  },
+  "numberPrmStudy": {
+    "text": "Nv",
+    "val": 1
+  }
 }
 
 regionList = [
-    'Piemonte',
-    "Valle d'Aosta",
-    'Lombardia',
-    'Trentino-Alto Adige',
-    'Veneto',
-    'Friuli-Venezia Giulia',
-    'Liguria',
-    'Emilia-Romagna',
-    'Toscana',
-    'Umbria',
-    'Marche',
-    'Lazio',
-    'Abruzzo',
-    'Molise',
-    'Campania',
-    'Puglia',
-    'Basilicata',
-    'Calabria',
-    'Sicilia',
-    'Sardegna',
-    'Italia'
+  'Piemonte',
+  "Valle d'Aosta",
+  'Lombardia',
+  'Trentino-Alto Adige',
+  'Veneto',
+  'Friuli-Venezia Giulia',
+  'Liguria',
+  'Emilia-Romagna',
+  'Toscana',
+  'Umbria',
+  'Marche',
+  'Lazio',
+  'Abruzzo',
+  'Molise',
+  'Campania',
+  'Puglia',
+  'Basilicata',
+  'Calabria',
+  'Sicilia',
+  'Sardegna',
+  'Italia'
 ]
 
 intRuleList = [
-    'λ(rs^α)/(1+rs^α)',         # 0
-    'λ(rsk/α)/(1+rsk/α)',       # 1
-    'λ(rsk^α)/(1+rsk^α)',       # 2
-    'λ[rsk/(1+rsk)]^α',         # 3
+  'λ(rs^α)/(1+rs^α)',     # 0
+  'λ(rsk/α)/(1+rsk/α)',    # 1
+  'λ(rsk^α)/(1+rsk^α)',    # 2
+  'λ[rsk/(1+rsk)]^α',     # 3
 ]
 
 caseStudies = {
-    "selected": "Default",
-    "list": {
-        "Default": {
-            "attractivity": .18,
-            "convincibility": .44,
-            "deviation": 0.05,
-            "region": 20,
-            "zetaValue": 0.01,
-            "timestep": 0.01,
-            "timesteps": int(3e7),
-            "iterations": 10,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": True,
-            "fluctuations": False,
-            "zetaFraction": False,
-            "interactionRule": 2,
-            "pdfPopUp": False,
-            "TikZConversion": True,
-            "snapshots": 1000,
-            "smoothingFactor": 50,
-            "studiedParameter": 1,
-            "startValuePrmStudy": .3,
-            "endValuePrmStudy": .6,
-            "numberPrmStudy": 5,
-            "parametricStudy": False 
-        },
-        "λ(rsk/α)/(1+rsk/α)": {
-            "attractivity": 0.05,
-            "deviation": 0.05,
-            "region": 19,
-            "zetaValue": 0.1,
-            "timestep": 0.01,
-            "timesteps": int(5e5),
-            "iterations": 15,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": False,
-            "fluctuations": True,
-            "zetaFraction": False,
-            "interactionRule": 1,
-            "pdfPopUp": False,
-            "TikZConversion": False,
-            "snapshots": 100,
-            "smoothingFactor": 10,
-            "studiedParameter": 0,
-            "startValuePrmStudy": 1.0,
-            "endValuePrmStudy": 1.0,
-            "numberPrmStudy": 1,
-            "parametricStudy": False
-        },
-        "(1-ζ)efl_k/α+ζefs_k": {
-            "attractivity": 0.05,
-            "deviation": 0.05,
-            "region": 19,
-            "zetaValue": 0.1,
-            "timestep": 0.01,
-            "timesteps": int(1e7),
-            "iterations": 15,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": False,
-            "fluctuations": True,
-            "zetaFraction": True,
-            "interactionRule": 1,
-            "pdfPopUp": False,
-            "TikZConversion": False,
-            "snapshots": 100,
-            "smoothingFactor": 10,
-            "studiedParameter": 0,
-            "startValuePrmStudy": 0.01,
-            "endValuePrmStudy": 0.1,
-            "numberPrmStudy": 5,
-            "parametricStudy": True
-        },
-        "λ(rsk^α)/(1+rsk^α)": {
-            "attractivity": 0.1,
-            "convincibility": 0.5,
-            "deviation": 0.8,
-            "region": 19,
-            "zetaValue": 0.1,
-            "timestep": 0.01,
-            "timesteps": int(4e5),
-            "iterations": 100,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": True,
-            "fluctuations": True,
-            "zetaFraction": False,
-            "interactionRule": 2,
-            "pdfPopUp": False,
-            "TikZConversion": False,
-            "snapshots": 1000,
-            "smoothingFactor": 50,
-            "studiedParameter": 1,
-            "startValuePrmStudy": 0.1,
-            "endValuePrmStudy": 1,
-            "numberPrmStudy": 10,
-            "parametricStudy": False
-        },
-        "λ[rsk/(1+rsk)]^α": {
-            "attractivity": 0.05,
-            "convincibility": 0.3,
-            "deviation": 0.05,
-            "region": 19,
-            "zetaValue": 0.1,
-            "timestep": 0.01,
-            "timesteps": int(1e7),
-            "iterations": 15,
-            "progressBar": False,
-            "extraction": False,
-            "analysis": False,
-            "edgeWeights": False,
-            "fluctuations": True,
-            "zetaFraction": False,
-            "interactionRule": 3,
-            "pdfPopUp": False,
-            "TikZConversion": False,
-            "snapshots": 100,
-            "smoothingFactor": 10,
-            "studiedParameter": 1,
-            "startValuePrmStudy": 0.3,
-            "endValuePrmStudy": 1,
-            "numberPrmStudy": 3,
-            "parametricStudy": False
-        }
+  "selected": "Default",
+  "list": {
+    "Default": {
+      "attractivity": .18,
+      "convincibility": .44,
+      "deviation": 0.05,
+      "region": 20,
+      "zetaValue": 0.01,
+      "timestep": 0.01,
+      "timesteps": int(3e7),
+      "iterations": 10,
+      "progressBar": False,
+      "extraction": False,
+      "analysis": False,
+      "edgeWeights": True,
+      "fluctuations": False,
+      "zetaFraction": False,
+      "interactionRule": 2,
+      "pdfPopUp": False,
+      "TikZConversion": True,
+      "snapshots": 1000,
+      "smoothingFactor": 50,
+      "studiedParameter": 1,
+      "startValuePrmStudy": .3,
+      "endValuePrmStudy": .6,
+      "numberPrmStudy": 5,
+      "parametricStudy": False 
+    },
+    "λ(rsk/α)/(1+rsk/α)": {
+      "attractivity": 0.05,
+      "deviation": 0.05,
+      "region": 19,
+      "zetaValue": 0.1,
+      "timestep": 0.01,
+      "timesteps": int(5e5),
+      "iterations": 15,
+      "progressBar": False,
+      "extraction": False,
+      "analysis": False,
+      "edgeWeights": False,
+      "fluctuations": True,
+      "zetaFraction": False,
+      "interactionRule": 1,
+      "pdfPopUp": False,
+      "TikZConversion": False,
+      "snapshots": 100,
+      "smoothingFactor": 10,
+      "studiedParameter": 0,
+      "startValuePrmStudy": 1.0,
+      "endValuePrmStudy": 1.0,
+      "numberPrmStudy": 1,
+      "parametricStudy": False
+    },
+    "(1-ζ)efl_k/α+ζefs_k": {
+      "attractivity": 0.05,
+      "deviation": 0.05,
+      "region": 19,
+      "zetaValue": 0.1,
+      "timestep": 0.01,
+      "timesteps": int(1e7),
+      "iterations": 15,
+      "progressBar": False,
+      "extraction": False,
+      "analysis": False,
+      "edgeWeights": False,
+      "fluctuations": True,
+      "zetaFraction": True,
+      "interactionRule": 1,
+      "pdfPopUp": False,
+      "TikZConversion": False,
+      "snapshots": 100,
+      "smoothingFactor": 10,
+      "studiedParameter": 0,
+      "startValuePrmStudy": 0.01,
+      "endValuePrmStudy": 0.1,
+      "numberPrmStudy": 5,
+      "parametricStudy": True
+    },
+    "λ(rsk^α)/(1+rsk^α)": {
+      "attractivity": 0.1,
+      "convincibility": 0.5,
+      "deviation": 0.8,
+      "region": 19,
+      "zetaValue": 0.1,
+      "timestep": 0.01,
+      "timesteps": int(4e5),
+      "iterations": 100,
+      "progressBar": False,
+      "extraction": False,
+      "analysis": False,
+      "edgeWeights": True,
+      "fluctuations": True,
+      "zetaFraction": False,
+      "interactionRule": 2,
+      "pdfPopUp": False,
+      "TikZConversion": False,
+      "snapshots": 1000,
+      "smoothingFactor": 50,
+      "studiedParameter": 1,
+      "startValuePrmStudy": 0.1,
+      "endValuePrmStudy": 1,
+      "numberPrmStudy": 10,
+      "parametricStudy": False
+    },
+    "λ[rsk/(1+rsk)]^α": {
+      "attractivity": 0.05,
+      "convincibility": 0.3,
+      "deviation": 0.05,
+      "region": 19,
+      "zetaValue": 0.1,
+      "timestep": 0.01,
+      "timesteps": int(1e7),
+      "iterations": 15,
+      "progressBar": False,
+      "extraction": False,
+      "analysis": False,
+      "edgeWeights": False,
+      "fluctuations": True,
+      "zetaFraction": False,
+      "interactionRule": 3,
+      "pdfPopUp": False,
+      "TikZConversion": False,
+      "snapshots": 100,
+      "smoothingFactor": 10,
+      "studiedParameter": 1,
+      "startValuePrmStudy": 0.3,
+      "endValuePrmStudy": 1,
+      "numberPrmStudy": 3,
+      "parametricStudy": False
     }
+  }
 }
 
 prmStudyList = [
-    parameters['attractivity']['text'],
-    parameters['convincibility']['text'],
-    parameters['zetaValue']['text']
+  parameters['attractivity']['text'],
+  parameters['convincibility']['text'],
+  parameters['zetaValue']['text']
 ]
 
 regPopDict = { # Italian region sizes in 1991
-    'Piemonte':int(4302565),
-    "Valle d'Aosta":int(115938),
-    'Lombardia':int(8856074),
-    'Trentino-Alto Adige':int(890360),
-    'Veneto':int(4380797),
-    'Friuli-Venezia Giulia':int(1197666),
-    'Liguria':int(1676282),
-    'Emilia-Romagna':int(3909512),
-    'Toscana':int(3529946),
-    'Umbria':int(811831),
-    'Marche':int(1429205),
-    'Lazio':int(5140371),
-    'Abruzzo':int(1249054),
-    'Molise':int(330900),
-    'Campania':int(5630280),
-    'Puglia':int(4031885),
-    'Basilicata':int(610528),
-    'Calabria':int(2070203),
-    'Sicilia':int(4966386),
-    'Sardegna':int(1648248),
-    'Italia':int(56778031)
+  'Piemonte':int(4302565),
+  "Valle d'Aosta":int(115938),
+  'Lombardia':int(8856074),
+  'Trentino-Alto Adige':int(890360),
+  'Veneto':int(4380797),
+  'Friuli-Venezia Giulia':int(1197666),
+  'Liguria':int(1676282),
+  'Emilia-Romagna':int(3909512),
+  'Toscana':int(3529946),
+  'Umbria':int(811831),
+  'Marche':int(1429205),
+  'Lazio':int(5140371),
+  'Abruzzo':int(1249054),
+  'Molise':int(330900),
+  'Campania':int(5630280),
+  'Puglia':int(4031885),
+  'Basilicata':int(610528),
+  'Calabria':int(2070203),
+  'Sicilia':int(4966386),
+  'Sardegna':int(1648248),
+  'Italia':int(56778031)
 } # See Table 6.1 on p. 488 of «ISTAT Popolazione e abitazioni 1991 {04-12-2025}.pdf»
 
 workersShMTemplate = {
-    'handles':[],
-    'parameters':{
-        'Mdt': None,
-        'wOdt': None,
-        'wI': None,
-        'di': None,
-        'idi': None,
-        'ns': None
-    },
-    'gui':{
-        'progress': np.int64,
-        'elapsed': np.float64,
-        'done': np.int8
-    }
+  'handles':[],
+  'parameters':{
+    'Mdt': None,
+    'wOdt': None,
+    'wI': None,
+    'di': None,
+    'idi': None,
+    'ns': None
+  },
+  'gui':{
+    'progress': np.int64,
+    'elapsed': np.float64,
+    'done': np.int8
+  }
 }
 
 
@@ -344,27 +344,27 @@ workersShMTemplate = {
 
 @dataclass(eq=False)
 class Parameter:
-    text: Any = None
-    val: Any = None
-    var: Any = None
-    lbl: Any = None
-    wid: Any = None
-    frame: Any = None
-    list: Any = None
-    cbid: Any = None
+  text: Any = None
+  val: Any = None
+  var: Any = None
+  lbl: Any = None
+  wid: Any = None
+  frame: Any = None
+  list: Any = None
+  cbid: Any = None
 
 class Parameters():
-    def __init__(self,**kwargs):
-        for text,value in kwargs.items():
-            setattr(self,text,value)
+  def __init__(self,**kwargs):
+    for text,value in kwargs.items():
+      setattr(self,text,value)
 
 class ComboBoxList():
-    def __init__(self,attribute,list):
-        attribute.list = list
-        self.list = list
-        self.code = {
-            r:i for i,r in enumerate(list)
-        }
+  def __init__(self,attribute,list):
+    attribute.list = list
+    self.list = list
+    self.code = {
+      r:i for i,r in enumerate(list)
+    }
 
 def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
 
@@ -373,260 +373,260 @@ def CopyWorkerShMTemplate(): return deepcopy(workersShMTemplate)
 
 #region Alternative implementation to store all the module attributes but inside a «.json» file; it was discarded, even though it's quite neat, to justify the existance of «libParameters.py», which without those attributes would only contain three very short classes
 """ File structure of «paramters.json»
-    {
-        "parameters":{
-            "population": {
-                "text":"S",
-                "val":1
-            },
-            "attractivity": {
-                "text":"λ",
-                "val":1.0
-            },
-            "convincibility": {
-                "text":"α",
-                "val":1.0
-            },
-            "deviation": {
-                "text":"σ",
-                "val":1.0
-            },
-            "region": {
-                "text":"Region selected",
-                "val":"region"
-            },
-            "zetaValue": {
-                "text":"ζ",
-                "val":1.0
-            },
-            "timestep": {
-                "text":"Δt",
-                "val":1.0
-            },
-            "timesteps": {
-                "text":"Nt",
-                "val":1
-            },
-            "iterations": {
-                "text":"Ni",
-                "val":1
-            },
-            "progressBar": {
-                "text":"Progress Bar",
-                "val":true
-            },
-            "extraction": {
-                "text":"Extract data",
-                "val":false
-            },
-            "analysis": {
-                "text":"Network analysis",
-                "val":false
-            },
-            "edgeWeights": {
-                "text":"Edge weights",
-                "val":false
-            },
-            "interactionRule": {
-                "text":"Interacting law",
-                "val":"law"
-            },
-            "pdfPopUp": {
-                "text":"Open PDF",
-                "val":false
-            },
-            "TikZConversion": {
-                "text":"LaTeX Conversion",
-                "val":false
-            },
-            "snapshots": {
-                "text":"Ns",
-                "val":100
-            },
-            "smoothingFactor": {
-                "text":"Sf",
-                "val":10
-            },
-            "parametricStudy": {
-                "text":"Parametric study",
-                "val":false
-            },
-            "studiedParameter": {
-                "text":"Studied parameter",
-                "val":"study"
-            },
-            "startValuePrmStudy": {
-                "text":"Start",
-                "val":1.0
-            },
-            "endValuePrmStudy": {
-                "text":"End",
-                "val":1.0
-            },
-            "numberPrmStudy": {
-                "text":"Nv",
-                "val":1
-            }
+  {
+    "parameters":{
+      "population": {
+        "text":"S",
+        "val":1
+      },
+      "attractivity": {
+        "text":"λ",
+        "val":1.0
+      },
+      "convincibility": {
+        "text":"α",
+        "val":1.0
+      },
+      "deviation": {
+        "text":"σ",
+        "val":1.0
+      },
+      "region": {
+        "text":"Region selected",
+        "val":"region"
+      },
+      "zetaValue": {
+        "text":"ζ",
+        "val":1.0
+      },
+      "timestep": {
+        "text":"Δt",
+        "val":1.0
+      },
+      "timesteps": {
+        "text":"Nt",
+        "val":1
+      },
+      "iterations": {
+        "text":"Ni",
+        "val":1
+      },
+      "progressBar": {
+        "text":"Progress Bar",
+        "val":true
+      },
+      "extraction": {
+        "text":"Extract data",
+        "val":false
+      },
+      "analysis": {
+        "text":"Network analysis",
+        "val":false
+      },
+      "edgeWeights": {
+        "text":"Edge weights",
+        "val":false
+      },
+      "interactionRule": {
+        "text":"Interacting law",
+        "val":"law"
+      },
+      "pdfPopUp": {
+        "text":"Open PDF",
+        "val":false
+      },
+      "TikZConversion": {
+        "text":"LaTeX Conversion",
+        "val":false
+      },
+      "snapshots": {
+        "text":"Ns",
+        "val":100
+      },
+      "smoothingFactor": {
+        "text":"Sf",
+        "val":10
+      },
+      "parametricStudy": {
+        "text":"Parametric study",
+        "val":false
+      },
+      "studiedParameter": {
+        "text":"Studied parameter",
+        "val":"study"
+      },
+      "startValuePrmStudy": {
+        "text":"Start",
+        "val":1.0
+      },
+      "endValuePrmStudy": {
+        "text":"End",
+        "val":1.0
+      },
+      "numberPrmStudy": {
+        "text":"Nv",
+        "val":1
+      }
+    },
+    "caseStudies": {
+      "selected": "Default",
+      "list":{
+        "Default": {
+          "attractivity": 0.05,
+          "convincibility": 0.5,
+          "deviation": 0.05,
+          "region": 19,
+          "zetaValue": 0.1,
+          "timestep": 0.01,
+          "timesteps": 100000,
+          "iterations": 3,
+          "progressBar": false,
+          "extraction": false,
+          "analysis": false,
+          "edgeWeights": false,
+          "interactionRule": 3,
+          "pdfPopUp": false,
+          "TikZConversion": false,
+          "studiedParameter": 1,
+          "snapshots": 100,
+          "smoothingFactor": 10,
+          "parametricStudy": false,
+          "startValuePrmStudy": 0.1,
+          "endValuePrmStudy": 1.0,
+          "numberPrmStudy": 3
         },
-        "caseStudies": {
-            "selected": "Default",
-            "list":{
-                "Default": {
-                    "attractivity": 0.05,
-                    "convincibility": 0.5,
-                    "deviation": 0.05,
-                    "region": 19,
-                    "zetaValue": 0.1,
-                    "timestep": 0.01,
-                    "timesteps": 100000,
-                    "iterations": 3,
-                    "progressBar": false,
-                    "extraction": false,
-                    "analysis": false,
-                    "edgeWeights": false,
-                    "interactionRule": 3,
-                    "pdfPopUp": false,
-                    "TikZConversion": false,
-                    "studiedParameter": 1,
-                    "snapshots": 100,
-                    "smoothingFactor": 10,
-                    "parametricStudy": false,
-                    "startValuePrmStudy": 0.1,
-                    "endValuePrmStudy": 1.0,
-                    "numberPrmStudy": 3
-                },
-                "λ(rsk/α)/(1+rsk/α)": {
-                    "attractivity": 0.05,
-                    "deviation": 0.05,
-                    "region": 19,
-                    "timestep": 0.01,
-                    "timesteps": 500000,
-                    "iterations": 15,
-                    "progressBar": false,
-                    "extraction": false,
-                    "analysis": false,
-                    "edgeWeights": false,
-                    "interactionRule": 1,
-                    "pdfPopUp": false,
-                    "TikZConversion": false,
-                    "snapshots": 100,
-                    "smoothingFactor": 10,
-                    "studiedParameter": 0,
-                    "parametricStudy": false,
-                    "startValuePrmStudy": 1.0,
-                    "endValuePrmStudy": 1.0,
-                    "numberPrmStudy": 1
-                },
-                "(1-ζ)efl_k/α+ζefs_k/": {
-                    "attractivity": 0.05,
-                    "deviation": 0.05,
-                    "region": 19,
-                    "timestep": 0.01,
-                    "timesteps": 10000000,
-                    "iterations": 15,
-                    "progressBar": false,
-                    "extraction": false,
-                    "analysis": false,
-                    "edgeWeights": false,
-                    "interactionRule": 2,
-                    "pdfPopUp": false,
-                    "TikZConversion": false,
-                    "studiedParameter": 0,
-                    "snapshots": 100,
-                    "smoothingFactor": 10,
-                    "parametricStudy": false,
-                    "startValuePrmStudy": 1.0,
-                    "endValuePrmStudy": 1.0,
-                    "numberPrmStudy": 1
-                },
-                "λ(rsk^α)/(1+rsk^α)": {
-                    "attractivity": 0.05,
-                    "convincibility": 0.3,
-                    "deviation": 0.05,
-                    "region": 19,
-                    "zetaValue": 0.1,
-                    "timestep": 0.01,
-                    "timesteps": 10000000,
-                    "iterations": 15,
-                    "progressBar": false,
-                    "extraction": false,
-                    "analysis": false,
-                    "edgeWeights": false,
-                    "interactionRule": 3,
-                    "pdfPopUp": false,
-                    "TikZConversion": false,
-                    "studiedParameter": 0,
-                    "snapshots": 100,
-                    "smoothingFactor": 10,
-                    "parametricStudy": false,
-                    "startValuePrmStudy": 1.0,
-                    "endValuePrmStudy": 1.0,
-                    "numberPrmStudy": 1
-                },
-                "λ[rsk/(1+rsk)]^α": {
-                    "attractivity": 0.05,
-                    "convincibility": 0.3,
-                    "deviation": 0.05,
-                    "region": 19,
-                    "zetaValue": 0.1,
-                    "timestep": 0.01,
-                    "timesteps": 10000000,
-                    "iterations": 15,
-                    "progressBar": false,
-                    "extraction": false,
-                    "analysis": false,
-                    "edgeWeights": false,
-                    "interactionRule": 5,
-                    "pdfPopUp": false,
-                    "TikZConversion": false,
-                    "studiedParameter": 0,
-                    "snapshots": 100,
-                    "smoothingFactor": 10,
-                    "parametricStudy": false,
-                    "startValuePrmStudy": 1.0,
-                    "endValuePrmStudy": 1.0,
-                    "numberPrmStudy": 1
-                }
-            }
+        "λ(rsk/α)/(1+rsk/α)": {
+          "attractivity": 0.05,
+          "deviation": 0.05,
+          "region": 19,
+          "timestep": 0.01,
+          "timesteps": 500000,
+          "iterations": 15,
+          "progressBar": false,
+          "extraction": false,
+          "analysis": false,
+          "edgeWeights": false,
+          "interactionRule": 1,
+          "pdfPopUp": false,
+          "TikZConversion": false,
+          "snapshots": 100,
+          "smoothingFactor": 10,
+          "studiedParameter": 0,
+          "parametricStudy": false,
+          "startValuePrmStudy": 1.0,
+          "endValuePrmStudy": 1.0,
+          "numberPrmStudy": 1
+        },
+        "(1-ζ)efl_k/α+ζefs_k/": {
+          "attractivity": 0.05,
+          "deviation": 0.05,
+          "region": 19,
+          "timestep": 0.01,
+          "timesteps": 10000000,
+          "iterations": 15,
+          "progressBar": false,
+          "extraction": false,
+          "analysis": false,
+          "edgeWeights": false,
+          "interactionRule": 2,
+          "pdfPopUp": false,
+          "TikZConversion": false,
+          "studiedParameter": 0,
+          "snapshots": 100,
+          "smoothingFactor": 10,
+          "parametricStudy": false,
+          "startValuePrmStudy": 1.0,
+          "endValuePrmStudy": 1.0,
+          "numberPrmStudy": 1
+        },
+        "λ(rsk^α)/(1+rsk^α)": {
+          "attractivity": 0.05,
+          "convincibility": 0.3,
+          "deviation": 0.05,
+          "region": 19,
+          "zetaValue": 0.1,
+          "timestep": 0.01,
+          "timesteps": 10000000,
+          "iterations": 15,
+          "progressBar": false,
+          "extraction": false,
+          "analysis": false,
+          "edgeWeights": false,
+          "interactionRule": 3,
+          "pdfPopUp": false,
+          "TikZConversion": false,
+          "studiedParameter": 0,
+          "snapshots": 100,
+          "smoothingFactor": 10,
+          "parametricStudy": false,
+          "startValuePrmStudy": 1.0,
+          "endValuePrmStudy": 1.0,
+          "numberPrmStudy": 1
+        },
+        "λ[rsk/(1+rsk)]^α": {
+          "attractivity": 0.05,
+          "convincibility": 0.3,
+          "deviation": 0.05,
+          "region": 19,
+          "zetaValue": 0.1,
+          "timestep": 0.01,
+          "timesteps": 10000000,
+          "iterations": 15,
+          "progressBar": false,
+          "extraction": false,
+          "analysis": false,
+          "edgeWeights": false,
+          "interactionRule": 5,
+          "pdfPopUp": false,
+          "TikZConversion": false,
+          "studiedParameter": 0,
+          "snapshots": 100,
+          "smoothingFactor": 10,
+          "parametricStudy": false,
+          "startValuePrmStudy": 1.0,
+          "endValuePrmStudy": 1.0,
+          "numberPrmStudy": 1
         }
+      }
     }
+  }
 """
 """ Functions in «libData.py»
-    def SetParameters(cls):
-        caseStudiesPath = mainFolder/'parameters.json'
-        text = caseStudiesPath.read_text(encoding="utf-8")
-        data = json.loads(text)
+  def SetParameters(cls):
+    caseStudiesPath = mainFolder/'parameters.json'
+    text = caseStudiesPath.read_text(encoding="utf-8")
+    data = json.loads(text)
 
-        parameters = data['parameters']
-        for name,kwargs in parameters.items():
-            setattr(cls,name,libP.Parameter(**kwargs))
+    parameters = data['parameters']
+    for name,kwargs in parameters.items():
+      setattr(cls,name,libP.Parameter(**kwargs))
 
-    def LoadCaseStudies(cls):
-        caseStudiesPath = mainFolder/'parameters.json'
-        text = caseStudiesPath.read_text(encoding="utf-8")
-        data = json.loads(text)
+  def LoadCaseStudies(cls):
+    caseStudiesPath = mainFolder/'parameters.json'
+    text = caseStudiesPath.read_text(encoding="utf-8")
+    data = json.loads(text)
 
-        caseStudies = data['caseStudies']['list']
-        selectedCS = data['caseStudies']['selected']
-        listCS = list(caseStudies.keys())
-        dictCS = {}
+    caseStudies = data['caseStudies']['list']
+    selectedCS = data['caseStudies']['selected']
+    listCS = list(caseStudies.keys())
+    dictCS = {}
 
-        for name,study in caseStudies.items():
-            dictCS[name] = {}
+    for name,study in caseStudies.items():
+      dictCS[name] = {}
 
-            for key,val in study.items():
-                prm = getattr(cls,key)
-                dictCS[name][prm] = val
+      for key,val in study.items():
+        prm = getattr(cls,key)
+        dictCS[name][prm] = val
 
-            for (prmName,prmlist) in [
-                ('region','regList'),
-                ('interactionRule','intLawList'),
-                ('studiedParameter','studiedPrmList')
-            ]:
-                prm = getattr(cls,prmName)
-                value = dictCS[name][prm]
-                dictCS[name][prm] = getattr(cls,prmlist).Name[value]
+      for (prmName,prmlist) in [
+        ('region','regList'),
+        ('interactionRule','intLawList'),
+        ('studiedParameter','studiedPrmList')
+      ]:
+        prm = getattr(cls,prmName)
+        value = dictCS[name][prm]
+        dictCS[name][prm] = getattr(cls,prmlist).Name[value]
 
-        return dictCS, selectedCS, listCS
+    return dictCS, selectedCS, listCS
 """
 #endregion Of course, even the functions in «libData.py» have to change as shown

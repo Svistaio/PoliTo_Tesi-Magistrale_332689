@@ -1,9 +1,9 @@
 
 //#region Preambolo
-    #import "Preambolo.typ":*
+  #import "Preambolo.typ":*
 
-    #show:articleTemplate
-    #show:mathEnvTemplate
+  #show:articleTemplate
+  #show:mathEnvTemplate
 //#endregion
 
 //

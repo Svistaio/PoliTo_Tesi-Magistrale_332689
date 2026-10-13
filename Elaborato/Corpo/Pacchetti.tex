@@ -4,24 +4,24 @@
 \usepackage{iftex}
 
 \ifInCompiler\relax\else
-    \usepackage[
-        pass,
-        showframe=\bozza
-    ]{geometry}\fi
+  \usepackage[
+    pass,
+    showframe=\bozza
+  ]{geometry}\fi
 
 \usepackage{amsmath}
 \usepackage{amsthm}
 \ifInCompiler\relax\else
-    % \usepackage{amssymb}
-    \usepackage{bbold}
+  % \usepackage{amssymb}
+  \usepackage{bbold}
 \fi
 
 \ifLuaTeX
-    \usepackage{fontspec}
+  \usepackage{fontspec}
 \else
-    \usepackage[T1]{fontenc}
-    % \usepackage[utf8]{inputenc}
-    \usepackage[utf8]{inputenx}
+  \usepackage[T1]{fontenc}
+  % \usepackage[utf8]{inputenc}
+  \usepackage[utf8]{inputenx}
 \fi
 \usepackage{microtype}
 
@@ -29,8 +29,8 @@
 
 \usepackage{csquotes}
 \usepackage[
-    backend=biber,
-    style=numeric-comp
+  backend=biber,
+  style=numeric-comp
 ]{biblatex}
 \DeclareDelimFormat{finalnamedelim}{\addspace\&\space}
 \addbibresource{../Corpo/Bibliografia.bib}
@@ -39,43 +39,43 @@
 \usepackage[dvipsnames]{xcolor}
 
 \ifInCompiler\relax\else
-    \usepackage[
-        drafting=\bozza,
-        eulerchapternumbers,
-        % subfig,
-        beramono,
-        eulermath,
-        pdfspacing,
-        dottedtoc=true
-    ]{classicthesis}
-    \usepackage{arsclassica}
-    \usepackage{scrhack}
+  \usepackage[
+    drafting=\bozza,
+    eulerchapternumbers,
+    % subfig,
+    beramono,
+    eulermath,
+    pdfspacing,
+    dottedtoc=true
+  ]{classicthesis}
+  \usepackage{arsclassica}
+  \usepackage{scrhack}
 \fi
 \usepackage[strict]{changepage}
 
 \usepackage{tikz}
 \usetikzlibrary{
-    positioning,
-    shapes.geometric,
-    plotmarks,
-    arrows.meta,
-    calc,
-    decorations.pathreplacing,
-    backgrounds,
-    patterns.meta,
-    fpu, % «floating point unit»
-    % external,
+  positioning,
+  shapes.geometric,
+  plotmarks,
+  arrows.meta,
+  calc,
+  decorations.pathreplacing,
+  backgrounds,
+  patterns.meta,
+  fpu, % «floating point unit»
+  % external,
 } 
 \usepackage{shellesc}
-\immediate\write18{if not exist "../../Figure/.fnl/TikZpdf" mkdir "../../Figure/.fnl/TikZpdf"}
+\immediate\write18{if not exist "../../Figure/.fnl/Elaborato/TikZpdf" mkdir "../../Figure/.fnl/Elaborato/TikZpdf"}
 
 \usepackage{etoolbox}
 \newbool{forcetikzrecompile}
 
-% \tikzexternalize[prefix={../../Figure/.fnl/TikZpdf/}]
+% \tikzexternalize[prefix={../../Figure/.fnl/Elaborato/TikZpdf/}]
 % \tikzset{
-%     % external/force remake,
-%     external/system call={pdflatex \tikzexternalcheckshellescape -interaction=batchmode -jobname "\image" "\texsource"}
+%   % external/force remake,
+%   external/system call={pdflatex \tikzexternalcheckshellescape -interaction=batchmode -jobname "\image" "\texsource"}
 % }
 % Il comando «\cref{}» non funziona all'interno di «\begin{tikzpicture}» se si attiva «\tikzexternalize»
 % https://tex.stackexchange.com/questions/245411/using-ref-in-tikzpicture-node-while-using-externalize
@@ -83,9 +83,9 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
 \usepgfplotslibrary{
-    patchplots,
-    groupplots,
-    colorbrewer
+  patchplots,
+  groupplots,
+  colorbrewer
 }
 \pgfdeclarelayer{background}
 \pgfdeclarelayer{foreground}
@@ -97,61 +97,61 @@
 \usepackage{zref-savepos}
 \newcounter{figposcount} % Crea un contatore unico per tracciare la posizione
 \usepackage{xstring}
-    
+  
 \usepackage{accents}
 
 \usepackage{newunicodechar}
 
 \usepackage{
-    graphicx,
-    caption,
-    subcaption,
-    float,
-    stfloats
+  graphicx,
+  caption,
+  subcaption,
+  float,
+  stfloats
 }
 
 \usepackage[left]{lineno}
 
 \usepackage[
-    italiano,
-    italianokw,
-    ruled,
-    vlined,
-    linesnumbered
+  italiano,
+  italianokw,
+  ruled,
+  vlined,
+  linesnumbered
 ]{algorithm2e}
 % \usepackage{listings}
 \usepackage[
-    section,
-    newfloat
+  section,
+  newfloat
 ]{minted} % Va caricato dopo «lineno»
 
 \usepackage{enumitem}
 \usepackage{ragged2e} 
 
 \ifInCompiler
-    \usepackage{xr-hyper}
-    \usepackage{hyperref} % È già caricato da «classicthesis»
+  \usepackage{xr-hyper}
+  \usepackage{hyperref} % È già caricato da «classicthesis»
 \else
-    \PassOptionsToPackage{hyphens}{url}
-    \hypersetup{
-        colorlinks=true,
-        linktocpage=true,
-        breaklinks=true,
-        urlcolor=CTurl,
-        linkcolor=CTlink,
-        citecolor=CTcitation,
-        % destlabel=true % Migliora la precisione dei nessi ipertestuali
-    } % Si v. la linea 732 di «classicthesis.sty»
-    % \hypersetup{
-    %     colorlinks=false,
-    %     linkbordercolor=CTlink,
-    %     citebordercolor=CTcitation,
-    %     urlbordercolor=CTurl
-    %     linktocpage=true,
-    %     breaklinks=true,
-    %     pdfborder={1 1 1},
-    % }
-    % \usepackage[all]{hypcap}
+  \PassOptionsToPackage{hyphens}{url}
+  \hypersetup{
+    colorlinks=true,
+    linktocpage=true,
+    breaklinks=true,
+    urlcolor=CTurl,
+    linkcolor=CTlink,
+    citecolor=CTcitation,
+    % destlabel=true % Migliora la precisione dei nessi ipertestuali
+  } % Si v. la linea 732 di «classicthesis.sty»
+  % \hypersetup{
+  %   colorlinks=false,
+  %   linkbordercolor=CTlink,
+  %   citebordercolor=CTcitation,
+  %   urlbordercolor=CTurl
+  %   linktocpage=true,
+  %   breaklinks=true,
+  %   pdfborder={1 1 1},
+  % }
+  % \usepackage[all]{hypcap}
 \fi
 \usepackage{xurl}
 
@@ -159,14 +159,14 @@
 
 \usepackage{siunitx}
 \sisetup{
-    exponent-mode=threshold,
-    exponent-thresholds=-3:3,
-    round-mode=places,% figures
-    round-precision=3,
-    round-pad=false,
-    separate-uncertainty=true,
-    print-unity-mantissa=false,
-    tight-spacing=true,
+  exponent-mode=threshold,
+  exponent-thresholds=-3:3,
+  round-mode=places,% figures
+  round-precision=3,
+  round-pad=false,
+  separate-uncertainty=true,
+  print-unity-mantissa=false,
+  tight-spacing=true,
 }
 
 \usepackage[normalem]{ulem}

@@ -1,9 +1,9 @@
 
 //#region Preambolo
-    #import "Preambolo.typ":* // Include i pacchetti
-    // #include "Preambolo.typ" // Non include i pacchetti
-    #show:slideTemplate
-    #show:mathEnvTemplate
+  #import "Preambolo.typ":* // Include i pacchetti
+  // #include "Preambolo.typ" // Non include i pacchetti
+  #show:slideTemplate
+  #show:mathEnvTemplate
 //#endregion
 
 ///
@@ -61,7 +61,7 @@
         #place(
           center + horizon,
           image(
-            "../Figure/.fnl/Frontespizio/LogoPoliTO.jpg",
+            "../Figure/.fnl/Elaborato/Frontespizio/LogoPoliTO.jpg",
             width:7cm,
             height:auto,
           ),
@@ -115,14 +115,14 @@
         ]
 
         #slide(
-          height:36cm,
+          height:29cm,
           // margin:(top:0em,bottom:0em),
           // alignment:center+horizon,
         )[
-          #let img-path = "../Figure/.fnl/TikZpdf/figEsempioFunzioneLognormale.pdf"
+          #let img-path = "../Figure/.fnl/Elaborato/TikZpdf/figEsempioFunzioneLognormale.pdf"
           #includefigure((
-              (path:img-path,height:14cm,dy:-0cm),
-              (path:img-path,height:16.3cm,dy:-28.5cm),
+              (path:img-path,height:11cm,dy:-0cm),
+              (path:img-path,height:13cm,dy:-21.93cm),
             ),
             width:105%
           )
@@ -199,7 +199,7 @@
             ]
           ]
 
-          #let img-path = "../Figure/.fnl/TikZpdf/figEsempioGrafoInDiretto.pdf"
+          #let img-path = "../Figure/.fnl/Elaborato/TikZpdf/figEsempioGrafoInDiretto.pdf"
           #let blk-width = 25cm
           #align(center+horizon)[
             #block(width:130%)[
@@ -465,7 +465,7 @@
           margin:(top:0em,bottom:0em),
           // alignment:center+horizon,
         )[
-          #let img-path = "../Figure/.fnl/TikZpdf/figRappresentazioneGraficaApprossimazione.pdf"
+          #let img-path = "../Figure/.fnl/Elaborato/TikZpdf/figRappresentazioneGraficaApprossimazione.pdf"
           #includefigure((path:img-path,height:auto,dy:-0cm))
         ]
       ]
@@ -519,7 +519,7 @@
       ]
 
       #subsection(subtitle:[Risultati #BracketRef("RE","S")])[
-        #let img-path = "../Figure/.fnl/TikZpdf/figConfigurazioneRiferimentoInstabileRET.pdf"
+        #let img-path = "../Figure/.fnl/Elaborato/TikZpdf/figConfigurazioneRiferimentoInstabileRET.pdf"
 
         #slide[
           #grid(
@@ -576,7 +576,7 @@
       ]
 
       #subsection(subtitle:[Risultati #BracketRef("RE","SK")])[
-        #let img-path = "../Figure/.fnl/TikZpdf/figConfigurazioneRiferimentoRETG.pdf"
+        #let img-path = "../Figure/.fnl/Elaborato/TikZpdf/figConfigurazioneRiferimentoRETG.pdf"
 
         #slide[
           #grid(
@@ -823,7 +823,7 @@
       ]
 
       #subsection(subtitle:[Risultati #BracketRef("RE","SW")])[
-        #let img-path = "../Figure/.fnl/TikZpdf/figConfigurazioneRiferimentoRETF.pdf"
+        #let img-path = "../Figure/.fnl/Elaborato/TikZpdf/figConfigurazioneRiferimentoRETF.pdf"
 
         #slide[
           #grid(
@@ -833,7 +833,7 @@
             [
               Essa ha forma:
               
-              $ E_(S K)(s,i,s_*,i_*) equiv lambda frac([(s_*\/s)(w_(i_*)\/w_i)]^alpha,1 + [(s_*\/s)(k_(i_*)\/k_i)]^alpha) $
+              $ E_(S K)(s,i,s_*,i_*) equiv lambda frac([(s_*\/s)(w_(i_*)\/w_i)]^alpha,1 + [(s_*\/s)(w_(i_*)\/w_i)]^alpha) $
               
               con $lambda in (0,1)$ e $alpha in RR^+$. //La logica è che il tasso d'emigrazione verso la città ricevente è tanto maggiore quanto piú grande è la sua popolazione relativa, data dal rapporto $s_*\/s$, rispetto alla città interagente.
             ],
@@ -901,7 +901,7 @@
 
           #v(1fr)
 
-          #let img-path = "../Figure/.fnl/TikZpdf/figFunzioneHillGradoa.pdf"
+          #let img-path = "../Figure/.fnl/Elaborato/TikZpdf/figFunzioneHillGradoa.pdf"
           #includefigure((path:img-path,height:auto,dy:-0cm),width:80%)
 
           #v(.5fr)
@@ -988,7 +988,7 @@
           counting:false
         )[
           Sí, per due vincoli: uno di natura fisica e l'altro sociale.
-          #let img-path = "../Figure/.fnl/TikZpdf/figForzaVsGrado20.pdf"
+          #let img-path = "../Figure/.fnl/Elaborato/TikZpdf/figForzaVsGrado20.pdf"
           #includefigure((path:img-path),width:100%)
         ]
       ]

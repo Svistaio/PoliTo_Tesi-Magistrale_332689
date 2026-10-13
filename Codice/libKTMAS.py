@@ -25,1391 +25,1391 @@ import libFigures as libF
 ### Main classes ###
 
 class KineticSimulation():
-    def __init__(self,clsPrm,clsReg):
-        self.il = int(clsPrm.interactionRule)
+  def __init__(self,clsPrm,clsReg):
+    self.il = int(clsPrm.interactionRule)
 
-        self.l = float(clsPrm.attractivity)
-        self.a = float(clsPrm.convincibility)
-        self.s = clsPrm.fluctuations*float(clsPrm.deviation)
-        self.z = clsPrm.zetaFraction*float(clsPrm.zetaValue)
+    self.l = float(clsPrm.attractivity)
+    self.a = float(clsPrm.convincibility)
+    self.s = clsPrm.fluctuations*float(clsPrm.deviation)
+    self.z = clsPrm.zetaFraction*float(clsPrm.zetaValue)
 
-        self.Ni = int(clsPrm.iterations)
-        Nc = int(clsReg.Nc); self.Nc = Nc
-        self.li2Name = clsReg.li2Name
+    self.Ni = int(clsPrm.iterations)
+    Nc = int(clsReg.Nc); self.Nc = Nc
+    self.li2Name = clsReg.li2Name
 
-        self.progressBar = clsPrm.progressBar
-        dt = float(clsPrm.timestep); self.dt = dt
-        Nt = int(clsPrm.timesteps); self.Nt = Nt
+    self.progressBar = clsPrm.progressBar
+    dt = float(clsPrm.timestep); self.dt = dt
+    Nt = int(clsPrm.timesteps); self.Nt = Nt
 
-        Ns = int(clsPrm.snapshots); self.Ns = Ns
-        ns = np.array(
-            [i*Nt/Ns for i in range(Ns+1)],
-            dtype=np.int64
-        ); self.ns = ns
+    Ns = int(clsPrm.snapshots); self.Ns = Ns
+    ns = np.array(
+      [i*Nt/Ns for i in range(Ns+1)],
+      dtype=np.int64
+    ); self.ns = ns
 
-        Nw = clsPrm.smoothingFactor; self.Nw = Nw
-        ks = int(Ns/Nw); self.ks = ks # Kernel size
-        self.times = ns[::ks]*dt
+    Nw = clsPrm.smoothingFactor; self.Nw = Nw
+    ks = int(Ns/Nw); self.ks = ks # Kernel size
+    self.times = ns[::ks]*dt
 
-        self.R = int(clsPrm.region)
-        self.P = int(clsPrm.population)
-        self.p0 = float(self.P/self.Nc)
-        self.realSizeDistr = clsReg.sizeDistr
-        self.logRealSizeDistr = np.log10(clsReg.sizeDistr)
+    self.R = int(clsPrm.region)
+    self.P = int(clsPrm.population)
+    self.p0 = float(self.P/self.Nc)
+    self.realSizeDistr = clsReg.sizeDistr
+    self.logRealSizeDistr = np.log10(clsReg.sizeDistr)
 
-        # Exact unitary adjacency matrix
-        M = clsReg.A
-        self.dk = np.sum(M,axis=1,dtype=np.int32)
-        self.Mdt = M*dt
+    # Exact unitary adjacency matrix
+    M = clsReg.A
+    self.dk = np.sum(M,axis=1,dtype=np.int32)
+    self.Mdt = M*dt
 
-        # Approximated adjacency matrix
-        Mn = np.sum(M)
-        self.wOdt = np.sum(M[:,:],axis=1)*dt/Mn
-        self.wI = np.sum(M[:,:],axis=0)
-        # M[:,:,1]  = wO@wI/Mn
-        # In this case wO=wI but it's better to define them rigorously
+    # Approximated adjacency matrix
+    Mn = np.sum(M)
+    self.wOdt = np.sum(M[:,:],axis=1)*dt/Mn
+    self.wI = np.sum(M[:,:],axis=0)
+    # M[:,:,1] = wO@wI/Mn
+    # In this case wO=wI but it's better to define them rigorously
 
-        self.ew = clsPrm.edgeWeights
-        if clsPrm.edgeWeights:
-            self.di = np.sum(clsReg.W/np.max(clsReg.W),axis=1,dtype=np.float64)
-        else:
-            self.di = np.sum(clsReg.A,axis=1,dtype=np.int32)
-        self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
-        # self.D = di@invdi.T
+    self.ew = clsPrm.edgeWeights
+    if clsPrm.edgeWeights:
+      self.di = np.sum(clsReg.W/np.max(clsReg.W),axis=1,dtype=np.float64)
+    else:
+      self.di = np.sum(clsReg.A,axis=1,dtype=np.int32)
+    self.idi = np.array(1.0/self.di,dtype=np.float64) # Inverse degrees
+    # self.D = di@invdi.T
 
-        self.typ = np.array([0,1],dtype=np.int64)
-        self.lblEn = ('Ext.','Apx.','Real')
-        self.lblIt = (
-            ('esatto','appr.','reale'),
-            ('esatta','appr.','reale'),
-            ('Esatto','Appr.','Reale'),
-        )
-        self.clr = ('#0072B2','#D55E00','#000000')
-        # self.clr = ('blue','red')
+    self.typ = np.array([0,1],dtype=np.int64)
+    self.lblEn = ('Ext.','Apx.','Real')
+    self.lblIt = (
+      ('esatto','appr.','reale'),
+      ('esatta','appr.','reale'),
+      ('Esatto','Appr.','Reale'),
+    )
+    self.clr = ('#0072B2','#D55E00','#000000')
+    # self.clr = ('blue','red')
 
-        if clsPrm.parametricStudy:
-            self.figData = None
-            self.Nv = clsPrm.numberPrmStudy
-            self.studiedPrmString = None
-        else:
-            self.figData = libF.FigData(clsPrm,'KS')
-            self.Nv = None
-            self.fw = 8 # Figure width
-            self.fh = 6 # Figure height
-        self.sid = None
+    if clsPrm.parametricStudy:
+      self.figData = None
+      self.Nv = clsPrm.numberPrmStudy
+      self.studiedPrmString = None
+    else:
+      self.figData = libF.FigData(clsPrm,'KS')
+      self.Nv = None
+      self.fw = 8 # Figure width
+      self.fh = 6 # Figure height
+    self.sid = None
 
-    # Simulation
-    def MonteCarloSimulation(self):
-        Ni = self.Ni
-        Nc = self.Nc
-        p0 = self.p0
+  # Simulation
+  def MonteCarloSimulation(self):
+    Ni = self.Ni
+    Nc = self.Nc
+    p0 = self.p0
 
-        gui = self.progressBar
-        Nt = self.Nt
-        Ns = self.Ns
+    gui = self.progressBar
+    Nt = self.Nt
+    Ns = self.Ns
 
-        sid = self.sid
-        Nv = self.Nv
+    sid = self.sid
+    Nv = self.Nv
 
-        l = self.l
-        a = self.a
-        s = self.s
-        z = self.z
-        il = self.il
-        typ = self.typ.size
+    l = self.l
+    a = self.a
+    s = self.s
+    z = self.z
+    il = self.il
+    typ = self.typ.size
 
-        process = range(Ni)
+    process = range(Ni)
 
-        shmPrm = {}
-        shmHandles = {}
+    shmPrm = {}
+    shmHandles = {}
 
-        for key in workersShM['parameters'].keys():
-            spec, shm = BuildShM(getattr(self,key))
-            shmPrm[key] = spec
-            shmHandles[key] = shm
+    for key in workersShM['parameters'].keys():
+      spec, shm = BuildShM(getattr(self,key))
+      shmPrm[key] = spec
+      shmHandles[key] = shm
 
-        ctx = mp.get_context("spawn")
+    ctx = mp.get_context("spawn")
 
-        if gui: 
-            for key,dtype in workersShM['gui'].items():
-                spec, shm = BuildShM(Ni=Ni,dtype=dtype)
-                shmPrm[key] = spec
-                shmHandles[key] = shm
+    if gui: 
+      for key,dtype in workersShM['gui'].items():
+        spec, shm = BuildShM(Ni=Ni,dtype=dtype)
+        shmPrm[key] = spec
+        shmHandles[key] = shm
 
-            # Import of ProgressBarsGUI locally [and not at the top of the module] to avoid freezing the GUI when in a parametric study (Tk must live only in the parent thread but spawn under Windows imports it in each worker [if written at the top of the module] making it prone to errors)
-            from libGUIs import ProgressBarsGUI
-            bar = ProgressBarsGUI(Ni,Nt,sid,Nv,shmPrm,LoadShM)
+      # Import of ProgressBarsGUI locally [and not at the top of the module] to avoid freezing the GUI when in a parametric study (Tk must live only in the parent thread but spawn under Windows imports it in each worker [if written at the top of the module] making it prone to errors)
+      from libGUIs import ProgressBarsGUI
+      bar = ProgressBarsGUI(Ni,Nt,sid,Nv,shmPrm,LoadShM)
 
-            try:
-                with ProcessPoolExecutor(
-                    max_workers=3,
-                    mp_context=ctx,
-                    initializer=InitializeMCSWorker,
-                    initargs=(shmPrm,True)
-                ) as executor:
-                    futures = {}
-                    for p in range(Ni):
-                        futures[p] = executor.submit(
-                            MonteCarloAlgorithm,
-                            p,Nc,Ns,p0,typ,
-                            l,a,s,z,il,gui
-                        )
-                    bar.mainloop()
+      try:
+        with ProcessPoolExecutor(
+          max_workers=3,
+          mp_context=ctx,
+          initializer=InitializeMCSWorker,
+          initargs=(shmPrm,True)
+        ) as executor:
+          futures = {}
+          for p in range(Ni):
+            futures[p] = executor.submit(
+              MonteCarloAlgorithm,
+              p,Nc,Ns,p0,typ,
+              l,a,s,z,il,gui
+            )
+          bar.mainloop()
 
-            finally:
-                data = [None]*Ni
-                for p, fut in futures.items():
-                    data[p] = fut.result()
-                self.data = data
+      finally:
+        data = [None]*Ni
+        for p, fut in futures.items():
+          data[p] = fut.result()
+        self.data = data
 
-                for shm in shmHandles.values():
-                    shm.close(); shm.unlink()
+        for shm in shmHandles.values():
+          shm.close(); shm.unlink()
 
-        else:
-            try:
-                with ProcessPoolExecutor(
-                    max_workers=3,
-                    mp_context=ctx,
-                    initializer=InitializeMCSWorker,
-                    initargs=(shmPrm,)
-                ) as executor:
-                    data = list(
-                        executor.map(
-                            MonteCarloAlgorithm,
-                            process,[Nc]*Ni,[Ns]*Ni,
-                            [p0]*Ni,[typ]*Ni,[l]*Ni,
-                            [a]*Ni,[s]*Ni,[z]*Ni,
-                            [il]*Ni,[gui]*Ni
-                        )
-                    ); self.data = data
-            finally:
-                for shm in shmHandles.values():
-                    shm.close(); shm.unlink()
+    else:
+      try:
+        with ProcessPoolExecutor(
+          max_workers=3,
+          mp_context=ctx,
+          initializer=InitializeMCSWorker,
+          initargs=(shmPrm,)
+        ) as executor:
+          data = list(
+            executor.map(
+              MonteCarloAlgorithm,
+              process,[Nc]*Ni,[Ns]*Ni,
+              [p0]*Ni,[typ]*Ni,[l]*Ni,
+              [a]*Ni,[s]*Ni,[z]*Ni,
+              [il]*Ni,[gui]*Ni
+            )
+          ); self.data = data
+      finally:
+        for shm in shmHandles.values():
+          shm.close(); shm.unlink()
 
-        self.EvaluateSimulationData()
-        WriteSimulationData(
-            self.vrtState,
-            self.snapshots,
-            self.siVrtState,
-            self.typ,
-            self.lblEn,
-            self.li2Name,
-            Ni,
-            self.sid
-        )
+    self.EvaluateSimulationData()
+    WriteSimulationData(
+      self.vrtState,
+      self.snapshots,
+      self.siVrtState,
+      self.typ,
+      self.lblEn,
+      self.li2Name,
+      Ni,
+      self.sid
+    )
 
-    def EvaluateSimulationData(self):
-        Ni = self.Ni
-        data = self.data
-        Nw = self.Nw
-        ks = self.ks
+  def EvaluateSimulationData(self):
+    Ni = self.Ni
+    data = self.data
+    Nw = self.Nw
+    ks = self.ks
 
-        def Convolve(v):
-            Nrw, _, Nty = v.shape # Number of rows, times and types
+    def Convolve(v):
+      Nrw, _, Nty = v.shape # Number of rows, times and types
 
-            filter = np.array([float(1/ks)]*ks)
-            sv = np.zeros((Nrw,Nw+1,Nty),dtype=float) # Smoothed vector
+      filter = np.array([float(1/ks)]*ks)
+      sv = np.zeros((Nrw,Nw+1,Nty),dtype=float) # Smoothed vector
 
-            for r in range(Nrw):
-                for t in range(Nty):
-                    sv[r,0,t] = v[r,0,t].copy()
-                    conv = np.convolve(
-                        v[r,1:,t],
-                        filter,
-                        'valid'
-                    )
-                    sv[r,1:,t] = conv[::ks].copy()
-            
-            # This functions applies the mean every ks unit of the Ns snapshots
-            return sv
+      for r in range(Nrw):
+        for t in range(Nty):
+          sv[r,0,t] = v[r,0,t].copy()
+          conv = np.convolve(
+            v[r,1:,t],
+            filter,
+            'valid'
+          )
+          sv[r,1:,t] = conv[::ks].copy()
+      
+      # This functions applies the mean every ks unit of the Ns snapshots
+      return sv
 
-        self.vrtState = np.array([data[p][0] for p in range(Ni)])
-        self.logVrtState = np.log10(np.array([data[p][0] for p in range(Ni)]))
-        self.snapshots = np.array([data[p][1] for p in range(Ni)])
-        self.avrState = Convolve(np.mean(self.snapshots,axis=1))
+    self.vrtState = np.array([data[p][0] for p in range(Ni)])
+    self.logVrtState = np.log10(np.array([data[p][0] for p in range(Ni)]))
+    self.snapshots = np.array([data[p][1] for p in range(Ni)])
+    self.avrState = Convolve(np.mean(self.snapshots,axis=1))
 
-        self.logNodeSimAvrVrtState = np.mean(self.logVrtState,axis=1)
-        self.logNodeSimMinVrtState = np.min(self.logVrtState,axis=1)
-        self.logNodeSimMaxVrtState = np.max(self.logVrtState,axis=1)
-        self.logNodeSimSumVrtState = np.sum(self.logVrtState,axis=1)
+    self.logNodeSimAvrVrtState = np.mean(self.logVrtState,axis=1)
+    self.logNodeSimMinVrtState = np.min(self.logVrtState,axis=1)
+    self.logNodeSimMaxVrtState = np.max(self.logVrtState,axis=1)
+    self.logNodeSimSumVrtState = np.sum(self.logVrtState,axis=1)
 
-        self.logNodeRealAvrVrtState = np.mean(self.logRealSizeDistr)
-        self.logNodeRealMinVrtState = np.min(self.logRealSizeDistr)
-        self.logNodeRealMaxVrtState = np.max(self.logRealSizeDistr)
-        self.logNodeRealSumVrtState = np.sum(self.logRealSizeDistr)
+    self.logNodeRealAvrVrtState = np.mean(self.logRealSizeDistr)
+    self.logNodeRealMinVrtState = np.min(self.logRealSizeDistr)
+    self.logNodeRealMaxVrtState = np.max(self.logRealSizeDistr)
+    self.logNodeRealSumVrtState = np.sum(self.logRealSizeDistr)
 
-        if Ni>1:
-            self.ta = stats.t.ppf(0.975,df=Ni-1)
+    if Ni>1:
+      self.ta = stats.t.ppf(0.975,df=Ni-1)
 
-            self.itAvrVrtState = np.mean(self.vrtState,axis=0)
-            self.itAvrSnapshots = np.mean(self.snapshots,axis=0)
-        else:
-            self.ta = None
+      self.itAvrVrtState = np.mean(self.vrtState,axis=0)
+      self.itAvrSnapshots = np.mean(self.snapshots,axis=0)
+    else:
+      self.ta = None
 
-            self.itAvrVrtState = self.vrtState[0,:,:]
-            self.itAvrSnapshots = self.snapshots[0,:,:,:]
+      self.itAvrVrtState = self.vrtState[0,:,:]
+      self.itAvrSnapshots = self.snapshots[0,:,:,:]
 
-        self.itAvrConvSnapshots = Convolve(self.itAvrSnapshots)
-        self.siVrtState = np.argsort(self.vrtState,axis=1)
-        self.siAvrState = np.argsort(self.itAvrVrtState,axis=0)
+    self.itAvrConvSnapshots = Convolve(self.itAvrSnapshots)
+    self.siVrtState = np.argsort(self.vrtState,axis=1)
+    self.siAvrState = np.argsort(self.itAvrVrtState,axis=0)
 
-    # Figures
-    def SizeDistrFittingsFig(
-        self,
-        ax=None,
+  # Figures
+  def SizeDistrFittingsFig(
+    self,
+    ax=None,
+    idx=1,
+    figData=None,
+    saveFig=False
+  ):
+    Ni = self.Ni
+    ta = self.ta
+
+    csSv = self.vrtState
+    csRv = self.realSizeDistr.reshape(1,-1)
+
+    logCsSv = self.logVrtState
+    logCsRv = self.logRealSizeDistr.reshape(1,-1)
+
+    logCsSAvr = self.logNodeSimAvrVrtState
+    logCsSMin = self.logNodeSimMinVrtState
+    logCsSMax = self.logNodeSimMaxVrtState
+    logCsSSum = self.logNodeSimSumVrtState
+
+    logCsRAvr = self.logNodeRealAvrVrtState
+    logCsRMin = self.logNodeRealMinVrtState
+    logCsRMax = self.logNodeRealMaxVrtState
+    logCsRSum = self.logNodeRealSumVrtState
+
+    typ = self.typ
+    # lbl = self.lblEn
+    lbl = self.lblIt
+    clr = self.clr
+
+    Nf = 9 # Numbers of figures
+    if figData is None:
+      figData = self.figData
+      fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
+      saveFig = True
+
+    sMaxEA = csSv.max(); sMinEA = csSv.min()
+
+    sMaxER = max(csSv[:,:,0].max(),csRv.max())
+    sMinER = min(csSv[:,:,0].min(),csRv.min())
+
+    sMaxAR = max(csSv[:,:,1].max(),csRv.max())
+    sMinAR = min(csSv[:,:,1].min(),csRv.min())
+
+    def EstimateBinNumber(v):
+      vf = v.ravel()
+      vl = np.log10(vf[vf>0])
+      
+      # edges = np.histogram_bin_edges(vl,bins='fd')
+      edges = np.histogram_bin_edges(vl,bins='doane')
+      # edges = np.histogram_bin_edges(vl,bins='scott')
+      # edges = np.histogram_bin_edges(vl,bins='stone')
+
+      return len(edges)-1
+
+    nBins = np.zeros((3,),dtype=np.int32)
+    for i,v in enumerate([csSv[:,:,0],csSv[:,:,1],csRv]):
+      for j in range(v.shape[0]):
+        nBin = EstimateBinNumber(v[j,:])
+        if nBin > nBins[i]: nBins[i] = nBin
+
+    p = (.5,1.075); dp = (1,.05)
+    axis = 4; xScale='lin';
+    string = 'h' if xScale == 'lin' else 's'
+
+    for t in typ: # t[ype]
+      ### Lognormal fit ###
+
+      # Exact-Approximated plot
+      libF.CreateHistogramPlot(
+        csSv[:,:,t] if xScale == 'log' else logCsSv[:,:,t],
+        np.max(nBins[:2]),
+        getattr(figData,f'fig{idx}'),
+        limits=(
+          (sMinEA,sMaxEA)
+        ) if xScale == 'log' else (
+          (np.log10(sMinEA),np.log10(sMaxEA))
+        ),
+        xScale=xScale,
+        Ni=Ni,
+        ta=ta,
+        # label=f'{lbl[t]} histogram',
+        label=f'Istogramma {lbl[0][t]}',
+        color=clr[t],
+        alpha=(0.35,0.45) if Ni>1 else 0.35,
+        idx=t+1,
+        ax=ax[0]
+      )
+      xiS,m1S,s1S,m2S,s2S = libF.CreateLognormalFitPlot(
+        csSv[:,:,t] if xScale == 'log' else logCsSv[:,:,t],
+        getattr(figData,f'fig{idx}'),
+        limits=(
+          (sMinEA,sMaxEA)
+        ) if xScale == 'log' else (
+          (np.log10(sMinEA),np.log10(sMaxEA))
+        ),
+        xScale=xScale,
+        Ni=Ni,
+        ta=ta,
+        # label=f'{lbl[t]} lognormal fit (ML)',
+        label=fr"Adatt. BLN {lbl[0][t]}",# ($\mathit{{ML}}$)
+        # (
+        #   fr'{lbl[t]} mean value $\langle k\rangle$',
+        #   f'{lbl[t]} lognormal fit (ML)'
+        # ),
+        color=clr[t],#(clr[t],clr[t]),
+        alpha=(1,0.15) if Ni>1 else 1,
+        bimodal=True,
+        idx=t+1,
+        ax=ax[0]
+      )
+
+      # Exact-Real and Approximated-Real plots
+      libF.CreateHistogramPlot(
+        csSv[:,:,t] if xScale == 'log' else logCsSv[:,:,t],
+        max(nBins[t],nBins[2]),
+        getattr(figData,f'fig{idx+t+1}'),
+        limits=(
+          (sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR)
+        ) if xScale == 'log' else (
+          (np.log10(sMinER),np.log10(sMaxER)) if t == 0
+          else (np.log10(sMinAR),np.log10(sMaxAR))
+        ),
+        xScale=xScale,
+        Ni=Ni,
+        ta=ta,
+        # label=f'{lbl[t]} histogram',
+        label=f'Istogramma {lbl[0][t]}',
+        color=clr[t],
+        alpha=(0.35,0.45) if Ni>1 else 0.35,
         idx=1,
-        figData=None,
-        saveFig=False
-    ):
-        Ni = self.Ni
-        ta = self.ta
-
-        csSv = self.vrtState
-        csRv = self.realSizeDistr.reshape(1,-1)
-
-        logCsSv = self.logVrtState
-        logCsRv = self.logRealSizeDistr.reshape(1,-1)
-
-        logCsSAvr = self.logNodeSimAvrVrtState
-        logCsSMin = self.logNodeSimMinVrtState
-        logCsSMax = self.logNodeSimMaxVrtState
-        logCsSSum = self.logNodeSimSumVrtState
-
-        logCsRAvr = self.logNodeRealAvrVrtState
-        logCsRMin = self.logNodeRealMinVrtState
-        logCsRMax = self.logNodeRealMaxVrtState
-        logCsRSum = self.logNodeRealSumVrtState
-
-        typ = self.typ
-        # lbl = self.lblEn
-        lbl = self.lblIt
-        clr = self.clr
-
-        Nf = 9 # Numbers of figures
-        if figData is None:
-            figData = self.figData
-            fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
-            saveFig = True
-
-        sMaxEA = csSv.max(); sMinEA = csSv.min()
-
-        sMaxER = max(csSv[:,:,0].max(),csRv.max())
-        sMinER = min(csSv[:,:,0].min(),csRv.min())
-
-        sMaxAR = max(csSv[:,:,1].max(),csRv.max())
-        sMinAR = min(csSv[:,:,1].min(),csRv.min())
-
-        def EstimateBinNumber(v):
-            vf = v.ravel()
-            vl = np.log10(vf[vf>0])
-            
-            # edges = np.histogram_bin_edges(vl,bins='fd')
-            edges = np.histogram_bin_edges(vl,bins='doane')
-            # edges = np.histogram_bin_edges(vl,bins='scott')
-            # edges = np.histogram_bin_edges(vl,bins='stone')
-
-            return len(edges)-1
-
-        nBins = np.zeros((3,),dtype=np.int32)
-        for i,v in enumerate([csSv[:,:,0],csSv[:,:,1],csRv]):
-            for j in range(v.shape[0]):
-                nBin = EstimateBinNumber(v[j,:])
-                if nBin > nBins[i]: nBins[i] = nBin
-
-        p = (.5,1.075); dp = (1,.05)
-        axis = 4; xScale='lin';
-        string = 'h' if xScale == 'lin' else 's'
-
-        for t in typ: # t[ype]
-            ### Lognormal fit ###
-
-            # Exact-Approximated plot
-            libF.CreateHistogramPlot(
-                csSv[:,:,t] if xScale == 'log' else logCsSv[:,:,t],
-                np.max(nBins[:2]),
-                getattr(figData,f'fig{idx}'),
-                limits=(
-                    (sMinEA,sMaxEA)
-                ) if xScale == 'log' else (
-                    (np.log10(sMinEA),np.log10(sMaxEA))
-                ),
-                xScale=xScale,
-                Ni=Ni,
-                ta=ta,
-                # label=f'{lbl[t]} histogram',
-                label=f'Istogramma {lbl[0][t]}',
-                color=clr[t],
-                alpha=(0.35,0.45) if Ni>1 else 0.35,
-                idx=t+1,
-                ax=ax[0]
-            )
-            xiS,m1S,s1S,m2S,s2S = libF.CreateLognormalFitPlot(
-                csSv[:,:,t] if xScale == 'log' else logCsSv[:,:,t],
-                getattr(figData,f'fig{idx}'),
-                limits=(
-                    (sMinEA,sMaxEA)
-                ) if xScale == 'log' else (
-                    (np.log10(sMinEA),np.log10(sMaxEA))
-                ),
-                xScale=xScale,
-                Ni=Ni,
-                ta=ta,
-                # label=f'{lbl[t]} lognormal fit (ML)',
-                label=fr"Adatt. BLN {lbl[0][t]}",# ($\mathit{{ML}}$)
-                # (
-                #     fr'{lbl[t]} mean value $\langle k\rangle$',
-                #     f'{lbl[t]} lognormal fit (ML)'
-                # ),
-                color=clr[t],#(clr[t],clr[t]),
-                alpha=(1,0.15) if Ni>1 else 1,
-                bimodal=True,
-                idx=t+1,
-                ax=ax[0]
-            )
-
-            # Exact-Real and Approximated-Real plots
-            libF.CreateHistogramPlot(
-                csSv[:,:,t] if xScale == 'log' else logCsSv[:,:,t],
-                max(nBins[t],nBins[2]),
-                getattr(figData,f'fig{idx+t+1}'),
-                limits=(
-                    (sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR)
-                ) if xScale == 'log' else (
-                    (np.log10(sMinER),np.log10(sMaxER)) if t == 0
-                    else (np.log10(sMinAR),np.log10(sMaxAR))
-                ),
-                xScale=xScale,
-                Ni=Ni,
-                ta=ta,
-                # label=f'{lbl[t]} histogram',
-                label=f'Istogramma {lbl[0][t]}',
-                color=clr[t],
-                alpha=(0.35,0.45) if Ni>1 else 0.35,
-                idx=1,
-                ax=ax[0+t+1]
-            )
-            libF.CreateLognormalFitPlot(
-                csSv[:,:,t] if xScale == 'log' else logCsSv[:,:,t],
-                getattr(figData,f'fig{idx+t+1}'),
-                limits=(
-                    (sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR)
-                ) if xScale == 'log' else (
-                    (np.log10(sMinER),np.log10(sMaxER)) if t == 0
-                    else (np.log10(sMinAR),np.log10(sMaxAR))
-                ),
-                xScale=xScale,
-                Ni=Ni,
-                ta=ta,
-                # label=f'{lbl[t]} lognormal fit (ML)',
-                label=fr"Adatt. BLN {lbl[0][t]}",# ($\mathit{{ML}}$)
-                color=clr[t],#(clr[t],clr[t]),
-                alpha=(1,0.15) if Ni>1 else 1,
-                bimodal=True,
-                idx=1,
-                ax=ax[0+t+1]
-            )
-
-            libF.CreateHistogramPlot(
-                csRv if xScale == 'log' else logCsRv,
-                max(nBins[t],nBins[2]),
-                getattr(figData,f'fig{idx+t+1}'),
-                limits=(
-                    (sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR)
-                ) if xScale == 'log' else (
-                    (np.log10(sMinER),np.log10(sMaxER)) if t == 0
-                    else (np.log10(sMinAR),np.log10(sMaxAR))
-                ),
-                xScale=xScale,
-                # label=f'{lbl[2]} histogram',
-                label=f'Istogramma {lbl[0][2]}',
-                color=clr[2],
-                alpha=0.35,
-                idx=2,
-                ax=ax[0+t+1]
-            )
-            xiR,m1R,s1R,m2R,s2R = libF.CreateLognormalFitPlot(
-                csRv if xScale == 'log' else logCsRv,
-                getattr(figData,f'fig{idx+t+1}'),
-                limits=(
-                    (sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR)
-                ) if xScale == 'log' else (
-                    (np.log10(sMinER),np.log10(sMaxER)) if t == 0
-                    else (np.log10(sMinAR),np.log10(sMaxAR))
-                ),
-                xScale=xScale,
-                # label=f'{lbl[2]} lognormal fit (ML)',
-                label=fr"Adatt. BLN {lbl[0][2]}",# ($\mathit{{ML}}$)
-                color=clr[2],
-                alpha=1,
-                bimodal=True,
-                idx=2,
-                ax=ax[0+t+1]
-            )
-
-
-            ### Power law vs bimodal lognormal fit log-log ###
-
-            if t: libF.CreateParetoFitPlot(
-                csRv,
-                getattr(figData,f'fig{idx+3}'),
-                yScale='log',
-                # label=(
-                #     f'{lbl[2]} empirical CCDF',
-                #     f'{lbl[2]} Pareto fit (ML)',
-                #     f'{lbl[2]} bimodal lognormal fit (ML)'
-                # ),
-                label=(
-                    f'FRC empirica {lbl[1][2]}',
-                    fr"Adatt. Pareto {lbl[0][2]}",# ($\mathit{{ML}}$)
-                    fr"Adatt. BLN {lbl[0][2]}"# ($\mathit{{ML}}$)
-                ),
-                color=(clr[2],clr[2]),
-                alpha=(0.6,1),
-                bimodal=True,
-                idx=1,
-                ax=ax[3]
-            )
-            libF.CreateParetoFitPlot(
-                csSv[:,:,t],
-                getattr(figData,f'fig{idx+3+t+1}'),
-                upperbound=sMaxEA,
-                yScale='log',
-                Ni=Ni,
-                ta=ta,
-                # label=(
-                #     f'{lbl[t]} empirical CCDF',
-                #     f'{lbl[t]} Pareto fit (ML)',
-                #     f'{lbl[t]} bimodal lognormal fit (ML)'
-                # ),
-                label=(
-                    f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]}",# ($\mathit{{ML}}$)
-                    fr"Adatt. BLN {lbl[0][t]}"# ($\mathit{{ML}}$)
-                ),
-                color=(clr[t],clr[t]),
-                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                bimodal=True,
-                idx=1,
-                ax=ax[3+t+1]
-            )
-
-
-            ### Power law fit log-log ###
-
-            # Exact-Approximated plot
-            libF.CreateParetoFitPlot(
-                csSv[:,:,t],
-                getattr(figData,f'fig{idx+6}'),
-                upperbound=sMaxEA,
-                yScale='log',
-                Ni=Ni,
-                ta=ta,
-                # label=(
-                #     f'{lbl[t]} empirical CCDF',
-                #     f'{lbl[t]} Pareto fit (ML)'
-                # ),
-                label=(
-                    f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
-                ),
-                color=(clr[t],clr[t]),
-                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=t+1,
-                ax=ax[6]
-            )
-
-            # Exact-Real and Approximated-Real plots
-            blS = libF.CreateParetoFitPlot(
-                csSv[:,:,t],
-                getattr(figData,f'fig{idx+6+t+1}'),
-                upperbound=sMaxER if t == 0 else sMaxAR,
-                yScale='log',
-                Ni=Ni,
-                ta=ta,
-                # label=(
-                #     f'{lbl[t]} empirical CCDF',
-                #     f'{lbl[t]} Pareto fit (ML)'
-                # ),
-                label=(
-                    f'FRC empirica {lbl[1][t]}',
-                    fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
-                ),
-                color=(clr[t],clr[t]),
-                alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-                idx=1,
-                ax=ax[6+t+1]
-            )
-            blR = libF.CreateParetoFitPlot(
-                csRv,
-                getattr(figData,f'fig{idx+6+t+1}'),
-                upperbound=sMaxER if t == 0 else sMaxAR,
-                yScale='log',
-                # label=(
-                #     f'{lbl[2]} empirical CCDF',
-                #     f'{lbl[2]} Pareto fit (ML)'
-                # ),
-                label=(
-                    f'FRC empirica {lbl[1][2]}',
-                    fr"Adatt. Pareto {lbl[0][2]}"# ($\mathit{{ML}}$)
-                ),
-                color=(clr[2],clr[2]),
-                alpha=(0.6,1),
-                idx=2,
-                ax=ax[6+t+1]
-            )
-
-
-            libF.Text(
-                ax[axis],(p[0],p[1]-t*dp[1]),
-                # fr'{lbl[t]}:$\quad$'+
-                fr"{lbl[2][t]}:$\quad$"+
-                libF.DataString(xiS,Ni,ta,r'\xi')+
-                libF.DataString(m1S,Ni,ta,r'\mu_1')+
-                libF.DataString(s1S,Ni,ta,r'\sigma_1')+
-                libF.DataString(m2S,Ni,ta,r'\mu_2')+
-                libF.DataString(s2S,Ni,ta,r'\sigma_2')+
-                libF.DataString(logCsSMin[:,t],Ni,ta,fr'{string}_{{min}}')+
-                libF.DataString(logCsSMax[:,t],Ni,ta,fr'{string}_{{max}}')+
-                libF.DataString(logCsSAvr[:,t],Ni,ta,fr'\langle {string}\rangle')+
-                libF.DataString(
-                    logCsSSum[:,t],Ni,ta,fr'{string}_{{\Sigma}}',
-                    formatVal='.2e',formatErr='.2e'
-                )+
-                libF.DataString(blS,Ni,ta,r'\beta',space=False),
-                ha='center',
-                color=clr[t]
-            )
-
-        libF.Text(
-            ax[axis],(p[0],p[1]+dp[1]),
-            # fr'{lbl[t]}:$\quad$'j
-            fr"{lbl[2][2]}:$\quad$"+
-            libF.DataString(xiR,head=r'\xi')+
-            libF.DataString(m1R,head=r'\mu_1')+
-            libF.DataString(s1R,head=r'\sigma_1')+
-            libF.DataString(m2R,head=r'\mu_2')+
-            libF.DataString(s2R,head=r'\sigma_2')+
-            libF.DataString(logCsRMin,head=fr'{string}_{{min}}')+
-            libF.DataString(logCsRMax,head=fr'{string}_{{max}}')+
-            libF.DataString(logCsRAvr,head=fr'\langle {string}\rangle')+
-            libF.DataString(
-                logCsRSum,head=fr'{string}_{{\Sigma}}',
-                formatVal='.2e',formatErr='.2e'
-            )+
-            libF.DataString(blR,head=r'\beta',space=False),
-            ha='center',
-            color=clr[2]
-        )
-
-        if idx == 1:
-            libF.TextBlock(
-                ax[1],[[
-                    fr'$Nc={self.Nc}$',
-                    fr'$R={self.R}$',
-                    # libF.DataString(blR,head=r'\beta',space=False),
-                    # libF.DataString(xiR,head=r'\xi',space=False)
-                ]],
-                p=(.5,1.01),
-                dp=(dp[0]/6,dp[1])
-            )
-
-            # p = (.5,p[1])
-            # dp = (.8,dp[1])
-            libF.TextBlock(
-                ax[-2],[[
-                    fr'$\lambda={self.l}$',
-                    fr'$\sigma={self.s}$',
-                    fr'$ζ={self.z}$',
-                    fr'$Ni={Ni}$',
-                    fr'$Ns={self.Ns}$',
-                ],[ 
-                    fr'$\alpha={self.a}$',
-                    fr'$il={self.il+1}$',
-                    fr'$d_i={'w_i' if self.ew else 'k_i'}$',
-                    fr'$\Delta t={self.dt}$',
-                    fr'$Nw={self.Nw}$',
-                ]],
-                p=(.5,1.05),
-                dp=(dp[0]/1.4,dp[1])
-            )
-
-        for f in range(Nf):
-            libF.SetFigStyle(
-                # r'$s$',r'$\bar f_N(s)$',
-                r'$r$',r'$\bar f_N(r)$' if f<3 else r'$FRC(r)$',
-                yNotation='sci' if f<3 else 'plain',
-                xScale=(
-                    'lin' if f>2 else 'log'
-                ) if xScale == 'log' else ('lin'),
-                yScale='log' if f>2 else 'lin',
-                ax=ax[f],
-                data=getattr(figData,f'fig{idx+f}')
-            )
-
-        # CentreFig()
-        if saveFig: figData.SaveFig('SizeDistributionFittings')
-        else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
-
-    def AverageSizeFig(
-        self,
-        ax=None,
+        ax=ax[0+t+1]
+      )
+      libF.CreateLognormalFitPlot(
+        csSv[:,:,t] if xScale == 'log' else logCsSv[:,:,t],
+        getattr(figData,f'fig{idx+t+1}'),
+        limits=(
+          (sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR)
+        ) if xScale == 'log' else (
+          (np.log10(sMinER),np.log10(sMaxER)) if t == 0
+          else (np.log10(sMinAR),np.log10(sMaxAR))
+        ),
+        xScale=xScale,
+        Ni=Ni,
+        ta=ta,
+        # label=f'{lbl[t]} lognormal fit (ML)',
+        label=fr"Adatt. BLN {lbl[0][t]}",# ($\mathit{{ML}}$)
+        color=clr[t],#(clr[t],clr[t]),
+        alpha=(1,0.15) if Ni>1 else 1,
+        bimodal=True,
         idx=1,
-        figData=None,
-        saveFig=False
-    ):
-        Ni = self.Ni
-        ta = self.ta
+        ax=ax[0+t+1]
+      )
 
-        times = self.times
-        csSa = self.avrState
-        csRa = np.ones_like(times)*self.realSizeDistr.mean()
-        
-        # lbl = self.lblEn
-        lbl = self.lblIt
-        clr = self.clr
+      libF.CreateHistogramPlot(
+        csRv if xScale == 'log' else logCsRv,
+        max(nBins[t],nBins[2]),
+        getattr(figData,f'fig{idx+t+1}'),
+        limits=(
+          (sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR)
+        ) if xScale == 'log' else (
+          (np.log10(sMinER),np.log10(sMaxER)) if t == 0
+          else (np.log10(sMinAR),np.log10(sMaxAR))
+        ),
+        xScale=xScale,
+        # label=f'{lbl[2]} histogram',
+        label=f'Istogramma {lbl[0][2]}',
+        color=clr[2],
+        alpha=0.35,
+        idx=2,
+        ax=ax[0+t+1]
+      )
+      xiR,m1R,s1R,m2R,s2R = libF.CreateLognormalFitPlot(
+        csRv if xScale == 'log' else logCsRv,
+        getattr(figData,f'fig{idx+t+1}'),
+        limits=(
+          (sMinER,sMaxER) if t == 0 else (sMinAR,sMaxAR)
+        ) if xScale == 'log' else (
+          (np.log10(sMinER),np.log10(sMaxER)) if t == 0
+          else (np.log10(sMinAR),np.log10(sMaxAR))
+        ),
+        xScale=xScale,
+        # label=f'{lbl[2]} lognormal fit (ML)',
+        label=fr"Adatt. BLN {lbl[0][2]}",# ($\mathit{{ML}}$)
+        color=clr[2],
+        alpha=1,
+        bimodal=True,
+        idx=2,
+        ax=ax[0+t+1]
+      )
 
-        if figData is None:
-            figData = self.figData
-            fig = figData.SetFigs()
-            saveFig = True
 
-        for t in self.typ:
-            libF.CreateFunctionPlot(
-                times,
-                csSa[:,:,t],
-                figData.fig if saveFig
-                else getattr(figData,f'fig{idx}'),
-                Ni=Ni,
-                ta=ta,
-                # label=rf"{lbl[t]} city size average $\langle s\rangle$",
-                label=fr'Taglia media {lbl[1][t]}',
-                color=clr[t],
-                alpha=(1,0.15) if Ni>1 else 1,
-                idx=t+1,
-                ax=ax
-            )
+      ### Power law vs bimodal lognormal fit log-log ###
 
+      if t: libF.CreateParetoFitPlot(
+        csRv,
+        getattr(figData,f'fig{idx+3}'),
+        yScale='log',
+        # label=(
+        #   f'{lbl[2]} empirical CCDF',
+        #   f'{lbl[2]} Pareto fit (ML)',
+        #   f'{lbl[2]} bimodal lognormal fit (ML)'
+        # ),
+        label=(
+          f'FRC empirica {lbl[1][2]}',
+          fr"Adatt. Pareto {lbl[0][2]}",# ($\mathit{{ML}}$)
+          fr"Adatt. BLN {lbl[0][2]}"# ($\mathit{{ML}}$)
+        ),
+        color=(clr[2],clr[2]),
+        alpha=(0.6,1),
+        bimodal=True,
+        idx=1,
+        ax=ax[3]
+      )
+      libF.CreateParetoFitPlot(
+        csSv[:,:,t],
+        getattr(figData,f'fig{idx+3+t+1}'),
+        upperbound=sMaxEA,
+        yScale='log',
+        Ni=Ni,
+        ta=ta,
+        # label=(
+        #   f'{lbl[t]} empirical CCDF',
+        #   f'{lbl[t]} Pareto fit (ML)',
+        #   f'{lbl[t]} bimodal lognormal fit (ML)'
+        # ),
+        label=(
+          f'FRC empirica {lbl[1][t]}',
+          fr"Adatt. Pareto {lbl[0][t]}",# ($\mathit{{ML}}$)
+          fr"Adatt. BLN {lbl[0][t]}"# ($\mathit{{ML}}$)
+        ),
+        color=(clr[t],clr[t]),
+        alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+        bimodal=True,
+        idx=1,
+        ax=ax[3+t+1]
+      )
+
+
+      ### Power law fit log-log ###
+
+      # Exact-Approximated plot
+      libF.CreateParetoFitPlot(
+        csSv[:,:,t],
+        getattr(figData,f'fig{idx+6}'),
+        upperbound=sMaxEA,
+        yScale='log',
+        Ni=Ni,
+        ta=ta,
+        # label=(
+        #   f'{lbl[t]} empirical CCDF',
+        #   f'{lbl[t]} Pareto fit (ML)'
+        # ),
+        label=(
+          f'FRC empirica {lbl[1][t]}',
+          fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
+        ),
+        color=(clr[t],clr[t]),
+        alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+        idx=t+1,
+        ax=ax[6]
+      )
+
+      # Exact-Real and Approximated-Real plots
+      blS = libF.CreateParetoFitPlot(
+        csSv[:,:,t],
+        getattr(figData,f'fig{idx+6+t+1}'),
+        upperbound=sMaxER if t == 0 else sMaxAR,
+        yScale='log',
+        Ni=Ni,
+        ta=ta,
+        # label=(
+        #   f'{lbl[t]} empirical CCDF',
+        #   f'{lbl[t]} Pareto fit (ML)'
+        # ),
+        label=(
+          f'FRC empirica {lbl[1][t]}',
+          fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
+        ),
+        color=(clr[t],clr[t]),
+        alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+        idx=1,
+        ax=ax[6+t+1]
+      )
+      blR = libF.CreateParetoFitPlot(
+        csRv,
+        getattr(figData,f'fig{idx+6+t+1}'),
+        upperbound=sMaxER if t == 0 else sMaxAR,
+        yScale='log',
+        # label=(
+        #   f'{lbl[2]} empirical CCDF',
+        #   f'{lbl[2]} Pareto fit (ML)'
+        # ),
+        label=(
+          f'FRC empirica {lbl[1][2]}',
+          fr"Adatt. Pareto {lbl[0][2]}"# ($\mathit{{ML}}$)
+        ),
+        color=(clr[2],clr[2]),
+        alpha=(0.6,1),
+        idx=2,
+        ax=ax[6+t+1]
+      )
+
+
+      libF.Text(
+        ax[axis],(p[0],p[1]-t*dp[1]),
+        # fr'{lbl[t]}:$\quad$'+
+        fr"{lbl[2][t]}:$\quad$"+
+        libF.DataString(xiS,Ni,ta,r'\xi')+
+        libF.DataString(m1S,Ni,ta,r'\mu_1')+
+        libF.DataString(s1S,Ni,ta,r'\sigma_1')+
+        libF.DataString(m2S,Ni,ta,r'\mu_2')+
+        libF.DataString(s2S,Ni,ta,r'\sigma_2')+
+        libF.DataString(logCsSMin[:,t],Ni,ta,fr'{string}_{{min}}')+
+        libF.DataString(logCsSMax[:,t],Ni,ta,fr'{string}_{{max}}')+
+        libF.DataString(logCsSAvr[:,t],Ni,ta,fr'\langle {string}\rangle')+
+        libF.DataString(
+          logCsSSum[:,t],Ni,ta,fr'{string}_{{\Sigma}}',
+          formatVal='.2e',formatErr='.2e'
+        )+
+        libF.DataString(blS,Ni,ta,r'\beta',space=False),
+        ha='center',
+        color=clr[t]
+      )
+
+    libF.Text(
+      ax[axis],(p[0],p[1]+dp[1]),
+      # fr'{lbl[t]}:$\quad$'j
+      fr"{lbl[2][2]}:$\quad$"+
+      libF.DataString(xiR,head=r'\xi')+
+      libF.DataString(m1R,head=r'\mu_1')+
+      libF.DataString(s1R,head=r'\sigma_1')+
+      libF.DataString(m2R,head=r'\mu_2')+
+      libF.DataString(s2R,head=r'\sigma_2')+
+      libF.DataString(logCsRMin,head=fr'{string}_{{min}}')+
+      libF.DataString(logCsRMax,head=fr'{string}_{{max}}')+
+      libF.DataString(logCsRAvr,head=fr'\langle {string}\rangle')+
+      libF.DataString(
+        logCsRSum,head=fr'{string}_{{\Sigma}}',
+        formatVal='.2e',formatErr='.2e'
+      )+
+      libF.DataString(blR,head=r'\beta',space=False),
+      ha='center',
+      color=clr[2]
+    )
+
+    if idx == 1:
+      libF.TextBlock(
+        ax[1],[[
+          fr'$Nc={self.Nc}$',
+          fr'$R={self.R}$',
+          # libF.DataString(blR,head=r'\beta',space=False),
+          # libF.DataString(xiR,head=r'\xi',space=False)
+        ]],
+        p=(.5,1.01),
+        dp=(dp[0]/6,dp[1])
+      )
+
+      # p = (.5,p[1])
+      # dp = (.8,dp[1])
+      libF.TextBlock(
+        ax[-2],[[
+          fr'$\lambda={self.l}$',
+          fr'$\sigma={self.s}$',
+          fr'$ζ={self.z}$',
+          fr'$Ni={Ni}$',
+          fr'$Ns={self.Ns}$',
+        ],[ 
+          fr'$\alpha={self.a}$',
+          fr'$il={self.il+1}$',
+          fr'$d_i={'w_i' if self.ew else 'k_i'}$',
+          fr'$\Delta t={self.dt}$',
+          fr'$Nw={self.Nw}$',
+        ]],
+        p=(.5,1.05),
+        dp=(dp[0]/1.4,dp[1])
+      )
+
+    for f in range(Nf):
+      libF.SetFigStyle(
+        # r'$s$',r'$\bar f_N(s)$',
+        r'$r$',r'$\bar f_N(r)$' if f<3 else r'$FRC(r)$',
+        yNotation='sci' if f<3 else 'plain',
+        xScale=(
+          'lin' if f>2 else 'log'
+        ) if xScale == 'log' else ('lin'),
+        yScale='log' if f>2 else 'lin',
+        ax=ax[f],
+        data=getattr(figData,f'fig{idx+f}')
+      )
+
+    # CentreFig()
+    if saveFig: figData.SaveFig('SizeDistributionFittings')
+    else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
+
+  def AverageSizeFig(
+    self,
+    ax=None,
+    idx=1,
+    figData=None,
+    saveFig=False
+  ):
+    Ni = self.Ni
+    ta = self.ta
+
+    times = self.times
+    csSa = self.avrState
+    csRa = np.ones_like(times)*self.realSizeDistr.mean()
+    
+    # lbl = self.lblEn
+    lbl = self.lblIt
+    clr = self.clr
+
+    if figData is None:
+      figData = self.figData
+      fig = figData.SetFigs()
+      saveFig = True
+
+    for t in self.typ:
+      libF.CreateFunctionPlot(
+        times,
+        csSa[:,:,t],
+        figData.fig if saveFig
+        else getattr(figData,f'fig{idx}'),
+        Ni=Ni,
+        ta=ta,
+        # label=rf"{lbl[t]} city size average $\langle s\rangle$",
+        label=fr'Taglia media {lbl[1][t]}',
+        color=clr[t],
+        alpha=(1,0.15) if Ni>1 else 1,
+        idx=t+1,
+        ax=ax
+      )
+
+    libF.CreateFunctionPlot(
+      times,
+      csRa,
+      figData.fig if saveFig
+      else getattr(figData,f'fig{idx}'),
+      linestyle='--',
+      linewidth=0.75,
+      # label=rf"{lbl[2]} city size average $\langle s\rangle$",
+      label=rf'Taglia media {lbl[1][2]}',
+      color=clr[2],
+      alpha=1,
+      idx=3,
+      ax=ax
+    )
+
+    # CentreFig()
+    libF.SetFigStyle(
+      r"$t$",r"$\langle s\rangle$",
+      data=figData.fig if saveFig
+      else getattr(figData,f'fig{idx}'),
+      ax=ax
+    )
+
+    if saveFig: figData.SaveFig('AverageSize')
+    else: libF.Text(ax,(1.1,.5),self.studiedPrmString)
+
+  def SizeVsDegreeFig(
+    self,
+    ax=None,
+    idx=1,
+    figData=None,
+    saveFig=False
+  ):
+    ki = self.dk
+
+    csSv = self.itAvrVrtState
+    csRv = self.realSizeDistr
+
+    typ = self.typ
+    # lbl = self.lblEn
+    lbl = self.lblIt
+    clr = self.clr
+
+    si = self.siAvrState
+    li2Name = self.li2Name
+
+    if figData is None:
+      figData = self.figData
+      Nf = 3 # Numbers of figures
+      fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
+      saveFig = True
+
+    for t in typ:
+      libF.CreateScatterPlot(
+        ki,csSv[:,t],
+        getattr(figData,f'fig{idx}'),
+        # label=lbl[t],
+        label=f'Dispersione {lbl[1][t]}',
+        color=clr[t],
+        alpha=0.7,
+        idx=t+1,
+        ax=ax[0]
+      )
+
+      libF.CreateScatterPlot(
+        ki,csSv[:,t],
+        getattr(figData,f'fig{t+1+idx}'),
+        # label=lbl[t],
+        label=f'Dispersione {lbl[1][t]}',
+        color=clr[t],
+        alpha=0.6,
+        idx=1,
+        ax=ax[t+1]
+      )
+
+      libF.CreateScatterPlot(
+        ki,csRv,
+        getattr(figData,f'fig{t+1+idx}'),
+        # label=lbl[2],
+        label=f'Dispersione {lbl[1][2]}',
+        color=clr[2],
+        alpha=0.6,
+        idx=2,
+        ax=ax[t+1]
+      )
+
+    for f in range(3):
+      libF.SetFigStyle(
+        r'$k$',r'$s(k)$',
+        yScale='log',xScale='log',
+        data=getattr(figData,f'fig{f+idx}'),
+        ax=ax[f]
+      )
+
+    for t in typ:
+      libF.TextBlock(
+        ax[0],[[
+          libF.DataString(
+            csSv[si[i,t],t],
+            head=li2Name[si[i,t]],
+            formatVal='.2e',
+            space=False
+          )
+        ] for i in range(-1,-6,-1)],
+        p=(.8,.35-t*.225),
+        dp=(0,.15),
+        ha='center',
+        color=clr[t]
+      )
+
+    # CentreFig()
+    if saveFig: figData.SaveFig('SizeVsDegree')
+    else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
+
+  def SizeDistrEvolutionFig(
+    self,
+    ax=None,
+    idx=1,
+    figData=None,
+    saveFig=False
+  ):
+    snapshots = self.itAvrSnapshots
+
+    ns = self.ns
+    Ns = self.Ns
+
+    dt = self.dt
+    typ = self.typ
+
+    if figData is None:
+      figData = self.figData
+      Nf = 2 # Numbers of figures
+      fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
+      saveFig = True
+    ax[0].set_title('Exact'); ax[1].set_title('Approximated')
+
+    samples = 6
+    clrmap = get_cmap('inferno') # magma
+    colours = [clrmap(i/(samples-1)) for i in range(samples)]
+
+    sMax = np.max(snapshots[:,-1,:])
+    sMin = np.min(snapshots[:,-1,:])
+
+    for t in typ: # t[ype]
+      for j,s in enumerate(np.linspace(0,Ns,samples,dtype=int)):
+        libF.CreateHistogramPlot(
+          snapshots[:,s,t],21,
+          getattr(figData,f'fig{t+idx}'),
+          limits=(sMin,sMax),
+          xScale='log',
+          label=f"t = {int(ns[s]*dt)}",
+          color=colours[j][:-1],
+          alpha=0.4,
+          idx=j+idx,
+          ax=ax[t],
+          norm=False
+        ) # Histogram plot
+
+      libF.SetFigStyle(
+        r"$cs$",r"$P(cs)$",
+        yNotation="sci", # ,xNotation="sci"
+        xScale='log',
+        yScale='log',
+        ax=ax[t],
+        data=getattr(figData,f'fig{t+idx}')
+      ) # Style
+
+    # CentreFig()
+    if saveFig: figData.SaveFig('SizeDistributionEvolution')
+    else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
+
+  def SizeEvolutionsFig(
+    self,
+    ax=None,
+    idx=1,
+    figData=None,
+    saveFig=False
+  ):
+    # Nc = self.Nc
+    typ = self.typ
+
+    times = self.times
+    snapshots = self.itAvrConvSnapshots
+
+    ki = self.dk
+    sf = self.Nw
+
+    if figData is None:
+      figData = self.figData
+      Nf = 2 # Numbers of figures
+      fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
+      saveFig = True
+    ax[0].set_title('Exact'); ax[1].set_title('Approximated')
+
+    dk, _ = np.unique(ki,return_counts=True); Nk = dk.size
+    snapshotsk = np.zeros((Nk,sf+1,2),dtype=np.float64)
+    for i,k in enumerate(dk):
+      bk = ki == k
+      snapshotsk[i,:,:] = snapshots[bk,:,:].mean(axis=0)
+
+    clrmap = get_cmap('inferno') # magma
+    norm = LogNorm(vmin=dk.min(),vmax=dk.max())
+    colours = clrmap(norm(dk[::-1]))
+    # colours = [clrmap(i/(Nc-1)) for i in range(Nc)]
+
+    labels = ['']*Nk
+    classes = np.linspace(0,Nk-1,4,dtype=np.int64)
+    for i in classes:
+      # labels[i] = f'Class k={dk[i]}'
+      labels[i] = f'Classe k={dk[i]}'
+
+    for t in typ: # t[ype]
+      # norm = LogNorm(
+      #   vmin=snapshotsk[:,-1,t].min(),
+      #   vmax=snapshotsk[:,-1,t].max()
+      # )
+      # colours = clrmap(norm(snapshotsk[:,-1,t]))
+
+      for k in np.linspace(Nk-1,0,Nk,dtype=np.int64):
         libF.CreateFunctionPlot(
-            times,
-            csRa,
-            figData.fig if saveFig
-            else getattr(figData,f'fig{idx}'),
-            linestyle='--',
-            linewidth=0.75,
-            # label=rf"{lbl[2]} city size average $\langle s\rangle$",
-            label=rf'Taglia media {lbl[1][2]}',
-            color=clr[2],
-            alpha=1,
-            idx=3,
-            ax=ax
-        )
+          times,snapshotsk[k,:,t],
+          getattr(figData,f'fig{t+idx}'),
+          color=colours[k,:],
+          alpha=0.8,
+          linewidth=1,
+          label=labels[k],
+          idx=k+idx,
+          ax=ax[t]
+        ) # Histogram plot
 
-        # CentreFig()
-        libF.SetFigStyle(
-            r"$t$",r"$\langle s\rangle$",
-            data=figData.fig if saveFig
-            else getattr(figData,f'fig{idx}'),
-            ax=ax
-        )
+      libF.SetFigStyle(
+        r"$t$",r"$s$",
+        # yNotation="sci", # ,xNotation="sci"
+        yScale='log',
+        data=getattr(figData,f'fig{t+idx}'),
+        ax=ax[t]
+      ) # Style
 
-        if saveFig: figData.SaveFig('AverageSize')
-        else: libF.Text(ax,(1.1,.5),self.studiedPrmString)
+    # CentreFig()
+    if saveFig: figData.SaveFig('SizeEvolutions')
+    else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
 
-    def SizeVsDegreeFig(
-        self,
-        ax=None,
-        idx=1,
-        figData=None,
-        saveFig=False
-    ):
-        ki = self.dk
-
-        csSv = self.itAvrVrtState
-        csRv = self.realSizeDistr
-
-        typ = self.typ
-        # lbl = self.lblEn
-        lbl = self.lblIt
-        clr = self.clr
-
-        si = self.siAvrState
-        li2Name = self.li2Name
-
-        if figData is None:
-            figData = self.figData
-            Nf = 3 # Numbers of figures
-            fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
-            saveFig = True
-
-        for t in typ:
-            libF.CreateScatterPlot(
-                ki,csSv[:,t],
-                getattr(figData,f'fig{idx}'),
-                # label=lbl[t],
-                label=f'Dispersione {lbl[1][t]}',
-                color=clr[t],
-                alpha=0.7,
-                idx=t+1,
-                ax=ax[0]
-            )
-
-            libF.CreateScatterPlot(
-                ki,csSv[:,t],
-                getattr(figData,f'fig{t+1+idx}'),
-                # label=lbl[t],
-                label=f'Dispersione {lbl[1][t]}',
-                color=clr[t],
-                alpha=0.6,
-                idx=1,
-                ax=ax[t+1]
-            )
-
-            libF.CreateScatterPlot(
-                ki,csRv,
-                getattr(figData,f'fig{t+1+idx}'),
-                # label=lbl[2],
-                label=f'Dispersione {lbl[1][2]}',
-                color=clr[2],
-                alpha=0.6,
-                idx=2,
-                ax=ax[t+1]
-            )
-
-        for f in range(3):
-            libF.SetFigStyle(
-                r'$k$',r'$s(k)$',
-                yScale='log',xScale='log',
-                data=getattr(figData,f'fig{f+idx}'),
-                ax=ax[f]
-            )
-
-        for t in typ:
-            libF.TextBlock(
-                ax[0],[[
-                    libF.DataString(
-                        csSv[si[i,t],t],
-                        head=li2Name[si[i,t]],
-                        formatVal='.2e',
-                        space=False
-                    )
-                ] for i in range(-1,-6,-1)],
-                p=(.8,.35-t*.225),
-                dp=(0,.15),
-                ha='center',
-                color=clr[t]
-            )
-
-        # CentreFig()
-        if saveFig: figData.SaveFig('SizeVsDegree')
-        else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
-
-    def SizeDistrEvolutionFig(
-        self,
-        ax=None,
-        idx=1,
-        figData=None,
-        saveFig=False
-    ):
-        snapshots = self.itAvrSnapshots
-
-        ns = self.ns
-        Ns = self.Ns
-
-        dt = self.dt
-        typ = self.typ
-
-        if figData is None:
-            figData = self.figData
-            Nf = 2 # Numbers of figures
-            fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
-            saveFig = True
-        ax[0].set_title('Exact'); ax[1].set_title('Approximated')
-
-        samples = 6
-        clrmap = get_cmap('inferno') # magma
-        colours = [clrmap(i/(samples-1)) for i in range(samples)]
-
-        sMax = np.max(snapshots[:,-1,:])
-        sMin = np.min(snapshots[:,-1,:])
-
-        for t in typ: # t[ype]
-            for j,s in enumerate(np.linspace(0,Ns,samples,dtype=int)):
-                libF.CreateHistogramPlot(
-                    snapshots[:,s,t],21,
-                    getattr(figData,f'fig{t+idx}'),
-                    limits=(sMin,sMax),
-                    xScale='log',
-                    label=f"t = {int(ns[s]*dt)}",
-                    color=colours[j][:-1],
-                    alpha=0.4,
-                    idx=j+idx,
-                    ax=ax[t],
-                    norm=False
-                ) # Histogram plot
-
-            libF.SetFigStyle(
-                r"$cs$",r"$P(cs)$",
-                yNotation="sci", # ,xNotation="sci"
-                xScale='log',
-                yScale='log',
-                ax=ax[t],
-                data=getattr(figData,f'fig{t+idx}')
-            ) # Style
-
-        # CentreFig()
-        if saveFig: figData.SaveFig('SizeDistributionEvolution')
-        else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
-
-    def SizeEvolutionsFig(
-        self,
-        ax=None,
-        idx=1,
-        figData=None,
-        saveFig=False
-    ):
-        # Nc = self.Nc
-        typ = self.typ
-
-        times = self.times
-        snapshots = self.itAvrConvSnapshots
-
-        ki = self.dk
-        sf = self.Nw
-
-        if figData is None:
-            figData = self.figData
-            Nf = 2 # Numbers of figures
-            fig, ax = figData.SetFigs(1,Nf,size=(self.fw*Nf,self.fh))
-            saveFig = True
-        ax[0].set_title('Exact'); ax[1].set_title('Approximated')
-
-        dk, _ = np.unique(ki,return_counts=True); Nk = dk.size
-        snapshotsk = np.zeros((Nk,sf+1,2),dtype=np.float64)
-        for i,k in enumerate(dk):
-            bk = ki == k
-            snapshotsk[i,:,:] = snapshots[bk,:,:].mean(axis=0)
-
-        clrmap = get_cmap('inferno') # magma
-        norm = LogNorm(vmin=dk.min(),vmax=dk.max())
-        colours = clrmap(norm(dk[::-1]))
-        # colours = [clrmap(i/(Nc-1)) for i in range(Nc)]
-
-        labels = ['']*Nk
-        classes = np.linspace(0,Nk-1,4,dtype=np.int64)
-        for i in classes:
-            # labels[i] = f'Class k={dk[i]}'
-            labels[i] = f'Classe k={dk[i]}'
-
-        for t in typ: # t[ype]
-            # norm = LogNorm(
-            #     vmin=snapshotsk[:,-1,t].min(),
-            #     vmax=snapshotsk[:,-1,t].max()
-            # )
-            # colours = clrmap(norm(snapshotsk[:,-1,t]))
-
-            for k in np.linspace(Nk-1,0,Nk,dtype=np.int64):
-                libF.CreateFunctionPlot(
-                    times,snapshotsk[k,:,t],
-                    getattr(figData,f'fig{t+idx}'),
-                    color=colours[k,:],
-                    alpha=0.8,
-                    linewidth=1,
-                    label=labels[k],
-                    idx=k+idx,
-                    ax=ax[t]
-                ) # Histogram plot
-
-            libF.SetFigStyle(
-                r"$t$",r"$s$",
-                # yNotation="sci", # ,xNotation="sci"
-                yScale='log',
-                data=getattr(figData,f'fig{t+idx}'),
-                ax=ax[t]
-            ) # Style
-
-        # CentreFig()
-        if saveFig: figData.SaveFig('SizeEvolutions')
-        else: libF.Text(ax[-1],(1.1,.5),self.studiedPrmString)
-
-    def ShowFig(self):
-        from matplotlib.pyplot import show
-        show()
+  def ShowFig(self):
+    from matplotlib.pyplot import show
+    show()
 
 class ParametricStudy():
-    def __init__(self,clsPrm,clsReg):
-        sp = clsPrm.studiedParameter
+  def __init__(self,clsPrm,clsReg):
+    sp = clsPrm.studiedParameter
 
-        sV = clsPrm.startValuePrmStudy; self.sV = sV
-        eV = clsPrm.endValuePrmStudy; self.eV = eV
-        Nv = clsPrm.numberPrmStudy; self.Nv = Nv
+    sV = clsPrm.startValuePrmStudy; self.sV = sV
+    eV = clsPrm.endValuePrmStudy; self.eV = eV
+    Nv = clsPrm.numberPrmStudy; self.Nv = Nv
 
-        self.KS = [None]*Nv
-        frmt = '.3f'
-        for s,val in enumerate(np.linspace(sV,eV,Nv)):
-            match sp:
-                case 0: 
-                    clsPrm.attractivity = val
-                    string = fr'$\lambda={val:{frmt}}$'
-                case 1:
-                    clsPrm.convincibility = val
-                    string = fr'$\alpha={val:{frmt}}$'
-                case 2:
-                    clsPrm.zetaFraction = val
-                    string = fr'$\zeta={val:{frmt}}$'
+    self.KS = [None]*Nv
+    frmt = '.3f'
+    for s,val in enumerate(np.linspace(sV,eV,Nv)):
+      match sp:
+        case 0: 
+          clsPrm.attractivity = val
+          string = fr'$\lambda={val:{frmt}}$'
+        case 1:
+          clsPrm.convincibility = val
+          string = fr'$\alpha={val:{frmt}}$'
+        case 2:
+          clsPrm.zetaFraction = val
+          string = fr'$\zeta={val:{frmt}}$'
 
-            self.KS[s] = KineticSimulation(clsPrm,clsReg)
-            self.KS[s].sid = s+1
-            self.KS[s].studiedPrmString = string 
+      self.KS[s] = KineticSimulation(clsPrm,clsReg)
+      self.KS[s].sid = s+1
+      self.KS[s].studiedPrmString = string 
 
-        self.fw = 8
-        self.fh = 6
-        self.figData = libF.FigData(clsPrm,'KS')
+    self.fw = 8
+    self.fh = 6
+    self.figData = libF.FigData(clsPrm,'KS')
 
-    # Simulation
-    def MonteCarloSimulation(self):
-        for s,KS in enumerate(self.KS):
-            print(f'Starting simulation {s+1}')
-            KS.MonteCarloSimulation()
+  # Simulation
+  def MonteCarloSimulation(self):
+    for s,KS in enumerate(self.KS):
+      print(f'Starting simulation {s+1}')
+      KS.MonteCarloSimulation()
 
-    # Figures
-    def SizeDistrFittingsFig(self):
-        figData = self.figData
-        fw = self.fw
-        fh = self.fh
+  # Figures
+  def SizeDistrFittingsFig(self):
+    figData = self.figData
+    fw = self.fw
+    fh = self.fh
 
-        nCol = 9 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
+    nCol = 9 # Figures for each row
+    nRow = self.Nv
+    fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
-        for s,KS in enumerate(self.KS):
-            KS.SizeDistrFittingsFig(
-                ax=ax[s,:],
-                idx=nCol*s+1,
-                figData=figData
-            )
+    for s,KS in enumerate(self.KS):
+      KS.SizeDistrFittingsFig(
+        ax=ax[s,:],
+        idx=nCol*s+1,
+        figData=figData
+      )
 
-        figData.SaveFig('SizeDistributionFittings')
+    figData.SaveFig('SizeDistributionFittings')
 
-    def AverageSizeFig(self):
-        figData = self.figData
-        fw = self.fw
-        fh = self.fh
+  def AverageSizeFig(self):
+    figData = self.figData
+    fw = self.fw
+    fh = self.fh
 
-        nCol = 1 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
+    nCol = 1 # Figures for each row
+    nRow = self.Nv
+    fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
-        for s,KS in enumerate(self.KS):
-            KS.AverageSizeFig(
-                ax=ax[s],
-                idx=nCol*s+1,
-                figData=figData
-            )
+    for s,KS in enumerate(self.KS):
+      KS.AverageSizeFig(
+        ax=ax[s],
+        idx=nCol*s+1,
+        figData=figData
+      )
 
-        figData.SaveFig('AverageSize')
+    figData.SaveFig('AverageSize')
 
-    def SizeVsDegreeFig(self):
-        figData = self.figData
-        fw = self.fw
-        fh = self.fh
+  def SizeVsDegreeFig(self):
+    figData = self.figData
+    fw = self.fw
+    fh = self.fh
 
-        nCol = 3 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
+    nCol = 3 # Figures for each row
+    nRow = self.Nv
+    fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
-        for s,KS in enumerate(self.KS):
-            KS.SizeVsDegreeFig(
-                ax=ax[s,:],
-                idx=nCol*s+1,
-                figData=figData
-            )
+    for s,KS in enumerate(self.KS):
+      KS.SizeVsDegreeFig(
+        ax=ax[s,:],
+        idx=nCol*s+1,
+        figData=figData
+      )
 
-        figData.SaveFig('SizeVsDegree')
+    figData.SaveFig('SizeVsDegree')
 
-    def SizeDistrEvolutionFig(self):
-        figData = self.figData
-        fw = self.fw
-        fh = self.fh
+  def SizeDistrEvolutionFig(self):
+    figData = self.figData
+    fw = self.fw
+    fh = self.fh
 
-        nCol = 2 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
+    nCol = 2 # Figures for each row
+    nRow = self.Nv
+    fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
-        for s,KS in enumerate(self.KS):
-            KS.SizeDistrEvolutionFig(
-                ax=ax[s,:],
-                idx=nCol*s+1,
-                figData=figData
-            )
+    for s,KS in enumerate(self.KS):
+      KS.SizeDistrEvolutionFig(
+        ax=ax[s,:],
+        idx=nCol*s+1,
+        figData=figData
+      )
 
-        figData.SaveFig('SizeDistributionEvolution')
+    figData.SaveFig('SizeDistributionEvolution')
 
-    def SizeEvolutionsFig(self):
-        figData = self.figData
-        fw = self.fw
-        fh = self.fh
+  def SizeEvolutionsFig(self):
+    figData = self.figData
+    fw = self.fw
+    fh = self.fh
 
-        nCol = 2 # Figures for each row
-        nRow = self.Nv
-        fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
+    nCol = 2 # Figures for each row
+    nRow = self.Nv
+    fig, ax = figData.SetFigs(nRow,nCol,size=(fw*nCol,fh*nRow))
 
-        for s,KS in enumerate(self.KS):
-            KS.SizeEvolutionsFig(
-                ax=ax[s,:],
-                idx=nCol*s+1,
-                figData=figData
-            )
+    for s,KS in enumerate(self.KS):
+      KS.SizeEvolutionsFig(
+        ax=ax[s,:],
+        idx=nCol*s+1,
+        figData=figData
+      )
 
-        figData.SaveFig('SizeEvolutions')
+    figData.SaveFig('SizeEvolutions')
 
-    def ShowFig(self):
-        from matplotlib.pyplot import show
-        show()
+  def ShowFig(self):
+    from matplotlib.pyplot import show
+    show()
 
 
 ### Auxiliary functions ###
 
 @dataclass(frozen=True)
 class ShMSpec:
-    name: str
-    shape: tuple[int,...]
-    dtype: str
+  name: str
+  shape: tuple[int,...]
+  dtype: str
 
 def BuildShM(
-    array=None,
-    Ni=None,
-    dtype=None
+  array=None,
+  Ni=None,
+  dtype=None
 ):
-    if array is not None:
-        a = np.ascontiguousarray(array)
-    else:
-        a = np.zeros(Ni,dtype=dtype)
+  if array is not None:
+    a = np.ascontiguousarray(array)
+  else:
+    a = np.zeros(Ni,dtype=dtype)
 
-    shm = shared_memory.SharedMemory(
-        create=True,
-        size=a.nbytes
-    )
+  shm = shared_memory.SharedMemory(
+    create=True,
+    size=a.nbytes
+  )
 
-    view = np.ndarray(
-        a.shape,
-        dtype=a.dtype,
-        buffer=shm.buf
-    )
-    view[:] = a
+  view = np.ndarray(
+    a.shape,
+    dtype=a.dtype,
+    buffer=shm.buf
+  )
+  view[:] = a
 
-    spec = ShMSpec(
-        name=shm.name,
-        shape=a.shape,
-        dtype=a.dtype.str
-    )
+  spec = ShMSpec(
+    name=shm.name,
+    shape=a.shape,
+    dtype=a.dtype.str
+  )
 
-    return spec, shm
+  return spec, shm
 
 def LoadShM(spec):
-    shm = shared_memory.SharedMemory(name=spec.name)
-    arr = np.ndarray(
-        spec.shape,
-        dtype=np.dtype(spec.dtype),
-        buffer=shm.buf
-    )
-    return shm, arr
+  shm = shared_memory.SharedMemory(name=spec.name)
+  arr = np.ndarray(
+    spec.shape,
+    dtype=np.dtype(spec.dtype),
+    buffer=shm.buf
+  )
+  return shm, arr
 
 def InitializeMCSWorker(
-    shmPrm,
-    gui=False
+  shmPrm,
+  gui=False
 ):
-    for key in workersShM['parameters'].keys():
-        shm, arr = LoadShM(shmPrm[key])
-        workersShM['handles'].append(shm)
-        workersShM['parameters'][key] = arr
+  for key in workersShM['parameters'].keys():
+    shm, arr = LoadShM(shmPrm[key])
+    workersShM['handles'].append(shm)
+    workersShM['parameters'][key] = arr
 
-    if gui:
-        for key in workersShM['gui'].keys():
-            shm, arr = LoadShM(shmPrm[key])
-            workersShM['handles'].append(shm)
-            workersShM['gui'][key] = arr
+  if gui:
+    for key in workersShM['gui'].keys():
+      shm, arr = LoadShM(shmPrm[key])
+      workersShM['handles'].append(shm)
+      workersShM['gui'][key] = arr
 
 def MonteCarloAlgorithm(
-    p,Nc,Ns,p0,typ,
-    l,a,s,z,il,gui
+  p,Nc,Ns,p0,typ,
+  l,a,s,z,il,gui
 ):
-    Mdt = workersShM['parameters']["Mdt"]
-    wOdt = workersShM['parameters']["wOdt"]
-    wI = workersShM['parameters']["wI"]
-    di = workersShM['parameters']["di"]
-    idi = workersShM['parameters']["idi"]
-    ns = workersShM['parameters']["ns"]
+  Mdt = workersShM['parameters']["Mdt"]
+  wOdt = workersShM['parameters']["wOdt"]
+  wI = workersShM['parameters']["wI"]
+  di = workersShM['parameters']["di"]
+  idi = workersShM['parameters']["idi"]
+  ns = workersShM['parameters']["ns"]
 
-    # rng = np.random.default_rng() # Even though it's recommended by Numpy it is not efficiently implemented in Numba, hence it halves the iterations per second if used
+  # rng = np.random.default_rng() # Even though it's recommended by Numpy it is not efficiently implemented in Numba, hence it halves the iterations per second if used
 
-    # Uniform initial state for all vertices
-    vrtState = np.full((Nc,typ),p0,dtype=np.float64)
-    snapshots = np.full((Nc,Ns+1,typ),p0,dtype=np.float64)
+  # Uniform initial state for all vertices
+  vrtState = np.full((Nc,typ),p0,dtype=np.float64)
+  snapshots = np.full((Nc,Ns+1,typ),p0,dtype=np.float64)
 
-    P = np.arange(Nc,dtype=np.int32)
+  P = np.arange(Nc,dtype=np.int32)
 
-    nk = ns[1]
-    hNc = Nc//2 # Nc half
-    nsid = 1
+  nk = ns[1]
+  hNc = Nc//2 # Nc half
+  nsid = 1
 
-    print(f'Starting iteration {p+1}')
+  print(f'Starting iteration {p+1}')
 
-    if gui: # If ProgressGUI is required
-        progress = workersShM['gui']['progress']
-        elapsed = workersShM['gui']['elapsed']
-        done = workersShM['gui']['done']
+  if gui: # If ProgressGUI is required
+    progress = workersShM['gui']['progress']
+    elapsed = workersShM['gui']['elapsed']
+    done = workersShM['gui']['done']
 
-        EvolveState(
-            vrtState,P,
-            Nc,hNc,nk,
-            Mdt,wOdt,wI,
-            di,idi,il,
-            l,a,s,z
-        ) # Warm-up iteration to avoid polluting the initial time t0
-        snapshots[:,nsid,0] = vrtState[:,0]
-        snapshots[:,nsid,1] = vrtState[:,1]
-        nsid += 1
+    EvolveState(
+      vrtState,P,
+      Nc,hNc,nk,
+      Mdt,wOdt,wI,
+      di,idi,il,
+      l,a,s,z
+    ) # Warm-up iteration to avoid polluting the initial time t0
+    snapshots[:,nsid,0] = vrtState[:,0]
+    snapshots[:,nsid,1] = vrtState[:,1]
+    nsid += 1
 
-        t0 = time.perf_counter()
-        for st in range(Ns-1): # step
-            EvolveState(
-                vrtState,P,
-                Nc,hNc,nk,
-                Mdt,wOdt,wI,
-                di,idi,il,
-                l,a,s,z
-            )
-            snapshots[:,nsid,0] = vrtState[:,0]
-            snapshots[:,nsid,1] = vrtState[:,1]
-            nsid += 1
+    t0 = time.perf_counter()
+    for st in range(Ns-1): # step
+      EvolveState(
+        vrtState,P,
+        Nc,hNc,nk,
+        Mdt,wOdt,wI,
+        di,idi,il,
+        l,a,s,z
+      )
+      snapshots[:,nsid,0] = vrtState[:,0]
+      snapshots[:,nsid,1] = vrtState[:,1]
+      nsid += 1
 
-            progress[p] = (st+2)*nk # ns[nsid]
-            elapsed[p] = time.perf_counter()-t0
+      progress[p] = (st+2)*nk # ns[nsid]
+      elapsed[p] = time.perf_counter()-t0
 
-        progress[p] = Ns*nk # ns[-1]
-        elapsed[p] = time.perf_counter()-t0
-        done[p] = True
+    progress[p] = Ns*nk # ns[-1]
+    elapsed[p] = time.perf_counter()-t0
+    done[p] = True
 
-        return vrtState, snapshots
+    return vrtState, snapshots
 
-    else:
-        EvolveState(
-            vrtState,P,
-            Nc,hNc,nk,
-            Mdt,wOdt,wI,
-            di,idi,il,
-            l,a,s,z
-        ) # Warm-up iteration to avoid polluting the initial time t0
-        snapshots[:,nsid,0] = vrtState[:,0]
-        snapshots[:,nsid,1] = vrtState[:,1]
-        nsid += 1
+  else:
+    EvolveState(
+      vrtState,P,
+      Nc,hNc,nk,
+      Mdt,wOdt,wI,
+      di,idi,il,
+      l,a,s,z
+    ) # Warm-up iteration to avoid polluting the initial time t0
+    snapshots[:,nsid,0] = vrtState[:,0]
+    snapshots[:,nsid,1] = vrtState[:,1]
+    nsid += 1
 
-        t0 = time.perf_counter()
-        for _ in range(Ns-1):
-            EvolveState(
-                vrtState,P,
-                Nc,hNc,nk,
-                Mdt,wOdt,wI,
-                di,idi,il,
-                l,a,s,z
-            )
-            snapshots[:,nsid,0] = vrtState[:,0]
-            snapshots[:,nsid,1] = vrtState[:,1]
-            nsid += 1
+    t0 = time.perf_counter()
+    for _ in range(Ns-1):
+      EvolveState(
+        vrtState,P,
+        Nc,hNc,nk,
+        Mdt,wOdt,wI,
+        di,idi,il,
+        l,a,s,z
+      )
+      snapshots[:,nsid,0] = vrtState[:,0]
+      snapshots[:,nsid,1] = vrtState[:,1]
+      nsid += 1
 
-        return vrtState, snapshots
+    return vrtState, snapshots
 
 @njit(cache=True)
 def EvolveState(
-    cs,P,Nc,
-    hNc,nk,Mdt,
-    wOdt,wI,
-    di,idi,il,
-    l,a,s,z
+  cs,P,Nc,
+  hNc,nk,Mdt,
+  wOdt,wI,
+  di,idi,il,
+  l,a,s,z
 ):
-    for _ in range(nk):
-        FYDInPlaceShuffle(P,Nc)
-        # P = np.random.permutation(Nc)
-        # pi = P[:hNc]; pr = P[hNc:]
+  for _ in range(nk):
+    FYDInPlaceShuffle(P,Nc)
+    # P = np.random.permutation(Nc)
+    # pi = P[:hNc]; pr = P[hNc:]
 
-        for i in range(hNc):
-            ii = P[i]; ir = P[i+hNc]
+    for i in range(hNc):
+      ii = P[i]; ir = P[i+hNc]
 
-            # t = 0
-            p = Mdt[ii,ir]
-            if p > 0:
-                theta = np.random.random() < p
+      # t = 0
+      p = Mdt[ii,ir]
+      if p > 0:
+        theta = np.random.random() < p
 
-                if theta == 1:
-                    si = cs[ii,0]; sr = cs[ir,0]
+        if theta == 1:
+          si = cs[ii,0]; sr = cs[ir,0]
 
-                    e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
-                    ga = StochasticFluctuations(s,e) if s>0 else 0
+          e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+          ga = StochasticFluctuations(s,e) if s>0 else 0
 
-                    cs[ii,0] = si*(1-e+ga) 
-                    cs[ir,0] = sr+si*e
+          cs[ii,0] = si*(1-e+ga) 
+          cs[ir,0] = sr+si*e
 
-            # t = 1
-            p = wOdt[ii]*wI[ir] 
-            # Apparently it's more efficient to access two values from two separate vectors and to multiply them, than it is to access the same pre-computed value from a matrix; the same holds for the product «di[ir]*idi[ii]» inside «NonLinearEmigration()»
-            # However, in order for this property to be valid the matrix has to have an underlying more simple structure which in both cases is rank 1
-            # In other words this trick does not work with the adjacency matrix «Mdt[ii,ir]» which cannot be computed from simpler elements
-            theta = np.random.random() < p
+      # t = 1
+      p = wOdt[ii]*wI[ir] 
+      # Apparently it's more efficient to access two values from two separate vectors and to multiply them, than it is to access the same pre-computed value from a matrix; the same holds for the product «di[ir]*idi[ii]» inside «NonLinearEmigration()»
+      # However, in order for this property to be valid the matrix has to have an underlying more simple structure which in both cases is rank 1
+      # In other words this trick does not work with the adjacency matrix «Mdt[ii,ir]» which cannot be computed from simpler elements
+      theta = np.random.random() < p
 
-            if theta == 1:
-                si = cs[ii,1]; sr = cs[ir,1]
+      if theta == 1:
+        si = cs[ii,1]; sr = cs[ir,1]
 
-                e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
-                ga = StochasticFluctuations(s,e) if s>0 else 0
+        e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+        ga = StochasticFluctuations(s,e) if s>0 else 0
 
-                cs[ii,1] = si*(1-e+ga) 
-                cs[ir,1] = sr+si*e
+        cs[ii,1] = si*(1-e+ga) 
+        cs[ir,1] = sr+si*e
 
-            # In the exact case it's reasonalbe to check whether p is actually positive before evaluating the Bernoulli distribution with «np.random.random()<p» since A can has zero components
-            # However its approximations Ap does not have zero components by definition (it's a complete network), hence that check becomes useless
+      # In the exact case it's reasonalbe to check whether p is actually positive before evaluating the Bernoulli distribution with «np.random.random()<p» since A can has zero components
+      # However its approximations Ap does not have zero components by definition (it's a complete network), hence that check becomes useless
 
-            # p = 1 if p>1 else (0 if p<0 else p)
-            # theta = np.random.binomial(1,p)
+      # p = 1 if p>1 else (0 if p<0 else p)
+      # theta = np.random.binomial(1,p)
 
 @njit(cache=True)
 def FYDInPlaceShuffle(v,n):
-    for i in range(n-1,0,-1):
-        j = np.random.randint(0,i+1)
-        tmp = v[i]
-        v[i] = v[j]
-        v[j] = tmp
+  for i in range(n-1,0,-1):
+    j = np.random.randint(0,i+1)
+    tmp = v[i]
+    v[i] = v[j]
+    v[j] = tmp
 
-        # In randint i+1 is necessary to include the i-th index
+    # In randint i+1 is necessary to include the i-th index
 
-    # Fisher–Yates–Durstenfeld [in-place] shuffle
-    # https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+  # Fisher–Yates–Durstenfeld [in-place] shuffle
+  # https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
 
 @njit(cache=True)
 def NonLinearEmigration(
-        si,idii, # Interacting city size
-        sr,dir,  # Receiving city size
-        il,l,a,z
-    ):
-    if si <= 0:
-        return 0
+    si,idii, # Interacting city size
+    sr,dir, # Receiving city size
+    il,l,a,z
+  ):
+  if si <= 0:
+    return 0
 
-    if il == 0:
-        rs = sr/si
-        efl = l*(rs**a)/(1+rs**a)
+  if il == 0:
+    rs = sr/si
+    efl = l*(rs**a)/(1+rs**a)
 
-        if z == 0:
-            return efl
-        else:
-            if sr <= 0:
-                return 0
-            else:
-                irs = 1/rs
-                efs = l*(irs**a)/(1+irs**a)
-                return (1-z)*efl+z*efs
-
-    elif il == 1:
-        rsk = (sr/si)*dir*idii
-        efl = l*(rsk/a)/(1+rsk/a)
-
-        if z == 0:
-            return efl
-        else:
-            if sr <= 0:
-                return 0
-            else:
-                irsk = 1/rsk
-                efs = l*(irsk/a)/(1+irsk/a)
-                return (1-z)*efl+z*efs
-
-    elif il == 2:
-        rsk = (sr/si)*dir*idii
-        efl = l*(rsk**a)/(1+rsk**a)
-
-        if z == 0:
-            return efl
-        else:
-            if sr <= 0:
-                return 0
-            else:
-                irsk = 1/rsk
-                efs = l*(irsk**a)/(1+irsk**a)
-                return (1-z)*efl+z*efs
-
+    if z == 0:
+      return efl
     else:
-        rsk = (sr/si)*dir*idii
-        efl = l*(rsk/(1+rsk))**a
+      if sr <= 0:
+        return 0
+      else:
+        irs = 1/rs
+        efs = l*(irs**a)/(1+irs**a)
+        return (1-z)*efl+z*efs
 
-        if z == 0:
-            return efl
-        else:
-            if sr <= 0:
-                return 0
-            else:
-                irsk = 1/rsk
-                efs = l*(irsk/(1+irsk))**a
-                return (1-z)*efl+z*efs
+  elif il == 1:
+    rsk = (sr/si)*dir*idii
+    efl = l*(rsk/a)/(1+rsk/a)
 
-        # rsk = (sr/si)*(dr*idi)  # Relative population*degree ratio
-        # irsk = (si/sr)*(di*idr) # Inverse relative population*degree ratio
-        # efl                     # Actual emigration rate for the lumping fraction
-        # efs                     # Actual emigration rate for the separation fraction
+    if z == 0:
+      return efl
+    else:
+      if sr <= 0:
+        return 0
+      else:
+        irsk = 1/rsk
+        efs = l*(irsk/a)/(1+irsk/a)
+        return (1-z)*efl+z*efs
 
-    # Numba does not officially support the match structure, hence, even if it appears to work, it's better to use an «if/elif/else» one for the sake of performance and stability
+  elif il == 2:
+    rsk = (sr/si)*dir*idii
+    efl = l*(rsk**a)/(1+rsk**a)
+
+    if z == 0:
+      return efl
+    else:
+      if sr <= 0:
+        return 0
+      else:
+        irsk = 1/rsk
+        efs = l*(irsk**a)/(1+irsk**a)
+        return (1-z)*efl+z*efs
+
+  else:
+    rsk = (sr/si)*dir*idii
+    efl = l*(rsk/(1+rsk))**a
+
+    if z == 0:
+      return efl
+    else:
+      if sr <= 0:
+        return 0
+      else:
+        irsk = 1/rsk
+        efs = l*(irsk/(1+irsk))**a
+        return (1-z)*efl+z*efs
+
+    # rsk = (sr/si)*(dr*idi) # Relative population*degree ratio
+    # irsk = (si/sr)*(di*idr) # Inverse relative population*degree ratio
+    # efl           # Actual emigration rate for the lumping fraction
+    # efs           # Actual emigration rate for the separation fraction
+
+  # Numba does not officially support the match structure, hence, even if it appears to work, it's better to use an «if/elif/else» one for the sake of performance and stability
 
 @njit(cache=True)
 def StochasticFluctuations(sigma,E):
-    alpha = ((1-E)**2)/(sigma**2)
-    beta  = (sigma**2)/(1-E)
+  alpha = ((1-E)**2)/(sigma**2)
+  beta = (sigma**2)/(1-E)
 
-    # if alpha<=1:
-    #     raise ValueError("α must be >1 to have a non-degenerate gamma distribution, and thus always admissible fluctuations")
+  # if alpha<=1:
+  #   raise ValueError("α must be >1 to have a non-degenerate gamma distribution, and thus always admissible fluctuations")
 
-    ga = np.random.gamma(alpha,beta) # Initial sampling
+  ga = np.random.gamma(alpha,beta) # Initial sampling
 
-    return ga+E-1 # Final left translation
+  return ga+E-1 # Final left translation
 
 
 ### Discarded code ###
 
 #region Old implementation for fluctuations with a [forcefully] resampled Gaussian until the value picked ensures the post-interaction population is positive
 """
-    def StochasticFluctuations(sigma,E):
-        while True:
-            mu = np.random.normal(0,sigma,size=1)
-            if mu>E-1: #and mu<E:
-                break
-        # The conditions «mu>E-1» and «mu<E» are necessary to have the total emigration rage 1-E+μ between 0 and 1
-        return mu
+  def StochasticFluctuations(sigma,E):
+    while True:
+      mu = np.random.normal(0,sigma,size=1)
+      if mu>E-1: #and mu<E:
+        break
+    # The conditions «mu>E-1» and «mu<E» are necessary to have the total emigration rage 1-E+μ between 0 and 1
+    return mu
 """
 #endregion I save it since I find it an interesting wrong approach
 
 #region Old implementation for the progress bar from «MonteCarloAlgorithm()» insinde the terminal, which can only be used with one process
 """
-    bar = tqdm(
-        range(Nt),
-        desc=f"Updating states {p}",
-        position=p,
-        leave=False,
-        dynamic_ncols=True,
-        # ascii=True,
-        mininterval=0.2,
-        smoothing=0.5,
-        miniters=100
-    )
-    if (nt+1) % 100 == 0:
-        bar.update(100)
+  bar = tqdm(
+    range(Nt),
+    desc=f"Updating states {p}",
+    position=p,
+    leave=False,
+    dynamic_ncols=True,
+    # ascii=True,
+    mininterval=0.2,
+    smoothing=0.5,
+    miniters=100
+  )
+  if (nt+1) % 100 == 0:
+    bar.update(100)
 """
 #endregion
 
 #region Alternative with the «.map()» method in «MonteCarloSimulation()» which cannot be used with «libGUI.ProgessGUI()»
 """
-    self.data = list(
-        executor.map(
-            RunSingleProcess,
-            [clsPrm]*Ni,
-            [clsReg]*Ni
-        )
+  self.data = list(
+    executor.map(
+      RunSingleProcess,
+      [clsPrm]*Ni,
+      [clsReg]*Ni
     )
+  )
 """
 #endregion
 
@@ -1417,160 +1417,160 @@ def StochasticFluctuations(sigma,E):
 """
 if clsPrm.progressBar:
 else:
-    with ProcessPoolExecutor(max_workers=3) as executor:
-        futures = {}
-        for p in process:
-            futures[p] = executor.submit(
-                MonteCarloAlgorithm,
-                clsPrm,clsReg,p,di,
-                np.array(typ,dtype=np.int64)
-            )
+  with ProcessPoolExecutor(max_workers=3) as executor:
+    futures = {}
+    for p in process:
+      futures[p] = executor.submit(
+        MonteCarloAlgorithm,
+        clsPrm,clsReg,p,di,
+        np.array(typ,dtype=np.int64)
+      )
 """
 #endregion
 
 #region Alternative «EvolveState» where a single permutation is used «its=1/dt» times to reduce computation costs; this approach, however, goes against the fundamental philosophy/assumption of sampling two agents independently at each iteration and, hence, it's been discarded
 """
 for _ in range(nP): # nk/100
-    FYDInPlaceShuffle(P,Nc)
-    # P = np.random.permutation(Nc)
-    # pi = P[:hNc]; pr = P[hNc:]
+  FYDInPlaceShuffle(P,Nc)
+  # P = np.random.permutation(Nc)
+  # pi = P[:hNc]; pr = P[hNc:]
 
-    for _ in range(itd): # 100
-        for i in range(hNc):
-            ii = P[i]; ir = P[i+hNc]
+  for _ in range(itd): # 100
+    for i in range(hNc):
+      ii = P[i]; ir = P[i+hNc]
 
-            # t = 0
-            p = Mdt[ii,ir]
-            if p > 0:
-                theta = np.random.random() < p
+      # t = 0
+      p = Mdt[ii,ir]
+      if p > 0:
+        theta = np.random.random() < p
 
-                if theta == 1:
-                    si = cs[ii,0]; sr = cs[ir,0]
+        if theta == 1:
+          si = cs[ii,0]; sr = cs[ir,0]
 
-                    e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
-                    ga = StochasticFluctuations(s,e) if f else 0
+          e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+          ga = StochasticFluctuations(s,e) if f else 0
 
-                    cs[ii,0] = si*(1-e+ga) 
-                    cs[ir,0] = sr+si*e
+          cs[ii,0] = si*(1-e+ga) 
+          cs[ir,0] = sr+si*e
 
-            # t = 1
-            p = wOdt[ii]*wI[ir] 
-            # Apparently it's more efficient to access two values from two separate vectors and to multiply them, than it is to access the same pre-computed value from a matrix; the same holds for the product «di[ir]*idi[ii]» inside «NonLinearEmigration()»
-            # However, in order for this property to be valid the matrix has to have an underlying more simple structure which in both cases is rank 1
-            # In other words this trick does not work with the adjacency matrix «Mdt[ii,ir]» which cannot be computed from simpler elements
-            theta = np.random.random() < p
+      # t = 1
+      p = wOdt[ii]*wI[ir] 
+      # Apparently it's more efficient to access two values from two separate vectors and to multiply them, than it is to access the same pre-computed value from a matrix; the same holds for the product «di[ir]*idi[ii]» inside «NonLinearEmigration()»
+      # However, in order for this property to be valid the matrix has to have an underlying more simple structure which in both cases is rank 1
+      # In other words this trick does not work with the adjacency matrix «Mdt[ii,ir]» which cannot be computed from simpler elements
+      theta = np.random.random() < p
 
-            if theta == 1:
-                si = cs[ii,1]; sr = cs[ir,1]
+      if theta == 1:
+        si = cs[ii,1]; sr = cs[ir,1]
 
-                e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
-                ga = StochasticFluctuations(s,e) if f else 0
+        e = NonLinearEmigration(si,idi[ii],sr,di[ir],il,l,a,z)
+        ga = StochasticFluctuations(s,e) if f else 0
 
-                cs[ii,1] = si*(1-e+ga) 
-                cs[ir,1] = sr+si*e
+        cs[ii,1] = si*(1-e+ga) 
+        cs[ir,1] = sr+si*e
 
-            # In the exact case it's reasonalbe to check whether p is actually positive before evaluating the Bernoulli distribution with «np.random.random()<p» since A can has zero components
-            # However its approximations Ap does not have zero components by definition (it's a complete network), hence that check becomes useless
+      # In the exact case it's reasonalbe to check whether p is actually positive before evaluating the Bernoulli distribution with «np.random.random()<p» since A can has zero components
+      # However its approximations Ap does not have zero components by definition (it's a complete network), hence that check becomes useless
 
-            # p = 1 if p>1 else (0 if p<0 else p)
-            # theta = np.random.binomial(1,p)
+      # p = 1 if p>1 else (0 if p<0 else p)
+      # theta = np.random.binomial(1,p)
 """
 #endregion
 
 #region Other plots from «SizeDistrFittingsFig»
-    # sMaxR = csRv.max();
-    # sMinR = csRv.min();
-    #
-    # # Real [distribution] plot
-    # if t:
-    #     libF.CreateHistogramPlot(
-    #         logCsRv,
-    #         nBins[2],
-    #         getattr(figData,f'fig{idx+3}'),
-    #         limits=(np.log10(sMinR),np.log10(sMaxR)),
-    #         xScale='lin',
-    #         # label=f'{lbl[2]} histogram',
-    #         label=f'Istogramma {lbl[0][2]}',
-    #         color=clr[2],
-    #         alpha=0.35,
-    #         idx=2,
-    #         ax=ax[3]
-    #     )
-    #     libF.CreateLognormalFitPlot(
-    #         logCsRv,
-    #         getattr(figData,f'fig{idx+3}'),
-    #         limits=(np.log10(sMinR),np.log10(sMaxR)),
-    #         xScale='lin',
-    #         # label=f'{lbl[2]} lognormal fit (ML)',
-    #         label=fr'Adatt. BLN {lbl[0][2]}',# ($\mathit{{ML}}$)
-    #         color=clr[2],
-    #         alpha=1,
-    #         bimodal=True,
-    #         idx=2,
-    #         ax=ax[3]
-    #     )
+  # sMaxR = csRv.max();
+  # sMinR = csRv.min();
+  #
+  # # Real [distribution] plot
+  # if t:
+  #   libF.CreateHistogramPlot(
+  #     logCsRv,
+  #     nBins[2],
+  #     getattr(figData,f'fig{idx+3}'),
+  #     limits=(np.log10(sMinR),np.log10(sMaxR)),
+  #     xScale='lin',
+  #     # label=f'{lbl[2]} histogram',
+  #     label=f'Istogramma {lbl[0][2]}',
+  #     color=clr[2],
+  #     alpha=0.35,
+  #     idx=2,
+  #     ax=ax[3]
+  #   )
+  #   libF.CreateLognormalFitPlot(
+  #     logCsRv,
+  #     getattr(figData,f'fig{idx+3}'),
+  #     limits=(np.log10(sMinR),np.log10(sMaxR)),
+  #     xScale='lin',
+  #     # label=f'{lbl[2]} lognormal fit (ML)',
+  #     label=fr'Adatt. BLN {lbl[0][2]}',# ($\mathit{{ML}}$)
+  #     color=clr[2],
+  #     alpha=1,
+  #     bimodal=True,
+  #     idx=2,
+  #     ax=ax[3]
+  #   )
 
-    #     ### Power law fit log-lin ###
+  #   ### Power law fit log-lin ###
 
-    #     # Exact-Approximated plot
-    #     libF.CreateParetoFitPlot(
-    #         csSv[:,:,t],
-    #         getattr(figData,f'fig{idx+10}'),
-    #         upperbound=sMaxEA,
-    #         yScale='lin',
-    #         Ni=Ni,
-    #         ta=ta,
-    #         # label=(
-    #         #     f'{lbl[t]} empirical CCDF',
-    #         #     fr'{lbl[t]} Pareto fit (ML)'
-    #         # ),
-    #         label=(
-    #             f'FRC empirica {lbl[1][t]}',
-    #             fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
-    #         ),
-    #         color=(clr[t],clr[t]),
-    #         alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-    #         idx=t+1,
-    #         ax=ax[10]
-    #     )
+  #   # Exact-Approximated plot
+  #   libF.CreateParetoFitPlot(
+  #     csSv[:,:,t],
+  #     getattr(figData,f'fig{idx+10}'),
+  #     upperbound=sMaxEA,
+  #     yScale='lin',
+  #     Ni=Ni,
+  #     ta=ta,
+  #     # label=(
+  #     #   f'{lbl[t]} empirical CCDF',
+  #     #   fr'{lbl[t]} Pareto fit (ML)'
+  #     # ),
+  #     label=(
+  #       f'FRC empirica {lbl[1][t]}',
+  #       fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
+  #     ),
+  #     color=(clr[t],clr[t]),
+  #     alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+  #     idx=t+1,
+  #     ax=ax[10]
+  #   )
 
-    #     # Exact-Real and Approximated-Real plots
-    #     libF.CreateParetoFitPlot(
-    #         csSv[:,:,t],
-    #         getattr(figData,f'fig{idx+10+t+1}'),
-    #         upperbound=sMaxER if t == 0 else sMaxAR,
-    #         yScale='log',
-    #         Ni=Ni,
-    #         ta=ta,
-    #         # label=(
-    #         #     f'{lbl[t]} empirical CCDF',
-    #         #     fr'{lbl[t]} Pareto fit (ML)'
-    #         # ),
-    #         label=(
-    #             f'FRC empirica {lbl[1][t]}',
-    #             fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
-    #         ),
-    #         color=(clr[t],clr[t]),
-    #         alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
-    #         idx=1,
-    #         ax=ax[10+t+1]
-    #     )
-    #     libF.CreateParetoFitPlot(
-    #         csRv,
-    #         getattr(figData,f'fig{idx+10+t+1}'),
-    #         upperbound=sMaxER if t == 0 else sMaxAR,
-    #         yScale='log',
-    #         # label=(
-    #         #     f'{lbl[2]} empirical CCDF',
-    #         #     fr'{lbl[2]} Pareto fit (ML)'
-    #         # ),
-    #         label=(
-    #             f'FRC empirica {lbl[1][2]}',
-    #             fr"Adatt. Pareto {lbl[0][2]}",# ($\mathit{{ML}}$)
-    #         ),
-    #         color=(clr[2],clr[2]),
-    #         alpha=(0.6,1),
-    #         idx=2,
-    #         ax=ax[10+t+1]
-    #     )
+  #   # Exact-Real and Approximated-Real plots
+  #   libF.CreateParetoFitPlot(
+  #     csSv[:,:,t],
+  #     getattr(figData,f'fig{idx+10+t+1}'),
+  #     upperbound=sMaxER if t == 0 else sMaxAR,
+  #     yScale='log',
+  #     Ni=Ni,
+  #     ta=ta,
+  #     # label=(
+  #     #   f'{lbl[t]} empirical CCDF',
+  #     #   fr'{lbl[t]} Pareto fit (ML)'
+  #     # ),
+  #     label=(
+  #       f'FRC empirica {lbl[1][t]}',
+  #       fr"Adatt. Pareto {lbl[0][t]}"# ($\mathit{{ML}}$)
+  #     ),
+  #     color=(clr[t],clr[t]),
+  #     alpha=((0.6,0.3),(1,0.15)) if Ni>1 else (0.6,1),
+  #     idx=1,
+  #     ax=ax[10+t+1]
+  #   )
+  #   libF.CreateParetoFitPlot(
+  #     csRv,
+  #     getattr(figData,f'fig{idx+10+t+1}'),
+  #     upperbound=sMaxER if t == 0 else sMaxAR,
+  #     yScale='log',
+  #     # label=(
+  #     #   f'{lbl[2]} empirical CCDF',
+  #     #   fr'{lbl[2]} Pareto fit (ML)'
+  #     # ),
+  #     label=(
+  #       f'FRC empirica {lbl[1][2]}',
+  #       fr"Adatt. Pareto {lbl[0][2]}",# ($\mathit{{ML}}$)
+  #     ),
+  #     color=(clr[2],clr[2]),
+  #     alpha=(0.6,1),
+  #     idx=2,
+  #     ax=ax[10+t+1]
+  #   )
 #endregion

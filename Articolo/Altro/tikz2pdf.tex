@@ -1,0 +1,25 @@
+
+% !TEX root = ../../Esperimenti/.tex/MEF.tex
+
+\documentclass[
+  class=cas-sc,
+  tikz
+  % border=1pt,
+  % crop=false,
+]{standalone}
+
+\input{../Corpo/pacchetti.tex}
+\input{../Corpo/definizioni.tex}
+
+\begin{document}
+  \def\even{even}
+  \newif\ifpageisodd
+  
+  \ifx\isodd\even
+    \pageisoddfalse
+  \else
+    \pageisoddtrue
+  \fi
+
+  \input{\sourcefilepath}
+\end{document}

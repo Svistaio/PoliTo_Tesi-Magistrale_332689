@@ -1,0 +1,196 @@
+
+% !TEX root = ../../../../Esperimenti/.tex/MEF.tex
+
+% This file was created by matlab2tikz.
+%
+% \input{../../Figure/.tex/20/NA/StrengthVSDegree.tex}
+\begin{tikzpicture}
+  %\begingroup Impostazioni
+    \definecolor{mycolor1}{rgb}{0.00000,0.44700,0.74100}%
+    %
+    \pgfmathsetlengthmacro\plotWidth{10cm}
+    \pgfmathsetlengthmacro\plotHeight{0.618*\plotWidth}
+  
+    % \renewcommand\labelSize{10}
+    % \renewcommand\tickSize{9}
+    % \renewcommand\legendSize{9}
+
+    \newcommand\commentSize9
+    \newcommand\lineshift{-.65em}
+    \tikzset{
+      comment/.style={
+        align=center,
+        anchorecenter,
+        font=\textsize{\commentSize},
+      },
+    }
+    \pgfplotsset{
+      axisKeys/.style={
+        name=SVsD,
+        width=\plotWidth,height=\plotHeight,
+        scale only axis,
+        % xmin=10,xmax=283,
+        % ymin=10,ymax=100000,
+        xlabel={$k$},ylabel={$w(k)$},
+        xlabel style={font=\textsize{\labelSize}\color{white!15!black}},
+        ylabel style={font=\textsize{\labelSize}\color{white!15!black}},
+        xticklabel style={font=\textsize{\tickSize}},
+        yticklabel style={font=\textsize{\tickSize}},
+        xmajorgrids,ymajorgrids,
+        xminorticks=true,yminorticks=true,
+        % axis x line*=bottom,axis y line*=left,
+        axis lines=left,
+        enlarge x limits=0.1,enlarge y limits=0.1,
+        axis background/.style={fill=white},
+        grid style={dashed},
+        legend pos=north west,
+        legend style={
+          font=\textsize{\legendSize},
+          legend cell align=left,
+          align=left,
+          draw=white!15!black
+        }
+      },
+    }
+  %\endgroup
+
+  \begin{axis}[
+    axisKeys,
+    xmode=log,
+    ymode=log,
+  ]
+    % \input{../../Figure/.tex/20/NA/StrengthVSDegree.tex}
+
+    %\begingroup Dispersione
+      \addplot[only marks, mark=*, mark size=1.2748pt, color=black, fill=black, draw=none, mark options={draw=none,line width=0pt}] table[row sep=crcr]{%
+      x	y\\
+      10	47\\
+      11	32\\
+      12	50\\
+      13	46.333\\
+      14	88.8\\
+      15	94\\
+      16	119\\
+      17	89\\
+      18	109.33\\
+      19	110.4\\
+      20	166\\
+      21	136.5\\
+      22	165.6\\
+      23	214.5\\
+      24	182.6\\
+      25	186.11\\
+      26	268.5\\
+      27	269.69\\
+      28	216.1\\
+      29	233.83\\
+      30	322\\
+      31	356.43\\
+      32	383.14\\
+      33	234.2\\
+      34	325\\
+      35	362\\
+      36	230\\
+      37	458.73\\
+      38	362\\
+      39	428.29\\
+      40	342\\
+      41	509.3\\
+      42	413.2\\
+      43	461\\
+      44	566.8\\
+      45	636.67\\
+      46	437.4\\
+      47	553\\
+      48	403.6\\
+      49	1015\\
+      50	553.33\\
+      51	667.25\\
+      52	1010.7\\
+      53	639.5\\
+      54	1472.5\\
+      55	748.33\\
+      56	1182.7\\
+      57	899\\
+      58	1134\\
+      59	625\\
+      61	1202\\
+      62	413\\
+      63	817\\
+      64	504.25\\
+      65	1067.5\\
+      67	771.5\\
+      68	1450\\
+      69	591\\
+      70	972.33\\
+      71	5581\\
+      72	1116\\
+      73	1178.7\\
+      76	2791\\
+      77	518\\
+      80	657.5\\
+      82	801\\
+      83	2359.3\\
+      84	742\\
+      85	1791\\
+      86	2413\\
+      87	1331\\
+      88	1722.5\\
+      89	2739\\
+      90	1082\\
+      91	2204\\
+      93	1801\\
+      94	2971\\
+      95	917\\
+      96	2992.7\\
+      97	7198\\
+      98	2261.5\\
+      99	5111\\
+      101	3714\\
+      103	6930\\
+      108	4078\\
+      109	1466\\
+      111	4378\\
+      112	6849\\
+      117	2595\\
+      120	3658\\
+      127	1893\\
+      129	6455\\
+      132	3472\\
+      135	5541\\
+      140	8233\\
+      149	19490\\
+      154	22926\\
+      182	3547\\
+      200	12665\\
+      206	7422\\
+      283	69293\\
+      };
+      \ifcasscclass\addlegendentry{Scatter}%
+      \else\addlegendentry{Dispersione}\fi%
+    %\endgroup
+
+    %\begingroup Regressione
+      \addplot [color=blue]
+      table[row sep=crcr]{%
+      10	31.996\\
+      283	19730\\
+      };
+      \ifcasscclass\addlegendentry{Regression}%
+      \else\addlegendentry{Regressione}\fi%
+    %\endgroup
+
+    %\begingroup Commenti
+      \node[comment] at (rel axis cs:.25,.5) {
+        \(\begin{aligned}
+          w_{\min}&=\num{32}\\[\lineshift]
+          w_{\max}&=\num{69293}\\[\lineshift]
+          \langle w\rangle&=\num{1074.373}
+        \end{aligned}\)
+      };
+      \node[comment] at (rel axis cs:.7,.3) {\(\beta=\num{1.922}\)};
+    %\endgroup
+  \end{axis}
+
+  \redefineTikZbounds{SVsD}{SVsD}
+\end{tikzpicture}%

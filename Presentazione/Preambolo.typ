@@ -2,14 +2,14 @@
 // https://typst.app/docs/guides/for-latex-users/
 
 //#region Pacchetti
-    #import "@preview/lovelace:0.3.0":*
-    #import "@preview/cetz:0.4.2":*
-    // #import "@preview/fletcher:0.5.8":* // https://typst.app/universe/package/fletcher/
-    // Il pacchetto «fletcher» non ha ancora la semplice chiave dell'ancora per i suoi nodi, cosa che rende il posizionamento relativo alquanto noioso da gestire
+  #import "@preview/lovelace:0.3.0":*
+  #import "@preview/cetz:0.4.2":*
+  // #import "@preview/fletcher:0.5.8":* // https://typst.app/universe/package/fletcher/
+  // Il pacchetto «fletcher» non ha ancora la semplice chiave dell'ancora per i suoi nodi, cosa che rende il posizionamento relativo alquanto noioso da gestire
 
-    // Mi sono reso conto che Typst è sufficientemente flessibile da non necessitare di particolari pacchetti per creare una presentazione
-    // #import "@preview/polylux:0.4.0":*// https://typst.app/universe/package/polylux
-    // #import "@preview/touying:0.6.1":*
+  // Mi sono reso conto che Typst è sufficientemente flessibile da non necessitare di particolari pacchetti per creare una presentazione
+  // #import "@preview/polylux:0.4.0":*// https://typst.app/universe/package/polylux
+  // #import "@preview/touying:0.6.1":*
 //#endregion
 
 //#region Bozza
