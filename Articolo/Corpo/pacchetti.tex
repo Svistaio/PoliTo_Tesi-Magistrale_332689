@@ -1,5 +1,28 @@
 
-%\begingroup For image generation 
+% Questa installazione di TeX Live non contiene il pacchetto «cm»: la mappa
+% pdftex.map non associa i font CM a versioni scalabili e pdfTeX genererebbe
+% bitmap (Type3), che microtype (espansione) rifiuta; lo stesso vale per i
+% simboli AMS (msam/msbm, es. «\R» = \mathbb{R}). Le copie di «amsfonts» sono
+% comunque presenti, quindi qui se ne integrano le mappe a livello locale
+% (soluzione al problema d'installazione: «tlmgr install cm symbols» + «updmap-user»).
+\ifdefined\pdfmapfile\pdfmapfile{+cm.map}\fi
+\ifdefined\pdfmapfile\pdfmapfile{+symbols.map}\fi
+
+% =====================================================================
+% Elenco attivo — due destinazioni:
+%   • «main article»  → Articolo/Testa/main.tex      (classe «article»)
+%   • «figures»       → Articolo/Altro/tikz2pdf.tex  (classe «standalone»
+%                       con sotto-classe «cas-sc») e i master in Supplemento.
+% Entrambe le destinazioni caricano l'intero elenco qui sotto: la scelta,
+% già adottata in precedenza, è di NON introdurre condizionali (nessun
+% «\ifcasscclass»), così da servire articolo e figure con una sola lista.
+% Suddivisione in due gruppi qui sotto è quindi documentale («figure» vs
+% «articolo»), non operativa; alcuni pacchetti di ciascun gruppo sono in
+% realtà condivisi perché «definizioni.tex» (caricato da entrambe le
+% destinazioni) ne usa alcuni attivamente.
+% =====================================================================
+
+%\begingroup Figure (generazione delle immagini: TikZ/PGFPlots + dipendenze)
   \usepackage[strict]{changepage}
 
   \usepackage{shellesc}
@@ -19,7 +42,7 @@
     patterns.meta,
     fpu, % «floating point unit»
     % external,
-  } 
+  }
 
   \usepackage{pgfplots}
   \pgfplotsset{compat=newest}
@@ -33,11 +56,20 @@
   \pgfsetlayers{background,main,foreground}
 %\endgroup
 
-%\begingroup For the paper
+%\begingroup Main article (articolo principale + dipendenze condivise da definizioni.tex)
   \usepackage{microtype}
+
+  \makeatletter
+  \@ifclassloaded{standalone}{}{%
+    \usepackage{a4wide}%
+  }
+  \makeatother
+  \usepackage[UKenglish]{babel}
+  \usepackage{authblk}
 
   \usepackage{amsmath}
   \usepackage{amsthm}
+  \usepackage{amssymb}
   \usepackage{accents}
 
   \usepackage{zref-savepos}
@@ -58,6 +90,8 @@
     float
   }
 
+  \usepackage{booktabs}
+
   \usepackage[%
     ruled,%
     vlined,%
@@ -66,28 +100,36 @@
 
   \usepackage{ragged2e}
 
-  \usepackage{enumitem}
-  \setlist[enumerate]{%
-    label=\arabic*.,
-    topsep=0.5em,%
-    parsep=0em,%
-    itemsep=0.2em,%
-    % leftmargin=2em,%
-    rightmargin=1.5em,%
-  }
-  \setlist[itemize]{%
-    label=\(\diamond\),
-    topsep=0.5em,%
-    parsep=0em,%
-    itemsep=0.2em,%
-    % leftmargin=2em,%
-    rightmargin=1.5em,%
-  }
+  \usepackage[inline]{enumitem}
+  % Le impostazioni di elenco restano disattivate: servono solo al vecchio «cas-sc», che è ritirato
+  % \setlist[enumerate]{%
+  %   label=\arabic*.,
+  %   topsep=0.5em,%
+  %   parsep=0em,%
+  %   itemsep=0.2em,%
+  %   % leftmargin=2em,%
+  %   rightmargin=1.5em,%
+  % }
+  % \setlist[itemize]{%
+  %   label=\(\diamond\),
+  %   topsep=0.5em,%
+  %   parsep=0em,%
+  %   itemsep=0.2em,%
+  %   % leftmargin=2em,%
+  %   rightmargin=1.5em,%
+  % }
 
   \usepackage{hyperref}
+  % Opzioni via «\hypersetup» (non via opzioni di «\usepackage»): la classe
+  % cas-sc carica già hyperref nelle compilazioni delle figure e si avrebbe
+  % un «option clash»
+  \hypersetup{colorlinks=true,linkcolor=blue,citecolor=red}
   \usepackage{xurl}
 
   \usepackage[english]{cleveref}
+
+  \usepackage{xspace}
+  \usepackage{pgffor}
 
   \usepackage{siunitx}
   \sisetup{%
@@ -100,4 +142,110 @@
     print-unity-mantissa=false,%
     tight-spacing=true,%
   }
+%\endgroup
+
+%\begingroup Versione per la classe «cas-sc»
+  % 
+  % %\begingroup For image generation 
+  %   \usepackage[strict]{changepage}
+  % 
+  %   \usepackage{shellesc}
+  % 
+  %   \usepackage{etoolbox}
+  %   \newbool{forcetikzrecompile}
+  % 
+  %   \usepackage{tikz}
+  %   \usetikzlibrary{
+  %     positioning,
+  %     shapes.geometric,
+  %     plotmarks,
+  %     arrows.meta,
+  %     calc,
+  %     decorations.pathreplacing,
+  %     backgrounds,
+  %     patterns.meta,
+  %     fpu, % «floating point unit»
+  %     % external,
+  %   } 
+  % 
+  %   \usepackage{pgfplots}
+  %   \pgfplotsset{compat=newest}
+  %   \usepgfplotslibrary{
+  %     patchplots,
+  %     groupplots,
+  %     colorbrewer
+  %   }
+  %   \pgfdeclarelayer{background}
+  %   \pgfdeclarelayer{foreground}
+  %   \pgfsetlayers{background,main,foreground}
+  % %\endgroup
+  % 
+  % %\begingroup For the paper
+  %   \usepackage{microtype}
+  % 
+  %   \usepackage{amsmath}
+  %   \usepackage{amsthm}
+  %   \usepackage{accents}
+  % 
+  %   \usepackage{zref-savepos}
+  %   \newcounter{figposcount}
+  % 
+  %   \usepackage{xstring}
+  % 
+  %   %\usepackage[numbers]{natbib}
+  %   %\usepackage[authoryear]{natbib}
+  %   % \usepackage[authoryear,longnamesfirst]{natbib}
+  %   \usepackage[numbers,square]{natbib}
+  % 
+  %   \usepackage{
+  %     graphicx,
+  %     caption,
+  %     subcaption,
+  %     stfloats,
+  %     float
+  %   }
+  % 
+  %   \usepackage[%
+  %     ruled,%
+  %     vlined,%
+  %     linesnumbered%
+  %   ]{algorithm2e}
+  % 
+  %   \usepackage{ragged2e}
+  % 
+  %   \usepackage{enumitem}
+  %   \setlist[enumerate]{%
+  %     label=\arabic*.,
+  %     topsep=0.5em,%
+  %     parsep=0em,%
+  %     itemsep=0.2em,%
+  %     % leftmargin=2em,%
+  %     rightmargin=1.5em,%
+  %   }
+  %   \setlist[itemize]{%
+  %     label=\(\diamond\),
+  %     topsep=0.5em,%
+  %     parsep=0em,%
+  %     itemsep=0.2em,%
+  %     % leftmargin=2em,%
+  %     rightmargin=1.5em,%
+  %   }
+  % 
+  %   \usepackage{hyperref}
+  %   \usepackage{xurl}
+  % 
+  %   \usepackage[english]{cleveref}
+  % 
+  %   \usepackage{siunitx}
+  %   \sisetup{%
+  %     exponent-mode=threshold,%
+  %     exponent-thresholds=-3:3,%
+  %     round-mode=places,% figures
+  %     round-precision=3,%
+  %     round-pad=false,%
+  %     separate-uncertainty=true,%
+  %     print-unity-mantissa=false,%
+  %     tight-spacing=true,%
+  %   }
+  % %\endgroup
 %\endgroup

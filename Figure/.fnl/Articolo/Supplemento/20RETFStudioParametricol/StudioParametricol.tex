@@ -1,0 +1,122 @@
+% Studio parametrico sul parametro \lambda: le cinque sotto-figure della tesi
+% (SDF1, SDF2, SDF3, SVsD, SE) composte in un unico PDF di cinque pagine
+% (tesi pp. 63-67). Le legende «Class k=...» sono riscritte in «Class =...»:
+% la legenda si compone fuori dalla moda matematica, dove un \xi darebbe
+% «Missing $ inserted».
+%
+% Compilare con LuaLaTeX da questa cartella (la CWD deve essere la cartella di
+% questo file):
+%   lualatex -shell-escape -interaction=nonstopmode -output-directory=..\..\TikZpdf -jobname=figSSERParametricStudyLambda StudioParametricol.tex
+% Così il PDF finisce in Figure/.fnl/Articolo/TikZpdf/ come tutti gli altri.
+%
+% Perché LuaLaTeX e non pdfLaTeX: ogni pagina è una sola tikzpicture con cinque
+% groupplot (quindici grafici) e il soft path di TikZ sopravvive fino a
+% \end{tikzpicture}; standalone, a sua volta, trattiene tutte le pagine fino
+% alla fine del documento. La sola pagina SDF2 contiene cinquanta layer
+% «only marks, mark=*» (circa 23000 cerchi, quattro curve di Bézier ciascuno) e
+% da sé supera le 5000000 parole di main_memory, che in pdfTeX è fissata nel
+% formato e non è modificabile da riga di comando. LuaTeX alloca invece la
+% memoria dinamicamente.
+%
+% Non è una deroga alla pipeline dell'articolo: main.tex compila già con
+% \tikzexternalizedfigure[lualatex] le quattro Infopagina di configurazione di
+% riferimento, che hanno la stessa struttura a cinque groupplot di SDF2. Questo
+% master resta comunque un documento supplementare isolato, non entra in
+% main.tex, e la pipeline pdfLaTeX delle altre figure resta invariata.
+
+\documentclass[
+  class=cas-sc,
+  tikz
+]{standalone}
+
+\def\isodd{even}
+
+\input{../../../../../Articolo/Corpo/pacchetti.tex}
+\input{../../../../../Articolo/Corpo/definizioni.tex}
+
+% Tutte e cinque le pagine alla stessa larghezza, con la figura centrata.
+% L'opzione «tikz» di standalone implica «multi=tikzpicture»: ogni pagina è la
+% scatola delimitante della propria tikzpicture, perciò standalone ritaglia
+% ciascuna pagina sul proprio contenuto e le larghezze naturali vanno da
+% 502pt (SE) a 569pt (SDF1); sfogliando il PDF la figura sembra spostarsi.
+% Non si può rimediare incapsulando l'\input in un \hbox, che standalone
+% scarterebbe. Si ridefinisce invece \redefineTikZbounds, la macro che
+% ciascuna Infopagina chiama per ultima, con due modifiche: una semilarghezza
+% minima, e la centratura sul centro della scatola delimitante reale anziché
+% sul punto medio della griglia dei grafici. Quest'ultima serve perché su SE
+% l'inchiostro sborda a destra della griglia: a parità di larghezza di pagina
+% la figura restava spostata (69.6bp di margine a sinistra contro 19.2bp).
+% In cambio le colonne dei grafici non cadono più esattamente alla stessa
+% ascissa in tutte le pagine. Gli argomenti #1 e #2 non servono più, ma la
+% firma resta a due argomenti per compatibilità colle chiamate esistenti.
+% La ridefinizione è locale a questo master; definizioni.tex non viene
+% toccato, così le figure dell'articolo conservano le scatole attuali.
+\def\semilarghezzaMinima{286} % pt: metà della larghezza comune di pagina (572pt)
+% «current bounding box» registra a sinistra circa 36bp che non contengono
+% inchiostro (l'etichetta della scala verticale, traslata da yScaleLabelShift:
+% cf. definizioni.tex:59). Centrando sulla scatola, la figura resterebbe
+% spostata a destra di 36bp esatti — lo scarto misurato è identico su tutte e
+% dieci le pagine dei due studi — perciò si sposta il centro di metà di esso.
+% Per riverificarlo: rendere le pagine con «pdftoppm -r 30 -gray» e
+% confrontare i margini d'inchiostro a sinistra e a destra.
+\def\correzioneCentratura{18.07pt} % = 18bp, metà dello scarto misurato
+\renewcommand\redefineTikZbounds[2]{
+  \coordinate (RealSW) at (current bounding box.south west);
+  \coordinate (RealNE) at (current bounding box.north east);
+  \coordinate (Center) at ($(RealSW)!0.5!(RealNE)+(\correzioneCentratura,0)$);
+
+  \pgfresetboundingbox
+
+  \useasboundingbox
+    let \p1=(RealSW),\p2=(RealNE),\p3=(Center),
+    % Si misura solo verso destra: \x2 è il bordo reale dell'inchiostro,
+    % mentre \x1 comprende i 36bp fantasma e, col centro corretto, gonfierebbe
+    % la semilarghezza rompendo l'uniformità delle pagine.
+    \n1={max(\x2-\x3,\semilarghezzaMinima)} in
+    (\x3-\n1,\y1) rectangle (\x3+\n1,\y2+.25em);
+}
+
+\begin{document}
+  \def\even{even}
+  \newif\ifpageisodd
+
+  \ifx\isodd\even
+    \pageisoddfalse
+  \else
+    \pageisoddtrue
+  \fi
+
+  \let\originfopageKeysI\infopageKeysI
+  \renewcommand\infopageKeysI{%
+    \originfopageKeysI
+    \renewcommand\ClasskILegend{Class =283}%
+    \renewcommand\ClasskIILegend{Class =83}%
+    \renewcommand\ClasskIIILegend{Class =43}%
+    \renewcommand\ClasskIVLegend{Class =10}%
+  }
+
+  \begingroup
+    \setcounter{subfigure}{0}
+    \input{SDF1/Infopagina.tex}
+  \endgroup
+
+  \begingroup
+    \setcounter{subfigure}{0}
+    \input{SDF2/Infopagina.tex}
+  \endgroup
+
+  \begingroup
+    \setcounter{subfigure}{0}
+    \input{SDF3/Infopagina.tex}
+  \endgroup
+
+  \begingroup
+    \setcounter{subfigure}{0}
+    \input{SVsD/Infopagina.tex}
+  \endgroup
+
+  \begingroup
+    \setcounter{subfigure}{0}
+    \input{SE/Infopagina.tex}
+  \endgroup
+\end{document}
